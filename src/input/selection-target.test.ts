@@ -23,3 +23,10 @@ it.each(['input', 'textarea', 'select', 'div[role="dialog"]', 'div[role="menu"]'
   toolbar.append(element); const event = new Event("keydown", { bubbles: true }); element.dispatchEvent(event);
   expect(selectionInputTarget(event, mounts, () => undefined)).toEqual({ excluded: true });
 });
+
+it('recognises an explicitly owned presentation toolbar without classifying its sibling editor as a toolbar',()=>{
+ const mounts=new MountRegistry(),root=document.body.appendChild(document.createElement('div')),toolbar=root.appendChild(document.createElement('nav')),text=root.appendChild(document.createElement('div'));
+ toolbar.dataset.selectionToolbar='';const release=ownSelectionToolbar(toolbar,mounts);
+ const event=new Event('pointerdown',{bubbles:true});toolbar.dispatchEvent(event);expect(selectionInputTarget(event,mounts,()=>undefined).toolbar).toBe(true);
+ const native=new Event('pointerdown',{bubbles:true});text.dispatchEvent(native);expect(selectionInputTarget(native,mounts,()=>undefined).toolbar).toBe(false);release();
+});

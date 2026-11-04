@@ -200,7 +200,7 @@ export class ReactiveEditor {
     this.rangeAnnotations = new RangeAnnotations({ ranges: this.textRanges,
       properties: key => unwrap((this.node(key)?.payload.standoffProperties ?? []) as Record<string, unknown>[]),
       write: (key, properties, origins) => this.commands.setPayloadField(key, "standoffProperties", properties, undefined, origins),
-      transaction: (label, apply) => this.commands.transaction(label, apply),
+      transaction: (label, apply) => this.commands.structuralTransaction(label, apply),
     }, result => this.showHide.annotationApplied(result));
     this.initialis = new InitialisController(this);
     this.gloss = new GlossController(this);

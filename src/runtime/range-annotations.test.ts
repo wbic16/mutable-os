@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ReactiveEditor } from "../reactive-editor/editor";
 import { RangeAnnotations } from "./range-annotations";
 import { mergeTextRanges, TextRanges, type TextRangeSnapshot } from "./text-ranges";
@@ -66,4 +66,15 @@ describe("neutral range and annotation boundary", () => {
     const ranges = new TextRanges(() => live ? { ...range, length: 3 } : undefined);
     ranges.validate([range]); live = false; expect(() => ranges.validate([range])).toThrow("stale");
   });
+});
+
+it.each([false,true])('keeps formatting batches bounded across one or several text owners (multiple=%s)',multiple=>{
+ const {editor,view,a,b}=fixture();
+ const snapshots=vi.spyOn(editor.repository,'snapshot'), rebuild=vi.spyOn(view as any,'build'),references=vi.spyOn(editor.repository as any,'rebuildReferences');
+ const ranges=[editor.textRanges.snapshot(a.key,0,2),...(multiple?[editor.textRanges.snapshot(b.key,1,3)]:[])];
+ editor.rangeAnnotations.apply(ranges,'style/bold');
+ expect(a.payload.standoffProperties).toHaveLength(1);if(multiple)expect(b.payload.standoffProperties).toHaveLength(1);
+ editor.repository.undo();expect(a.payload.standoffProperties??[]).toHaveLength(0);if(multiple)expect(b.payload.standoffProperties??[]).toHaveLength(0);
+ editor.repository.redo();expect(a.payload.standoffProperties).toHaveLength(1);
+ expect(snapshots).not.toHaveBeenCalled();expect(rebuild).not.toHaveBeenCalled();expect(references).not.toHaveBeenCalled();
 });

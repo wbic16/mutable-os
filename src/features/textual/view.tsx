@@ -69,7 +69,8 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
   return <Portal><div ref={root} class="textual-workspace" data-textual-palette={preferences().palette} data-columns={columns()} data-rows={rows()}
     role="region" aria-label="Textual Workspace" tabIndex={-1} onKeyDown={keys}
     style={{ '--tw-font-size': `${16 * preferences().zoom}px`, '--tw-line-height': `${20 * preferences().zoom}px`, '--tw-cell-width': `${grid()?.cellWidthPx ?? 0}px` }}>
-    <span ref={probe} class="tw-font-probe" aria-hidden="true">{'M'.repeat(256)}</span>
+    {/* Match the per-Cell inline fragments: Chrome rounds their advances differently from one long Text node. */}
+    <span ref={probe} class="tw-font-probe" aria-hidden="true">{Array.from({length:256},()=> <span>M</span>)}</span>
     <Show when={grid() && columns() >= 20 && rows() >= 8} fallback={<div class="tw-small"><p>{error() || 'Enlarge the window or reduce font zoom to show the grid.'}</p><button onClick={() => zoom(-.1)}>Zoom out</button><button onClick={props.returnDesktop}>Return to Desktop</button></div>}>
       <nav class="tw-cell tw-menu-bar" aria-label="Workspace menu" style={rect({col:0,row:0,widthCells:columns(),heightCells:1})}>
         <button style={{width: `${11*(grid()?.cellWidthPx??0)}px`}} aria-haspopup="true" aria-expanded={menu()} onClick={() => setMenu(!menu())}>Workspace</button>
