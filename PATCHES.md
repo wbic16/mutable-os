@@ -129,6 +129,84 @@ a flag.
   round-trip across flush/reopen including the folded deep path,
   mutation rules, .bak, and located checksum tampering).
 
+## PhextVFS Phase 2 (2026-11-04)
+
+The stage-C gates backend: the four gates consumers (history store,
+job storage, publication storage, managed assets) can run on the
+Cavern's single phext. Behind the **`phextVfs` feature flag, default
+false** — a storage switch defaults off until proven, per Will's
+specification, overriding the repo's usual flag default. Flag off is
+byte-for-byte today's behavior: the dispatch in `filesystem.mjs` is
+keyed on a registration that only happens when the flag is on.
+
+Modified upstream files:
+
+| File | Change | Reason | Rebase / re-apply note |
+| --- | --- | --- | --- |
+| `src/configuration.ts` | Added `phextVfs: boolean` to `FeatureFlags` and `phextVfs: false` to the frozen defaults, beside `phextDocuments`. | Repo convention: major features behind a flag; the specification for this storage switch is default-off. | Two added lines in the flag block beside `phextDocuments`; the only readers are `cavern-lifecycle.ts` and this note. |
+| `scripts/stage-c-gates/filesystem.mjs` | Added the backend registry (`registerPhextBackend` / `unregisterPhextBackend`), dispatch at the head of `pinDirectory` / `atDirectory` / `createDirectory` / `lockFile`, and a backend flush in `closeFilesystemWorkers`. No disk-path body changed. | Least invasive dispatch: all four consumers dynamically import this one module and call only these exports, so no consumer file changes at all. | The dispatch blocks sit above the unchanged disk bodies; if upstream rewrites the module, re-add the registry + the four dispatch heads and keep `phext-backend.mjs` beside it. |
+| `server/cavern-lifecycle.ts` | When the flag is on, `stores()` opens `<root>/cavern.phext` via `PhextVFS.openOrCreate` and starts registration; `establish()` awaits it (`phextReady`) before any consumer can pin; `close()` unregisters (flush) and closes the VFS. | Cavern selection is the one place that knows the Cavern root and the stores' lifetime. | Three small hunks: an import pair, the `stores()` setup block, one await in `establish()`, and the tail of `close()`. |
+| `src/phext/vfs.ts`, `src/phext/lattice.ts` | Import specifiers `./coordinate` → `./coordinate.js` (and `./lattice` → `./lattice.js` in vfs.ts). | Pulling vfs.ts into the server build makes Node ESM load the emitted files directly; Node requires explicit extensions (Vite/vitest tolerated the extensionless form). Without this the production server fails to boot — caught by the boot smoke. | Only the server-reachable chain changed; the rest of `src/phext/` keeps extensionless imports because only the client bundler loads it. Keep the `.js` specifiers if these files are edited. |
+
+Design (full detail in the header of `phext-backend.mjs`):
+
+- **Dispatch scope.** A registered backend owns the gates trees under
+  its Cavern root: paths whose first relative component is `.mutable`,
+  plus any path at or below a `.memory` component (history memoirs sit
+  beside documents). Document folders and documents themselves stay on
+  disk (Phase 3), as does SQLite knowledge (Phase 4). A stat/mkdir of a
+  tree-starting component (`.mutable`, `.memory`) against a disk pin is
+  answered by the backend, so component-by-component descent crosses
+  into the phext at the boundary.
+- **Identity.** `{ dev: "phext:<id>", ino: <token> }`: a random token
+  per VFS node, assigned at creation (or first observation) and
+  persisted in an in-phext registry, `/.control/gates-identities.json`.
+  Tokens survive restarts (the history store JSON-compares persisted
+  directory identities in `binding.json`), are dropped on unlink/rmdir
+  so recreated nodes fail stale pins closed, and publish inherits the
+  source's token, mirroring hard-link inode sharing.
+- **Locking stays real.** `lockFile` takes a real flock via
+  `flock.mjs` — not on the phext (every flush renames it) but on a
+  stable per-lock anchor file beside it, `cavern.phext.anchor-<hash of
+  the lock's VFS path>`, created once and never renamed or unlinked.
+  Per-lock anchors (rather than one per Cavern) preserve the disk
+  semantics exactly: locks on different files never exclude each
+  other. `close()` flushes the VFS before releasing, so the next
+  acquirer opens a phext that already holds the previous holder's
+  publications.
+- **Ops in-process, no worker fork.** Path confinement is structural
+  in the VFS, and each op is one synchronous VFS transaction; the
+  worker's serialization role is replaced by the consumers' own locks
+  plus the server-wide foreground serializer. Flush points are the
+  consumers' own commit points: publish ops, lock release, and
+  shutdown (`closeFilesystemWorkers` / unregister). Between them,
+  history's record appends are create+publish pairs and land on the
+  publish flush, as on disk.
+- **Known bounds.** One owning server process per Cavern phext: the
+  anchor flock still excludes a second process's locks, but a second
+  process sees the phext as of the last flush. Data written through
+  the gates in earlier flag-off use is not migrated (a flag-on Cavern
+  starts its gates trees empty in the phext); migration is a later
+  phase's concern, and the flag defaults off.
+
+Coverage: `server/phext-gates-backend.test.ts` (op vocabulary,
+paging, publish identity inheritance, binary round-trip, cold-reopen
+persistence with stable identities, stale-pin fail-closed, in-process
+flock semantics, cross-process anchor contention) and
+`server/phext-history.test.ts` (the real history store appending 15
+records into the phext and reading the timeline back after a cold
+reopen; no `.memory` on disk). Gates on the final tree: typecheck 0,
+build 0, boot smoke HTTP 200 with the flag off; a flag-on smoke
+(temporary flip, reverted) created two Caverns end-to-end — managed
+asset recovery ran on the backend during activation, leaving
+`/.mutable/assets` + `writer.lock` in the phext (assets stratum) and
+a real anchor file beside it, and the first Cavern's phext reopened
+with integrity verified after the switch. Flag-off regressions:
+stage-C suites 27/28 (the one failure is the known uid-0 chmod
+artifact, identical before the change), phext suites 46/46,
+publication + foundation consumer suites identical to baseline
+(31 passed / 2 pre-existing failures).
+
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,
@@ -158,6 +236,12 @@ a flag.
   shape, keyed by the lock file's verified identity (see the live-site
   fixes table above). `scripts/stage-c-gates/flock.test.mjs` is its
   contention / shared-coexistence / crash-recovery suite.
+- `scripts/stage-c-gates/phext-backend.mjs` — the PhextVFS Phase 2
+  gates backend (op vocabulary over one Cavern phext; identity tokens,
+  anchor flocks, flush policy — see the Phase 2 section above).
+- `server/phext-gates-backend.test.ts`,
+  `server/phext-history.test.ts` — the Phase 2 backend suite and the
+  history-store consumer proof; see the Phase 2 section above.
 - `server/native-vault-store-lock.test.mjs` — the native vault store
   lock's fs-ext-absent regression suite (action runs, contention
   message, cross-process crash recovery).
