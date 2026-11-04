@@ -1,4 +1,4 @@
-import { parse, parseVerbatim } from '@retorquere/bibtex-parser';
+import { parse, parseVerbatim } from '@retorquere/bibtex-parser/js';
 import { emptyCitation, type AcademicProjection, type CitationRecord } from './model';
 export function bibliography(source: string, format: 'bibtex' | 'ris'): AcademicProjection {
   if (new TextEncoder().encode(source).length > 2 * 1024 * 1024)
