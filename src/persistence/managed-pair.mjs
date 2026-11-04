@@ -1,13 +1,35 @@
 /** Managed-filesystem pair adapter, qualified in B2 and used by the native server.
  * Replacements MOVE the displaced inode aside, then publish create-only.
  * Preserved prior files are never deleted, including late writes via open handles. */
-import { promises as fs } from "node:fs";
+import { promises as fs, fstatSync } from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { promisify } from "node:util";
+import { flockDescriptor } from "../../scripts/stage-c-gates/flock.mjs";
 let nativeLock;
 try { nativeLock = promisify(createRequire(import.meta.url)("fs-ext").flock); } catch { /* optional native capability */ }
-export const nativeFlock = (...args) => nativeLock ? nativeLock(...args) : Promise.reject(Object.assign(new Error("Native pair locking is unavailable on this server"), { code: "ENOSYS" }));
+// When the fs-ext binding is absent, route through the stage-C gates
+// fallback (scripts/stage-c-gates/flock.mjs): a token lock keyed by the
+// descriptor's dev+ino identity, contention reported with code
+// EWOULDBLOCK — the same contract the call sites already handle from the
+// native path. The helper's release function replaces the native 'un'
+// call; releases are tracked per descriptor because the native-vault
+// store drops its lock by closing the handle, and its explicit unlock
+// (like ManagedPair's) lands here first.
+const fallbackReleases = new Map();
+async function fallbackFlock(fd, operation) {
+  if (operation === "un") {
+    const release = fallbackReleases.get(fd);
+    if (release) { fallbackReleases.delete(fd); await release(); }
+    return;
+  }
+  const stat = fstatSync(fd);
+  const release = await flockDescriptor(fd,
+    { dev: String(stat.dev), ino: String(stat.ino) },
+    operation === "sh" || operation === "shnb");
+  fallbackReleases.set(fd, release);
+}
+export const nativeFlock = nativeLock ? (...args) => nativeLock(...args) : fallbackFlock;
 const flock = nativeFlock;
 import { createHash, randomUUID } from "node:crypto";
 import { decodeNative } from "./native-resource";

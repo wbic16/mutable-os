@@ -99,7 +99,7 @@ export class NativeVaultStore {
  async privateHome(){const p='.mutable-relocations';await this.resolve(p,{missing:true});try{await fs.mkdir(path.join(this.root,p),{mode:0o700});await this.sync('.');}catch(e){if(e.code!=='EEXIST')throw e;}await this.resolve(p);return p;}
  async lock(action) {
   await this.resolve('.mutable-store.lock',{missing:true});const h=await fs.open(path.join(this.root,'.mutable-store.lock'),C.O_RDWR|C.O_CREAT|C.O_NOFOLLOW,0o600);
-  try{try{await nativeFlock(h.fd,'exnb');}catch(e){if(['EAGAIN','EWOULDBLOCK'].includes(e.code))fail('Another managed operation is active; retry');fail('Native store locking is unavailable',503);}return await action();}finally{await h.close();}
+  try{try{await nativeFlock(h.fd,'exnb');}catch(e){if(['EAGAIN','EWOULDBLOCK'].includes(e.code))fail('Another managed operation is active; retry');fail('Native store locking is unavailable',503);}return await action();}finally{try{await nativeFlock(h.fd,'un');}catch{}await h.close();}
  }
  async records(){
   const base='.mutable-relocations';if(await absent(path.join(this.root,base)))return [];
