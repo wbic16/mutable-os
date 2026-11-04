@@ -1,0 +1,22 @@
+/* Illustrative CSS only. Runtime must measure actual font cell advance. */
+.textual {
+ --cell-w:10px;--cell-h:20px;
+ font-family:ui-monospace,'Cascadia Mono',Consolas,monospace;
+ font-variant-ligatures:none;font-feature-settings:'liga' 0,'calt' 0;
+ font-size:calc(var(--cell-h)*.75);line-height:var(--cell-h);
+ background:var(--t-bg);color:var(--t-ink);position:relative;overflow:hidden;
+}
+.cell-rect {
+ position:absolute;box-sizing:border-box;overflow:hidden;
+ left:calc(var(--col)*var(--cell-w));top:calc(var(--row)*var(--cell-h));
+ width:calc(var(--cols)*var(--cell-w));height:calc(var(--rows)*var(--cell-h));
+}
+.tui-menu {background:var(--t-menu-bg);color:var(--t-menu-ink)}
+.tui-window {background:var(--t-surface);border:1px solid var(--t-border)}
+.tui-shadow {box-shadow:var(--cell-w) var(--cell-h) 0 var(--t-shadow)}
+.tui-selected {background:var(--t-selected);color:var(--t-selected-ink)}
+.tui-focus:focus-visible {outline:2px solid var(--t-focus);outline-offset:-2px}
+.tui-margin {--sub-w:calc(var(--cell-w)/2);--sub-h:calc(var(--cell-h)/2);
+ font-size:calc(var(--cell-h)*.375);line-height:var(--sub-h)}
+.tui-media {display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tui-media>img,.tui-media>video {max-width:100%;max-height:100%;object-fit:contain}

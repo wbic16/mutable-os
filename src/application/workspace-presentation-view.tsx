@@ -1,3 +1,4 @@
+import { TextualWorkspace } from "../features/textual/view";
 import { ErrorBoundary, Suspense, lazy, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { ReactiveViewProvider } from "../reactive-editor/context";
 import { BlockOutlet } from "../rendering/block-outlet";
@@ -41,6 +42,7 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
     onMount(() => onCleanup(props.session.ownPresentationInteraction(input)));
     return null;
   };
+  const DesktopHost = () => <div style={{display: presentation.active() === "textual" ? "none" : "contents"}} inert={presentation.active() === "textual"}><BlockOutlet nodeKey={projection.state.rootKey} /></div>;
   const [spatialResize, setSpatialResize] = createSignal<WindowResizePort>();
   const spatialGeometry = (key: string): WindowGeometryHost | undefined => {
     const actions = props.session.spatial;
@@ -58,13 +60,13 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
       camera: actions.camera, arrange: actions.arrange, available: actions.available, ownInteraction: actions.ownInteraction, returnDesktop: actions.returnDesktop,
       document: actions.document, renderDocument: () => <DocumentSlot />, displayedSize: () => spatialResize()?.presentedSize() }} />;
   };
-  return <WindowManagerPlane manager={props.session.windowManager}><ReactiveViewProvider editor={editor} projection={projection}
+  return <WindowManagerPlane manager={props.session.windowManager} suspended={presentation.active() === "textual"}><ReactiveViewProvider editor={editor} projection={projection}
     coordinates={{ scale: () => presentation.active() === "canvas" ? input.camera().zoom : 1 }}
     windowGeometry={key => presentation.active() === "canvas" ? geometry(key) : presentation.active() === "spatial" ? spatialGeometry(key) : undefined}>
     <Show when={editor.features.desktopApplicationIcons && presentation.active() === "desktop"}>
       <DesktopApplicationIcons session={props.session} actions={props.desktopActions} available={props.desktopAvailable} />
     </Show>
-    <Show when={presentation.active() === "canvas"} fallback={<Show when={presentation.active() === "spatial" && props.session.spatial} fallback={<BlockOutlet nodeKey={projection.state.rootKey} />}>
+    <Show when={presentation.active() === "canvas"} fallback={<Show when={presentation.active() === "spatial" && props.session.spatial} fallback={<DesktopHost />}>
       <ErrorBoundary fallback={(error, reset) => <div role="alert">Spatial could not load: {String(error)} <button onClick={reset}>Retry</button><button onClick={() => props.session.selectPresentation("desktop")}>Return to Desktop</button></div>}>
         <Suspense fallback={<p role="status">Opening the study…</p>}><SpatialHost /></Suspense>
       </ErrorBoundary>
@@ -80,5 +82,6 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
     </Show>
     <Show when={props.session.documentSessions?.detachment}>{controller=><DetachedDocumentWindows controller={controller()}/>}</Show>
     <ReactiveViewLayers editor={editor} projection={projection} />
+    <Show when={presentation.active() === "textual"}><TextualWorkspace returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
   </ReactiveViewProvider></WindowManagerPlane>;
 }

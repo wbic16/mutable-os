@@ -1,0 +1,52 @@
+{
+  "archive": "/Users/iianneill/Downloads/Textual_Astra_Brief.zip",
+  "sha256": "50dbcb2cce98cf50413776ddf6bdda4b629708014338bd335a1dd0b4077da599",
+  "usage": "Unmodified user-supplied reference package; documentation only, not production code",
+  "files": [
+    {
+      "path": "textual-grid.css",
+      "bytes": 1283,
+      "sha256": "6faac6e7637197792cf9014a11dea3652159f00b7f1952589ff024a3179105fa"
+    },
+    {
+      "path": "textual-palette.css",
+      "bytes": 754,
+      "sha256": "95fd18d6b51926cf21a4b1f304612fce87380ffecb62b7cd0bb95e505fe6ca19"
+    },
+    {
+      "path": "README.md",
+      "bytes": 867,
+      "sha256": "f07feab9dc09ef0a41f2c39d5fd08bc678d2bee56661657d4cbe668940bf76fa"
+    },
+    {
+      "path": "TEXTUAL_WORKSPACE_FEATURE_BRIEF.md",
+      "bytes": 11754,
+      "sha256": "53f8f06437ef33dcd36e4a87cedf057dbeda4b7e2c4f9df52d89c3eb30adb5ef"
+    },
+    {
+      "path": "layouts/WIREFRAMES.md",
+      "bytes": 3805,
+      "sha256": "69ac62883094a58330affdd09b94a83caea7c9b7eeba8d2d0edea7d67a0e3de6"
+    },
+    {
+      "path": "layouts/textual-layouts.ts",
+      "bytes": 1596,
+      "sha256": "f3d6475b9f20c9d48403fe81851ccff0230c20019c73096116ab872f24893906"
+    },
+    {
+      "path": "reference/Flint_Gloss_Existing.png",
+      "bytes": 852240,
+      "sha256": "e0808f7c28e79d658692abfe9cf3a0c9935e4f775c1ed906b8460aa2271c68ee"
+    },
+    {
+      "path": "reference/Textual_Flint_Scry_Concept.png",
+      "bytes": 1993718,
+      "sha256": "a62d7ddfe2a9fcee85821a560ea6e7c2a1af40947422982e130d012abbc33ab8"
+    },
+    {
+      "path": "reference/Flint_Gloss_Graph_Existing.png",
+      "bytes": 2699490,
+      "sha256": "72b91a590e6de0fe70ea4d85763f3537449363ac4be7969143d49afdfb4da8f0"
+    }
+  ]
+}

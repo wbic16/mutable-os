@@ -121,6 +121,8 @@ export type FeatureFlags = Readonly<{
   /** Canonical Desktop/Canvas presentation. The main application enables it;
    * other editor hosts opt in explicitly. */
   canvasWorkspace: boolean;
+  /** Dedicated measured character-cell Workspace presentation. */
+  textualWorkspace: boolean;
   /** Experimental study presentation; explicitly opt in at application assembly. */
   spatialWorkspace: boolean;
   /** Lift and arrange all desk objects, including the study props. */
@@ -219,6 +221,7 @@ export const featureFlags: FeatureFlags = Object.freeze({
   threeDObjects: true,
   anchorRelationships: true,
   canvasWorkspace: false,
+  textualWorkspace: true,
   spatialWorkspace: false,
   spatialDeskObjects: true,
   timer: true,

@@ -149,3 +149,21 @@ describe("canonical presentation switching", () => {
     expect(second.session.presentation.read()!.presentations.canvas!.placements).toHaveLength(3);
   });
 });
+
+describe('Textual shell isolation', () => {
+  it('retains graphical DOM and canonical state across shell switches without snapshots', async () => {
+    const {session,editor,host}=mount();await tick();
+    const original=[...host.querySelectorAll('textarea')];expect(original.length).toBe(2);
+    const revision=editor.repository.state.revision;
+    const snapshot=vi.spyOn(editor.repository,'snapshot');
+    expect(session.selectPresentation('textual')).toBe(true);await tick();
+    expect(document.querySelector('.textual-workspace')).not.toBeNull();
+    expect(host.querySelector<HTMLElement>('.mwm-window-plane')?.hidden).toBe(true);
+    expect([...host.querySelectorAll('textarea')]).toEqual(original);
+    expect(session.selectPresentation('desktop')).toBe(true);await tick();
+    expect(document.querySelector('.textual-workspace')).toBeNull();
+    expect(host.querySelector<HTMLElement>('.mwm-window-plane')?.hidden).toBe(false);
+    expect([...host.querySelectorAll('textarea')]).toEqual(original);
+    expect(editor.repository.state.revision).toBe(revision);expect(snapshot).not.toHaveBeenCalled();
+  });
+});

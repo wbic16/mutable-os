@@ -1,0 +1,19 @@
+{
+  "initial": {
+    "columns": 199,
+    "rows": 54,
+    "hidden": true,
+    "connected": true,
+    "revision": 0,
+    "snapshots": 0
+  },
+  "zoomed": {
+    "columns": 181,
+    "rows": 49
+  },
+  "retainedEditor": true,
+  "restoredGraphicalFont": true,
+  "narrowMenuReturn": true,
+  "trustedTypingAfterReturn": true,
+  "snapshots": 0
+}

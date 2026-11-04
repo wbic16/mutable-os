@@ -81,3 +81,20 @@ describe("workspace presentation envelope", () => {
     expect(() => state.setCamera({ x: 0, y: 0, zoom: 1 })).toThrow("disposed");
   });
 });
+
+describe('Textual presentation envelope', () => {
+  it('initialises only on request and preserves layout when unavailable or newer', () => {
+    const state = new WorkspacePresentationState({type:'workspace-block'}, {canvas:false,textual:true});
+    expect(state.capture().present).toBe(false);
+    state.initializeTextual(); state.select('textual');
+    expect(state.active()).toBe('textual');
+    const root=withWorkspacePresentation({type:'workspace-block'},state.capture());
+    const disabled=new WorkspacePresentationState(root,{canvas:false,textual:false});
+    expect(disabled.active()).toBe('desktop'); expect(disabled.issue()).toContain('preserved');
+    expect(withWorkspacePresentation(root,disabled.capture())).toEqual(root);
+    const future=structuredClone(root);(future.metadata as any).workspacePresentation.presentations.textual.version=2;
+    const unsupported=new WorkspacePresentationState(future,{canvas:false,textual:true});
+    expect(unsupported.active()).toBe('desktop');expect(()=>unsupported.select('textual')).toThrow('unsupported');
+    expect(withWorkspacePresentation(future,unsupported.capture())).toEqual(future);
+  });
+});

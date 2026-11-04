@@ -39,10 +39,11 @@ export function ApplicationSurfaceBoundary(props: { children: JSX.Element }) {
   return <WindowOwner.Provider value={{ ...owner, surfaceId:id, modal: true }}><div ref={root} style={{display:"contents"}}>{props.children}</div></WindowOwner.Provider>;
 }
 
-export function WindowManagerPlane(props: { manager?: WorkspaceWindowManager; children: JSX.Element }) {
+export function WindowManagerPlane(props: { manager?: WorkspaceWindowManager; suspended?: boolean; children: JSX.Element }) {
   if (!props.manager) return props.children;
   const plane = document.createElement("div");
   plane.className = "mwm-window-plane";
+  createEffect(() => { plane.hidden = !!props.suspended; plane.inert = !!props.suspended; });
   props.manager.plane = plane;
   props.manager.lifecycle.install(document);
   onMount(()=>{props.manager!.geometry.install(plane);props.manager!.named.finishRestoration();});

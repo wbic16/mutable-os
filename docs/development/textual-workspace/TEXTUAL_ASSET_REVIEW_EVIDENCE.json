@@ -1,0 +1,577 @@
+{
+  "scope": "Bounded evaluation of supplied pure layout functions and palette values; no browser rendering or application qualification",
+  "source": "Textual_Astra_Brief.zip",
+  "layoutSha256": "f3d6475b9f20c9d48403fe81851ccff0230c20019c73096116ab872f24893906",
+  "samples": [
+    {
+      "grid": {
+        "cols": 192,
+        "rows": 54
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 192,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 192,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 53,
+          "cols": 192,
+          "rows": 1
+        },
+        "editor": {
+          "col": 24,
+          "row": 2,
+          "cols": 124,
+          "rows": 51
+        },
+        "margin": {
+          "col": 0,
+          "row": 2,
+          "cols": 24,
+          "rows": 51
+        },
+        "references": {
+          "col": 148,
+          "row": 2,
+          "cols": 44,
+          "rows": 51
+        },
+        "overlay": {
+          "col": 56,
+          "row": 8,
+          "cols": 80,
+          "rows": 27
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 256,
+        "rows": 72
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 256,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 256,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 71,
+          "cols": 256,
+          "rows": 1
+        },
+        "editor": {
+          "col": 24,
+          "row": 2,
+          "cols": 188,
+          "rows": 69
+        },
+        "margin": {
+          "col": 0,
+          "row": 2,
+          "cols": 24,
+          "rows": 69
+        },
+        "references": {
+          "col": 212,
+          "row": 2,
+          "cols": 44,
+          "rows": 69
+        },
+        "overlay": {
+          "col": 88,
+          "row": 11,
+          "cols": 80,
+          "rows": 27
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 384,
+        "rows": 108
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 384,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 384,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 107,
+          "cols": 384,
+          "rows": 1
+        },
+        "editor": {
+          "col": 24,
+          "row": 2,
+          "cols": 316,
+          "rows": 105
+        },
+        "margin": {
+          "col": 0,
+          "row": 2,
+          "cols": 24,
+          "rows": 105
+        },
+        "references": {
+          "col": 340,
+          "row": 2,
+          "cols": 44,
+          "rows": 105
+        },
+        "overlay": {
+          "col": 152,
+          "row": 17,
+          "cols": 80,
+          "rows": 27
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 109,
+        "rows": 40
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 109,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 109,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 39,
+          "cols": 109,
+          "rows": 1
+        },
+        "editor": {
+          "col": 0,
+          "row": 2,
+          "cols": 109,
+          "rows": 37
+        },
+        "overlay": {
+          "col": 14,
+          "row": 6,
+          "cols": 80,
+          "rows": 27
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 110,
+        "rows": 40
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 110,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 110,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 39,
+          "cols": 110,
+          "rows": 1
+        },
+        "editor": {
+          "col": 14,
+          "row": 2,
+          "cols": 96,
+          "rows": 37
+        },
+        "margin": {
+          "col": 0,
+          "row": 2,
+          "cols": 14,
+          "rows": 37
+        },
+        "overlay": {
+          "col": 15,
+          "row": 6,
+          "cols": 80,
+          "rows": 27
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 154,
+        "rows": 40
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 154,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 154,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 39,
+          "cols": 154,
+          "rows": 1
+        },
+        "editor": {
+          "col": 20,
+          "row": 2,
+          "cols": 134,
+          "rows": 37
+        },
+        "margin": {
+          "col": 0,
+          "row": 2,
+          "cols": 20,
+          "rows": 37
+        },
+        "overlay": {
+          "col": 37,
+          "row": 6,
+          "cols": 80,
+          "rows": 27
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 155,
+        "rows": 40
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 155,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 155,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 39,
+          "cols": 155,
+          "rows": 1
+        },
+        "editor": {
+          "col": 20,
+          "row": 2,
+          "cols": 100,
+          "rows": 37
+        },
+        "margin": {
+          "col": 0,
+          "row": 2,
+          "cols": 20,
+          "rows": 37
+        },
+        "references": {
+          "col": 120,
+          "row": 2,
+          "cols": 35,
+          "rows": 37
+        },
+        "overlay": {
+          "col": 37,
+          "row": 6,
+          "cols": 80,
+          "rows": 27
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 80,
+        "rows": 24
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 80,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 80,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 23,
+          "cols": 80,
+          "rows": 1
+        },
+        "editor": {
+          "col": 0,
+          "row": 2,
+          "cols": 80,
+          "rows": 21
+        },
+        "overlay": {
+          "col": 2,
+          "row": 3,
+          "cols": 76,
+          "rows": 18
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 40,
+        "rows": 16
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 40,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 40,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 15,
+          "cols": 40,
+          "rows": 1
+        },
+        "editor": {
+          "col": 0,
+          "row": 2,
+          "cols": 40,
+          "rows": 13
+        },
+        "overlay": {
+          "col": 2,
+          "row": 2,
+          "cols": 36,
+          "rows": 10
+        }
+      },
+      "issues": []
+    },
+    {
+      "grid": {
+        "cols": 10,
+        "rows": 3
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 10,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 10,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 2,
+          "cols": 10,
+          "rows": 1
+        },
+        "editor": {
+          "col": 0,
+          "row": 2,
+          "cols": 10,
+          "rows": 0
+        },
+        "overlay": {
+          "col": 2,
+          "row": 2,
+          "cols": 6,
+          "rows": -3
+        }
+      },
+      "issues": [
+        "overlay: negative size"
+      ]
+    },
+    {
+      "grid": {
+        "cols": 3,
+        "rows": 5
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 3,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 3,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 4,
+          "cols": 3,
+          "rows": 1
+        },
+        "editor": {
+          "col": 0,
+          "row": 2,
+          "cols": 3,
+          "rows": 2
+        },
+        "overlay": {
+          "col": 2,
+          "row": 2,
+          "cols": -1,
+          "rows": -1
+        }
+      },
+      "issues": [
+        "overlay: negative size"
+      ]
+    },
+    {
+      "grid": {
+        "cols": 80,
+        "rows": 1
+      },
+      "layout": {
+        "menu": {
+          "col": 0,
+          "row": 0,
+          "cols": 80,
+          "rows": 1
+        },
+        "tabs": {
+          "col": 0,
+          "row": 1,
+          "cols": 80,
+          "rows": 1
+        },
+        "status": {
+          "col": 0,
+          "row": 0,
+          "cols": 80,
+          "rows": 1
+        },
+        "editor": {
+          "col": 0,
+          "row": 2,
+          "cols": 80,
+          "rows": 0
+        },
+        "overlay": {
+          "col": 2,
+          "row": 2,
+          "cols": 76,
+          "rows": -5
+        }
+      },
+      "issues": [
+        "tabs: outside grid",
+        "editor: outside grid",
+        "overlay: negative size"
+      ]
+    }
+  ],
+  "zeroWidthMetric": {
+    "cols": "Infinity",
+    "rows": 30,
+    "cellWidthPx": 0,
+    "cellHeightPx": 20
+  },
+  "subgrid": {
+    "cellWidthPx": 5,
+    "cellHeightPx": 10
+  },
+  "paletteContrast": [
+    {
+      "preset": "borland",
+      "ratios": {
+        "ink/surface": 12.305,
+        "menu-ink/menu-bg": 11.14,
+        "selected-ink/selected": 8.899,
+        "muted/surface": 6.915,
+        "accent/surface": 7.913,
+        "disabled/surface": 4.521
+      }
+    },
+    {
+      "preset": "paper",
+      "ratios": {
+        "ink/surface": 12.314,
+        "menu-ink/menu-bg": 8.44,
+        "selected-ink/selected": 7.661,
+        "muted/surface": 4.655,
+        "accent/surface": 3.847,
+        "disabled/surface": 2.907
+      }
+    }
+  ]
+}

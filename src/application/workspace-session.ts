@@ -54,7 +54,7 @@ export class WorkspaceSession {
     if (this.windowManager && this.editor.features.retainedDocumentSessions)
       this.editor.documentSessions = this.documentSessions = new DocumentSessionStore(this.editor);
     if(this.documentSessions && this.editor.features.documentSessionHostTransfer && this.editor.features.documentDetachment) this.documentSessions.detachment=new DocumentDetachment(this.documentSessions,this.editor);
-    this.presentation = new WorkspacePresentationState(root.payload, { canvas: this.editor.features.canvasWorkspace, spatial: this.editor.features.spatialWorkspace ? { supports: supportsSpatial } : undefined });
+    this.presentation = new WorkspacePresentationState(root.payload, { textual: this.editor.features.textualWorkspace, canvas: this.editor.features.canvasWorkspace, spatial: this.editor.features.spatialWorkspace ? { supports: supportsSpatial } : undefined });
     this.editor.persistence.attachWorkspacePresentation({ capture: () => { this.interaction?.finish(); return this.presentation.capture(); }, markSaved: snapshot => this.presentation.markSaved(snapshot) });
     registerApplicationViews(this.editor);
     this.projection = this.editor.createView("loaded-workspace");
@@ -63,8 +63,8 @@ export class WorkspaceSession {
     if (this.editor.features.spatialWorkspace) { this.spatial = createSpatialActions(this); this.cleanup.push(this.spatial.dispose); }
     if (this.presentation.enabled) {
       this.cleanup.push(this.editor.commandRegistry.register({ id: "workspace.presentation.createDesktop", label: "Create Desktop from Canvas", canExecute: () => this.canCreateDesktop(), execute: () => { this.createDesktop(); } }, "workspace-session"));
-      for (const name of (["desktop", "canvas", "spatial"] as const).filter(name => this.presentation.available(name))) this.cleanup.push(this.editor.commandRegistry.register({
-        id: `workspace.presentation.${name}`, label: name === "desktop" ? "Desktop" : name === "canvas" ? "Canvas" : "Spatial",
+      for (const name of (["desktop", "canvas", "spatial", "textual"] as const).filter(name => this.presentation.available(name))) this.cleanup.push(this.editor.commandRegistry.register({
+        id: `workspace.presentation.${name}`, label: name === "desktop" ? "Desktop" : name === "canvas" ? "Canvas" : name === "textual" ? "Textual" : "Spatial",
         canExecute: () => this.presentation.editable(), execute: () => { this.selectPresentation(name); },
       }, "workspace-session"));
       this.cleanup.push(this.editor.repository.subscribeChanges(change => {
@@ -153,6 +153,7 @@ export class WorkspaceSession {
       const candidate = createDesktop ? deriveDesktop(editor.repository.snapshot(), this.presentation.read()!, this.resolveObjects(),
         typeof window === "undefined" ? undefined : { width: window.innerWidth, height: window.innerHeight }) : undefined;
       batch(() => {
+        if (name === "textual" && this.presentation.read()?.presentations.textual === undefined) this.presentation.initializeTextual();
         if (name === "spatial" && this.presentation.read()?.presentations.spatial === undefined) this.spatial?.create();
         if (name === "canvas" && !this.presentation.read()?.presentations.canvas) {
           const candidate = deriveCanvas(editor.repository.snapshot(), this.presentation.read());
@@ -182,7 +183,7 @@ export class WorkspaceSession {
         this.noticeSignal[1](candidate ? `Desktop created with ${candidate.entries.length} object(s).${candidate.skipped.length ? " Retained without a Desktop conversion: " + candidate.skipped.map(item => `${item.label} (${item.reason})`).join("; ") + "." : ""}` : "");
       });
       queueMicrotask(() => {
-        if (this.disposed || !key) return;
+        if (this.disposed || !key || name === "textual") return;
         // Existing occurrences (including minimized ones) keep their bookmark.
         // A reparented occurrence has a new route: match its retained ancestor
         // placements so a shared Document does not steal focus into another Window.

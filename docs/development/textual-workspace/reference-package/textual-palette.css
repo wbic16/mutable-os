@@ -1,0 +1,15 @@
+/* Borland-inspired semantic tokens; colour is independent of app logic. */
+.textual,[data-textual-palette="borland"] {
+ --t-bg:#000080;--t-surface:#0000a8;--t-ink:#f5f5f5;
+ --t-menu-bg:#c6c6c6;--t-menu-ink:#101010;
+ --t-heading:#ffff55;--t-accent:#00dddd;--t-selected:#00caca;
+ --t-selected-ink:#001044;--t-border:#dce3ff;--t-muted:#aab9e9;
+ --t-error:#ff6666;--t-disabled:#8d94ba;--t-focus:#ffff55;--t-shadow:#000;
+}
+[data-textual-palette="paper"] {
+ --t-bg:#e6dec7;--t-surface:#f3eedc;--t-ink:#292b26;
+ --t-menu-bg:#c5c6b7;--t-menu-ink:#252a26;
+ --t-heading:#4e603e;--t-accent:#557f79;--t-selected:#a7cac0;
+ --t-selected-ink:#16332e;--t-border:#626c5e;--t-muted:#666c61;
+ --t-error:#963f38;--t-disabled:#8a8d83;--t-focus:#245b7b;--t-shadow:#262626;
+}

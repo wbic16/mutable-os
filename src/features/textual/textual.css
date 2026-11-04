@@ -1,0 +1,22 @@
+/* All rules, including portalled surfaces in later increments, belong to Textual. */
+.textual-workspace {
+  --tw-bg:#000080; --tw-surface:#0000a8; --tw-ink:#f5f5f5; --tw-menu:#c6c6c6; --tw-menu-ink:#101010; --tw-focus:#ffff55;
+  position:fixed; inset:0; z-index:2147483647; overflow:hidden; isolation:isolate;
+  font-family:ui-monospace,'Cascadia Mono',Consolas,monospace; font-size:var(--tw-font-size); line-height:var(--tw-line-height);
+  font-variant-ligatures:none; font-feature-settings:'liga' 0,'calt' 0; letter-spacing:0; color:var(--tw-ink); background:var(--tw-bg);
+}
+.textual-workspace[data-textual-palette="paper"] { --tw-bg:#e6dec7; --tw-surface:#f3eedc; --tw-ink:#292b26; --tw-menu:#c5c6b7; --tw-menu-ink:#252a26; --tw-focus:#245b7b; }
+.textual-workspace .tw-font-probe { position:absolute; visibility:hidden; pointer-events:none; white-space:pre; width:max-content; font:inherit; letter-spacing:0; }
+.textual-workspace .tw-cell { position:absolute; box-sizing:border-box; }
+.textual-workspace button { font:inherit; line-height:inherit; letter-spacing:0; border:0; border-radius:0; margin:0; padding:0 var(--tw-cell-width); background:var(--tw-menu); color:var(--tw-menu-ink); cursor:pointer; }
+.textual-workspace button:focus-visible { outline:2px solid var(--tw-focus); outline-offset:-2px; }
+.textual-workspace .tw-menu-bar,.textual-workspace .tw-status,.textual-workspace .tw-popup { background:var(--tw-menu); color:var(--tw-menu-ink); }
+.textual-workspace .tw-menu-bar { overflow:hidden; }
+.textual-workspace .tw-title { color:var(--tw-focus); font-weight:bold; white-space:nowrap; overflow:hidden; }
+.textual-workspace .tw-content { overflow:auto; }
+.textual-workspace p { margin:0; padding:0; }
+.textual-workspace .tw-status { display:flex; align-items:center; overflow:hidden; white-space:nowrap; gap:var(--tw-cell-width); }
+.textual-workspace .tw-popup { overflow:auto; }
+.textual-workspace .tw-popup button { display:block; width:100%; text-align:left; white-space:nowrap; }
+.textual-workspace .tw-popup button:hover { background:#00caca; color:#001044; }
+.textual-workspace .tw-small { overflow:auto; height:100%; }
