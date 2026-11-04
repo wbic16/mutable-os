@@ -4,8 +4,8 @@ import multer, { type FileFilterCallback } from 'multer';
 import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
 import fs from "fs";
-import { RecordId, Surreal } from "surrealdb";
-import { surrealdbNodeEngines } from "@surrealdb/node";
+import { RecordId, Surreal, Table } from "surrealdb";
+import { createNodeEngines } from "@surrealdb/node";
 import type { IBlockDto, StandoffEditorBlockDto, BlockType, IndexedBlock } from "./types";
 import { createNativeDocumentStoreRouter } from "./native-document-store.mjs";
 import { createDocumentStoreRouter } from "./document-store.js";
@@ -54,7 +54,7 @@ export async function initDb(): Promise<Surreal | undefined> {
   if (db) return db;
   // db = new Surreal();
   db = new Surreal({
-    engines: surrealdbNodeEngines(), // enable embedded Node engine
+    engines: createNodeEngines(), // enable embedded Node engine
   });
   try {
       // await db.connect("http://127.0.0.1:8000/rpc", {
@@ -159,7 +159,7 @@ export async function saveConcepts(claims: IConceptDto[]) {
       code: node.Code,
       deleted: node.IsDeleted
     } as any;
-    await db.upsert<Concept>(recordId, data);
+    await db.upsert<Concept>(recordId).content(data);
   }
 }
 
@@ -190,11 +190,9 @@ export async function saveSubsetOfConcepts(relations: SubsetOfConceptDto[]) {
   for (const relation of relations) {
     const sourceId = new RecordId("Concept", toId(relation.Source.Guid));
     const targetId = new RecordId("Concept", toId(relation.Target.Guid));
-    await db.insert_relation<SubsetOfConcept>('subset_of_concept', {
-      in: sourceId,
-      out: targetId,
+    await db.relate<SubsetOfConcept>(sourceId, new Table('subset_of_concept'), targetId, {
       primary: relation.IsPrimary
-    });
+    } as SubsetOfConcept);
   }
 }
 
@@ -206,7 +204,7 @@ export async function saveClaims(claims: IClaimDto[]) {
       role: node.Role,
       deleted: node.IsDeleted
     } as any;
-    await db.upsert<Claim>(recordId, data);
+    await db.upsert<Claim>(recordId).content(data);
   }
 }
 
@@ -218,7 +216,7 @@ export async function saveAgents(agents: IAgentDto[]) {
       type: node.AgentType,
       deleted: node.IsDeleted
     } as any;
-    await db.upsert<Agent>(recordId, data);
+    await db.upsert<Agent>(recordId).content(data);
   }
 }
 
@@ -366,7 +364,7 @@ app.post('/api/graph/update-entity-references', async (req: Request, res: Respon
 
 app.post('/api/addToGraphJson', async (req: Request, res: Response) => {
   const { id, name } = req.body;
-  const results = await db.upsert<Agent>(new RecordId("Agent", id), { name } as Agent);
+  const results = await db.upsert<Agent>(new RecordId("Agent", id)).content({ name } as Agent);
   console.log('/api/addToGraphJson', { results, id, name });
   res.send({
     Success: true
@@ -559,7 +557,7 @@ const saveDocumentIndex = async (doc: IBlockDto) => {
       metadata: doc.metadata
   } as Document;
   //console.log({ documentData });
-  await db.upsert<Document>(new RecordId("Document", doc.id), documentData);
+  await db.upsert<Document>(new RecordId("Document", doc.id)).content(documentData);
   const textBlocks = blocks
     .filter(x => x.block.type == "standoff-editor-block")
     .map(x => x.block as any as StandoffEditorBlockDto);
@@ -575,7 +573,7 @@ const saveDocumentIndex = async (doc: IBlockDto) => {
         metadata: textBlock.metadata
     } as TextBlock;
     //console.log({ textBlockData });
-    await db.upsert<TextBlock>(new RecordId("TextBlock", textBlock.id), textBlockData);
+    await db.upsert<TextBlock>(new RecordId("TextBlock", textBlock.id)).content(textBlockData);
     const definitions = (doc as any).linkedAnnotations ?? {};
     let properties = (textBlock.standoffProperties ?? []).map((property: any) => {
       const shared = property.annotationId && definitions[property.annotationId];
@@ -596,14 +594,11 @@ const saveDocumentIndex = async (doc: IBlockDto) => {
         metadata: property.metadata
       } as StandoffProperty;
       //console.log({ standoffPropertyData });
-      await db.upsert<StandoffProperty>(new RecordId("StandoffProperty", property.id), standoffPropertyData);
+      await db.upsert<StandoffProperty>(new RecordId("StandoffProperty", property.id)).content(standoffPropertyData);
       const sourceId = new RecordId("StandoffProperty", property.id);
       const targetId = new RecordId("Agent", property.value);
       //console.log({ sourceId, targetId });
-      await db.insert_relation<StandoffProperty_RefersTo_Agent>('standoff_property_refers_to_agent', {
-        in: sourceId,
-        out: targetId
-      });
+      await db.relate<StandoffProperty_RefersTo_Agent>(sourceId, new Table('standoff_property_refers_to_agent'), targetId);
     }
   }
 }
