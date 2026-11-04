@@ -15,62 +15,28 @@ ssh ubuntu@mc.phext.io
 bash /source/mutable-os/deploy/deploy.sh
 ```
 
-## Streamlined deployment: build the bundle off-box
+## Build on the box
 
 The host has **3.8 GiB RAM** (plus zram 5.6G at swap priority 5 ahead of
 an 8G swapfile, 13 GiB swap total) and already runs phext-edit, SQ, and
-nginx. mutable-os's Vite client build is the problem: on the pre-update
-tree it **OOM-died at Node's default heap** (Mark-Compact stuck at
-~2029.8 MB against a ~2084.7 MB cap, in Rollup's "rendering chunks"
-phase) and at a 2048 MB cap, and only passed at **3072 MB**, peaking at
-~2.8 GiB RSS. That build does not belong on this box. So the primary
-route is a **prebuilt bundle**: build where RAM is plentiful, ship a
-tarball, extract on the box in seconds.
+nginx. deploy.sh builds on the box: `npm ci --legacy-peer-deps`, then
+`npm run build` with `NODE_OPTIONS=--max-old-space-size=3072`.
 
-Three build locations, honestly:
-
-| Where | Verdict |
-| --- | --- |
-| **Ranch node (aletheia-core) — preferred** | 29 GiB RAM, 16 cores; builds in ~2 minutes and can `scp` the bundle straight to the box (key-only SSH verified). No hop through the Muse VM. |
-| Muse VM | Works (all numbers below were measured there) but the VM is shared and contended; timings swing. |
-| The AWS box itself — fallback only | deploy.sh still supports it. With the 3072 heap cap backed by zram + swapfile it is *possible*, just slow and swap-hungry, and a multi-GB compile evicts the pages of the co-hosted services. After the 2026-11-03 dependency update the client build's heap floor dropped to ≤1024 MB, so the fallback is less dire than it was — but the bundle stays primary. |
-
-### The flow
-
-```bash
-# On the build host (ranch node preferred), in a checkout of the branch:
-bash deploy/build-bundle.sh --push   # builds + scp's to wbic16@44.248.235.76:/source/mutable-os/
-# (without --push it just writes mutable-bundle.tar.gz + .sha256 locally)
-
-# On the box, one sudo-capable run — bundle mode verifies the SHA-256
-# and extracts instead of building:
-bash /source/mutable-os/deploy/deploy.sh
-```
-
-`build-bundle.sh` installs (`npm install --legacy-peer-deps
---ignore-scripts` — the script header explains why not `npm ci`), builds
-with `NODE_OPTIONS=--max-old-space-size=3072`, prunes to production
-dependencies, and packs the bundle. It aborts without writing a bundle
-if any step fails. Note the prune rewrites the build checkout's
-`node_modules` to production-only; run `npm install` there afterwards
-to restore dev dependencies.
-
-**Bundle contents** — exactly what the server reads at runtime, verified
-against `server/index.ts`: `dist/` (static root + `dist/server/index.js`),
-`node_modules/` (production-only), `package.json`, `data/` (templates +
-the default document/workspace roots), `src/assets/hosted/` (the
-`/video-backgrounds` + `/image-backgrounds` roots). Extraction on the
-box overwrites those paths but never deletes, so documents the server
-stored under `data/` survive a redeploy.
-
-**Native modules.** The bundle carries N-API natives:
-`@surrealdb/node-native`, `@napi-rs/canvas`, `@img/sharp`
-(sharp-libvips), and better-sqlite3's bundled prebuilds. N-API is
-ABI-stable across Node 22 (the box) and Node 24 (build hosts), but the
-build host must be **linux x86_64 glibc** like the target. Keep the
-target-runtime smoke check in the flow: after deploy, the service must
-answer `http://127.0.0.1:3003/` (deploy.sh already waits for exactly
-that) — a native mismatch would fail there, loudly.
+That was not always safe. On the pre-update tree the Vite client build
+**OOM-died at Node's default heap** (Mark-Compact stuck at ~2029.8 MB
+against a ~2084.7 MB cap, in Rollup's "rendering chunks" phase) and at a
+2048 MB cap; its measured heap floor was **3072 MB**, peaking at
+~2.8 GiB RSS — which is why a prebuilt-bundle route (build off-box,
+ship a tarball, extract on the box) was built and used for the first
+live deploy on 2026-11-03. **The bundle route was retired the same
+night**: Will enabled zram on the host, and the 2026-11-03 dependency
+update (vite 8) dropped the client build's measured heap floor to
+**≤1024 MB**, so the on-box build at the 3072 cap now runs with ~3×
+margin over the floor plus zram behind it. Will confirmed the box build
+is clear, deploy.sh carries the single on-box path again, and the
+bundle tooling (`deploy/build-bundle.sh`, the bundle mode in deploy.sh)
+is removed. The measurements below are kept as the record of why the
+cap is 3072.
 
 **Runtime guardrails** (in `deploy/mutable-os.service`): measured idle
 RSS is ~91–96 MiB. The unit caps the server heap at
@@ -87,17 +53,7 @@ RSS is ~91–96 MiB. The unit caps the server heap at
 | `dist` | 91M | 80M |
 | Client build heap floor | 3072 (2048 and 1536 OOM in rendering chunks) | ≤1024 (lowest rung tested; passes) |
 | Full build @3072 heap | client alone: 176s, peak RSS 2844 MiB | client+server: 49.7s, peak RSS 1372 MiB |
-| Server RSS, idle / after requests | 90.3 / 90.6 MiB | 95.5 / 97.8 MiB (booted from the bundle) |
-
-Bundle pipeline from a fresh clone (install + build + prune + tar):
-109s wall, peak RSS 1476 MiB, producing a **256M** bundle
-(267,963,448 bytes; the verification build's SHA-256 was
-`20e808657f89ea56d070430a7e5253bc58bf2b5120bf39995a5bdb97fca4a123` —
-rebuilds differ in tar metadata, and deploy.sh verifies whatever
-sidecar ships with the tarball rather than trusting a constant).
-Verified end-to-end: extracted into a pristine clone, the server
-answered 200 in ~1s on a test port and the served JS contains the
-"Open Phext" menu string.
+| Server RSS, idle / after requests | 90.3 / 90.6 MiB | 95.5 / 97.8 MiB |
 
 ### Package updates (2026-11-03)
 
@@ -128,16 +84,12 @@ Each run, in order:
    Nothing is written if that test fails.
 2. **Stops if the checkout is dirty.** Uncommitted changes on the box are
    never reset away; commit, stash, or clean them first.
-3. Fetches `origin/BRANCH` (default `emise/phext-support`) and hard-resets
+3. Fetches `origin/BRANCH` (default `main`) and hard-resets
    `APP_DIR` to it (a pull-side reset, like the phext-lattice deploy).
-4. **Bundle mode (primary):** if `BUNDLE_FILE` exists (default
-   `/source/mutable-os/mutable-bundle.tar.gz`), verifies its SHA-256
-   sidecar (a bundle without one is refused) and extracts it over the
-   checkout — no install, no build. **Fallback:** `npm ci
-   --legacy-peer-deps`, then `npm run build` with
-   `NODE_OPTIONS=--max-old-space-size=3072` (zram-backed; see
-   "Streamlined deployment" above). Either way, verifies
-   `dist/server/index.js` and `dist/index.html` exist.
+4. Builds on the box: `npm ci --legacy-peer-deps`, then `npm run build`
+   with `NODE_OPTIONS=--max-old-space-size=3072` (see "Build on the
+   box" above). Verifies `dist/server/index.js` and `dist/index.html`
+   exist.
 5. Writes `/etc/systemd/system/mutable-os.service` from
    `deploy/mutable-os.service` (a timestamped `.bak-*` copy is kept when the
    unit changes), `systemctl daemon-reload`, enables the service, and
@@ -195,14 +147,13 @@ Environment variables override the defaults. Flags override the same names.
 
 | Latch | Default | Effect |
 | --- | --- | --- |
-| `BRANCH` / `--branch` | `emise/phext-support` | Git branch that is hard-reset and built |
+| `BRANCH` / `--branch` | `main` | Git branch that is hard-reset and built |
 | `PORT` / `--port` | `3003` | mutable-os listen port and nginx `proxy_pass` |
 | `DOMAIN` / `--domain` | `mutable.phext.io` | nginx `server_name`, certificate directory, site file name |
 | `APP_DIR` | `/source/mutable-os` | Checkout that is reset and built |
 | `SERVICE_USER` | `wbic16` | User that owns the checkout and the service process |
 | `EXPECTED_A` | `44.248.235.76` | Address `DOMAIN` must resolve to before certbot |
-| `BUILD_NODE_OPTIONS` | `--max-old-space-size=3072` | Heap cap for the fallback on-box build (see step 4) |
-| `BUNDLE_FILE` | `/source/mutable-os/mutable-bundle.tar.gz` | Prebuilt bundle (deploy/build-bundle.sh); when present, its sha256 is verified and it is extracted instead of building |
+| `BUILD_NODE_OPTIONS` | `--max-old-space-size=3072` | Heap cap for the on-box build (see step 4) |
 | `NO_TLS=1` / `--no-tls` | off | Do not run certbot |
 | `MUTABLE_NGINX_FORCE=1` / `--force-nginx` | off | Replace a site file the marker does not own. The previous file is copied to `DOMAIN.bak-<timestamp>` first. Any value other than `1` does not force. |
 | `--check`, `--dry-run` | off | Render the nginx site, check the marker hash, exercise the latch against temp files, and validate the systemd unit template. No sudo, no build, no restart, no write under `/etc`. |

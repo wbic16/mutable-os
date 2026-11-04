@@ -1,6 +1,6 @@
 # Patches on upstream
 
-This branch (`emise/phext-support`) carries wbic16's changes on top of
+The fork's `emise/*` branches carry wbic16's changes on top of
 upstream `argimenes/mutable-os` (based on `cb47fb72`, the commit both
 repositories shared when the fork was set up). The intent is that the
 changes stay small, enumerable, and easy to re-apply after a rebase onto a
@@ -38,7 +38,7 @@ prod-server smoke 200.
 
 | File | Change | Reason | Rebase / re-apply note |
 | --- | --- | --- | --- |
-| `package.json`, `package-lock.json` | All dependencies to latest (vite 4→8, vitest 2→5, express 4→5, surrealdb 1.3.2→2.2.1, @surrealdb/node →3.2, typescript 5.9→6.0, pdfjs-dist 5.4→6.5, three →0.187, mermaid →12.3, @types/node 22→26, …); added esbuild (explicit devDep; server history tests import it directly — it previously arrived hoisted via vite 4) and @surrealdb/node-native (runtime peer of @surrealdb/node 3.2). | Will: "update packages to latest… just work through package updates if needed." Package count 670 → 590. | package.json hunks are small; the lockfile regenerates (`npm install --legacy-peer-deps --ignore-scripts`; see deploy/build-bundle.sh for why not `npm ci`). **Held back:** typescript 7.0.2 — surrealdb 2.2.1 declares peer `typescript ^5‖^6`, npm ERESOLVEs, so typescript is pinned at ^6.0.0. Known wart: solid-devtools@0.34.5 declares peerOptional vite ^2–^7 vs vite 8 (it is not imported anywhere); installs need `--legacy-peer-deps` until upstream widens the range. |
+| `package.json`, `package-lock.json` | All dependencies to latest (vite 4→8, vitest 2→5, express 4→5, surrealdb 1.3.2→2.2.1, @surrealdb/node →3.2, typescript 5.9→6.0, pdfjs-dist 5.4→6.5, three →0.187, mermaid →12.3, @types/node 22→26, …); added esbuild (explicit devDep; server history tests import it directly — it previously arrived hoisted via vite 4) and @surrealdb/node-native (runtime peer of @surrealdb/node 3.2). | Will: "update packages to latest… just work through package updates if needed." Package count 670 → 590. | package.json hunks are small; the lockfile regenerates with `npm install --legacy-peer-deps` (deploy.sh's on-box install is `npm ci --legacy-peer-deps`; fs-ext is optional and its node-gyp build may fail harmlessly — nothing requires its binding, see the live-site fixes table). **Held back:** typescript 7.0.2 — surrealdb 2.2.1 declares peer `typescript ^5‖^6`, npm ERESOLVEs, so typescript is pinned at ^6.0.0. Known wart: solid-devtools@0.34.5 declares peerOptional vite ^2–^7 vs vite 8 (it is not imported anywhere); installs need `--legacy-peer-deps` until upstream widens the range. |
 | `server/index.ts` | `surrealdbNodeEngines` → `createNodeEngines`; `db.upsert(id, data)` → `db.upsert(id).content(data)` (7 sites); `db.insert_relation` → `db.relate(from, new Table(…), to, data?)` (2 sites); import `Table`. | surrealdb 2.2 / @surrealdb/node 3.2 builder API replaced the 1.x methods. | Mechanical renames at the call sites; re-apply by searching for the old method names after a rebase. |
 | `server/entity-search.test.ts` | Same engine-factory rename as above. | @surrealdb/node 3.2. | One line. |
 | `src/pdf/viewer.ts`, `server/application-services/pdf-inspection.ts` | Removed `isEvalSupported: false` from the pdfjs option objects. | pdfjs-dist 6 removed the option (TS2353). | Delete the option wherever pdfjs is configured. |
@@ -80,8 +80,6 @@ files where possible.
 - `deploy/deploy.sh`, `deploy/deploy.md`,
   `deploy/nginx-mutable.phext.io.conf`, `deploy/mutable-os.service` —
   hosting for mutable.phext.io.
-- `deploy/build-bundle.sh` — builds the prebuilt deploy bundle off-box
-  (see deploy/deploy.md, "Streamlined deployment").
 - `PATCHES.md`, `PHEXT.md` — this file and the phext design notes.
 
 ## Rebase flow
