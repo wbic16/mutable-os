@@ -7,7 +7,8 @@ import os from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { PhextVFS } from '../src/phext/vfs.js';
 import { SqliteKnowledgeHost } from './sqlite-knowledge-host.js';
 import { createHistoryService } from './history-router.js';
 import { createNativeDocumentStoreRouter } from './native-document-store.mjs';
@@ -74,6 +75,20 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
   function stores(root: string) {
     const sql = new SqliteKnowledgeHost({ root, entitiesEnabled: featureFlags.sqliteEntities, semanticServicesEnabled: featureFlags.sqliteSemanticServices, thesisEnabled: featureFlags.thesis, cardexEnabled: featureFlags.cardex, verifyCardexImage:async ref=>{if(!assets)throw Error("Managed assets unavailable");const {manifest}=await assets.store.get(ref.assetId,ref.cavernId);if(!["image/png","image/jpeg"].includes(manifest.mediaType))throw Error("Canonical image must be PNG or JPEG");} });
     const history = createHistoryService({ root });
+    // PhextVFS Phase 2: with the flag on, the gates consumers (history,
+    // jobs, publications, managed assets) store into <root>/cavern.phext
+    // through the stage-C gates phext backend. Registration must
+    // complete before any consumer pins a directory, so establish()
+    // awaits `phextReady` before the stores are used.
+    let phextVfs: PhextVFS | undefined, phextReady: Promise<void> | undefined;
+    if (featureFlags.phextVfs) {
+      phextVfs = PhextVFS.openOrCreate(path.join(root, 'cavern.phext'));
+      const vfs = phextVfs;
+      phextReady = (async () => {
+        const gates = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href);
+        gates.registerPhextBackend({ root, vfs });
+      })();
+    }
     const coordinate = <T>(action: () => Promise<T>) => sql.foreground(action);
     const api = Router();
     // Applications share the root Cavern; they may still browse its subfolders.
@@ -113,13 +128,13 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
       indexWork = read().finally(() => { indexWork = undefined; });
       return indexWork;
     };
-    return { api, sql,
+    return { api, sql, phextReady,
       async activateAssets(cavern: Cavern) {
         if(featureFlags.applicationServices)services=createApplicationServiceHost({root,cavernId:cavern.cavernGuid,nativeEnabled:featureFlags.nativeDocumentPersistence,publicationEnabled:featureFlags.webPublishing,academicEnabled:featureFlags.academicResourceLoaders,iiifEnabled:featureFlags.iiifResourceLoaders,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,everydayEnabled:featureFlags.everydayWebResources,academic:(request,signal)=>sql.academic(request,signal),assets:()=>assets?.store,knowledge:(request,signal)=>sql.entityLookup({vault:'.',request},signal,true)});
         if (featureFlags.managedAssetClipboard) { assets = createManagedAssetService({ root, cavernId: cavern.cavernGuid, session: cavern.session,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,inspectOriginal:(bytes,mediaType,signal)=>{if(!services)throw Error('Application services unavailable');return services.executor.run(['application/xml','application/epub+zip','application/x-bibtex','application/x-research-info-systems'].includes(mediaType)?{kind:'academic-original-inspect',bytes,mediaType}:mediaType==='application/pdf'?{kind:'pdf-inspect',bytes}:{kind:'json-inspect',bytes},signal);} }); return assets.recover(); } },
       async index(policy: any) { indexPolicy ??= normalizePolicy(policy); return indexStatus(); },
       async status() { return indexPolicy ? indexStatus() : undefined; },
-      async close() { await services?.close(); await assets?.close(); await indexWork?.catch(() => {}); await sql.close(); await history.dispose(); },
+      async close() { await services?.close(); await assets?.close(); await indexWork?.catch(() => {}); await sql.close(); await history.dispose(); if (phextVfs) { await phextReady?.catch(() => {}); const gates = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href); await gates.unregisterPhextBackend(root); phextVfs.close(); } },
     };
   }
   const establish = async (input: unknown, intent: unknown, confirmed = false) => {
@@ -143,6 +158,7 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
       if (requests) await new Promise<void>(done => { drain = done; });
       // Establish/open with the existing SQLite foundation; no replacement metadata.
       next = stores(target.path);
+      await next.phextReady;
       const established = await next.sql.establish('.');
       const selected: Cavern = { path: target.path, name: target.name, cavernGuid: established.vaultGuid, session: randomUUID() };
       const assetRecovery = await next.activateAssets(selected);
