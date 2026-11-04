@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { isMainThread } from 'node:worker_threads';
+import { flockExclusiveSync } from './advisory-lock.mjs';
 const require=createRequire(import.meta.url);
 const exists=p=>{try{return fs.lstatSync(p);}catch(e){if(e.code==='ENOENT')return;throw e;}};
 export function inspectVaultScope(vault,{maxEntries=100000,maxDepth=128,maxMs=5000}={}) {
@@ -40,6 +41,9 @@ export function lockVaultEstablishment(){
  const fd=fs.openSync(file,fs.constants.O_CREAT|fs.constants.O_RDWR|fs.constants.O_NOFOLLOW,0o600);
  const stat=fs.fstatSync(fd);
  if(!stat.isFile()||stat.nlink!==1||(process.getuid&&stat.uid!==process.getuid())){fs.closeSync(fd);throw Error('Invalid Vault establishment coordinator');}
- try{require('fs-ext').flockSync(fd,'exnb');}catch(e){fs.closeSync(fd);throw Object.assign(Error('Another Vault establishment is in progress; retry'),{code:e.code});}
- let closed=false;return()=>{if(!closed){closed=true;fs.closeSync(fd);}};
+ // Only genuine contention (a live peer holds the lock) may report "in progress";
+ // a missing native flock binding falls back to the portable token lock inside
+ // flockExclusiveSync, and any other failure propagates with its real cause.
+ let releaseLock;try{releaseLock=flockExclusiveSync(fd,`${file}.holder`);}catch(e){fs.closeSync(fd);if(e.code==='EWOULDBLOCK'||e.code==='EAGAIN')throw Object.assign(Error('Another Vault establishment is in progress; retry'),{code:'EWOULDBLOCK'});throw e;}
+ let closed=false;return()=>{if(!closed){closed=true;try{releaseLock();}finally{fs.closeSync(fd);}}};
 }

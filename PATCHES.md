@@ -46,10 +46,25 @@ prod-server smoke 200.
 | `src/application/anchor-capabilities.ts`, `src/features/phosphor/studio-drift.ts` | `parent.hidden` / `canvas.hidden` truthiness reads → explicit `!!` coercions. | TypeScript 6 lib.dom types `HTMLElement.hidden` as `boolean \| "until-found"` (TS2872/TS1345). | Two one-token edits. |
 | `server/application-services/executor.ts`, `server/native-knowledge-jobs.ts` | Worker `'error'` handlers normalise `e instanceof Error ? e : Error(String(e))` before logging. | @types/node 26 types the worker error payload as `unknown` (TS18046). | Wrap the logged value; no behaviour change. |
 
+## Live-site fixes on mutable.phext.io (2026-11-03)
+
+Bugs Will hit on the deployed site the day it went live. Each fix is the
+smallest change that addresses the root cause; new logic lives in new
+files where possible.
+
+| File | Change | Reason | Rebase / re-apply note |
+| --- | --- | --- | --- |
+| `src/knowledge-sqlite/vault-scope.mjs` | `lockVaultEstablishment` takes its lock through the new `flockExclusiveSync` helper (`src/knowledge-sqlite/advisory-lock.mjs`): only genuine contention (EWOULDBLOCK/EAGAIN) produces "Another Vault establishment is in progress; retry", now always with code `EWOULDBLOCK` so `client.mjs`'s retry loop applies; every other failure propagates with its real cause. | Live bug: vault creation always failed with that message. fs-ext's compiled binding is absent wherever install scripts did not run (the deployed bundle, this VM), so `require('fs-ext')` itself threw — and the old catch-all reported *every* failure as lock contention. The helper prefers the native binding when usable and otherwise falls back to a portable O_EXCL token lock with pid-based stale recovery. | Rendezvous-file creation and validation above the lock call are unchanged. Keep the lock routed through `advisory-lock.mjs` after a rebase. |
+| `src/knowledge-sqlite/paths.mjs` | `writerLock` takes the SQLite writer lease through the same `flockExclusiveSync` helper (fallback token at `writer.lock.holder`); its error wrap ("SQLite writer unavailable: …") is unchanged. | The writer lease was the next fs-ext wall in the same vault-open flow: with establishment fixed, vault creation would still have failed at the lease in any fs-ext-less deployment. | The rendezvous `writer.lock` inode is still never unlinked; only the fallback's `.holder` token is created and removed. |
+| `index.html` | `<title>Solid App</title>` → `<title>Mutable</title>`. | The browser title bar showed the upstream template's placeholder name. | One line; re-apply if upstream retitles. (`src/features/phosphor/glyphs.ts` contains "Solid Apple", an icon name — unrelated, untouched.) |
+
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,
   `src/phext/file-io.ts` — the phext module (see PHEXT.md).
+- `src/knowledge-sqlite/advisory-lock.mjs` — advisory lock with a native
+  fs-ext flock fast path and a portable token-file fallback (see the
+  live-site fixes table above).
 - `src/phext/codec.test.ts`, `src/phext/document.test.ts`,
   `src/demo/phext-menu.test.tsx` — tests.
 - `deploy/deploy.sh`, `deploy/deploy.md`,
