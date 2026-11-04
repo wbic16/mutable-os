@@ -34,12 +34,12 @@ try {
     const unlock = writerLock(home);
     try {
       const names = fs.readdirSync(home);
-      if (names.some(n => !/^(writer\.lock|(mutable|audit)\.db(-wal|-shm|-journal)?)$/.test(n))) throw Error('Unexpected file in disposable store');
+      if (names.some(n => !/^(writer\.lock(\.holder)?|(mutable|audit)\.db(-wal|-shm|-journal)?)$/.test(n))) throw Error('Unexpected file in disposable store');
       for (const name of names) regularFile(path.join(home,name));
-      for (const name of names) if (name !== 'writer.lock') fs.unlinkSync(path.join(home,name));
+      for (const name of names) if (name !== 'writer.lock' && name !== 'writer.lock.holder') fs.unlinkSync(path.join(home,name));
     } finally { unlock(); }
     // Explicit disposable-only reset removes the empty test home; normal init never repairs partial infrastructure.
-    fs.unlinkSync(path.join(home,'writer.lock'));fs.rmdirSync(home);
+    fs.rmSync(path.join(home,'writer.lock.holder'),{force:true});fs.unlinkSync(path.join(home,'writer.lock'));fs.rmdirSync(home);
   }
   client = await openSqliteFoundation({ vault, initialize: ['init','init-test','reset-test'].includes(command),
     readOnly: !!values['read-only'] || command === 'inspect', ...(command === 'restore' ? { restoreFrom: values.source } : {}) });

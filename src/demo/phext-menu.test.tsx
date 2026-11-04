@@ -39,10 +39,19 @@ describe("phext Workspace menu entries", () => {
     expect(button("Export Phext…", local)).not.toBeUndefined();
   });
 
+  it("offers the bundled default phexts in the Local files group by default", () => {
+    const host = mount();
+    const local = host.querySelector('[aria-label="Local files"]')!;
+    expect(button("Open Choose Your Own Adventure", local)).not.toBeUndefined();
+    expect(button("Open Incipit", local)).not.toBeUndefined();
+  });
+
   it("hides both entries when the phextDocuments flag is off", () => {
     const host = mount(false);
     const local = host.querySelector('[aria-label="Local files"]')!;
     expect(button("Open Phext…", local)).toBeUndefined();
     expect(button("Export Phext…", local)).toBeUndefined();
+    expect(button("Open Choose Your Own Adventure", local)).toBeUndefined();
+    expect(button("Open Incipit", local)).toBeUndefined();
   });
 });
