@@ -64,10 +64,83 @@ files where possible.
 | `src/persistence/managed-pair.mjs` | `nativeFlock` keeps the promisified fs-ext `flock` when the binding loads — same call, byte-for-byte — but when it is absent the export now routes through the stage-C gates helper (`scripts/stage-c-gates/flock.mjs`) instead of rejecting every call with ENOSYS ("Native pair locking is unavailable on this server"): the descriptor's dev+ino identity is taken with `fstatSync`, `flockDescriptor` provides the lock, and its release function is invoked on the `'un'` call, tracked per descriptor. | Third fs-ext chokepoint: `ManagedPair.lock` (every paired write) and `NativeVaultStore.lock` (every managed store operation) both consume `nativeFlock`, so wherever the binding is absent the native store 503'd ("Native store locking is unavailable") and pair writes threw — the round-2 vitest batch showed 95 failures across the native-store / foundation / encyclopedia suites with stacks at this stub. One fallback implementation (`flock.mjs`) now serves all three chokepoints; this file only adapts its signature. | Keep `nativeFlock` routed through `flock.mjs` after a rebase; the per-descriptor release map and the `fstatSync` identity are the whole adapter. Coverage: `server/native-vault-store-lock.test.mjs`. |
 | `server/native-vault-store.mjs` | `lock()`'s finally now calls `nativeFlock(h.fd, 'un')` (errors swallowed) before closing the handle. | The store previously released its lock by closing the handle alone, which drops a native flock but cannot remove a fallback token: without an explicit unlock, the first store operation's token would outlive it and every later lock in the process would report false contention. On the native path, unlock-then-close is identical to close alone. | One line in `lock()`; keep it while `nativeFlock` has a token fallback. |
 
+## PhextVFS Phase 1 (2026-11-04)
+
+Will's direction: every Mutable I/O path is to be mapped to a virtual fs
+layer that routes into one phext per Cavern ("package up all of your
+knowledge work and ship it off — like a jupyter notebook"), and the fs
+driver is to use the processing engine from phext-lattice so it is as
+performant as edit.phext.io. Phase 1 is the engine port plus the VFS
+core; it modifies **no upstream files** — everything is new files under
+`src/phext/` (plus this note and a benchmark script) — and it is wired
+into no server path yet. Phase 2 adds the stage-C gates backend behind
+a flag.
+
+- **Engine** (`src/phext/lattice.ts`): a faithful TypeScript port of
+  phext-lattice's `src/index.rs` (`LatticeIndex`: one buffer scan builds
+  a coordinate → byte-span map plus the ordered coordinate list; O(1)
+  lookup thereafter) and `src/mmap.rs` (`MappedLattice`: read-only
+  backing store, copy-on-write overlay of modified/inserted/deleted
+  scrolls, merged reconstruction in ascending coordinate order, atomic
+  save + rebase). The Node `Buffer` plays the mmap's role; content is
+  decoded as UTF-8 only on read. Two documented deltas from the Rust:
+  empty scrolls are normalized eagerly (an empty write is a delete —
+  the Rust index itself never materializes empty spans), and
+  `writeScroll` rejects dimension break bytes in content rather than
+  corrupting on save (mirrors `codec.ts`'s assert). Provenance:
+  wbic16/phext-lattice, MIT, same author as this fork.
+- **VFS core** (`src/phext/vfs.ts`): strata libraries mirroring today's
+  on-disk homes (1 documents, 2 pair journals, 3 knowledge, 4 history,
+  5 services, 6 assets, 7 control, 9 VFS index; 8/10+ reserved);
+  structural path ↔ coordinate mapping where every directory is a JSON
+  index scroll at its home coordinate (browsing = reading index
+  scrolls), child slots come from a high-water mark persisted in the
+  index and are never reused (slot 1 is the directory itself), and
+  paths deeper than five directory levels fold into suffix-named
+  entries under the depth-5 directory — with ordinary sequential slots,
+  because phext arms are unary: reaching component N costs N−1 break
+  bytes in the serialized file, so slot values must stay small (a
+  hash-derived slot ~2^20 OOM'd the serializer in testing; that is the
+  kind of fact this note exists to record). Files are chunk series on
+  the scroll arm (64 KB default; text snapped to codepoint boundaries
+  so chunks are valid UTF-8 and concatenation is byte-identical;
+  binary stored base64 per chunk under a `format` marker in its index
+  entry, +33% for a package that leaves nothing behind). Library 9
+  holds the manifest and a per-scroll SHA-256 checksum series, verified
+  at open with mismatches located to coordinate and path; each flush
+  keeps the previous generation at `<path>.bak`.
+- **BENCH** (`node scripts/bench-phext-lattice.mjs`; this VM, Node 24,
+  medians of 3; edit rows include a fresh open, as an editing session
+  would pay it):
+
+  | Corpus | codec parse | codec read 1 scroll | codec serialize | lattice index (once) | lattice readScroll | lattice edit + rebuild | lattice edit + save |
+  | --- | --- | --- | --- | --- | --- | --- | --- |
+  | CYOA, 4.4 MiB, 831 scrolls | 106 ms | 99 ms | 108 ms | 20 ms | 3 µs | 30 ms | 50 ms |
+  | synthetic, 48 MiB, 17,046 scrolls | 985 ms | 971 ms | 896 ms | 183 ms | 1 µs | 262 ms | 529 ms |
+
+  The per-read cost after open is independent of file size (µs at both
+  scales, vs a full parse per read with the codec — ~10⁵–10⁶×), and an
+  edit never re-parses: reconstruction emits spans and overlay content
+  in coordinate order, so its cost is the output bytes, not a parse.
+- Coverage: `src/phext/lattice.test.ts` (index parity with the Rust
+  fixtures, equivalence with the existing codec on CYOA — same populated
+  coordinates and contents, reconstruction a byte fixed point — and the
+  overlay semantics) and `src/phext/vfs.test.ts` (Cavern-shaped
+  round-trip across flush/reopen including the folded deep path,
+  mutation rules, .bak, and located checksum tampering).
+
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,
   `src/phext/file-io.ts` — the phext module (see PHEXT.md).
+- `src/phext/lattice.ts` + `src/phext/lattice.test.ts` — the phext
+  processing engine, ported from phext-lattice (`index.rs` + `mmap.rs`);
+  see the PhextVFS Phase 1 section above.
+- `src/phext/vfs.ts` + `src/phext/vfs.test.ts` — the PhextVFS core
+  (virtual fs over one phext per Cavern); see the PhextVFS Phase 1
+  section above.
+- `scripts/bench-phext-lattice.mjs` — the codec-vs-lattice benchmark
+  whose numbers are recorded in the PhextVFS Phase 1 section above.
 - `src/phext/default-documents.ts` + `src/phext/default-documents.test.ts` —
   the bundled default phexts (CYOA, Incipit): runtime conversion with
   stable document ids.
