@@ -1,0 +1,19 @@
+[Unit]
+Description=mutable-os — Mutable / Codex at mutable.phext.io
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=wbic16
+WorkingDirectory=/source/mutable-os
+Environment=PORT=3003
+ExecStart=/usr/bin/node /source/mutable-os/dist/server/index.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
