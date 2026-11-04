@@ -8,6 +8,12 @@ Type=simple
 User=wbic16
 WorkingDirectory=/source/mutable-os
 Environment=PORT=3003
+# Runtime guardrails, sized from the measured footprint (deploy.md):
+# idle RSS ~91 MiB, so the heap cap is ~4x idle and MemoryMax is 2x the
+# heap cap -- this service can never starve phext-edit/SQ/nginx on the
+# 3.8 GiB box.
+Environment=NODE_OPTIONS=--max-old-space-size=384
+MemoryMax=768M
 ExecStart=/usr/bin/node /source/mutable-os/dist/server/index.js
 Restart=on-failure
 RestartSec=5

@@ -27,9 +27,17 @@ EXPECTED_A="${EXPECTED_A:-44.248.235.76}"
 APP_DIR="${APP_DIR:-/source/mutable-os}"
 SERVICE_USER="${SERVICE_USER:-wbic16}"
 NO_TLS="${NO_TLS:-0}"
-# The build box has ~3.8 GiB RAM; the Vite client build OOMs at Node's
-# default heap there, so cap the build's old-space explicitly.
-BUILD_NODE_OPTIONS="${BUILD_NODE_OPTIONS:---max-old-space-size=2048}"
+# Fallback on-box build only (bundle mode below skips the build): the
+# box has ~3.8 GiB RAM and the Vite client build OOMs at Node's default
+# heap there, so cap the build's old-space explicitly. 3072 is backed by
+# zram (5.6G, priority 5) ahead of the 8G swapfile -- the build is
+# possible, just slow and swap-hungry. See deploy/deploy.md.
+BUILD_NODE_OPTIONS="${BUILD_NODE_OPTIONS:---max-old-space-size=3072}"
+# Prebuilt bundle (deploy/build-bundle.sh). When this file exists, the
+# build is skipped entirely: the sha256 sidecar is verified and the
+# tarball is extracted over the checkout. Set BUNDLE_FILE to another
+# path to relocate it; the bundle is the primary deploy route.
+BUNDLE_FILE="${BUNDLE_FILE:-${APP_DIR}/mutable-bundle.tar.gz}"
 # 1 replaces a site file this script does not own. Anything else does not.
 NGINX_FORCE=0
 if [[ "${MUTABLE_NGINX_FORCE:-0}" == "1" ]]; then
@@ -64,6 +72,11 @@ documented in deploy/deploy.md.
                      MUTABLE_NGINX_FORCE=1). The previous file is kept
                      beside it as a .bak-* copy.
 --no-tls             Do not run certbot.
+
+If a prebuilt bundle exists at BUNDLE_FILE (default
+/source/mutable-os/mutable-bundle.tar.gz, built by
+deploy/build-bundle.sh), its sha256 is verified and it is extracted
+instead of building on the box.
 
 Run as a sudo-capable account, not root. --check does not need sudo.
 EOF
@@ -438,9 +451,25 @@ EOF
   grep -qF "ExecStart=/usr/bin/node ${APP_DIR}/dist/server/index.js" "$unit" \
     || die "unit template is missing the expected ExecStart"
   grep -qF 'NoNewPrivileges=true' "$unit" || die "unit template is missing NoNewPrivileges=true"
+  grep -qF 'Environment=NODE_OPTIONS=--max-old-space-size=' "$unit" \
+    || die "unit template is missing the NODE_OPTIONS heap guardrail"
+  grep -qF 'MemoryMax=' "$unit" || die "unit template is missing MemoryMax"
 
   rm -rf "$work"
   printf 'deploy.sh --check: nginx render, marker hash, latch, and unit ok\n'
+  if [[ -f "$BUNDLE_FILE" ]]; then
+    local bundle_size
+    bundle_size=$(du -h "$BUNDLE_FILE" | awk '{print $1}')
+    printf '  mode:      bundle (%s, %s) -- build would be SKIPPED\n' "$BUNDLE_FILE" "$bundle_size"
+    if [[ -f "${BUNDLE_FILE}.sha256" ]]; then
+      printf '  bundle sha256 sidecar: present (verified on a real run)\n'
+    else
+      printf '  bundle sha256 sidecar: MISSING (%s.sha256) -- a real run would refuse\n' "$BUNDLE_FILE"
+    fi
+  else
+    printf '  mode:      on-box build (no bundle at %s) -- fallback path, heap %s\n' \
+      "$BUNDLE_FILE" "$BUILD_NODE_OPTIONS"
+  fi
   printf '  template:  %s\n' "$template"
   printf '  domain:    %s\n' "$DOMAIN"
   printf '  port:      %s\n' "$PORT"
@@ -491,9 +520,27 @@ main() {
   as_owner git -C "$APP_DIR" reset --hard "origin/${BRANCH}"
   local commit
   commit=$(as_owner git -C "$APP_DIR" rev-parse --short HEAD)
-  printf 'Building %s\n' "$commit"
-  as_owner env --chdir="$APP_DIR" npm ci
-  as_owner env --chdir="$APP_DIR" NODE_OPTIONS="$BUILD_NODE_OPTIONS" npm run build
+  local build_mode
+  if [[ -f "$BUNDLE_FILE" ]]; then
+    # Bundle mode (primary): verify the SHA-256 sidecar, extract over the
+    # checkout, and skip npm ci + build entirely. Extraction overwrites
+    # the bundle's paths but never deletes files, so documents the server
+    # stored under data/ survive; repo files under data/ are refreshed.
+    [[ -f "${BUNDLE_FILE}.sha256" ]] \
+      || die "bundle present but ${BUNDLE_FILE}.sha256 is missing; refusing an unverified bundle."
+    (cd "$(dirname "$BUNDLE_FILE")" && as_owner sha256sum -c "$(basename "$BUNDLE_FILE").sha256") \
+      || die "bundle sha256 verification failed for ${BUNDLE_FILE}."
+    as_owner tar -xzf "$BUNDLE_FILE" -C "$APP_DIR"
+    build_mode="bundle (extracted $(du -h "$BUNDLE_FILE" | awk '{print $1}'), no on-box build)"
+    printf 'Bundle %s verified and extracted\n' "$BUNDLE_FILE"
+  else
+    # Fallback: build on the box. Slow and swap-hungry (zram-backed
+    # 3072 heap); the bundle route above is the measured primary path.
+    printf 'Building %s on-box (fallback; no bundle at %s)\n' "$commit" "$BUNDLE_FILE"
+    as_owner env --chdir="$APP_DIR" npm ci --legacy-peer-deps
+    as_owner env --chdir="$APP_DIR" NODE_OPTIONS="$BUILD_NODE_OPTIONS" npm run build
+    build_mode="on-box build (heap ${BUILD_NODE_OPTIONS})"
+  fi
   [[ -f "${APP_DIR}/dist/server/index.js" ]] || die "server build was not produced (dist/server/index.js missing)."
   [[ -f "${APP_DIR}/dist/index.html" ]] || die "client build was not produced (dist/index.html missing)."
 
@@ -617,6 +664,7 @@ main() {
 
   printf '\nmutable-os deploy\n'
   printf '  commit:    %s\n' "$commit"
+  printf '  build:     %s\n' "$build_mode"
   printf '  service:   %s (%s)\n' "$SERVICE" "$(systemctl is-active "$SERVICE")"
   printf '  listen:    127.0.0.1:%s\n' "$PORT"
   printf '  nginx:     %s (%s)\n' "$available" "$nginx_result"
