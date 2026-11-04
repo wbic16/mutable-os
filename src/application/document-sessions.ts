@@ -1,3 +1,4 @@
+import { DocumentHostPresentations } from "./document-host-presentations";
 import { createRoot, createSignal, getOwner, type Owner } from "solid-js";
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import type { BlockTreeProjection } from "../block-tree/projection";
@@ -61,6 +62,7 @@ export class DocumentSessionStore {
   private lifetime = new AbortController();
   readonly signal = this.lifetime.signal;
   readonly transfers: DocumentHostTransfers;
+  readonly presentations: DocumentHostPresentations;
   detachment?: import("./document-detachment").DocumentDetachment;
   readonly saveHandlers = new Map<string, () => Promise<unknown>>();
   private privateViews = new Map<string, RetainedDocumentSession>();
@@ -74,6 +76,7 @@ export class DocumentSessionStore {
   };
   constructor(private editor: ReactiveEditor) {
     this.transfers = new DocumentHostTransfers(this, editor);
+    this.presentations = new DocumentHostPresentations(editor);
     if (editor.features.documentSessionHostTransfer && typeof document !== 'undefined') document.addEventListener('keydown', this.saveShortcut, true);
   }
   forElement(element: Element) { const id = element.closest<HTMLElement>('[data-document-session]')?.dataset.documentSession; return id ? this.records.get(id)?.session : undefined; }
@@ -130,6 +133,7 @@ export class DocumentSessionStore {
   release(session: RetainedDocumentSession) {
     const record = this.records.get(session.id);
     if (!record || record.session !== session) return;
+    this.presentations.forget(session);
     this.records.delete(session.id);
     this.transfers.releaseSession(session); this.privateViews.delete(session.projection.viewId);
     record.dispose();
@@ -141,6 +145,7 @@ export class DocumentSessionStore {
     if (!this.alive) return;
     this.alive = false; this.lifetime.abort();
     if (typeof document !== "undefined") document.removeEventListener("keydown", this.saveShortcut, true);
+    this.presentations.dispose();
     this.detachment?.dispose(); this.saveHandlers.clear();
     this.transfers.dispose();
     for (const { session } of [...this.records.values()]) this.release(session);

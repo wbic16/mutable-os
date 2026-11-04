@@ -1,7 +1,8 @@
+import { documentStylePorts } from '../runtime/document-style-ports';
 import {useGlossPresentation} from '../features/gloss/presentation-context';
 import { initialisCommand } from "../features/initialis/controller";
 import { ownSelectionToolbar } from "../input/selection-target";
-import { For, Show, createEffect, createSignal, createComponent, onCleanup } from "solid-js";
+import { For, Show, createEffect, createSignal, createComponent, onCleanup, onMount } from "solid-js";
 import { unwrap } from "solid-js/store";
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import type { NodeKey } from "../block-tree/types";
@@ -287,6 +288,7 @@ export function DocumentStyleBar(props: { editor: ReactiveEditor; scopeKey?: Nod
     { id: "clear", label: "Clear formatting", glyph: "T×", toolset: "Typography", disabled: hasCrossRange, run: clear },
     ...editor.annotationUI.list().map((item): CompactTool => ({ id: item.id, label: item.label, glyph: item.label, width: 120, toolset: "Annotations", run: () => annotate(item.type) })),
   ];
+  if(editor.features.textualWorkspace && props.scopeKey)onMount(()=>onCleanup(documentStylePorts(editor).register(props.scopeKey!, {capture,tools,annotate,notice})));
   const StylePicker = () => <select class="annotation-bar__style" aria-label="Paragraph style" title="Paragraph or heading style" disabled={hasCrossRange()} value="" onChange={event => {
     const value = event.currentTarget.value;
     if (value) blockStyle("block/font/size", value);

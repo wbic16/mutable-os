@@ -80,7 +80,7 @@ export function ApplicationSurfacePortal(props: {
   editor?: ReactiveEditor; ownerKey?: string; sourceViewId?: string;
   id?: string; kind?: SurfaceKind; legacyInline?: boolean; children: JSX.Element;
 }) {
-  const inherited = useContext(WindowOwner), documentSession = useDocumentSession();
+  const inherited = useContext(WindowOwner), documentSession = useDocumentSession() ?? (props.ownerKey ? props.editor?.documentSessions?.forNode(props.ownerKey) : undefined);
   const manager = props.editor?.windowManager ?? inherited?.manager;
   const initialWindowId = untrack(() => props.ownerKey ? manager?.ownerForNode(props.ownerKey) ?? inherited?.windowId : inherited?.windowId);
   const windowId = () => documentSession ? documentSession.host.windowId : initialWindowId;
@@ -98,6 +98,8 @@ export function ApplicationSurfacePortal(props: {
   if (documentSession) { host.dataset.documentSession = documentSession.id; onCleanup(documentSession.ownSurface({ id, element: host, transferable: props.documentTransfer === "retained" })); }
   onMount(()=>manager.lifecycle.refreshInert());
   createEffect(() => {
+    const target = documentSession?.host.port?.surfaceContainer ?? (windowId() ? manager.groups.get(windowId()!) : manager.plane);
+    if(target && host.parentElement !== target)target.append(host);
     const visible = (windowId() ? manager.registry.windows[windowId()!]?.visible ?? false : true)
       && (!documentSession || documentSession.host.activity().visible);
     if (!windowId()) { manager.registry.revision(); host.style.zIndex = String(manager.count() * 2 + 2); }

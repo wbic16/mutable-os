@@ -20,3 +20,41 @@
 .textual-workspace .tw-popup button { display:block; width:100%; text-align:left; white-space:nowrap; }
 .textual-workspace .tw-popup button:hover { background:#00caca; color:#001044; }
 .textual-workspace .tw-small { overflow:auto; height:100%; }
+
+/* Flint presentation only. Authored payloads and graphical editor styles remain intact. */
+.textual-workspace .tw-flint { display:contents; }
+.textual-workspace .tw-flint-menu { display:flex; overflow:hidden; white-space:nowrap; }
+.textual-workspace .tw-flint-tabs { display:flex; overflow:auto hidden; white-space:nowrap; scrollbar-width:none; gap:var(--tw-cell-width); }
+.textual-workspace .tw-flint-tabs button { flex-shrink:0; max-width:calc(28 * var(--tw-cell-width)); overflow:hidden; text-overflow:ellipsis; }
+.textual-workspace .tw-flint-tabs button[aria-current] { background:var(--tw-focus); color:var(--tw-bg); }
+.textual-workspace .tw-flint-editor { overflow:auto; padding:0 var(--tw-cell-width); scroll-behavior:auto; }
+.textual-workspace .tw-flint-slot { width:var(--tw-prose-width); min-height:100%; }
+.textual-workspace .tw-flint-editor .reactive-document-occurrence { display:block; height:auto; min-height:0; width:100%; }
+.textual-workspace .tw-flint-editor .reactive-document-occurrence__content { padding:0; margin:0; overflow:visible; height:auto; max-height:none; }
+.textual-workspace .tw-flint-editor .document-style-bar { display:none; }
+.textual-workspace .tw-flint-editor .reactive-container-block { gap:var(--tw-line-height); }
+.textual-workspace .tw-flint-editor .reactive-standoff-block { padding:0; border:0; border-radius:0; }
+.textual-workspace .tw-flint-editor .reactive-standoff-surface { min-height:var(--tw-line-height); padding:0; border:0; border-radius:0; background:transparent; color:inherit; }
+.textual-workspace .tw-flint-editor .reactive-standoff-flow { font-family:ui-monospace,'Cascadia Mono',Consolas,monospace!important; font-size:var(--tw-font-size)!important; line-height:var(--tw-line-height)!important; letter-spacing:0!important; text-indent:0!important; text-align:left!important; min-height:var(--tw-line-height); }
+.textual-workspace .tw-flint-editor .reactive-standoff-flow > span { font-family:inherit!important; font-size:inherit!important; line-height:inherit!important; letter-spacing:0!important; }
+.textual-workspace .tw-flint-editor .reactive-page { padding:0; background:transparent; box-shadow:none; }
+.textual-workspace .tw-flint-editor .reactive-list { gap:var(--tw-line-height); padding-left:calc(2 * var(--tw-cell-width)); border:0; }
+.textual-workspace .tw-flint-status { white-space:nowrap; overflow:hidden; }
+.textual-workspace .tw-flint-popup { z-index:2; }
+.textual-workspace .tw-popup { z-index:3; }
+.textual-workspace select,.textual-workspace input { font:inherit; line-height:var(--tw-line-height); box-sizing:border-box; padding:0; border:0; border-radius:0; max-width:100%; background:var(--tw-surface); color:var(--tw-ink); }
+.textual-workspace .tw-dialog-shade { position:absolute; inset:0; z-index:5; background:#0008; }
+.textual-workspace .tw-save-dialog { padding:var(--tw-line-height) var(--tw-cell-width); overflow:auto; background:var(--tw-menu); color:var(--tw-menu-ink); }
+.textual-workspace .tw-save-dialog label { display:block; }
+.textual-workspace .tw-save-dialog input { width:calc(40 * var(--tw-cell-width)); }
+
+.textual-workspace .tw-flint-surfaces { position:absolute; inset:0; z-index:4; pointer-events:none; }
+.textual-workspace .tw-flint-applications { border:0; padding:0; margin:0; }
+
+/* Superscripts/subscripts retain their authored annotations and visual offset,
+   but no longer expand the ordinary line box off the measured grid. */
+.textual-workspace .tw-flint-editor .reactive-standoff-flow > span { vertical-align:baseline!important; }
+.textual-workspace .tw-flint-editor .reactive-standoff-flow > span[style*="vertical-align: super"] { position:relative; top:-.2em; }
+.textual-workspace .tw-flint-editor .reactive-standoff-flow > span[style*="vertical-align: sub"] { position:relative; top:.2em; }
+.textual-workspace .tw-command-menu input { display:block; width:100%; }
+.textual-workspace .tw-command-menu button { overflow:hidden; text-overflow:ellipsis; }

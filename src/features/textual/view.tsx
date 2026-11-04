@@ -1,10 +1,10 @@
-import { Portal } from 'solid-js/web';
+import { Dynamic, Portal } from 'solid-js/web';
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { cellStyle, loadPreferences, measuredGrid, normalisePreferences, savePreferences, type CellRect, type TextualGrid } from './grid';
 import './textual.css';
 
 /** Dedicated presentation; no editor/repository dependencies or global input bindings. */
-export function TextualWorkspace(props: { returnDesktop(): void; notice?: string }) {
+export function TextualWorkspace(props: { returnDesktop(): void; notice?: string; application?: import("solid-js").Component<{grid:TextualGrid}>; beforeZoom?():void }) {
   let root!: HTMLDivElement, probe!: HTMLSpanElement;
   const [preferences, setPreferences] = createSignal(loadPreferences());
   const [grid, setGrid] = createSignal<TextualGrid>();
@@ -26,6 +26,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
     });
   };
   const preference = (patch: Partial<ReturnType<typeof preferences>>) => {
+    if(patch.zoom!==undefined)props.beforeZoom?.();
     const next = normalisePreferences({ ...preferences(), ...patch }); setPreferences(next); savePreferences(next);
   };
   const zoom = (delta: number) => preference({ zoom: preferences().zoom + delta });
@@ -50,7 +51,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
   const keys = (event: KeyboardEvent) => {
     if (event.isComposing) return;
     if (event.key === 'Escape' && menu()) { event.preventDefault(); event.stopPropagation(); closeMenu(); }
-    if (event.key === 'Tab') {
+    if (event.key === 'Tab' && !(event.target instanceof Element && event.target.closest('[data-document-session],input,textarea,select,[role=dialog]'))) {
       const targets = [...root.querySelectorAll<HTMLElement>('button:not(:disabled)')].filter(el => el.getClientRects().length);
       const i = targets.indexOf(root.ownerDocument.activeElement as HTMLElement);
       if (targets.length && (event.shiftKey ? i <= 0 : i < 0 || i === targets.length - 1)) {
@@ -73,10 +74,12 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
       <nav class="tw-cell tw-menu-bar" aria-label="Workspace menu" style={rect({col:0,row:0,widthCells:columns(),heightCells:1})}>
         <button style={{width: `${11*(grid()?.cellWidthPx??0)}px`}} aria-haspopup="true" aria-expanded={menu()} onClick={() => setMenu(!menu())}>Workspace</button>
       </nav>
+      <Show when={props.application} fallback={<>
       <div class="tw-cell tw-title" style={rect({col:1,row:2,widthCells:columns()-2,heightCells:1})}>Textual Desktop</div>
       <div class="tw-cell tw-content" style={rect({col:1,row:4,widthCells:columns()-2,heightCells:Math.max(1,rows()-6)})}>
         <p>No application selected.</p><button style={{width: `${19*(grid()?.cellWidthPx??0)}px`}} onClick={props.returnDesktop}>Return to Desktop</button>
       </div>
+      </>}>{view=><Dynamic component={view()} grid={grid()!}/>}</Show>
       <footer class="tw-cell tw-status" style={rect({col:0,row:rows()-1,widthCells:columns(),heightCells:1})}>
         <button aria-label="Zoom out" onClick={() => zoom(-.1)}>−</button><span>{Math.round(preferences().zoom*100)}%</span><button aria-label="Zoom in" onClick={() => zoom(.1)}>+</button><span>{columns()} × {rows()}</span><span role="status">{props.notice}</span>
       </footer>

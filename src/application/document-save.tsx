@@ -6,9 +6,16 @@ import {vaultContains,vaultRoot,vaultLeaf,type VaultLocation} from './document-v
 import {DocumentSaveCollision,type SaveCollisionChoice} from '../rendering/document-save-collision';
 import {DocumentDialog} from '../demo/document-dialog';
 
+export type SavePrompt = {kind:'collision';filename:string;suggested:string;overwriteUnavailable?:string;choose:(choice:SaveCollisionChoice)=>void} | {kind:'destination';root:string;filename:string;choose:(location?:VaultLocation)=>void};
+export function validateSaveDestination(root:string,folder:string,filename:string):VaultLocation {
+ const location={folder:vaultRoot(folder),filename:vaultLeaf(filename)};
+ if(!vaultContains(root,location.folder))throw Error('Choose a folder inside the active Vault.');
+ if(!/\.(ink|phosphor|mutable\.json)$/.test(location.filename))throw Error('Use an .ink filename.');
+ return location;
+}
 type SaveVault = {root:string;check?:()=>void;run?:<T>(action:()=>Promise<T>,first:boolean)=>Promise<T>};
 /** Manual Save policy shared by Flint and standalone Document windows. */
-export function createDocumentSave(editor:ReactiveEditor,options:{vault:()=>Promise<SaveVault|undefined>;guard:()=>void}) {
+export function createDocumentSave(editor:ReactiveEditor,options:{vault:()=>Promise<SaveVault|undefined>;guard:()=>void;externalPresentation?:()=>boolean}) {
  const native=nativeDocumentSession(editor);
  const [collision,setCollision]=createSignal<{filename:string;suggested:string;overwriteUnavailable?:string;choose:(choice:SaveCollisionChoice)=>void}>();
  const [destination,setDestination]=createSignal<{root:string;filename:string;choose:(location?:VaultLocation)=>void}>();
@@ -16,6 +23,7 @@ export function createDocumentSave(editor:ReactiveEditor,options:{vault:()=>Prom
  onCleanup(()=>{disposed=true;collision()?.choose({action:'cancel'});destination()?.choose();});
  const guard=()=>{if(disposed)throw Error('Document Save view closed');options.guard();};
  return {
+  prompt:():SavePrompt|undefined=>collision()?{kind:'collision',...collision()!}:destination()?{kind:'destination',...destination()!}:undefined,
   async save(id:string,requested?:VaultLocation,forceChoose=false):Promise<boolean>{
    if(editor.completionInput?.beforeSave?.()===false)return false;
    if(saving)throw Error('A Document Save is already in progress');saving=true;
@@ -61,12 +69,12 @@ export function createDocumentSave(editor:ReactiveEditor,options:{vault:()=>Prom
     if(result?.phase!=='saved')throw Error(native.status(id));return true;
    }finally{saving=false;}
   },
-  Dialogs:()=> <><Show when={collision()}>{value=><DocumentSaveCollision {...value()}/>}</Show><Show when={destination()}>{value=><VaultSaveDestination {...value()}/>}</Show></>,
+  Dialogs:()=> <Show when={!options.externalPresentation?.()}><Show when={collision()}>{value=><DocumentSaveCollision {...value()}/>}</Show><Show when={destination()}>{value=><VaultSaveDestination {...value()}/>}</Show></Show>,
  };
 }
 function VaultSaveDestination(props:{root:string;filename:string;choose:(location?:VaultLocation)=>void}){
  const [folder,setFolder]=createSignal(props.root),[name,setName]=createSignal(props.filename),[error,setError]=createSignal('');
- const choose=()=>{try{const location={folder:vaultRoot(folder()),filename:vaultLeaf(name())};if(!vaultContains(props.root,location.folder))throw Error('Choose a folder inside the active Vault.');if(!/\.(ink|phosphor|mutable\.json)$/.test(location.filename))throw Error('Use an .ink filename.');props.choose(location);}catch(e){setError((e as Error).message);}};
+ const choose=()=>{try{props.choose(validateSaveDestination(props.root,folder(),name()));}catch(e){setError((e as Error).message);}};
  return <DocumentDialog title="Save in Vault" compact onClose={()=>props.choose()}><div style={{padding:'1rem'}}>
   <p>Choose a location in the active Vault ({props.root}). The original file will remain untouched.</p>
   <label>Vault folder <input aria-label="Save Vault folder" value={folder()} onInput={e=>setFolder(e.currentTarget.value)}/></label>

@@ -18,7 +18,7 @@ export function selectionInputTarget(event: Event, mounts: Pick<MountRegistry, "
   if (excluded) return { excluded: true };
   if (element?.matches('[data-cross-text-input]')) return { key: crossHead(element), excluded: false };
   const resolved = mounts.resolveEvent(event);
-  const toolbar = element?.closest(".document-style-bar");
+  const toolbar = element?.closest(".document-style-bar, [data-selection-toolbar]");
   return { key: resolved?.handle.inputPolicy === "standoff" ? resolved.nodeKey : undefined, excluded: false,
     composing: resolved?.handle.composing, toolbar: !!toolbar && toolbarOwners.get(toolbar)?.mounts === mounts };
 }

@@ -1,3 +1,5 @@
+import { TextualFlint } from '../features/textual/flint';
+import { documentApplicationPorts } from './document-application-ports';
 import { TextualWorkspace } from "../features/textual/view";
 import { ErrorBoundary, Suspense, lazy, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { ReactiveViewProvider } from "../reactive-editor/context";
@@ -19,6 +21,7 @@ const SpatialView = lazy(() => import("../features/spatial/view"));
 /** One provider and one overlay set survive switches; only active roots mount. */
 export function WorkspacePresentationView(props: { session: WorkspaceSession; desktopActions?: DesktopActions; desktopAvailable?: () => boolean }) {
   const { editor, projection, presentation } = props.session;
+  const TextualApplication = (p:{grid:import("../features/textual/grid").TextualGrid}) => <TextualFlint session={props.session} grid={p.grid}/>;
   createEffect(()=>props.session.windowManager?.layout.setEnabled(presentation.active()==="desktop"));
   const canvas = createMemo(() => presentation.read()?.presentations.canvas);
   const roots = createMemo(() => presentation.active() === "canvas" ? props.session.canvasRoots() : []);
@@ -82,6 +85,6 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
     </Show>
     <Show when={props.session.documentSessions?.detachment}>{controller=><DetachedDocumentWindows controller={controller()}/>}</Show>
     <ReactiveViewLayers editor={editor} projection={projection} />
-    <Show when={presentation.active() === "textual"}><TextualWorkspace returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
+    <Show when={presentation.active() === "textual"}><TextualWorkspace application={TextualApplication} beforeZoom={()=>{for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);}}} returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
   </ReactiveViewProvider></WindowManagerPlane>;
 }

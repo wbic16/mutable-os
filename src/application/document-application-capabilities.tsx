@@ -1,3 +1,4 @@
+import { documentApplicationPorts } from './document-application-ports';
 import { tabOrientation } from '../block-tree/tab-orientation';
 import { tabOrientationMenu } from '../runtime/tab-orientation';
 import {registerCompletionDocuments} from './completion-documents';
@@ -85,6 +86,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
       const initialView = launchViews.get(applicationId);
       launchViews.delete(applicationId);
       const cavern = useCurrentCavern();
+      const [externalPresentation,setExternalPresentation] = createSignal(false);
       const retainedSessions = useManagedWindowOwner() ? editor.documentSessions : undefined;
       // Stage A hosts a Window application, never an application recursively inside a Document.
       if (editor.blockQueries.ancestors(props.nodeKey).some(n => n.viewType === "document-block")) return <p role="status">This application requires a Window outside a Document.</p>;
@@ -273,7 +275,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
             if (target) { chooseTab(target); recents?.record({ id, title: doc.title, location: native?.location(id) }, recentVaultId()); }
           };
       const [selectedVault, setSelectedVault] = createSignal<DocumentVaultLease>();
-      const documentSaver=native?createDocumentSave(editor,{guard,vault:async()=>{
+      const documentSaver=native?createDocumentSave(editor,{guard,externalPresentation,vault:async()=>{
         const selected=selectedVault();if(!selected)return undefined;
         return {root:selected.root,check:()=>{if(selectedVault()!==selected||!selected.isAlive())throw Error('The active Vault changed before Save. Try again in the intended Vault.');},run:(action,first)=>selected.mutate(action,first)};
       }}):undefined;
@@ -522,8 +524,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
           else {const id=activeId();void editor.interchange.dropFiles(files,node!.key,()=>mounted&&scope.active()&&activeId()===id);}
         },
       } : undefined;
-      return <>{documentSaver && <documentSaver.Dialogs/>}<Show when={publication()}>{p=><PublicationDialog editor={editor} initial={p().initial} close={()=>setPublication(undefined)}/>}</Show><Show when={collectionMode()}>{mode=><CollectionDialog editor={editor} vault={selectedVault()?.root??'.'} current={()=>mounted&&scope.active()} mode={mode()} close={()=>setCollectionMode(undefined)}/>}</Show><Show when={choosingVault()}><DocumentBrowser mode="directory" initialLocation={{folder:selectedVault()?.root??'.',filename:''}} busy={chooserBusy()} error={chooserError()} onClose={()=>setChoosingVault(false)} onChoose={async location=>{setChooserBusy(true);setChooserError('');try{await vault!.open(location.folder);if(mounted)setChoosingVault(false);return true;}catch(e){if(mounted)setChooserError(String(e));return false;}finally{if(mounted)setChooserBusy(false);}}}/></Show><div ref={root} tabIndex={-1} data-block-type={definition.type} data-runtime-key={props.nodeKey}>
-        <Dynamic component={definition.view} initialView={initialView} application={{
+      const application: import('../feature-api/document-application').DocumentApplicationInstance = {
           documents: () => documents().map(({ id, title }) => ({ id, title })), tabs, files, vault, properties, knowledge, interchange, entityBacklinks: EntityBacklinks,
           recentDocuments: recents ? {
             items: () => recents.items(recentVaultId()).map(d => ({ ...d, title: resolve(d.id)?.title ?? d.title, location: native?.location(d.id) ?? d.location })),
@@ -561,7 +562,18 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
             editor.commands.setPayloadField(doc.placement, "metadata", { ...(content.payload.metadata as object), title: title.trim() }, "Rename Document");
           },
           closeActiveTab() { const key = activeTab(); if (key) closeTab(key); },
-        }} />
+        };
+      if(editor.features.textualWorkspace && retainedSessions) {
+        onMount(()=>onCleanup(documentApplicationPorts(editor).register({
+          key:props.nodeKey,application,windowId:()=>editor.windowManager?.ownerForNode(props.nodeKey),
+          tabs:()=>tabKeys().map(key=>({key,documentId:tabId(key),title:resolve(tabId(key)??'')?.title??'Unavailable Document',dirty:!!native?.isDirty(tabId(key)??'')})),
+          activeTab,selectTab:chooseTab,presented:setExternalPresentation,
+          session:()=>{retainedSessions.transfers.observe();return retainedSessions.sessions().find(s=>s.host.ownerKey===props.nodeKey&&s.host.slotKey===activeTab());},
+          prompt:()=>documentSaver?.prompt(),
+        })));
+      }
+      return <>{documentSaver && <documentSaver.Dialogs/>}<Show when={publication()}>{p=><PublicationDialog editor={editor} initial={p().initial} close={()=>setPublication(undefined)}/>}</Show><Show when={collectionMode()}>{mode=><CollectionDialog editor={editor} vault={selectedVault()?.root??'.'} current={()=>mounted&&scope.active()} mode={mode()} close={()=>setCollectionMode(undefined)}/>}</Show><Show when={choosingVault()}><DocumentBrowser mode="directory" initialLocation={{folder:selectedVault()?.root??'.',filename:''}} busy={chooserBusy()} error={chooserError()} onClose={()=>setChoosingVault(false)} onChoose={async location=>{setChooserBusy(true);setChooserError('');try{await vault!.open(location.folder);if(mounted)setChoosingVault(false);return true;}catch(e){if(mounted)setChooserError(String(e));return false;}finally{if(mounted)setChooserBusy(false);}}}/></Show><div ref={root} tabIndex={-1} data-block-type={definition.type} data-runtime-key={props.nodeKey}>
+        <Dynamic component={definition.view} initialView={initialView} application={application} />
       </div></>;
     };
     scope.own(editor.registry.register({ type: definition.type, capabilities: ["container"], view: props => <Show when={scope.active()}><Instance nodeKey={props.nodeKey} /></Show> }, scope.owner));

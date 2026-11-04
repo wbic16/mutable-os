@@ -15,6 +15,9 @@ export interface DocumentHostPort {
   readonly scrollport?: HTMLElement;
   readonly coordinates: LocalCoordinates;
   selected(): boolean;
+  /** Optional activity of a same-owner presentation host. */
+  surfaceContainer?: HTMLElement;
+  activity?(): {mounted:boolean;visible:boolean;active:boolean};
 }
 export interface DocumentHostLease {
   readonly port: DocumentHostPort;
@@ -82,6 +85,7 @@ export class DocumentHostTransfers {
     host.occupant = session; this.entries.set(session.id, { session, origin: host, host });
     session.host.bind(host.port);
     host.port.container.append(session.element);
+    this.revision[1](n => n + 1);
   }
   private host(lease: DocumentHostLease): Host {
     const host = this.hosts.get(hostKey(lease.port));
@@ -139,6 +143,7 @@ export class DocumentHostTransfers {
     this.host(source); this.host(destination);
     if (!probe && (source === destination || destination.occupant || destination.reservation && destination.reservation !== token))
       throw Error('Destination is occupied or reserved');
+    if (session.host.port !== source.port) throw Error("Restore the Document presentation before transferring between windows");
     if (!manager?.layout.active()) throw Error('Document transfer requires the managed Desktop');
     for (const host of [source, destination]) {
       const p = host.port, group = manager.groups.get(p.windowId);

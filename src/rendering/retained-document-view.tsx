@@ -34,8 +34,9 @@ export function RetainedDocumentHost(props: {
       const port = session.host.port;
       const window = owner?.manager.registry.windows[session.host.windowId];
       const selected = port ? port.selected() : props.selected;
-      const visible = !session.host.suspended() && selected && (!owner || !!window?.visible);
-      untrack(() => session.host.update(visible, visible && (!owner || !!window?.active)));
+      const activity = port?.activity?.();
+      const visible = !session.host.suspended() && selected && (activity ? activity.visible : !owner || !!window?.visible);
+      untrack(() => session.host.update(visible, visible && (activity ? activity.active : !owner || !!window?.active)));
     });
     insert(session.element, () => <DocumentSessionContext.Provider value={session}>
       <DocumentSessionWindowOwner session={session} manager={owner?.manager}>

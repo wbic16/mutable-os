@@ -1,3 +1,4 @@
+import { documentApplicationPorts } from "./document-application-ports";
 import { createSpatialActions, supportsSpatial } from "./spatial-actions";
 import type { ReactiveEditorConfiguration } from "../configuration";
 import type { ContentKey, PlacementKey } from "../block-tree/types";
@@ -152,6 +153,8 @@ export class WorkspaceSession {
       this.interaction?.cancel();
       const candidate = createDesktop ? deriveDesktop(editor.repository.snapshot(), this.presentation.read()!, this.resolveObjects(),
         typeof window === "undefined" ? undefined : { width: window.innerWidth, height: window.innerHeight }) : undefined;
+      const retainedPresentation = name === "textual" || this.presentation.active() === "textual";
+      if(retainedPresentation)for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session){this.documentSessions?.presentations.check(session);this.documentSessions?.presentations.remember(session);}}
       batch(() => {
         if (name === "textual" && this.presentation.read()?.presentations.textual === undefined) this.presentation.initializeTextual();
         if (name === "spatial" && this.presentation.read()?.presentations.spatial === undefined) this.spatial?.create();
@@ -178,12 +181,14 @@ export class WorkspaceSession {
           this.presentation.initializeDesktop(candidate.objects);
         }
         editor.selectionGestures.cancelGesture();
-        editor.crossText.clear();
+        if(!retainedPresentation)editor.crossText.clear();
         this.presentation.select(name);
         this.noticeSignal[1](candidate ? `Desktop created with ${candidate.entries.length} object(s).${candidate.skipped.length ? " Retained without a Desktop conversion: " + candidate.skipped.map(item => `${item.label} (${item.reason})`).join("; ") + "." : ""}` : "");
       });
       queueMicrotask(() => {
-        if (this.disposed || !key || name === "textual") return;
+        if (this.disposed || name === "textual") return;
+        if(retainedPresentation)for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)this.documentSessions?.presentations.restorePosition(session);}
+        if(!key)return;
         // Existing occurrences (including minimized ones) keep their bookmark.
         // A reparented occurrence has a new route: match its retained ancestor
         // placements so a shared Document does not steal focus into another Window.
