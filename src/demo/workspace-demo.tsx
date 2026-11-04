@@ -31,6 +31,8 @@ import { resolveFeatureFlags, type ReactiveEditorConfiguration } from "../config
 import { backgroundImages } from "../rendering/backgrounds";
 import { CodexSystemBar } from "./codex-system-bar";
 import { createWorkspaceOpenControls } from "./workspace-open-controls";
+import { documentToPhext, phextFilenameFor, phextToDocument } from "../phext/document";
+import { openPhextFile, savePhextFile } from "../phext/file-io";
 import { CavernControl, useCurrentCavern } from "../application/cavern-startup";
 
 type DemoWindowState = "normal" | "minimized" | "maximized" | "closed";
@@ -201,6 +203,29 @@ function DemoSession(props: { configuration: ReactiveEditorConfiguration; onEdit
   for (const [id, serverExecute, localExecute] of [["workspace.open", props.onWorkspaceOpen, props.onLocalWorkspaceOpen], ["workspace.save", props.onWorkspaceSave, props.onLocalWorkspaceSave]] as const) {
     editor.commandRegistry.register({ id, label: id, canExecute: () => !props.workspaceBusy, execute: serverExecute });
   }
+  // Phext import/export are explicit Local file actions (feature-flagged);
+  // they never run on the typing path and export never acknowledges a Save.
+  const [phextError, setPhextError] = createSignal("");
+  const openPhext = () => documents.guard("open a phext document", () => void (async () => {
+    setPhextError("");
+    try {
+      const selected = await openPhextFile();
+      if (!selected) return;
+      props.onOpenLocal(phextToDocument(selected.text, selected.filename), { filename: selected.filename, handle: selected.handle });
+    } catch (reason) {
+      setPhextError(reason instanceof Error ? reason.message : String(reason));
+    }
+  })());
+  const exportPhext = () => {
+    setPhextError("");
+    try {
+      const document = editor.encodeDocument();
+      void savePhextFile(documentToPhext(document), phextFilenameFor(document))
+        .catch((reason) => setPhextError(reason instanceof Error ? reason.message : String(reason)));
+    } catch (reason) {
+      setPhextError(reason instanceof Error ? reason.message : String(reason));
+    }
+  };
   const encoded = createMemo(() => {
     editor.repository.state.revision;
     return showJson() ? JSON.stringify(editor.encodeDocument(), null, 2) : "";
@@ -253,6 +278,7 @@ function DemoSession(props: { configuration: ReactiveEditorConfiguration; onEdit
             <button data-document-save type="button" disabled={documents.busy()} onClick={() => documents.run("document.saveAs", "local")}>Save as…</button>
             <button type="button" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceOpen}>Open Workspace…</button>
             <button data-document-save type="button" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceSave}>Save Workspace…</button>
+            <Show when={editor.features.phextDocuments}><button type="button" disabled={documents.busy()} onClick={openPhext}>Open Phext…</button><button data-document-save type="button" disabled={documents.busy()} onClick={exportPhext}>Export Phext…</button></Show>
           </span>
         </>}
         <button type="button" title={editor.bindings.label("sticky.createFloating")} onClick={() => editor.stickyNotes.create()}>New Sticky Note</button>
@@ -285,6 +311,7 @@ function DemoSession(props: { configuration: ReactiveEditorConfiguration; onEdit
               <button data-document-save type="button" role="menuitem" disabled={documents.busy()} onClick={() => documents.run("document.saveAs", "local")}>Save as…</button>
               <button type="button" role="menuitem" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceOpen}>Open Workspace…</button>
               <button data-document-save type="button" role="menuitem" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceSave}>Save Workspace…</button>
+              <Show when={editor.features.phextDocuments}><button type="button" role="menuitem" disabled={documents.busy()} onClick={openPhext}>Open Phext…</button><button data-document-save type="button" role="menuitem" disabled={documents.busy()} onClick={exportPhext}>Export Phext…</button></Show>
             </fieldset>
           </>}
           <hr role="separator" />
@@ -337,6 +364,7 @@ function DemoSession(props: { configuration: ReactiveEditorConfiguration; onEdit
             <DocumentMarginContext.Provider value={marginPresentation}>
               <DocumentStyleBar toolset={toolset()} onToolset={setToolset} onNotice={setToolbarNotice} editor={editor} scopeKey={projection.state.rootKey} margins={{ collapsed: marginsCollapsed(), count: marginEntries().length, open: marginDrawerOpen(), controls: "demo-document-margin-drawer", toggle: toggleMargins }} />
               <Show when={documents.error() && !documents.browser() && !documents.pending()}><p class="workspace-demo__file-notice" role="alert">{documents.error()}</p></Show>
+              <Show when={phextError()}><p class="workspace-demo__file-notice" role="alert">{phextError()}</p></Show>
               <Show when={editor.persistence.state.warning}><p class="workspace-demo__file-notice" role="status">{editor.persistence.state.warning}</p></Show>
               <section class="workspace-demo__document" classList={{ "workspace-demo__document--tabbed": hasDocumentTabs(), "workspace-demo__document--flow": !hasDocumentTabs() }} aria-label={title()}>
                 <ReactiveTreeView editor={editor} projection={projection} />

@@ -41,6 +41,8 @@ export type FeatureFlags = Readonly<{
   mutableClipboard: boolean;
   /** Explicit file import, source conversion and semantic export. */
   documentInterchange: boolean;
+  /** Explicit local .phext import/export of Documents (see src/phext). */
+  phextDocuments: boolean;
   /** Cavern application services, durable preparation jobs and bounded host execution. */
   applicationServices: boolean;
   /** Explicit reviewed static publication; independent of ordinary editing. */
@@ -175,6 +177,7 @@ export const featureFlags: FeatureFlags = Object.freeze({
   documentDetachment: true,
   mutableClipboard: true,
   documentInterchange: true,
+  phextDocuments: true,
   applicationServices: true,
   webPublishing: true,
   externalHtmlClipboard: true,
