@@ -66,7 +66,7 @@ import {
   originCoordinate,
   DIMENSION_BREAK_BYTES,
   type PhextCoordinate,
-} from "./coordinate";
+} from "./coordinate.js";
 
 /** A scroll's location within the base buffer: bytes `[start, end)`. */
 export interface ScrollSpan {

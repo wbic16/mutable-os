@@ -108,8 +108,8 @@ import { copyFileSync, existsSync } from "node:fs";
 import {
   formatCoordinate,
   type PhextCoordinate,
-} from "./coordinate";
-import { PhextLattice } from "./lattice";
+} from "./coordinate.js";
+import { PhextLattice } from "./lattice.js";
 
 export const PHEXT_VFS_FORMAT = "mutable-phext-vfs";
 export const PHEXT_VFS_VERSION = 1;
