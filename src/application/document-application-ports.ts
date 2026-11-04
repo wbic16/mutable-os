@@ -15,6 +15,7 @@ export interface DocumentApplicationPort {
   session(): RetainedDocumentSession | undefined;
   presented(value: boolean): void;
   prompt(): SavePrompt | undefined;
+  saveAs?():Promise<unknown>;
 }
 const registries = new WeakMap<ReactiveEditor, ReturnType<typeof createRegistry>>();
 function createRegistry() {

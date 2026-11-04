@@ -1,3 +1,4 @@
+import {ownApplicationPresentationSurface} from '../rendering/application-presentation-surface';
 import { TextualFlint } from '../features/textual/flint';
 import { documentApplicationPorts } from './document-application-ports';
 import { TextualWorkspace } from "../features/textual/view";
@@ -85,6 +86,6 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
     </Show>
     <Show when={props.session.documentSessions?.detachment}>{controller=><DetachedDocumentWindows controller={controller()}/>}</Show>
     <ReactiveViewLayers editor={editor} projection={projection} />
-    <Show when={presentation.active() === "textual"}><TextualWorkspace application={TextualApplication} beforeZoom={()=>{for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);}}} returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
+    <Show when={presentation.active() === "textual"}><TextualWorkspace ownSurface={element=>props.session.windowManager?ownApplicationPresentationSurface(props.session.windowManager,element):()=>{}} application={TextualApplication} beforeZoom={()=>{for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);}}} returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
   </ReactiveViewProvider></WindowManagerPlane>;
 }

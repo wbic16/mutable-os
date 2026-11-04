@@ -570,6 +570,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
           activeTab,selectTab:chooseTab,presented:setExternalPresentation,
           session:()=>{retainedSessions.transfers.observe();return retainedSessions.sessions().find(s=>s.host.ownerKey===props.nodeKey&&s.host.slotKey===activeTab());},
           prompt:()=>documentSaver?.prompt(),
+          saveAs:documentSaver?()=>documentSaver.save(requireId(),undefined,true):undefined,
         })));
       }
       return <>{documentSaver && <documentSaver.Dialogs/>}<Show when={publication()}>{p=><PublicationDialog editor={editor} initial={p().initial} close={()=>setPublication(undefined)}/>}</Show><Show when={collectionMode()}>{mode=><CollectionDialog editor={editor} vault={selectedVault()?.root??'.'} current={()=>mounted&&scope.active()} mode={mode()} close={()=>setCollectionMode(undefined)}/>}</Show><Show when={choosingVault()}><DocumentBrowser mode="directory" initialLocation={{folder:selectedVault()?.root??'.',filename:''}} busy={chooserBusy()} error={chooserError()} onClose={()=>setChoosingVault(false)} onChoose={async location=>{setChooserBusy(true);setChooserError('');try{await vault!.open(location.folder);if(mounted)setChoosingVault(false);return true;}catch(e){if(mounted)setChooserError(String(e));return false;}finally{if(mounted)setChooserBusy(false);}}}/></Show><div ref={root} tabIndex={-1} data-block-type={definition.type} data-runtime-key={props.nodeKey}>

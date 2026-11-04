@@ -1,3 +1,4 @@
+import {applicationPresentationSurface} from '../rendering/application-presentation-surface';
 import { createSignal, createUniqueId, onCleanup, onMount, type JSX } from "solid-js";
 import { windowManagerForDocument } from "../application/window-lifecycle";
 import { Portal } from "solid-js/web";
@@ -56,7 +57,7 @@ export function DocumentDialog(props: { title: string; onClose: () => void; busy
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
   };
-  return <Portal>
+  return <Portal mount={applicationPresentationSurface(manager)}>
     <div class="document-dialog__backdrop">
       <section ref={dialog} class="document-dialog" classList={{ "document-dialog--compact": props.compact, "document-dialog--resizable": !!props.resizable }} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-busy={props.busy} tabIndex={-1} onKeyDown={keyDown}
         style={props.resizable ? { left: `${position().x}px`, top: `${position().y}px`, width: `${windowResize.dimensions().width}px`, height: `${windowResize.dimensions().height}px` } : undefined}>

@@ -1,3 +1,4 @@
+import {createDocumentSave} from './document-save';
 // @vitest-environment jsdom
 import {afterEach,it,expect,vi} from 'vitest';
 import {render} from 'solid-js/web';
@@ -43,4 +44,21 @@ it('outside-Vault Ink Save asks for a Vault copy, supports cancellation, and ret
  expect(await fs.readFile(path.join(f.root,'outside/Original.ink'),'utf8')).toBe(f.original);expect(JSON.parse(await fs.readFile(path.join(f.root,'vault/Copied.ink'),'utf8')).resourceId).toBe(id);
  expect(f.session.projection).toBe(projection);expect(document.querySelector('[contenteditable=true]')).toBe(dom);expect(f.session.projection.nodeForPlacement(placement)).toBeTruthy();
  click('Save Document');await wait(()=>expect(document.body.textContent).toContain('Saved Mutable JSON Document'));expect(document.body.textContent).not.toContain('Save in Vault');
+},15000);
+
+it('Save As uses the existing copy service, preserves the source and retains the editor',async()=>{
+ const f=await setup();await fs.writeFile(path.join(f.root,'vault/Original.ink'),f.original);
+ await f.actions.serverDocument({folder:'vault',filename:'Original.ink'},new AbortController().signal);f.mount();
+ const id=JSON.parse(f.original).resourceId,dom=document.querySelector('[contenteditable=true]');let save!:(id:string,location?:any,choose?:boolean)=>Promise<boolean>;
+ const host=document.body.appendChild(document.createElement('div'));
+ {
+  const Host=()=>{const service=createDocumentSave(f.session.editor,{guard:()=>{},vault:async()=>({root:'vault'})});save=service.save;return <service.Dialogs/>;};
+  cleanup.push(render(()=><Host/>,host));
+ }
+ const pending=save(id,undefined,true);await wait(()=>expect(document.body.textContent).toContain('Save in Vault'));
+ const field=document.querySelector<HTMLInputElement>('[aria-label="Save Vault filename"]')!;field.value='Copy.ink';field.dispatchEvent(new Event('input',{bubbles:true}));click('Save in Vault');
+ expect(await pending).toBe(true);expect(f.native.location(id)).toEqual({folder:'vault',filename:'Copy.ink'});
+ expect(await fs.readFile(path.join(f.root,'vault/Original.ink'),'utf8')).toBe(f.original);
+ expect(JSON.parse(await fs.readFile(path.join(f.root,'vault/Copy.ink'),'utf8')).resourceId).toBe(id);
+ expect(document.querySelector('[contenteditable=true]')).toBe(dom);
 },15000);

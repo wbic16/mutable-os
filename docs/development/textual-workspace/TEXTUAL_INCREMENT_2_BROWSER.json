@@ -1,0 +1,64 @@
+{
+  "geometry": {
+    "font": "ui-monospace, \"Cascadia Mono\", Consolas, monospace",
+    "fontSize": "16px",
+    "cellWidth": 9.640625,
+    "lineHeight": 20,
+    "width": 1205.078125,
+    "columns": 125,
+    "x": 2,
+    "advances": [
+      9.640625,
+      9.640625,
+      9.640625,
+      9.640625
+    ],
+    "rows": [
+      4,
+      6,
+      8,
+      10,
+      16,
+      18,
+      20,
+      22
+    ],
+    "selection": {
+      "anchor": 20,
+      "head": 25
+    },
+    "status": "letter.ink"
+  },
+  "zoom": {
+    "selection": {
+      "anchor": 308,
+      "head": 308
+    },
+    "font": "ui-monospace, \"Cascadia Mono\", Consolas, monospace",
+    "fontSize": "17.6px",
+    "columns": "120"
+  },
+  "typing": {
+    "snapshots": 0,
+    "creates": 0,
+    "projectionRebuilds": 0,
+    "referenceRebuilds": 0
+  },
+  "trustedEditing": true,
+  "compositionSmoke": true,
+  "selectionPreservingFormatting": true,
+  "undoRedo": true,
+  "manualSave": true,
+  "newDocumentCancellation": true,
+  "saveAsAndCancel": true,
+  "serviceDialogVisible": true,
+  "slashPopupVisible": true,
+  "applicationSwitching": true,
+  "sharedOccurrenceSelection": true,
+  "scrollRetention": true,
+  "representativeListsTablesTabs": true,
+  "sameEditorCellAndTextNode": true,
+  "documentSwitching": true,
+  "desktopRoundTrip": true,
+  "snapshotsOutsideSave": 0
+}

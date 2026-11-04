@@ -4,7 +4,7 @@ import { cellStyle, loadPreferences, measuredGrid, normalisePreferences, savePre
 import './textual.css';
 
 /** Dedicated presentation; no editor/repository dependencies or global input bindings. */
-export function TextualWorkspace(props: { returnDesktop(): void; notice?: string; application?: import("solid-js").Component<{grid:TextualGrid}>; beforeZoom?():void }) {
+export function TextualWorkspace(props: { returnDesktop(): void; notice?: string; application?: import("solid-js").Component<{grid:TextualGrid}>; beforeZoom?():void; ownSurface?(element:HTMLElement):()=>void }) {
   let root!: HTMLDivElement, probe!: HTMLSpanElement;
   const [preferences, setPreferences] = createSignal(loadPreferences());
   const [grid, setGrid] = createSignal<TextualGrid>();
@@ -35,6 +35,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
   const rows = () => grid()?.rows ?? 0;
   createEffect(() => { preferences().zoom; schedule(true); });
   onMount(() => {
+    if(props.ownSurface)onCleanup(props.ownSurface(root));
     root.focus({ preventScroll: true });
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => schedule()) : undefined;
     observer?.observe(root);

@@ -46,6 +46,23 @@ This is the register of currently proposed shared changes. Add the exact files t
 
 Canonical repository, mutation, clipboard, serialization and history implementations are **reuse-only**. Graphical CSS is **unchanged**. Block renderers are reused through Textual wrappers; any demonstrated need to modify another renderer must first receive a specific register entry and a focused check.
 
+## Increment 2 boundary qualification — 2026-11-05
+
+The retained editor and application-host lifecycle are qualified; see [Increment 2 results](TEXTUAL_INCREMENT_2_QUALIFICATION.md). Increment 3 has not started. No inventory regeneration or broad source audit was performed.
+
+Concrete additions to the Shared-Code Impact Register:
+
+| Register | Actual shared changes | Reason / alternative / regression coverage |
+|---|---|---|
+| S1, S2 | `workspace-session.ts`, `workspace-presentation-view.tsx`; Textual font probe | Capture/restore the active retained session at presentation boundaries; compose the dedicated view. The probe now uses individual inline fragments, matching Chrome's per-Cell rounding (a demonstrated discrepancy from measuring one long Text node). Trusted zoom/round-trip and exact Cell advances; no canonical work for presentation changes. |
+| S3 | `document-application-capabilities.tsx`, new `document-application-ports.ts` | Expose the existing controller, tabs, Save policy and retained session through a runtime port. No new application/controller instance or graphical Flint layout branches. Browser document/application switching, manual Save and Save As. |
+| S4 | `document-sessions.ts`, `document-host-transfers.ts`, `retained-document-view.tsx`, new `document-host-presentations.ts` | A same-owner DOM presentation lease, with activity/scroll/surface ports, restoration and existing lifecycle guards. Cross-window transfer policy remains separate. Reuse the existing rebased selection model after shared-content edits. Session/transfer tests, attachment-failure rollback, real DOM identity, scrolling and shared-occurrence browser checks. |
+| S5 | `document-style-bar.tsx`, new `document-style-ports.ts`; `document-save.tsx`; `selection-target.ts` | Expose selection-aware formatting handlers; supply a dedicated Save presenter and explicit toolbar ownership attribute. Save As delegates to the existing copy service and collision checks. Avoid duplicated annotation/Save operations and hidden-toolbar clicks. Formatting, bounded authoring, native input exclusion and source-preserving Save tests. |
+| S11 | `window-manager.tsx`, `document-dialog.tsx`, new `application-presentation-surface.ts` | Route retained document surfaces and existing service dialogs to the active presentation. Default graphical body/window portals remain unchanged. Slash popup, Save/cancel, legacy Vault dialog, graphical Save tests and Desktop return. |
+| S12 (observed defect) | One transaction adapter in `reactive-editor/editor.ts`; `range-annotations.test.ts` | The browser exposed a legacy repository snapshot around formatting. Use the already-existing `structuralTransaction()` for annotation batch assembly; preserve canonical admission, history and fallback. Single/multiple-owner annotation tests and Undo/Redo prove zero snapshots, projection rebuilds and reference rebuilds. No transaction-engine refactoring. |
+
+All new views/styles remain under `src/features/textual/`. Graphical Flint's `shell.tsx` and its graphical stylesheet are unchanged. Dedicated integrated tool views remain Increment 3; native media, internal Block layout quantization and specialised presentation polish remain Increment 4. Rare File/Vault workflows still need presentation/parity follow-through against the existing action inventory; the underlying services remain available.
+
 ## Testing and reporting discipline
 
 For each increment, test new code and changed integration boundaries, then stop once focused checks pass. Reuse existing regression tests for unchanged operations. Do not perform a new inventory audit, exhaustive platform/Unicode matrix or unrelated accessibility/performance campaign. Pursue unusual Unicode/scaling cases only when a concrete defect or data/editing risk justifies it. Keep semantic controls and effective shortcuts correct as part of implementation.

@@ -46,7 +46,8 @@ export function createDocumentSave(editor:ReactiveEditor,options:{vault:()=>Prom
     }
     if(!target){if(!vault)throw Error('Open a Vault before saving this Document.');target={folder:vault.root,filename:availableNativeFilename(name,[])};}
     const validate=()=>{target={folder:vaultRoot(target!.folder),filename:vaultLeaf(target!.filename)};if(vault&&!vaultContains(vault.root,target.folder))throw Error('Choose a location inside the active Vault.');};validate();
-    const first=native.needsSaveDestination(id)||outside;
+    const copy=outside||!!(forceChoose&&source&&JSON.stringify(source)!==JSON.stringify(target));
+    const first=native.needsSaveDestination(id)||copy;
     let overwrite:NativeOverwrite|undefined;
     if(first){
      for(;;){
@@ -64,7 +65,7 @@ export function createDocumentSave(editor:ReactiveEditor,options:{vault:()=>Prom
     check();
     const latest=native.location(id);
     if(JSON.stringify(latest)!==JSON.stringify(source))throw Error('Another view changed this Document’s Save destination. Retry Save.');
-    const action=()=>outside?native.saveCopy(id,target!,overwrite):native.save(id,target,overwrite);
+    const action=()=>copy?native.saveCopy(id,target!,overwrite):native.save(id,target,overwrite);
     const result=vault?.run?await vault.run(action,first):await action();
     if(result?.phase!=='saved')throw Error(native.status(id));return true;
    }finally{saving=false;}

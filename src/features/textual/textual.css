@@ -58,3 +58,8 @@
 .textual-workspace .tw-flint-editor .reactive-standoff-flow > span[style*="vertical-align: sub"] { position:relative; top:.2em; }
 .textual-workspace .tw-command-menu input { display:block; width:100%; }
 .textual-workspace .tw-command-menu button { overflow:hidden; text-overflow:ellipsis; }
+.textual-workspace .tw-save-dialog fieldset { border:0; padding:0; margin:0; }
+/* Legacy service forms remain reachable in the active presentation until their
+   dedicated views are supplied; their graphical defaults are unchanged. */
+.textual-workspace .document-dialog { font:inherit; color:var(--tw-ink); background:var(--tw-bg); border-radius:0; }
+.textual-workspace .document-dialog__header { font:inherit; padding:var(--tw-line-height) var(--tw-cell-width); background:var(--tw-menu); color:var(--tw-menu-ink); }
