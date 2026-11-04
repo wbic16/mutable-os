@@ -57,11 +57,21 @@ files where possible.
 | `src/knowledge-sqlite/vault-scope.mjs` | `lockVaultEstablishment` takes its lock through the new `flockExclusiveSync` helper (`src/knowledge-sqlite/advisory-lock.mjs`): only genuine contention (EWOULDBLOCK/EAGAIN) produces "Another Vault establishment is in progress; retry", now always with code `EWOULDBLOCK` so `client.mjs`'s retry loop applies; every other failure propagates with its real cause. | Live bug: vault creation always failed with that message. fs-ext's compiled binding is absent wherever install scripts did not run (the deployed bundle, this VM), so `require('fs-ext')` itself threw — and the old catch-all reported *every* failure as lock contention. The helper prefers the native binding when usable and otherwise falls back to a portable O_EXCL token lock with pid-based stale recovery. | Rendezvous-file creation and validation above the lock call are unchanged. Keep the lock routed through `advisory-lock.mjs` after a rebase. |
 | `src/knowledge-sqlite/paths.mjs` | `writerLock` takes the SQLite writer lease through the same `flockExclusiveSync` helper (fallback token at `writer.lock.holder`); its error wrap ("SQLite writer unavailable: …") is unchanged. | The writer lease was the next fs-ext wall in the same vault-open flow: with establishment fixed, vault creation would still have failed at the lease in any fs-ext-less deployment. | The rendezvous `writer.lock` inode is still never unlinked; only the fallback's `.holder` token is created and removed. |
 | `index.html` | `<title>Solid App</title>` → `<title>Mutable</title>`. | The browser title bar showed the upstream template's placeholder name. | One line; re-apply if upstream retitles. (`src/features/phosphor/glyphs.ts` contains "Solid Apple", an icon name — unrelated, untouched.) |
+| `src/demo/workspace-demo.tsx` | In the same `DemoSession` phext wiring: one more import (`../phext/default-documents`), an `openDefaultPhext` handler beside `openPhext`, and "Open Choose Your Own Adventure" / "Open Incipit" buttons rendered from `defaultPhextDocuments` inside the existing `phextDocuments`-gated blocks of both Local-files surfaces. | CYOA and Incipit ship with the site by default. The Workspace demo menu is the surface a fresh visitor actually sees (the session lands there; the server document store is a separately-browsed public scratch space), and the buttons sit beside Open Phext… under the same flag — no new flag, no store writes. | The handler opens through `props.onOpenLocal` like Open Phext…; the conversion and stable-id stamping live in `src/phext/default-documents.ts`. If upstream restructures the menus, re-place the buttons inside the phextDocuments `<Show>` blocks. |
 
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,
   `src/phext/file-io.ts` — the phext module (see PHEXT.md).
+- `src/phext/default-documents.ts` + `src/phext/default-documents.test.ts` —
+  the bundled default phexts (CYOA, Incipit): runtime conversion with
+  stable document ids.
+- `src/assets/hosted/phext/choose-your-own-adventure.phext`,
+  `src/assets/hosted/phext/incipit.phext` — the canonical phext payloads
+  (copied byte-for-byte from wbic16/human; SHA-256
+  `75f13961787d773af060a603e1b3d0d114affcbc13948cd6aaa925f451e3a4d6` and
+  `9a4a7ff7cca3eabdcdbbd574e675da1fc3ea15a26d9e1826f009cc0186eae655`),
+  imported by URL so they ship inside the built site's `dist/assets/`.
 - `src/knowledge-sqlite/advisory-lock.mjs` — advisory lock with a native
   fs-ext flock fast path and a portable token-file fallback (see the
   live-site fixes table above).

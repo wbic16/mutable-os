@@ -33,6 +33,7 @@ import { CodexSystemBar } from "./codex-system-bar";
 import { createWorkspaceOpenControls } from "./workspace-open-controls";
 import { documentToPhext, phextFilenameFor, phextToDocument } from "../phext/document";
 import { openPhextFile, savePhextFile } from "../phext/file-io";
+import { defaultPhextDocuments, openDefaultPhextDocument, type DefaultPhextDocument } from "../phext/default-documents";
 import { CavernControl, useCurrentCavern } from "../application/cavern-startup";
 
 type DemoWindowState = "normal" | "minimized" | "maximized" | "closed";
@@ -226,6 +227,17 @@ function DemoSession(props: { configuration: ReactiveEditorConfiguration; onEdit
       setPhextError(reason instanceof Error ? reason.message : String(reason));
     }
   };
+  // Bundled default phexts (CYOA, Incipit): fetched and converted on the
+  // click only, opened through the same Local flow as Open Phext…, and
+  // never written to any store by the open itself.
+  const openDefaultPhext = (def: DefaultPhextDocument) => documents.guard("open a bundled phext document", () => void (async () => {
+    setPhextError("");
+    try {
+      props.onOpenLocal(await openDefaultPhextDocument(def), { filename: def.filename });
+    } catch (reason) {
+      setPhextError(reason instanceof Error ? reason.message : String(reason));
+    }
+  })());
   const encoded = createMemo(() => {
     editor.repository.state.revision;
     return showJson() ? JSON.stringify(editor.encodeDocument(), null, 2) : "";
@@ -278,7 +290,7 @@ function DemoSession(props: { configuration: ReactiveEditorConfiguration; onEdit
             <button data-document-save type="button" disabled={documents.busy()} onClick={() => documents.run("document.saveAs", "local")}>Save as…</button>
             <button type="button" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceOpen}>Open Workspace…</button>
             <button data-document-save type="button" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceSave}>Save Workspace…</button>
-            <Show when={editor.features.phextDocuments}><button type="button" disabled={documents.busy()} onClick={openPhext}>Open Phext…</button><button data-document-save type="button" disabled={documents.busy()} onClick={exportPhext}>Export Phext…</button></Show>
+            <Show when={editor.features.phextDocuments}><button type="button" disabled={documents.busy()} onClick={openPhext}>Open Phext…</button><button data-document-save type="button" disabled={documents.busy()} onClick={exportPhext}>Export Phext…</button><For each={defaultPhextDocuments}>{(def) => <button type="button" disabled={documents.busy()} onClick={() => openDefaultPhext(def)}>Open {def.title}</button>}</For></Show>
           </span>
         </>}
         <button type="button" title={editor.bindings.label("sticky.createFloating")} onClick={() => editor.stickyNotes.create()}>New Sticky Note</button>
@@ -311,7 +323,7 @@ function DemoSession(props: { configuration: ReactiveEditorConfiguration; onEdit
               <button data-document-save type="button" role="menuitem" disabled={documents.busy()} onClick={() => documents.run("document.saveAs", "local")}>Save as…</button>
               <button type="button" role="menuitem" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceOpen}>Open Workspace…</button>
               <button data-document-save type="button" role="menuitem" disabled={props.workspaceBusy} onClick={props.onLocalWorkspaceSave}>Save Workspace…</button>
-              <Show when={editor.features.phextDocuments}><button type="button" role="menuitem" disabled={documents.busy()} onClick={openPhext}>Open Phext…</button><button data-document-save type="button" role="menuitem" disabled={documents.busy()} onClick={exportPhext}>Export Phext…</button></Show>
+              <Show when={editor.features.phextDocuments}><button type="button" role="menuitem" disabled={documents.busy()} onClick={openPhext}>Open Phext…</button><button data-document-save type="button" role="menuitem" disabled={documents.busy()} onClick={exportPhext}>Export Phext…</button><For each={defaultPhextDocuments}>{(def) => <button type="button" role="menuitem" disabled={documents.busy()} onClick={() => openDefaultPhext(def)}>Open {def.title}</button>}</For></Show>
             </fieldset>
           </>}
           <hr role="separator" />
