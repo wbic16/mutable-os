@@ -6,7 +6,7 @@ export interface PdfViewer {destroy():void;page(index:number,zoom:number):Promis
 export async function mountPdfViewer(host:HTMLElement,bytes:Uint8Array,snapshot:PdfCapture,signal:AbortSignal,notice:(v:string)=>void):Promise<PdfViewer>{
  const pdf=await import('pdfjs-dist'),worker=await import('pdfjs-dist/build/pdf.worker.min.mjs?url');signal.throwIfAborted();pdf.GlobalWorkerOptions.workerSrc=worker.default;
  const support=new URL(import.meta.env.BASE_URL+'pdfjs/',location.origin).href;
- const task=pdf.getDocument({cMapUrl:support+'cmaps/',cMapPacked:true,standardFontDataUrl:support+'standard_fonts/',wasmUrl:support+'wasm/',data:bytes,isEvalSupported:false,useWasm:true,useSystemFonts:false,maxImageSize:PDF_LIMITS.pixels,stopAtErrors:true});
+ const task=pdf.getDocument({cMapUrl:support+'cmaps/',cMapPacked:true,standardFontDataUrl:support+'standard_fonts/',wasmUrl:support+'wasm/',data:bytes,useWasm:true,useSystemFonts:false,maxImageSize:PDF_LIMITS.pixels,stopAtErrors:true});
  let disposed=false,epoch=0,current:any,text:any,viewport:any,render:any,textLayer:any,pageIndex=-1;
  const pageHost=document.createElement('div');pageHost.className='mutable-pdf-page';host.replaceChildren(pageHost);
  const overlays=new Map<string,{a:PdfAnchor;element:HTMLElement}>();
