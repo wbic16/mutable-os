@@ -3,7 +3,7 @@ import { open, lstat } from 'node:fs/promises';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import fsExt from 'fs-ext';
+import { flockDescriptor } from './flock.mjs';
 
 export const fileIdentity = stat => ({ dev: String(stat.dev), ino: String(stat.ino) });
 const same = (a, b) => a.dev === b.dev && a.ino === b.ino;
@@ -63,8 +63,9 @@ export async function lockFile(directory, name, expectedIdentity, shared = false
   // The lock inode is created by the pinned worker, never by an unconfined open.
   const fd = await open(join(directory.path, name), constants.O_RDWR | constants.O_NOFOLLOW);
   try {
-    if (!same(fileIdentity(await fd.stat()), expectedIdentity)) throw new Error('lock identity changed');
-    await new Promise((resolve, reject) => fsExt.flock(fd.fd, shared ? 'shnb' : 'exnb', e => e ? reject(e) : resolve()));
-    return { fd: fd.fd, close: async () => { await sessions.get(fd.fd)?.close(); await fd.close(); } };
+    const identity = fileIdentity(await fd.stat());
+    if (!same(identity, expectedIdentity)) throw new Error('lock identity changed');
+    const releaseLock = await flockDescriptor(fd.fd, identity, shared);
+    return { fd: fd.fd, close: async () => { await sessions.get(fd.fd)?.close(); await releaseLock(); await fd.close(); } };
   } catch (error) { await fd.close(); throw error; }
 }
