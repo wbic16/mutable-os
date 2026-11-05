@@ -207,6 +207,129 @@ artifact, identical before the change), phext suites 46/46,
 publication + foundation consumer suites identical to baseline
 (31 passed / 2 pre-existing failures).
 
+## PhextVFS Phase 3a (2026-11-04)
+
+Documents and pair journals join the Cavern phext: `NativeVaultStore`
+and `ManagedPair` — and the native document routes built on them — run
+on a `node:fs`-shaped facade over the same PhextVFS Phase 2 uses,
+behind the same **`phextVfs` flag (default false)**. Flag off is
+byte-for-byte today's disk behavior: every consumer below swaps only
+its `promises as fs` binding to the facade, and the facade falls
+through to the real filesystem per path unless a registration covers
+the path. Knowledge SQLite stays on disk (Phase 4); the recognized
+document store's own journal under `.mutable/` is untouched.
+
+Modified upstream files:
+
+| File | Change | Reason | Rebase / re-apply note |
+| --- | --- | --- | --- |
+| `src/phext/vfs.ts` | Two additive APIs: `writeFile` gains a `slices` option (text format only; the slices must concatenate to the exact payload, else EINVAL) whose chunks follow the slice boundaries, and `rename(from, to)` with exclusive `renameat2(RENAME_NOREPLACE)` semantics (files move their raw chunk scrolls verbatim, preserving chunking; directories move recursively; works across strata). | Block-boundary chunking needs the VFS to store caller-supplied raw slices as consecutive scrolls without re-serializing; the relocation primitive needs a VFS-side exclusive rename. Reads already reassemble chunks by exact concatenation, so sliced writes are transparent to every reader. | Pure additions beside `writeFile`/`encodeChunks`; no existing signature changed. If upstream rewrites the write path, re-add `encodeSlices` + the `slices` branch and `rename`/`moveFileEntry`. |
+| `scripts/stage-c-gates/phext-backend.mjs` | The per-lock anchor logic is extracted into an exported `createFlockAnchorRegistry(vfs)` (`anchorPathFor` / `openAnchorFd`); `createPhextBackend`'s `lockFile` now consumes it. Anchor naming is unchanged (`cavern.phext.anchor-<sha256 of the lock's VFS path, 16 hex>`), so anchors created by Phase 2 builds remain the same files. | Phase 3a's locks must reuse Phase 2's anchor mechanism, not duplicate it. | An extraction only; behavior identical. Keep the export — `server/phext-fs.mjs` lazily imports this module for its default anchor registry. |
+| `server/native-vault-store.mjs` | `promises as fs` now comes from `./phext-fs.mjs` (sync `node:fs` imports unchanged — the Cavern root itself stays a real directory), and `move()` dispatches to the facade's exclusive rename when a registration covers the root, falling back to the compiled C helper otherwise. | The store's async surface (create-exclusive write, durable write, records, discovery, scope fences, relocation records) is the documents stratum's core. The C helper cannot rename inside a phext; the VFS rename has the same `RENAME_NOREPLACE` contract, and failures still surface as the same 409. | Two hunks: the import line and the head of `move()`. |
+| `src/persistence/managed-pair.mjs` | `promises as fs` now comes from `../../server/phext-fs.mjs` (`fstatSync` stays in `node:fs` — it stats real anchor descriptors). | The pair journal (receipt/pending/intent, staged files, publish-by-link) is stratum 2; every paired save flows through this module's fs calls. | One import line; the module already reaches across the tree for `scripts/stage-c-gates/flock.mjs`. |
+| `server/native-document-store.mjs` | `promises as fs` from `./phext-fs.mjs`. | Its reads/listings and the relocations preflight walk document folders that are virtual in phext mode. | One import line. |
+| `server/vault-listing-cache.mjs` | `promises as fs` from `./phext-fs.mjs`. | Browse listings `lstat`/`readdir` document folders (virtual); the cache home itself lives under `.mutable/` and falls through to real disk per path, so one binding serves both. | One import line. |
+| `server/collection-inventory.mjs` | `promises as fs` from `./phext-fs.mjs`. | The inventory walks the vault with `lstat`/`opendir`/`readdir`. | One import line. |
+| `server/recognized-source.mjs` | `promises as fs` from `./phext-fs.mjs` (`constants` stays in `node:fs`). | Recognized sources are read (`open` + positional `read`) from document folders. | One import line. |
+| `server/cavern-lifecycle.ts` | In the existing flag-on block of `stores()`: after the gates registration, dynamically import `server/phext-fs.mjs` and `registerPhextFs({ root, vfs })`, then record the phext-backed strata at `/.control/phext-strata.json` (L7) and flush. In `close()`: `unregisterPhextFs(root)` (flush) before the gates unregister and VFS close. | Mirrors Phase 2's registration pattern at the one place that owns the Cavern's lifetime; the L7 record is the in-phext statement of which strata are phext-backed (documents 1, pair journals 2, history 4, services 5, assets 6, control 7) and what remains on disk (knowledge — Phase 4). | Two hunks beside the Phase 2 hunks; the dynamic import is URL-based like the gates one because the lifecycle is loaded outside the server bundle graph. `src/configuration.ts` is **not** modified by this phase (the flag already exists). |
+
+Design (full detail in the header of `server/phext-fs.mjs`):
+
+- **Facade, not fork.** The shim implements exactly the fs surface the
+  two stores and their router consumers use: `open` (flag parsing
+  incl. `wx`/`ax`, positional `read`, `writeFile`, `sync`/`datasync`
+  as VFS flush, `stat`), `readFile`, `writeFile`, `mkdir`, `readdir`
+  (names and Dirent shapes), `opendir` (snapshot async iterable),
+  `lstat`/`stat`, POSIX `rename` (replace semantics layered over the
+  VFS's exclusive rename — ManagedPair's receipt publish renames over
+  the previous generation), an exclusive-rename entry point for the
+  vault store's `move()`, `link`, `unlink`, `realpath`. Sync
+  `node:fs` imports are never swapped.
+- **Dispatch.** A path is virtual iff a registration covers its root
+  and its first component is not `.mutable` (exact match — the
+  knowledge home, Phase 4) and not the phext file itself. The Cavern
+  root directory itself stays real; listing the root lists the virtual
+  root (the `.control` plumbing name is hidden). So `.mutable-pair-*`
+  journals → L2, `.mutable-relocations` + `.mutable-store.lock` →
+  L7/L1 by the VFS's own path dispatch, documents → L1 — with zero
+  per-consumer path logic.
+- **Locks stay real.** Opening any `*.lock` path returns a handle
+  whose descriptor is a real anchor fd from Phase 2's shared registry
+  (a virtual empty lock file also exists, so stats, signatures and
+  discovery see the lock exactly as on disk). The stores' `nativeFlock`
+  calls — and therefore both contention contracts ("Another managed
+  operation is active; retry"; the pair's conflict result) — are
+  untouched, and cross-process contention works because the anchor
+  path is a deterministic function of the VFS path.
+- **Identity and stamps.** Node tokens (stable `ino`) and per-node
+  versions persist in an L7 registry (`/.control/fs-nodes.json`);
+  timestamps derive deterministically from content hash × version, so
+  a stamp is stable while a file is unchanged (including across
+  restarts and cold reopens), changes on any mutation — even an
+  identical-bytes rewrite — survives rename, and directory versions
+  bump when any descendant mutates, preserving the stores' fence and
+  revalidation semantics. The registry is shared through
+  `globalThis` because the stores reach production inside the esbuild
+  bundle while the lifecycle loads the source module by URL — both
+  instances must see one registry (house pattern for shared modules).
+- **Block-boundary chunking.** Native documents (`.ink` /
+  `.mutable.json` names per `document-file-names.mjs`) are sliced
+  raw — envelope-without-blocks slice, one slice per `document.blocks`
+  entry, separator/tail slices — and stored as consecutive scrolls;
+  boundaries are located by a byte-level scanner (parsing finds
+  boundaries; storage never re-serializes), the slice concatenation
+  is verified byte-equal before storing, and any envelope shape that
+  does not slice cleanly falls back to Phase 1's opaque chunking for
+  that file. Evidence on `artifacts/flint-b1.2/rich.mutable.json`
+  (8,061 bytes, SHA-256
+  `fe5f210edba7c547cf113d0fed24d343734bc95ca5326cb1a66a1a62958a2b45`):
+  17 slices, block slices parsing to exactly the 8 block ids in
+  order, hash identical after a shim write/read round-trip, VFS
+  `stat().sha256` equal to the file hash. Non-native files (`.md`
+  projections, receipts, intents) chunk opaquely as in Phase 1.
+- **Not shimmable / deliberately not swapped.** `server/recognized-document-store.mjs`
+  keeps `node:fs`: every path it touches directly lives under
+  `.mutable/document-saves` (real by the dispatch rule either way) and
+  document access delegates to the two stores above.
+  `NativeVaultStore`'s constructor probes the root with sync fs —
+  the root is a real directory in every mode. Access checks,
+  `rmdir`/`rm`, and watch APIs are outside the facade; no wired
+  consumer uses them on virtual paths.
+
+Coverage and gates:
+
+- New suites: `server/phext-fs.test.mjs` (facade vocabulary: O_EXCL
+  collision, link-publish atomicity across a flush boundary, renames,
+  root listing, the block-slicing round-trip with hash + block-id
+  alignment, opaque fallback, both stores' lock contention contracts
+  against real anchors, stamp stability/mutation/rename rules,
+  per-path fallthrough), `server/phext-docs-scenario.test.mjs`
+  (discovery/pairing, pair + directory relocation, scope fences,
+  listing cache, cold reopen — through the stores' own APIs), and
+  `server/phext-docs-e2e.test.ts` (the real native routes: mkdir,
+  save, fault-interrupted save, recover, cold reopen from the phext
+  alone, asserting the disk holds only `cavern.phext`, its `.bak`
+  and anchors). 17 tests, all passing.
+- The pre-existing store suites build fixtures with raw `node:fs`
+  and probe disk-only semantics (symlinks, chmod, `fs.utimes`,
+  external descriptors, subprocess lock holders), so they cannot run
+  flag-on unmodified — a fixture written to disk is invisible to a
+  virtual store, and several scenarios (an external writer racing on
+  disk) have no phext-mode meaning. Flag-on behavior is therefore
+  covered by the scenario/E2E suites above plus a one-off flipped-flag
+  run of the **real** `createCavernLifecycle` (temporary flip +
+  throwaway harness, both reverted): establish → save → close → cold
+  reopen with document and receipt baseline intact, disk holding only
+  the phext family and `.mutable`. Flag-off counts are unchanged from
+  baseline: native vault store suites 59/60 (the one failure is the
+  known uid-0 artifact), native + recognized document stores 24/32
+  (the 8 failures are the known missing `data/raven.json` fixture),
+  phext + gates suites 51/51, stage-C node:test suites 27/28 (the
+  known uid-0 G2 artifact), ManagedPair qualification and
+  cavern-lifecycle suites green.
+- Gates on the final tree: typecheck 0, build 0, boot smoke HTTP 200
+  with the flag off and with it temporarily flipped on (reverted).
+
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,
@@ -242,6 +365,17 @@ publication + foundation consumer suites identical to baseline
 - `server/phext-gates-backend.test.ts`,
   `server/phext-history.test.ts` — the Phase 2 backend suite and the
   history-store consumer proof; see the Phase 2 section above.
+- `server/phext-fs.mjs` — the PhextVFS Phase 3a facade: the subset of
+  `node:fs/promises` the native stores use, implemented over one
+  Cavern phext, with real flock anchors for lock paths, an L7 node
+  registry for identities/stamps, and raw block-boundary slicing for
+  native documents; see the Phase 3a section above.
+- `server/phext-fs.test.mjs`, `server/phext-docs-scenario.test.mjs`,
+  `server/phext-docs-e2e.test.ts` — the Phase 3a shim unit suite, the
+  store-level phext-mode scenarios, and the routes-level end-to-end
+  (the E2E is `.ts` with the node test environment because the gates
+  module's top-level `import.meta.url` must survive vitest's module
+  pipeline — the same reason the Phase 2 consumer suites are `.ts`).
 - `server/native-vault-store-lock.test.mjs` — the native vault store
   lock's fs-ext-absent regression suite (action runs, contention
   message, cross-process crash recovery).

@@ -80,6 +80,10 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
     // through the stage-C gates phext backend. Registration must
     // complete before any consumer pins a directory, so establish()
     // awaits `phextReady` before the stores are used.
+    // Phase 3a: the native document stores join through phext-fs
+    // (server/phext-fs.mjs) — documents, pair journals and relocation
+    // records — and the control stratum records which strata are
+    // phext-backed. Knowledge SQLite stays on disk (Phase 4).
     let phextVfs: PhextVFS | undefined, phextReady: Promise<void> | undefined;
     if (featureFlags.phextVfs) {
       phextVfs = PhextVFS.openOrCreate(path.join(root, 'cavern.phext'));
@@ -87,6 +91,14 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
       phextReady = (async () => {
         const gates = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href);
         gates.registerPhextBackend({ root, vfs });
+        const phextFs = await import(pathToFileURL(path.resolve('server/phext-fs.mjs')).href);
+        phextFs.registerPhextFs({ root, vfs });
+        vfs.writeFile('/.control/phext-strata.json', JSON.stringify({
+          v: 1,
+          phextBacked: { documents: 1, pairJournals: 2, history: 4, services: 5, assets: 6, control: 7 },
+          onDisk: ['knowledge (.mutable, SQLite) — Phase 4'],
+        }));
+        vfs.flush();
       })();
     }
     const coordinate = <T>(action: () => Promise<T>) => sql.foreground(action);
@@ -134,7 +146,7 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
         if (featureFlags.managedAssetClipboard) { assets = createManagedAssetService({ root, cavernId: cavern.cavernGuid, session: cavern.session,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,inspectOriginal:(bytes,mediaType,signal)=>{if(!services)throw Error('Application services unavailable');return services.executor.run(['application/xml','application/epub+zip','application/x-bibtex','application/x-research-info-systems'].includes(mediaType)?{kind:'academic-original-inspect',bytes,mediaType}:mediaType==='application/pdf'?{kind:'pdf-inspect',bytes}:{kind:'json-inspect',bytes},signal);} }); return assets.recover(); } },
       async index(policy: any) { indexPolicy ??= normalizePolicy(policy); return indexStatus(); },
       async status() { return indexPolicy ? indexStatus() : undefined; },
-      async close() { await services?.close(); await assets?.close(); await indexWork?.catch(() => {}); await sql.close(); await history.dispose(); if (phextVfs) { await phextReady?.catch(() => {}); const gates = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href); await gates.unregisterPhextBackend(root); phextVfs.close(); } },
+      async close() { await services?.close(); await assets?.close(); await indexWork?.catch(() => {}); await sql.close(); await history.dispose(); if (phextVfs) { await phextReady?.catch(() => {}); const phextFs = await import(pathToFileURL(path.resolve('server/phext-fs.mjs')).href); phextFs.unregisterPhextFs(root); const gates = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href); await gates.unregisterPhextBackend(root); phextVfs.close(); } },
     };
   }
   const establish = async (input: unknown, intent: unknown, confirmed = false) => {

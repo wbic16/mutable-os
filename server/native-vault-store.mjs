@@ -2,7 +2,8 @@ import {isNativeDocumentName,markdownProjectionName,isDerivedMarkdownName} from 
 import { RecognizedDocumentStore } from './recognized-document-store.mjs';
 /** C1a: tree-derived discovery and journalled, same-vault storage relocation.
  * No authored hierarchy, editor, save generation or global resource catalog. */
-import { promises as fs, constants as C, existsSync, realpathSync, lstatSync } from 'node:fs';
+import { constants as C, existsSync, realpathSync, lstatSync } from 'node:fs';
+import { promises as fs, phextFsBackendFor } from './phext-fs.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
@@ -218,6 +219,11 @@ export class NativeVaultStore {
  }
  async move(from,to) {
   await this.resolve(from);await this.resolve(to,{missing:true});
+  // PhextVFS Phase 3a: inside a registered Cavern the exclusive
+  // rename lives in the VFS (chunk scrolls move verbatim); the C
+  // helper remains the primitive on disk.
+  const backend=phextFsBackendFor(path.join(this.root,from));
+  if(backend){try{backend.renameExclusive(path.join(this.root,from),path.join(this.root,to));}catch(e){fail(`Exclusive relocation primitive failed: ${e.message}`,409);}await this.sync(path.posix.dirname(from));await this.sync(path.posix.dirname(to));return;}
   try{await exec(this.helper,[this.root,from,to],{timeout:10000});}catch(e){fail(`Exclusive relocation primitive failed: ${e.stderr||e.message}`,e.code==='ENOENT'?503:409);}
  }
  async mkdir(vault,directory){this.writable();return this.lock(async()=>{relative(vault);relative(directory);if(!inside(vault,directory)||directory===vault)fail('Directory outside selected vault',400);await this.resolve(vault);await this.vacant(directory);for(const r of await this.records())if(!r.done)fail('Recover pending relocation first');await fs.mkdir(await this.resolve(directory,{missing:true}));await this.sync(path.posix.dirname(directory));return {directory};});}

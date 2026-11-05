@@ -1,7 +1,8 @@
 /** Managed-filesystem pair adapter, qualified in B2 and used by the native server.
  * Replacements MOVE the displaced inode aside, then publish create-only.
  * Preserved prior files are never deleted, including late writes via open handles. */
-import { promises as fs, fstatSync } from "node:fs";
+import { fstatSync } from "node:fs";
+import { promises as fs } from "../../server/phext-fs.mjs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { promisify } from "node:util";
