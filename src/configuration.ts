@@ -183,7 +183,7 @@ export const featureFlags: FeatureFlags = Object.freeze({
   mutableClipboard: true,
   documentInterchange: true,
   phextDocuments: true,
-  phextVfs: false,
+  phextVfs: true,
   applicationServices: true,
   webPublishing: true,
   externalHtmlClipboard: true,
