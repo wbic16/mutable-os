@@ -6,8 +6,8 @@
  * error contract, but with the directory tree living inside one PhextVFS
  * file (src/phext/vfs.ts) instead of on disk: `<cavern>/cavern.phext`.
  * filesystem.mjs dispatches to this backend only for directories under a
- * Cavern root that cavern-lifecycle registered (feature flag
- * `phextVfs`, default off), and only for the gates-owned trees:
+ * Cavern root that cavern-lifecycle registered (phext is the only
+ * storage mode since the cutover), and only for the gates-owned trees:
  *
  * - any path whose Cavern-relative first component is `.mutable`
  *   (jobs, publications, assets, and the knowledge home's gates view), or
