@@ -596,6 +596,101 @@ refuse (409) and behavior is byte-identical. Stacked on Phase 4.
   and compatible-document fail identically on base ea0c7e8. No
   phext-family src suite failed in any run.
 
+## PhextVFS Phase 3b (2026-11-05) — legacy stores + uploads
+
+The last authored content outside the phext joins it: the legacy
+document store, the workspace store, the recognized-document
+journal, and the legacy uploads endpoint. After this phase a
+phext-mode Cavern accounts for **every** store in its strata
+record — there is no standing remaining-on-disk list anymore.
+
+- Shim extension (`server/phext-fs.mjs`): the dispatch carve-out
+  that kept all of `.mutable` on real disk gains exactly two
+  exceptions — `.mutable` itself (the VFS home directory merging
+  strata 3/5/6, so `NativeVaultStore.resolve()`'s lstat-walk can
+  enter it) and `.mutable/document-saves/**`, the
+  recognized-document journal. No other `.mutable` path crosses:
+  knowledge is phext-native since Phase 4 and never travels
+  through this facade. `constants` is re-exported for facade
+  consumers. One subtlety, found by regression: `statFor` gives
+  the `.mutable` home a deterministic synthetic identity instead
+  of a registry assignment — `operations()` stats that directory
+  from inside discovery fence windows, and a registry assignment
+  would dirty `fs-nodes.json`, making the next flush rewrite the
+  phext mid-fence ("Vault changed during discovery" in the Phase 4
+  knowledge E2E; bisected and fixed, suite green again).
+- Legacy stores routed (`server/document-store.ts`,
+  `server/workspace-store.ts`, `server/recognized-document-store.mjs`):
+  each now imports `promises as fs` from `./phext-fs.mjs` instead
+  of `node:fs` — the Phase 3a pattern. Unregistered roots (every
+  flag-off and non-Cavern use) fall through to real fs untouched.
+  Their tmp+rename publish, `wx` staging, `link` create-only
+  publish, confined `realpath` discipline and lock behavior all
+  run on the facade's existing operations; document saves remain
+  manual (Cmd-S), nothing here adds background saves.
+- Discovery cache retired in phext mode
+  (`server/vault-listing-cache.mjs`): when a phext backend covers
+  the store root, `read()` returns nothing and `write()` is a
+  no-op — browse always reconciles, and reconciliation reads the
+  VFS directory index scrolls, which are the listing source. On
+  disk the cache keeps its exact prior behavior. The Phase 3a
+  scenario test that asserted the disk cache file was updated to
+  the new contract.
+- Uploads embedded (`server/phext-uploads.mjs`, new;
+  `server/index.ts`): behind the flag, multer stores through a
+  phext-aware engine and `/uploads` is served by a phext static
+  handler ahead of the disk one. The engine keeps diskStorage's
+  contract — caller-resolved destination with the same Cavern +
+  session checks, `Date.now() + ext` filenames, identical file
+  info — and writes binary content into the phext (base64-chunked,
+  the stratum-6 encoding of Phase 2's managed assets) at the
+  file's natural path `/uploads/<name>`, flushing before it
+  reports the upload. No backend (disk-mode Cavern) → the engine
+  writes real disk itself, byte-identical to the old behavior.
+  Flag off, neither piece is wired and the original diskStorage
+  stands untouched.
+- Build (`scripts/build-history-worker.mjs`): the tsc-compiled
+  legacy stores import the facade at runtime, so the build now
+  also bundles `server/phext-fs.mjs` → `dist/server/phext-fs.mjs`
+  (the native-store pattern). The facade registry lives on
+  globalThis, so the bundled copy shares registrations with the
+  source module the lifecycle loads by URL. Found by the boot
+  smoke: without this, dist cannot boot at all.
+- Migration/strata (`server/phext-cavern-transfer.mjs`,
+  `server/cavern-lifecycle.ts`): migration classification now
+  copies `uploads/**` and `.mutable/document-saves/**` into the
+  phext under the same per-file SHA-256 verification (with new
+  smoke reads for both), export restores them byte-identically,
+  and `REMAINING_ON_DISK` is empty — per-Cavern remainders
+  (symlinks, unrecognized `.mutable` remnants) are still computed
+  from the manifest and named, never hidden. The strata record
+  gains `legacyDocumentStores: 1, documentSavesJournal: 3,
+  uploads: 1`. Strata reading, stated plainly: the VFS assigns
+  strata by path (Phase 1 design) — the root-tree legacy stores
+  ride stratum 1 with the documents, the journal rides the
+  `.mutable` stratum (3) whose root is its home, and uploads ride
+  their root paths with stratum 6's binary encoding. The Phase 5
+  exit E2E's honesty assertions were updated to the new contract
+  (records now assert `onDisk: []` for a fully-covered fixture).
+- Acceptance: new `server/phext-legacy-e2e.test.ts` — one
+  phext-mode Cavern exercising legacy document save/list/load,
+  workspace save/list/load, a full recognized-document journal
+  save inside the phext, the retired cache, and a binary upload
+  round trip through the real multer engine + static handler,
+  then cold reopen from the phext alone (including an idempotent
+  recognized-save retry). The updated exit E2E covers migration
+  of a disk Cavern carrying all three strata. Gates: serial phext
+  vitest set 88/88 (16 files, incl. both new/updated E2Es and
+  cavern-lifecycle); `test:sqlite`
+  131/131; gates node:test 27/28, identical on base (uid-0
+  artifact); touched-store flag-off baselines identical to base
+  a221108 (document/workspace/listing-cache/vault-lock/collection
+  suites 49/49; native + recognized store suites 70 passed / 9
+  failed on both trees — the missing `data/raven.json` fixture
+  class); typecheck 0; build 0; boot smoke HTTP 200 flag-off and
+  flag-on (temporary flip, reverted; `src/configuration.ts` ends
+  unmodified at `phextVfs: false`).
+
 
 ## New files (no rebase risk beyond additions)
 
@@ -676,6 +771,9 @@ refuse (409) and behavior is byte-identical. Stacked on Phase 4.
   (migration, export, xz seal, open-from-phext); see the Phase 5
   section above.
 - `server/phext-exit-e2e.test.ts` — the Phase 5 exit-ramp E2E.
+- `server/phext-uploads.mjs` — the Phase 3b phext-aware multer
+  storage engine + `/uploads` static handler.
+- `server/phext-legacy-e2e.test.ts` — the Phase 3b acceptance E2E.
 - `PATCHES.md`, `PHEXT.md` — this file and the phext design notes.
 
 ## Rebase flow
