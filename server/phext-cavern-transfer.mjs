@@ -230,8 +230,17 @@ const remainingSummary = manifest => {
  * no disk knowledge state, a leftover fallback, live WAL sidecars.
  * On any failure the partial phext is discarded and the disk Cavern
  * is left exactly as found.
+ *
+ * Cutover addition: `allowNoKnowledge` (used only by the lifecycle's
+ * upgrade-on-encounter, where the folder is already confirmed a
+ * Cavern) converts a legacy layout whose home never gained a
+ * knowledge database — the tree is copied and verified the same
+ * way, the knowledge steps are skipped, and the vault identity is
+ * minted by the establishment that follows the conversion. The
+ * explicit /migrate route keeps the strict contract (a disk
+ * knowledge state is required).
  */
-export async function migrateCavernToPhext({ root, openVfs, now = () => new Date().toISOString() }) {
+export async function migrateCavernToPhext({ root, openVfs, now = () => new Date().toISOString(), allowNoKnowledge = false }) {
   const cavernRoot = path.resolve(root);
   const phextPath = path.join(cavernRoot, 'cavern.phext');
   const mutableHome = path.join(cavernRoot, '.mutable');
@@ -245,7 +254,8 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
   if (fs.existsSync(fallbackPath)) {
     throw Error(`A previous migration fallback (${FALLBACK_DIRNAME}) already exists; migration refused`);
   }
-  if (!fs.existsSync(mutableFile)) {
+  const hasKnowledge = fs.existsSync(mutableFile);
+  if (!hasKnowledge && !allowNoKnowledge) {
     throw Error('This folder has no disk knowledge state (.mutable/mutable.db); there is no disk-mode Cavern to migrate');
   }
 
@@ -280,12 +290,14 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
     let vfs = openVfs.create(temporaryPath);
     try {
       for (const entry of copied) writeVirtualFile(vfs, `/${entry.path}`, fs.readFileSync(path.join(cavernRoot, entry.path)));
-      const store = new PhextKnowledgeStore(vfs);
-      knowledgeReport = convertDiskKnowledgeToPhext({
-        mutableFile,
-        auditFile: fs.existsSync(auditFile) ? auditFile : undefined,
-        store,
-      });
+      if (hasKnowledge) {
+        const store = new PhextKnowledgeStore(vfs);
+        knowledgeReport = convertDiskKnowledgeToPhext({
+          mutableFile,
+          auditFile: fs.existsSync(auditFile) ? auditFile : undefined,
+          store,
+        });
+      }
       vfs.flush();
     } finally { vfs.close(); }
 
@@ -329,17 +341,19 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
         }
         smoke.upload = uploadEntry.path;
       }
-      const store = new PhextKnowledgeStore(vfs);
-      const control = store.readControl();
-      if (!control || control.vaultGuid !== knowledgeReport.vaultGuid) {
-        throw Error('Migration smoke read failed: knowledge control record missing or identity changed');
+      if (hasKnowledge) {
+        const store = new PhextKnowledgeStore(vfs);
+        const control = store.readControl();
+        if (!control || control.vaultGuid !== knowledgeReport.vaultGuid) {
+          throw Error('Migration smoke read failed: knowledge control record missing or identity changed');
+        }
+        const phextDump = dumpPhextKnowledge(store);
+        const diskDump = dumpDiskKnowledge({ mutableFile, auditFile: fs.existsSync(auditFile) ? auditFile : undefined });
+        if (canonText(phextDump) !== canonText(diskDump)) {
+          throw Error('Migration verification failed: phext knowledge dump differs from the disk dump');
+        }
+        smoke.knowledge = { vaultGuid: control.vaultGuid, entities: phextDump.tables.Entity.length };
       }
-      const phextDump = dumpPhextKnowledge(store);
-      const diskDump = dumpDiskKnowledge({ mutableFile, auditFile: fs.existsSync(auditFile) ? auditFile : undefined });
-      if (canonText(phextDump) !== canonText(diskDump)) {
-        throw Error('Migration verification failed: phext knowledge dump differs from the disk dump');
-      }
-      smoke.knowledge = { vaultGuid: control.vaultGuid, entities: phextDump.tables.Entity.length };
       var smokeReport = smoke;
     } finally { vfs.close(); }
 
@@ -350,16 +364,16 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       v: 1,
       format: 'phext-cavern-migration',
       migratedUtc,
-      vaultGuid: knowledgeReport.vaultGuid,
+      vaultGuid: knowledgeReport?.vaultGuid ?? null,
       sourceTreeSha256,
       manifest,
-      knowledge: {
+      knowledge: knowledgeReport ? {
         tables: Object.fromEntries(Object.entries(knowledgeReport.tables).map(([table, r]) => [table, r.count])),
         propositions: knowledgeReport.propositions.count,
         outbox: knowledgeReport.outbox.count,
         auditMutations: knowledgeReport.audit.mutations,
         auditEvents: knowledgeReport.audit.events,
-      },
+      } : null,
       filesCopied: copied.length,
       bytesCopied: copied.reduce((sum, e) => sum + e.size, 0),
       smoke: smokeReport,
@@ -372,7 +386,7 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       vfs.writeFile(STRATA_RECORD_PATH, JSON.stringify({ v: 1, phextBacked: { ...PHEXT_BACKED_STRATA }, onDisk, migrated: true }));
       vfs.writeFile(MIGRATION_RECORD_PATH, JSON.stringify(migrationRecord));
       vfs.writeFile(CAVERN_STATE_PATH, JSON.stringify({
-        v: 1, cavernGuid: knowledgeReport.vaultGuid, migratedUtc, lastOpenedUtc: null,
+        v: 1, ...(knowledgeReport ? { cavernGuid: knowledgeReport.vaultGuid } : {}), migratedUtc, lastOpenedUtc: null,
       }));
       vfs.flush();
     } finally { vfs.close(); }
@@ -382,12 +396,14 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
     // Cavern is never half-migrated.
     fs.renameSync(temporaryPath, phextPath);
     try { fs.unlinkSync(`${temporaryPath}.bak`); } catch { /* no prior generation */ }
-    try {
-      fs.renameSync(mutableHome, fallbackPath);
-    } catch (error) {
-      try { fs.renameSync(phextPath, temporaryPath); } catch { /* report the original failure */ }
-      discardTemporary();
-      throw Error(`Migration could not move .mutable aside as the fallback; aborted with the disk Cavern untouched: ${error.message}`);
+    if (fs.existsSync(mutableHome)) {
+      try {
+        fs.renameSync(mutableHome, fallbackPath);
+      } catch (error) {
+        try { fs.renameSync(phextPath, temporaryPath); } catch { /* report the original failure */ }
+        discardTemporary();
+        throw Error(`Migration could not move .mutable aside as the fallback; aborted with the disk Cavern untouched: ${error.message}`);
+      }
     }
     return { ...migrationRecord, phextPath, fallbackPath, verified: true };
   } catch (error) {
