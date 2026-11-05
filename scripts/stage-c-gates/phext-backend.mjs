@@ -116,6 +116,29 @@ const leaf = name => {
   return name;
 };
 
+/**
+ * The per-lock flock anchor mechanism, exported so Phase 3a's phext-fs
+ * shim (server/phext-fs.mjs) routes the native stores' virtual lock
+ * files (`.mutable-store.lock`, pair `writer.lock`) through the SAME
+ * anchors — a lock taken through either layer excludes the other, and
+ * every process that opens the same phext. An anchor is a real file
+ * beside the phext, `cavern.phext.anchor-<first 16 hex of the SHA-256
+ * of the lock's VFS path>`, created once (O_RDWR|O_CREAT, 0600) and
+ * never renamed or unlinked: a VFS flush rewrites the phext by rename,
+ * so the phext's own inode cannot carry a lock.
+ */
+export function createFlockAnchorRegistry(vfs) {
+  const anchorPathFor = vfsPath => path.join(
+    path.dirname(vfs.path),
+    `cavern.phext.anchor-${sha256Hex(Buffer.from(vfsPath)).slice(0, 16)}`,
+  );
+  return {
+    anchorPathFor,
+    /** Open the lock's real anchor file, creating it if needed. The caller closes the fd. */
+    openAnchorFd(vfsPath) { return openSync(anchorPathFor(vfsPath), constants.O_RDWR | constants.O_CREAT, 0o600); },
+  };
+}
+
 /** Mirrors PhextVFS's text rule: valid UTF-8 and no dimension break bytes. */
 function isTextSafe(bytes) {
   try { new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch { return false; }
@@ -125,6 +148,7 @@ function isTextSafe(bytes) {
 
 export function createPhextBackend({ root, vfs }) {
   const cavernRoot = path.resolve(root);
+  const anchors = createFlockAnchorRegistry(vfs);
   const phextId = sha256Hex(Buffer.from(vfs.path)).slice(0, 12);
   let tokens = null; // Map<vfsPath, token>, loaded lazily from the registry
   let lockSequence = 0;
@@ -353,11 +377,7 @@ export function createPhextBackend({ root, vfs }) {
       if (!sameIdentity(expectedIdentity, identityFor(vfsPath, false))) throw new Error('lock identity changed');
       // A real flock on a stable per-lock anchor beside the phext (see
       // the header: the phext's own inode is replaced by every flush).
-      const anchorPath = path.join(
-        path.dirname(vfs.path),
-        `cavern.phext.anchor-${sha256Hex(Buffer.from(vfsPath)).slice(0, 16)}`,
-      );
-      const fd = openSync(anchorPath, constants.O_RDWR | constants.O_CREAT, 0o600);
+      const fd = anchors.openAnchorFd(vfsPath);
       try {
         const releaseLock = await flockDescriptor(fd, fileIdentity(fstatSync(fd)), shared);
         let closed = false;
