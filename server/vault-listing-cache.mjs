@@ -1,7 +1,7 @@
 /** Rebuildable Library presentation cache. Never used as storage/identity proof.
  * Verified discovery, Open, Save and relocation continue through NativeVaultStore.
  */
-import { promises as fs } from './phext-fs.mjs';
+import { promises as fs, phextFsBackendFor } from './phext-fs.mjs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { hash } from '../src/persistence/managed-pair.mjs';
@@ -22,7 +22,16 @@ export class VaultListingCache {
     if(!s.isDirectory())throw Error('Vault must be a directory');
     return `${this.store.root}:${s.dev}:${s.ino}`;
   }
+  /**
+   * PhextVFS Phase 3b: in phext mode the discovery cache is retired —
+   * the VFS directory index scrolls (L9) are the listing source, and
+   * every browse reconciles against them. The cache file is neither
+   * read nor written; on disk it remains what it always was, a
+   * rebuildable presentation cache.
+   */
+  phextMode() { return !!phextFsBackendFor(this.store.root); }
   async read(vault, identity) {
+    if(this.phextMode())return;
     try {
       const bytes=await this.store.read(join(vault,'.mutable/discovery-cache.json'),true);
       if(!bytes)return;
@@ -41,6 +50,7 @@ export class VaultListingCache {
   }
   async write(vault, value, signal) {
     if(this.store.readOnly)return;
+    if(this.phextMode())return; // retired in phext mode (Phase 3b)
     // Establishment owns .mutable. A failed cache write must never fail Browse.
     let temporary;
     try {

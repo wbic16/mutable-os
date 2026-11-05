@@ -1,6 +1,6 @@
 import {isNativeDocumentName} from '../src/persistence/document-file-names.mjs';
 /** Single-file, codec-preserving publication. Existing paired resources stay on their own route. */
-import { constants as C, promises as fs } from 'node:fs';
+import { constants as C, promises as fs } from './phext-fs.mjs';
 import path from 'node:path';
 import { hash, publishManagedFile, checkDisplacedFile, validateResourceDependencies } from '../src/persistence/managed-pair.mjs';
 import { decodeNative } from '../src/persistence/native-resource';
