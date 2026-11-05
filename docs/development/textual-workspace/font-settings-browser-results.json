@@ -1,0 +1,84 @@
+{
+  "initial": {
+    "family": "\"IBM Plex Mono\", monospace",
+    "size": "16px",
+    "cw": 9.609375,
+    "ch": 20,
+    "columns": 182,
+    "reading": 88,
+    "margin": [
+      18,
+      25,
+      32,
+      38,
+      44,
+      50,
+      57,
+      63
+    ],
+    "advance": 9.609375
+  },
+  "system": {
+    "family": "\"Courier New\", \"IBM Plex Mono\", monospace",
+    "size": "16px",
+    "cw": 9.609375,
+    "ch": 20,
+    "columns": 182,
+    "reading": 88,
+    "margin": [
+      19,
+      26,
+      33,
+      39,
+      45,
+      51,
+      58,
+      64
+    ],
+    "advance": 9.609375
+  },
+  "zoomed": {
+    "family": "\"IBM Plex Mono\", monospace",
+    "size": "19.8px",
+    "cw": 11.875,
+    "ch": 26.40625,
+    "columns": 147,
+    "reading": 88,
+    "margin": [
+      17.999981065088758,
+      25.999981065088758,
+      33.99998106508876,
+      40.99999053254437,
+      47.00000946745563,
+      54.000018934911246,
+      61.00002840236686,
+      67.99996213017752
+    ],
+    "advance": 11.875
+  },
+  "persisted": {
+    "zoom": 1.1,
+    "palette": "borland",
+    "readingWidth": 88,
+    "font": {
+      "source": "bundled",
+      "family": "IBM Plex Mono",
+      "size": 18,
+      "lineHeight": 24
+    }
+  },
+  "sameAdvanceFontGeometry": true,
+  "systemMissingAndProportionalFallback": true,
+  "previewAndReset": true,
+  "selectionAndIdentity": true,
+  "typingUndo": true,
+  "typingFontLoads": 0,
+  "desktopRestoration": true,
+  "reloadPersistence": true,
+  "work": {
+    "snapshots": 0,
+    "projections": 0,
+    "rebuilds": 0,
+    "referenceRebuilds": 0
+  }
+}

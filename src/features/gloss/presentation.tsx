@@ -1,3 +1,4 @@
+import {observeFontLayout} from '../../rendering/font-layout';
 import {Dynamic} from 'solid-js/web';
 import {useInstrumentPresentations} from '../../rendering/instrument-presentations';
 import {GlossArgumentView} from './argument-view';
@@ -165,7 +166,7 @@ function GlossMargin(props:{index:GlossSessionIndex;session:RetainedDocumentSess
   if(diagnostics.workMs.length<200)diagnostics.workMs.push(performance.now()-begun);
  }
  const font=()=>{for(const item of visible())e.measurements.invalidateRanges(item.occurrence.nodeKey);schedule();};
- onMount(()=>{scrollport.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',font);document.fonts?.addEventListener('loadingdone',font);schedule();});
+ onMount(()=>{onCleanup(observeFontLayout(session.element,font));scrollport.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',font);document.fonts?.addEventListener('loadingdone',font);schedule();});
  const stop=index.subscribe((keys,structure)=>{if(structure)bind();else if(keys.size){const affected=[...keys].flatMap(k=>byContent.get(k)??[]);if([...keys].some(k=>{const c=e.repository.readState().contents[k];return c&&c.inlineKind!=='standoff';}))for(const item of visible())e.measurements.invalidateRanges(item.occurrence.nodeKey);for(const item of affected)e.measurements.invalidateRanges(item.occurrence.nodeKey);bind(affected);}schedule();});
  const mount=e.mounts.subscribe(key=>{const items=byNode.get(key);if(items)bind(items);});
  onCleanup(()=>{alive=false;if(frame)cancelAnimationFrame(frame);stop();mount();intersection?.disconnect();cardResize?.disconnect();blockResize?.disconnect();scrollport.removeEventListener('scroll',schedule);window.removeEventListener('resize',font);document.fonts?.removeEventListener('loadingdone',font);for(const item of records)e.measurements.invalidateRanges(item.occurrence.nodeKey);delete (session.element as any).glossGeometry;});

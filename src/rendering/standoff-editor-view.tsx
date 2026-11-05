@@ -1,3 +1,4 @@
+import {observeFontLayout} from './font-layout';
 import { CharacterSurfaceHost, type CharacterSurfaceRequest } from './character-surface-host';
 import { TaskControl, StandaloneTaskDisclosure } from './task-control';
 import { taskState } from '../runtime/tasks';
@@ -668,6 +669,7 @@ export function StandoffEditorView(props: BlockViewProps) {
       caretSurface = editor.caretModes.mount(props.nodeKey, flow, root.closest('[data-block-type="document-block"], [data-block-type="main-list-block"], [data-block-type="membrane-block"]') ?? root.parentElement ?? root, () => coordinates?.scale() ?? 1);
       caretSurface.visible((!activity || activity().visible) && typeof IntersectionObserver === "undefined");
     }
+    onCleanup(observeFontLayout(surface,()=>{editor.measurements.invalidateRanges(props.nodeKey);scheduleMeasure();}));
     if (typeof ResizeObserver !== "undefined") {
       observer = new ResizeObserver(scheduleMeasure);
       observer.observe(surface);

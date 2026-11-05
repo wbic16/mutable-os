@@ -97,3 +97,12 @@ No additional shared-code modifications were required. The compact Gloss master-
 ## Application presentation contract — 2026-11-05
 
 The separately approved contract now supplies an optional registry-backed path for Flint/Cardex. Shared modifications are limited to feature assembly/configuration, application identity/port publication and Desktop view resolution, plus registry-driven workspace admission/bookmark hooks. Existing application owners, document leases, global window barriers and graphical CSS remain intact. A dedicated Textual host replaces enabled-path application switching branches; the feature flag retains the previous path. This avoids controller extraction or a second application runtime. Focused retained-host/window tests and trusted browser flows cover both flag states, dirty Cardex drafts, source return and exact editor identity. A Textual-only pressed-button hit-target defect found by those checks was fixed. See the [contract qualification and module register](../UNIVERSAL_APPLICATION_PRESENTATION_CONTRACT_QUALIFICATION.md).
+
+## Font settings boundaries — 2026-11-05
+
+| Shared module | Necessary change and alternative | Graphical protection / coverage |
+|---|---|---|
+| `configuration.ts`, `workspace-presentation-view.tsx` | Default-on `textualFontSettings` and prop wiring; reuse shared presentation preferences instead of per-app settings. | No registry, owner or port changes. Disabled flag retains legacy Textual typography; browser round-trip restores Desktop font/container. |
+| `rendering/font-layout.ts`, `standoff-editor-view.tsx`, `features/gloss/presentation.tsx` | Presentation-scoped notification refreshes existing geometry owners when inherited fonts change without resizing Blocks. Actual same-width font switching exposed stale range heights. A global synthetic resize or a new geometry subsystem would invalidate unrelated content or duplicate the engine. | No Textual branches in graphical views. Only elements contained by the notification scope refresh; subscriptions clean up with their owners. Scope/disposal unit test, 26 existing renderer tests, browser same-advance geometry check and zero-snapshot/rebuild checks pass. |
+
+Font preferences, UI and CSS remain under Textual. Font changes preserve canonical authored styles, selection bookmarks, editor identity and manual persistence.

@@ -1,15 +1,21 @@
+import {notifyFontLayoutChange} from '../../rendering/font-layout';
+import {TextualFontSettingsPanel} from './font-settings';
+import {legacyTextualFont,resolveTextualFont,textualFontPixels} from './fonts';
 import {TextualWorkspaceContext} from './layout';
 import { Dynamic, Portal } from 'solid-js/web';
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { batch, createMemo, createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { cellStyle, loadPreferences, measuredGrid, normalisePreferences, savePreferences, type CellRect, type TextualGrid } from './grid';
 import './textual.css';
 
 /** Dedicated presentation; no editor/repository dependencies or global input bindings. */
-export function TextualWorkspace(props: { returnDesktop(): void; notice?: string; application?: import("solid-js").Component<{grid:TextualGrid}>; beforeZoom?():void; ownSurface?(element:HTMLElement):()=>void }) {
+export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:boolean; notice?: string; application?: import("solid-js").Component<{grid:TextualGrid}>; beforeZoom?():void; ownSurface?(element:HTMLElement):()=>void }) {
   let root!: HTMLDivElement, probe!: HTMLSpanElement;
   const [preferences, setPreferences] = createSignal(loadPreferences());
   const [grid, setGrid] = createSignal<TextualGrid>();
   const [menu, setMenu] = createSignal(false);
+  const [settings,setSettings]=createSignal(false),[loading,setLoading]=createSignal(false);
+  const [font,setFont]=createSignal({family:legacyTextualFont,label:'System monospace',notice:'',size:16,lineHeight:20});
+  let fontRequest=0,pendingFontLayout=false;
   const [statusSlot,setStatusSlot]=createSignal<HTMLElement>();
   const [error, setError] = createSignal('');
   let frame = 0, alive = true, metrics: { width: number; height: number } | undefined;
@@ -25,17 +31,31 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
         setGrid(old => old && Object.keys(next).every(key => next[key as keyof TextualGrid] === old[key as keyof TextualGrid]) ? old : next);
         setError('');
       } catch { setError('The text grid could not be measured.'); }
+      if(pendingFontLayout){pendingFontLayout=false;notifyFontLayoutChange(root);}
     });
   };
+  const applyFont=(next:ReturnType<typeof font>)=>setFont(previous=>{pendingFontLayout ||= previous.family!==next.family||previous.size!==next.size||previous.lineHeight!==next.lineHeight;return next;});
   const preference = (patch: Partial<ReturnType<typeof preferences>>) => {
-    if(patch.zoom!==undefined)props.beforeZoom?.();
+
     const next = normalisePreferences({ ...preferences(), ...patch }); setPreferences(next); savePreferences(next);
   };
   const zoom = (delta: number) => preference({ zoom: preferences().zoom + delta });
   const rect = (r: CellRect) => grid() ? cellStyle(grid()!, r) : {};
   const columns = () => grid()?.columns ?? 0;
   const rows = () => grid()?.rows ?? 0;
-  createEffect(() => { preferences().zoom; schedule(true); });
+  const fontRequestKey=createMemo(()=>JSON.stringify({font:preferences().font,zoom:preferences().zoom}));
+  createEffect(() => {
+    const {font:requested,zoom}=JSON.parse(fontRequestKey()) as Pick<ReturnType<typeof preferences>,'font'|'zoom'>,token=++fontRequest;
+    if(props.fontSettings===false){props.beforeZoom?.();applyFont({family:legacyTextualFont,label:'System monospace',notice:'',size:16*zoom,lineHeight:20*zoom});schedule(true);return;}
+    setLoading(true);
+    const pixels=textualFontPixels(requested,zoom);
+    void resolveTextualFont(document,requested,pixels.size).then(resolved=>{
+      if(!alive||token!==fontRequest)return;
+      props.beforeZoom?.();
+      batch(()=>{applyFont({...resolved,...pixels});setLoading(false);});
+      schedule(true);
+    });
+  });
   onMount(() => {
     if(props.ownSurface)onCleanup(props.ownSurface(root));
     root.focus({ preventScroll: true });
@@ -51,8 +71,10 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
   });
   onCleanup(() => { alive = false; cancelAnimationFrame(frame); });
   const closeMenu = () => { setMenu(false); root.querySelector<HTMLButtonElement>('[aria-haspopup]')?.focus(); };
+  const closeSettings=()=>{setSettings(false);root.querySelector<HTMLButtonElement>('[aria-haspopup]')?.focus();};
   const keys = (event: KeyboardEvent) => {
     if (event.isComposing) return;
+    if(event.key==='Escape'&&settings()){event.preventDefault();event.stopPropagation();closeSettings();return;}
     if (event.key === 'Escape' && menu()) { event.preventDefault(); event.stopPropagation(); closeMenu(); }
     if (event.key === 'Tab' && !(event.target instanceof Element && event.target.closest('[data-document-session],input,textarea,select,[role=dialog],[data-native-context-menu]'))) {
       const targets = [...root.querySelectorAll<HTMLElement>('button:not(:disabled)')].filter(el => el.getClientRects().length);
@@ -67,12 +89,13 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
     { label: 'Zoom in', run: () => zoom(.1) },
     { label: 'Zoom out', run: () => zoom(-.1) },
     { label: `Reading width: ${preferences().readingWidth||'Full'}${preferences().readingWidth?' cells':''}`, run:()=>preference({readingWidth:preferences().readingWidth?0:88}) },
+    ...(props.fontSettings===false?[]:[{label:'Presentation Settings…',run:()=>setSettings(true)}]),
     { label: 'Reset zoom', run: () => preference({ zoom: 1 }) },
     { label: `Palette: ${preferences().palette === 'paper' ? 'Paper' : 'Borland'}`, run: () => preference({ palette: preferences().palette === 'paper' ? 'borland' : 'paper' }) },
   ];
   return <TextualWorkspaceContext.Provider value={{preferences,status:statusSlot}}><Portal><div ref={root} class="textual-workspace" data-textual-palette={preferences().palette} data-textual-narrow={columns()<90||undefined} data-columns={columns()} data-rows={rows()}
     role="region" aria-label="Textual Workspace" tabIndex={-1} onKeyDown={keys}
-    style={{ '--tw-reading-cells':String(preferences().readingWidth||100000), '--tw-grid-width':`${columns()*(grid()?.cellWidthPx??0)}px`, '--tw-grid-height':`${rows()*(grid()?.cellHeightPx??0)}px`, '--tw-font-size': `${16 * preferences().zoom}px`, '--tw-line-height': `${20 * preferences().zoom}px`, '--tw-cell-width': `${grid()?.cellWidthPx ?? 0}px` }}>
+    style={{ '--tw-reading-cells':String(preferences().readingWidth||100000), '--tw-grid-width':`${columns()*(grid()?.cellWidthPx??0)}px`, '--tw-grid-height':`${rows()*(grid()?.cellHeightPx??0)}px`, '--tw-font-family':font().family, '--tw-font-size': `${font().size}px`, '--tw-line-height': `${font().lineHeight}px`, '--tw-cell-width': `${grid()?.cellWidthPx ?? 0}px` }}>
     {/* Match the per-Cell inline fragments: Chrome rounds their advances differently from one long Text node. */}
     <span ref={probe} class="tw-font-probe" aria-hidden="true">{Array.from({length:256},()=> <span>M</span>)}</span>
     <Show when={grid() && columns() >= 20 && rows() >= 8} fallback={<div class="tw-small"><p>{error() || 'Enlarge the window or reduce font zoom to show the grid.'}</p><button onClick={() => zoom(-.1)}>Zoom out</button><button onClick={props.returnDesktop}>Return to Desktop</button></div>}>
@@ -88,9 +111,10 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
       <footer class="tw-cell tw-status" style={rect({col:0,row:rows()-1,widthCells:columns(),heightCells:1})}>
         <button aria-label="Zoom out" onClick={() => zoom(-.1)}>−</button><span>{Math.round(preferences().zoom*100)}%</span><button aria-label="Zoom in" onClick={() => zoom(.1)}>+</button><span>{columns()} × {rows()}</span><span ref={setStatusSlot} class="tw-app-status"/><Show when={props.notice}><span role="status">{props.notice}</span></Show>
       </footer>
-      <Show when={menu()}><div class="tw-cell tw-popup" aria-label="Workspace actions" style={rect({col:0,row:1,widthCells:Math.min(28,columns()),heightCells:Math.min(8,rows()-2)})}>
+      <Show when={menu()}><div class="tw-cell tw-popup" aria-label="Workspace actions" style={rect({col:0,row:1,widthCells:Math.min(28,columns()),heightCells:Math.min(9,rows()-2)})}>
         <For each={actions()}>{action => <button onClick={() => { action.run(); closeMenu(); }}>{action.label}</button>}</For>
       </div></Show>
     </Show>
+    <Show when={settings()}><TextualFontSettingsPanel value={preferences().font} change={font=>preference({font})} close={closeSettings} notice={font().notice} loading={loading()} effective={font().label}/></Show>
   </div></Portal></TextualWorkspaceContext.Provider>;
 }

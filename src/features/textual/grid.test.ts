@@ -1,3 +1,4 @@
+import {defaultTextualFont} from './fonts';
 import { describe, expect, it } from 'vitest';
 import { cellStyle, measuredGrid, normalisePreferences } from './grid';
 describe('Textual measured grid', () => {
@@ -16,8 +17,8 @@ describe('Textual measured grid', () => {
   });
   it('bounds preferences and handles corrupt local values', () => {
     expect(normalisePreferences({readingWidth:0}).readingWidth).toBe(0);
-    expect(normalisePreferences(null)).toEqual({zoom:1,palette:'borland',readingWidth:88});
-    expect(normalisePreferences({zoom:Infinity,palette:'other'})).toEqual({zoom:1,palette:'borland',readingWidth:88});
-    expect(normalisePreferences({zoom:20,palette:'paper'})).toEqual({zoom:2,palette:'paper',readingWidth:88});
+    expect(normalisePreferences(null)).toEqual({zoom:1,palette:'borland',readingWidth:88,font:defaultTextualFont});
+    expect(normalisePreferences({zoom:Infinity,palette:'other'})).toEqual({zoom:1,palette:'borland',readingWidth:88,font:defaultTextualFont});
+    expect(normalisePreferences({zoom:20,palette:'paper'})).toEqual({zoom:2,palette:'paper',readingWidth:88,font:defaultTextualFont});
   });
 });
