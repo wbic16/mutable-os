@@ -120,19 +120,20 @@ it('scope fences are stable across reads and expire on any save', async () => {
   expect(await store.readScopeFence('.')).not.toBe(fence1);
 });
 
-it('listing cache browses the virtual tree; its cache file stays on disk under .mutable', async () => {
-  const { root, store } = await fixture();
-  await realFs.mkdir(path.join(root, '.mutable')); // establishment-owned, as on disk
+it('listing cache is retired in phext mode: browses reconcile from the VFS index, no cache file anywhere', async () => {
+  const { root, store, vfs } = await fixture();
   await savedPair(root);
   const cache = new VaultListingCache(store);
   const listing = await cache.browse('.');
   expect(listing.complete).toBe(true);
   expect(listing.documents).toHaveLength(1);
   expect(listing.documents[0].resourceId).toBeDefined();
-  const cacheFile = path.join(root, '.mutable', 'discovery-cache.json');
-  await expect(realFs.stat(cacheFile)).resolves.toBeDefined();
+  // Phase 3b: the discovery cache is neither written to disk nor
+  // into the phext — the VFS directory index scrolls are the listing.
+  await expect(realFs.stat(path.join(root, '.mutable', 'discovery-cache.json'))).rejects.toMatchObject({ code: 'ENOENT' });
+  expect(vfs.stat('/.mutable/discovery-cache.json')).toBeUndefined();
   const warm = await new VaultListingCache(store).browse('.');
-  expect(warm.cached).toBe(true);
+  expect(warm.cached).toBe(false);
   expect(warm.documents).toEqual(listing.documents);
 });
 

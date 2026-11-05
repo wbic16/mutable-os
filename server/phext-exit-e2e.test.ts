@@ -8,7 +8,8 @@
  * knowledge: entity + proposition + delivered/pending audit) is:
  *
  *   migrated → verification all-green, .mutable renamed aside as
- *   the fallback, legacy strata honestly listed as remaining;
+ *   the fallback, and (since Phase 3b) every legacy store phext-
+ *   backed: the records list no remaining-on-disk stratum;
  *   → the fallback is renamed AWAY and the Cavern is read back
  *     from the phext alone (documents, asset, knowledge dump);
  *   → downloaded raw + sealed (xz -t verifies; sidecar hash is
@@ -110,26 +111,31 @@ describe('Phase 5 exit ramps', () => {
     expect(report.knowledge.tables.Entity).toBeGreaterThanOrEqual(2);
     expect(report.knowledge.propositions).toBe(1);
     expect(report.smoke.knowledge.vaultGuid).toBe(f.vaultGuid);
-    // Honesty: the 3b remainder is named, never hidden.
-    expect(report.onDisk.join('\n')).toMatch(/Phase 3b pending/);
-    expect(report.onDisk.join('\n')).toMatch(/document-saves/);
-    expect(report.manifest.find((e: any) => e.path === 'uploads/up.bin')?.action).toBe('remaining');
+    // Phase 3b: the legacy stores and uploads migrated too — the
+    // records name no remaining-on-disk stratum for them.
+    expect(report.onDisk).toEqual([]);
+    expect(report.manifest.find((e: any) => e.path === 'uploads/up.bin')?.action).toBe('copy');
+    expect(report.manifest.find((e: any) => e.path === '.mutable/document-saves/rec/record.json')?.action).toBe('copy');
+    expect(report.smoke.documentSaves).toBe('.mutable/document-saves/rec/record.json');
+    expect(report.smoke.upload).toBe('uploads/up.bin');
     // Fallback discipline: .mutable renamed aside, phext published.
     expect(fs.existsSync(path.join(f.vault, '.mutable'))).toBe(false);
     expect(fs.existsSync(path.join(f.vault, '.mutable-disk-fallback', 'mutable.db'))).toBe(true);
     const phextPath = path.join(f.vault, 'cavern.phext');
     expect(fs.existsSync(phextPath)).toBe(true);
 
-    // The migration record lives in L7 and repeats the honesty list.
+    // The migration record lives in L7 and repeats the coverage.
     {
       const vfs = PhextVFS.open(phextPath);
       const record = JSON.parse(vfs.readTextFile('/.control/phext-migration.json'));
       expect(record.format).toBe('phext-cavern-migration');
       expect(record.sourceTreeSha256).toBe(report.sourceTreeSha256);
-      expect(record.onDisk.join('\n')).toMatch(/Phase 3b pending/);
+      expect(record.onDisk).toEqual([]);
       const strata = JSON.parse(vfs.readTextFile('/.control/phext-strata.json'));
       expect(strata.phextBacked.knowledge).toBe(3);
-      expect(strata.onDisk.length).toBeGreaterThan(0);
+      expect(strata.phextBacked.legacyDocumentStores).toBe(1);
+      expect(strata.phextBacked.uploads).toBe(1);
+      expect(strata.onDisk).toEqual([]);
       vfs.close();
     }
 
@@ -139,6 +145,8 @@ describe('Phase 5 exit ramps', () => {
       const vfs = PhextVFS.open(phextPath);
       expect(vfs.readFile('/notes/paper.mutable.json').equals(f.native)).toBe(true);
       expect(vfs.readFile('/.mutable/assets/blob.bin').equals(ASSET_BYTES)).toBe(true);
+      expect(vfs.readFile('/uploads/up.bin').toString()).toBe('uploaded bytes');
+      expect(JSON.parse(vfs.readTextFile('/.mutable/document-saves/rec/record.json'))).toEqual({ save: 1 });
       expect(JSON.parse(vfs.readTextFile('/notes/.memory/record-1.json')).text).toBe('remembered');
       const ks = new PhextKnowledgeStore(vfs);
       expect(canon(dumpPhextKnowledge(ks))).toEqual(canon(f.dump));
@@ -178,6 +186,10 @@ describe('Phase 5 exit ramps', () => {
     expect(exported.verified).toBe(true);
     expect(fs.readFileSync(path.join(destination, 'notes', 'paper.mutable.json')).equals(f.native)).toBe(true);
     expect(fs.readFileSync(path.join(destination, '.mutable', 'assets', 'blob.bin')).equals(ASSET_BYTES)).toBe(true);
+    // Phase 3b strata restore byte-identically too.
+    expect(fs.readFileSync(path.join(destination, 'uploads', 'up.bin')).toString()).toBe('uploaded bytes');
+    expect(JSON.parse(fs.readFileSync(path.join(destination, '.mutable', 'document-saves', 'rec', 'record.json'), 'utf8'))).toEqual({ save: 1 });
+    expect(JSON.parse(fs.readFileSync(path.join(destination, 'legacy.json'), 'utf8'))).toEqual({ kind: 'legacy-document', text: 'old store' });
     const exportedDump = dumpDiskKnowledge({
       mutableFile: path.join(destination, '.mutable', 'mutable.db'),
       auditFile: path.join(destination, '.mutable', 'audit.db'),
