@@ -781,6 +781,21 @@ disk-silence (a full exercise of save/knowledge/upload/history
 leaves only `cavern.phext` + mechanism files on disk) and
 upgrade-on-encounter (including the corrupt-fixture refusal).
 
+**Two phext-mode lookup fixes found by the cutover test conversions.**
+(1) The entity-lookup read cache keyed its invalidation solely on
+SQLite `data_version`, which never moves for same-connection commits;
+the phext replica is single-connection (one worker), so cached lookup
+results — including empty mention searches — never invalidated.
+`entity-lookup.mjs` now pairs `data_version` with `total_changes()`,
+the same formula as `reconcile.mjs`'s `sqlRevision`.
+(2) Derived document rows (Blocks/StandoffProperties) are ephemeral in
+phext mode: they exist only in the open Vault worker's replica and are
+never canonical store records, so the read-only reader replica used by
+`SqliteKnowledgeHost.entityLookup` could never see saved mentions.
+Lookups now route to the live worker when the Vault is open; the
+reader still serves unopened Vaults (canonical names/aliases/get;
+mentions there report as unindexed, per the lookup's own diagnostics).
+
 
 ## New files (no rebase risk beyond additions)
 
