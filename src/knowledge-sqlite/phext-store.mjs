@@ -80,11 +80,16 @@ export function rowToRecord(row) {
   return record;
 }
 
-/** Canonical record → SQL row values (attributes/valueJson re-encoded). */
+/** Canonical record → SQL row values (attributes/valueJson re-encoded).
+ * Records hold PARSED values (rowToRecord's contract), so a string
+ * here is a bare string value, not JSON text: always encode. The
+ * old typeof exemption passed bare strings through unencoded and
+ * produced invalid JSON on replica rebuild (exposed by the
+ * phext-only cutover routing proposition aggregates through L3). */
 export function recordToRow(record) {
   const row = { ...record };
   for (const field of ['attributes', 'valueJson']) {
-    if (row[field] !== undefined && row[field] !== null && typeof row[field] !== 'string') {
+    if (row[field] !== undefined && row[field] !== null) {
       row[field] = JSON.stringify(row[field]);
     }
   }

@@ -41,9 +41,14 @@ test('canonical Entity/alias/Relationship worker semantics, retries, restart, re
 
 test('canonical audit failure rolls back Entity mutation; bounded outbox never drops events',async()=>{
  const {default:Database}=await import('better-sqlite3'),{canonicalEntities}=await import('./entities.mjs');
- const dir=await mkdtemp(path.join(os.tmpdir(),'entity-audit-')),vault=path.join(dir,'vault');await mkdir(vault);
- const client=await openSqliteFoundation({vault,initialize:true});await client.close();const db=new Database(path.join(vault,'.mutable/mutable.db'));db.pragma('foreign_keys=ON');
- const audit=new Database(path.join(vault,'.mutable/audit.db'));const {canonicalLedger}=await import('./canonical-ledger.mjs');const ledger=canonicalLedger(db,()=>audit);
+ // Unit fixture: canonicalEntities/canonicalLedger operate on a
+ // mutable+audit database pair. On disk that pair is the ephemeral
+ // replica's shape (the phext is canonical), so build the pair
+ // directly from the schema instead of through a vault.
+ const {migrate}=await import('./schema.mjs');
+ const dir=await mkdtemp(path.join(os.tmpdir(),'entity-audit-'));const vaultGuid=uuid();
+ const db=new Database(path.join(dir,'mutable.db'));migrate(db,'mutable',{fresh:true,vaultGuid});db.pragma('foreign_keys=ON');
+ const audit=new Database(path.join(dir,'audit.db'));migrate(audit,'audit',{fresh:true,vaultGuid});const {canonicalLedger}=await import('./canonical-ledger.mjs');const ledger=canonicalLedger(db,()=>audit);
  try{
  const input=mutate('create',{id:uuid(),name:'Atomic'});let checks=0;
  assert.throws(()=>canonicalEntities(db,input,()=>{if(++checks===3)throw Error('interrupted before commit');},ledger),/interrupted/);

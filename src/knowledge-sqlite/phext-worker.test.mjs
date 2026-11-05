@@ -6,8 +6,9 @@
  * Establishes, mutates, delivers audit, checks the writer-lease
  * contention error, verifies the ephemeral replica's lifecycle
  * (created in temp, deleted at close), then cold-reopens from the
- * phext alone. Also pins the explicit refusals: snapshot restore is
- * not a phext-mode operation.
+ * phext alone. Snapshot restore is a CONVERSION into the phext
+ * (cutover): a backup restored into a fresh Cavern lands as phext
+ * knowledge; restoring over live knowledge is refused.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -27,11 +28,6 @@ test('phext knowledge through the production worker', async t => {
     await client?.close().catch(() => {});
     fs.rmSync(dir, { recursive: true, force: true });
   });
-
-  await assert.rejects(
-    openSqliteFoundation({ vault, phextKnowledge: phextPath, restoreFrom: path.join(dir, 'snapshot') }),
-    /does not restore/,
-  );
 
   client = await openSqliteFoundation({ vault, initialize: true, phextKnowledge: phextPath });
   const id = uuid(), operationId = uuid();
@@ -67,6 +63,21 @@ test('phext knowledge through the production worker', async t => {
   assert.equal((await client.entities({ op: 'get', id })).entity.name, 'Worker Entity');
   assert.equal((await client.operationOutcome(operationId)).status, 'committed');
   assert.equal((await client.auditStatus()).pending, 0);
+
+  // Snapshot restore converts into a fresh Cavern's phext.
+  const snapshot = await client.backup(path.join(dir, 'snapshot'));
+  assert.ok(snapshot?.filesIncluded === false || snapshot !== undefined);
   await client.close();
+  const restoredVault = path.join(dir, 'restored');
+  fs.mkdirSync(restoredVault);
+  const restored = await openSqliteFoundation({ vault: restoredVault, restoreFrom: path.join(dir, 'snapshot') });
+  assert.equal((await restored.entities({ op: 'get', id })).entity.name, 'Worker Entity');
+  assert.equal(fs.existsSync(path.join(restoredVault, '.mutable')), false);
+  await restored.close();
+  // Restoring over live knowledge is refused, never merged silently.
+  await assert.rejects(
+    openSqliteFoundation({ vault: restoredVault, restoreFrom: path.join(dir, 'snapshot') }),
+    /already|requires an unconverted/,
+  );
   client = undefined;
 });
