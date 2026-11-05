@@ -15,10 +15,12 @@ import {openPackage} from '../../src/interchange/package/format';
 import {decodeNative,captureNative,nativeText} from '../../src/persistence/native-resource';
 import {packageFragment,materializePackage} from '../../src/interchange/package/native';
 import {closeFilesystemWorkers} from '../../scripts/stage-c-gates/filesystem.mjs';
+import {promises as vfs} from '../phext-fs.mjs';
+import {testCavern} from '../../src/knowledge-sqlite/phext-test-cavern.mjs';
 const disposers:Array<()=>Promise<unknown>>=[];
 afterEach(async()=>{for(const fn of disposers.splice(0).reverse())await fn();await closeFilesystemWorkers();});
 const sha=(v:Uint8Array|string)=>createHash('sha256').update(v).digest('hex');
-async function root(){const p=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'application-services-')));disposers.push(()=>fs.rm(p,{recursive:true,force:true}));return p;}
+async function root(){const p=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'application-services-')));disposers.push(()=>fs.rm(p,{recursive:true,force:true}));const cavern=testCavern(p);disposers.push(()=>cavern.close());return p;}
 async function fixture(){
  const dir=await root(),sql=new SqliteKnowledgeHost({root:dir,entitiesEnabled:true});disposers.push(()=>sql.close());
  const established=await sql.establish('.'),cavernId=established.vaultGuid;
@@ -39,7 +41,7 @@ it('executes a durable semantic conversion through HTTP, retaining input and res
  const result=await f.client.call('jobs.result',{id});expect(result.kind).toBe('convert');if(result.kind==='convert')expect(JSON.stringify(result.fragment)).toContain('style/bold');
  expect((await f.client.call('jobs.list',{})).jobs.map(j=>j.id)).toContain(id);
  const reopened=new CavernJobStorage(f.dir,f.cavernId);disposers.push(()=>reopened.close());expect((await reopened.load(id)).summary).toEqual(done);
- expect(await fs.readdir(f.dir)).not.toContain('document.ink');expect(f.host.executor.status).toEqual({active:0,queued:0,bytes:0});
+ expect(await vfs.readdir(f.dir)).not.toContain('document.ink');expect(f.host.executor.status).toEqual({active:0,queued:0,bytes:0});
  await expect(f.client.call('jobs.create',{id,preparation:{...conversion,source:'different'}})).rejects.toThrow('different input');
 });
 it('reuses native writer bytes, original managed images and transactional package data in the package executor',async()=>{
@@ -53,7 +55,7 @@ it('reuses native writer bytes, original managed images and transactional packag
  const id=randomUUID(),created=await f.client.call('jobs.create',{id,preparation:{kind:'package',document:{location,expectedHash:read.sha256},knowledge:{}}});
  const done=await f.client.call('jobs.run',{id,expectedRevision:created.revision});expect(done.state,done.error).toBe('completed');
  const result=await f.client.call('jobs.result',{id});expect(result.kind).toBe('package');if(result.kind==='package'){const opened=await openPackage(result.bytes);expect(opened.snapshot.resourceId).toBe(resourceId);expect(opened.data.encoding).toBe('sqlite-storage-class-v1');}
- expect(await fs.readFile(path.join(f.dir,'saved.ink'),'utf8')).toBe(native);expect(await fs.stat(path.join(f.dir,'saved.md')).catch(()=>null)).toBeNull();
+ expect(await vfs.readFile(path.join(f.dir,'saved.ink'),'utf8')).toBe(native);expect(await vfs.stat(path.join(f.dir,'saved.md')).catch(()=>null)).toBeNull();
  await expect(f.client.call('native.read',{location,expectedHash:'0'.repeat(64)})).rejects.toThrow('changed');
 });
 it('rejects filesystem, SQL, foreign operation fields, symlinks and oversized input before preparation',async()=>{
@@ -79,7 +81,7 @@ it('enforces filesystem execution locks, checkpoint CAS, Cavern identity and res
  const lease=await a.acquire(id);try{await expect(b.acquire(id)).rejects.toThrow('another host');}finally{await lease.close();}
  await a.checkpoint({...r,summary:{...r.summary,state:'cancelled'}},0);await expect(b.checkpoint(r,0)).rejects.toThrow('conflict');
  const other=new CavernJobStorage(dir,'foreign');disposers.push(()=>other.close());await expect(other.load(id)).rejects.toThrow('evidence');
- const result=await a.putResult(id,new Uint8Array([1,2,3]));await fs.writeFile(path.join(dir,'.mutable/jobs',id,result.file),Buffer.from([3,2,1]));await expect(a.readResult(id,result)).rejects.toThrow('integrity');
+ const result=await a.putResult(id,new Uint8Array([1,2,3]));await vfs.writeFile(path.join(dir,'.mutable/jobs',id,result.file),Buffer.from([3,2,1]));await expect(a.readResult(id,result)).rejects.toThrow('integrity');
 });
 it('bounds active/queued workers and cancels queued and running CPU work without leaks',async()=>{
  const dir=await root(),worker=path.join(dir,'spin.mjs');await fs.writeFile(worker,"import {parentPort} from 'node:worker_threads';parentPort.once('message',()=>{while(true){}})");
@@ -102,10 +104,10 @@ it('packages referenced images once with original bytes and rejects stale saved 
  const context=await f.host.service.call('knowledge.packageData',{entities:[]});
  const materialized=materializePackage(fragment,f.cavernId,[[`${f.cavernId}/${reference.assetId}`,reference.assetId]],{...context,source:{}}),rootContent=materialized.state.contents[materialized.state.placements[materialized.roots[0]].contentKey];
  const native=nativeText(captureNative(materialized.state,String(rootContent.payload.id))),location={folder:'.',filename:'images.ink'};
- await fs.writeFile(path.join(f.dir,location.filename),native);const input={kind:'package' as const,document:{location,expectedHash:sha(native)},knowledge:{}};
+ await vfs.writeFile(path.join(f.dir,location.filename),native);const input={kind:'package' as const,document:{location,expectedHash:sha(native)},knowledge:{}};
  const job=await f.host.service.call('jobs.create',{id:randomUUID(),preparation:input}),done=await f.host.service.call('jobs.run',{id:job.id,expectedRevision:job.revision});expect(done.state,done.error).toBe('completed');
  const result=await f.host.service.call('jobs.result',{id:job.id});if(result.kind!=='package')throw Error('Expected package');const opened=await openPackage(result.bytes);expect(opened.assets).toHaveLength(1);expect(Buffer.from(opened.assets[0].bytes)).toEqual(bytes);
- const stale=await f.host.service.call('jobs.create',{id:randomUUID(),preparation:input});await fs.appendFile(path.join(f.dir,location.filename),' ');
+ const stale=await f.host.service.call('jobs.create',{id:randomUUID(),preparation:input});await vfs.writeFile(path.join(f.dir,location.filename),Buffer.concat([await vfs.readFile(path.join(f.dir,location.filename)),Buffer.from(' ')]));
  const rejected=await f.host.service.call('jobs.run',{id:stale.id,expectedRevision:stale.revision});expect(rejected.state).toBe('failed');expect(rejected.error).toMatch(/changed/);
 });
 it('cancels an active service worker and preserves cancellation across reopening',async()=>{
@@ -133,6 +135,6 @@ it('refuses native reads while publication recovery is pending and leaves recove
 });
 it('reports corrupt checkpoint evidence without guessing a state or replaying work',async()=>{
  const dir=await root(),store=new CavernJobStorage(dir,'cavern');disposers.push(()=>store.close());const id=randomUUID();await store.create(id,conversion);
- const file=path.join(dir,'.mutable/jobs',id,'revision-0000.json'),value=JSON.parse(await fs.readFile(file,'utf8'));value.summary.state='invented';await fs.writeFile(file,JSON.stringify(value));
+ const file=path.join(dir,'.mutable/jobs',id,'revision-0000.json'),value=JSON.parse(await vfs.readFile(file,'utf8'));value.summary.state='invented';await vfs.writeFile(file,JSON.stringify(value));
  await expect(store.load(id)).rejects.toThrow('recovery evidence');const page=await store.list();expect(page.jobs).toHaveLength(0);expect(page.diagnostics).toHaveLength(1);
 });

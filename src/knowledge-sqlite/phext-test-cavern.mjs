@@ -14,12 +14,14 @@
 import path from 'node:path';
 import { PhextVFS } from '../../dist/src/phext/vfs.js';
 import { registerPhextFs, unregisterPhextFs } from '../../server/phext-fs.mjs';
+import { registerPhextBackend, unregisterPhextBackend } from '../../scripts/stage-c-gates/filesystem.mjs';
 import { registerPhextKnowledge, unregisterPhextKnowledge } from './phext-registry.mjs';
 
 export function testCavern(root, { create = true } = {}) {
   const phextPath = path.join(root, 'cavern.phext');
   const vfs = create ? PhextVFS.openOrCreate(phextPath) : PhextVFS.open(phextPath);
   registerPhextFs({ root, vfs });
+  registerPhextBackend({ root, vfs });
   registerPhextKnowledge({ root, phextPath, vfs });
   return {
     vfs,
@@ -32,6 +34,7 @@ export function testCavern(root, { create = true } = {}) {
     close() {
       try { vfs.flush(); } catch { /* already closed */ }
       try { unregisterPhextFs(root); } catch { /* teardown raced the temp dir's removal */ }
+      try { unregisterPhextBackend(root)?.catch?.(() => {}); } catch { /* as above */ }
       try { unregisterPhextKnowledge(root); } catch { /* as above */ }
     },
   };

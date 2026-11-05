@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { spawn } from 'node:child_process';
 import { pinDirectory, atDirectory, lockFile, closeFilesystemWorkers, fileIdentity } from './filesystem.mjs';
 import { flockDescriptor } from './flock.mjs';
+import { testCavern } from '../../src/knowledge-sqlite/phext-test-cavern.mjs';
 
 // The import above is itself the first assertion: filesystem.mjs must load
 // in an environment where the optional fs-ext binding is absent, and every
@@ -15,7 +16,8 @@ after(closeFilesystemWorkers);
 
 async function sandbox(run) {
   const directory = await mkdtemp(join(tmpdir(), 'mutable-gates-flock-'));
-  try { await run(directory); } finally { await rm(directory, { recursive: true, force: true }); }
+  const cavern = testCavern(directory); // phext-only: gates operate inside a registered Cavern
+  try { await run(directory); } finally { cavern.close(); await rm(directory, { recursive: true, force: true }); }
 }
 
 // Mirror the application services' lock pattern (job-storage): the lock
