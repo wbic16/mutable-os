@@ -12,7 +12,7 @@ export function TextualCardex(props:{editor:ReactiveEditor;port:CardexPresentati
  const p=props.port,registry=cardexPresentationPorts(props.editor);
  const navigation=p.navigation();
  createEffect(()=>{const next=p.navigation();if(next&&next!==navigation)props.close(next.applicationKey??true);});
- return <section class="tw-instrument tw-cardex" aria-label="Textual Cardex" data-mwm-window={p.windowKey?props.editor.windowManager?.ownerForNode(p.windowKey):undefined} onKeyDown={e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'&&!e.isComposing){e.preventDefault();e.stopPropagation();void p.save();}}}>
+ return <><div class="tw-cardex-caption">Cardex · Entities</div><section class="tw-instrument tw-cardex" aria-label="Textual Cardex" data-mwm-window={p.windowKey?props.editor.windowManager?.ownerForNode(p.windowKey):undefined} onKeyDown={e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'&&!e.isComposing){e.preventDefault();e.stopPropagation();void p.save();}}}>
   <header><strong>Cardex · Entities</strong><Show when={registry.ports().length>1}><select aria-label="Cardex Instrument" disabled={!p.canPresent()} value={p.key} onChange={e=>props.choose(e.currentTarget.value)}><For each={registry.ports()}>{(item,i)=><option value={item.key}>{item.saved()?.name??`Cardex ${i()+1}`}</option>}</For></select></Show><button disabled={!p.canPresent()} onClick={()=>props.close()}>Return to Flint</button></header>
   <p>{p.vault()}{p.dirty()?' · Unsaved changes':''}</p><p role="status">{p.notice()}</p>
   <Show when={p.ready()} fallback={<p>Opening Entity service…</p>}>
@@ -22,5 +22,5 @@ export function TextualCardex(props:{editor:ReactiveEditor;port:CardexPresentati
     <footer><button disabled={p.busy()} onClick={()=>void p.save()}>{p.pending()?'Retry operation':'Save Entity'}</button><button disabled={p.busy()} onClick={p.back}>Cancel</button><Show when={p.saved()}><button disabled={p.busy()||p.dirty()||!!p.pending()} onClick={()=>void p.deletion()}>{p.saved()?.deletedUtc?'Restore…':'Delete…'}</button></Show></footer>
    </Show>
   </Show>
- </section>;
+ </section></>;
 }

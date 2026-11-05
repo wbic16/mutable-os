@@ -119,3 +119,95 @@
 .textual-workspace .tw-gloss .gloss-register-row small { color:inherit; opacity:.85; }
 
 .textual-workspace .tw-cardex .reactive-standoff-surface { min-height:var(--tw-line-height); }
+
+/* Increment 4: fixed, measured regions. Frames never consume a fraction of a cell. */
+.textual-workspace { --tw-shadow:#000; --tw-selection:#00d4d4; }
+.textual-workspace .tw-frame,.textual-workspace .tw-instrument,.textual-workspace .tw-save-dialog,.textual-workspace .tw-popup {
+ outline:3px double var(--tw-menu); outline-offset:-3px;
+}
+.textual-workspace .tw-document-frame { pointer-events:none; }
+.textual-workspace .tw-flint-editor { padding:var(--tw-line-height) var(--tw-cell-width); padding-left:calc(var(--tw-margin-width,0px) + var(--tw-cell-width)); }
+.textual-workspace .tw-secondary { background:var(--tw-bg); overflow:hidden; }
+.textual-workspace .tw-secondary[hidden] { display:none; }
+.textual-workspace .tw-secondary > [data-selection-toolbar] { height:100%; }
+.textual-workspace .tw-secondary :is(.tw-gloss,.tw-references) { position:relative; inset:auto; width:100%; max-width:none; height:100%; outline:0; box-shadow:none; }
+.textual-workspace .tw-instrument { width:calc(var(--tw-grid-width) - 4 * var(--tw-cell-width)); height:calc(var(--tw-grid-height) - 7 * var(--tw-line-height)); right:auto; bottom:auto; gap:var(--tw-line-height); }
+.textual-workspace :is(.tw-popup,.tw-save-dialog,.tw-scry,.tw-cardex) { box-shadow:var(--tw-cell-width) var(--tw-line-height) 0 var(--tw-shadow); }
+.textual-workspace .tw-popup { padding:var(--tw-line-height) var(--tw-cell-width); }
+.textual-workspace .tw-popup button:hover,.textual-workspace .tw-instrument [role=option][aria-selected=true],.textual-workspace .tw-instrument [role=option][aria-selected=true] > button { background:var(--tw-selection); color:#001044; }
+.textual-workspace .tw-scry { --tw-dialog-width:min(calc(88 * var(--tw-cell-width)),calc(var(--tw-grid-width) - 4 * var(--tw-cell-width))); width:var(--tw-dialog-width); left:round(down,calc((var(--tw-grid-width) - var(--tw-dialog-width))/2),var(--tw-cell-width)); }
+.textual-workspace .tw-scry .tw-ler { width:100%; height:100%; box-shadow:none; }
+.textual-workspace .tw-cardex { width:calc(var(--tw-grid-width) - 2 * var(--tw-cell-width)); height:calc(var(--tw-grid-height) - 5 * var(--tw-line-height)); }
+.textual-workspace .tw-instrument :is(input,select) { height:var(--tw-line-height); min-height:0; margin:0; }
+.textual-workspace .tw-instrument :is(h2,h3,h4) { font:inherit; color:var(--tw-focus); margin:0 0 var(--tw-line-height); }
+.textual-workspace .tw-instrument :is(hr,fieldset) { border:0; border-radius:0; padding:0; margin:0; min-width:0; }
+.textual-workspace .tw-instrument hr { height:var(--tw-line-height); background:linear-gradient(var(--tw-menu),var(--tw-menu)) center / 100% 1px no-repeat; }
+.textual-workspace .tw-instrument footer { padding-bottom:var(--tw-line-height); gap:var(--tw-line-height) calc(2 * var(--tw-cell-width)); }
+.textual-workspace .tw-instrument footer > button { box-shadow:var(--tw-cell-width) var(--tw-line-height) 0 var(--tw-shadow); }
+.textual-workspace .tw-instrument footer > button:active { transform:translate(var(--tw-cell-width),var(--tw-line-height)); box-shadow:none; }
+.textual-workspace .tw-instrument article { margin-bottom:var(--tw-line-height); overflow-wrap:anywhere; }
+.textual-workspace .tw-instrument textarea { box-sizing:border-box; max-width:100%; font:inherit; line-height:var(--tw-line-height); border:0; border-radius:0; padding:0 var(--tw-cell-width); }
+.textual-workspace .tw-instrument label { max-width:100%; }
+.textual-workspace .tw-native-island { min-height:calc(8 * var(--tw-line-height)); }
+.textual-workspace .tw-margin-heading { display:flex; align-items:center; justify-content:space-between; color:var(--tw-focus); white-space:nowrap; overflow:hidden; }
+.textual-workspace .gloss-margin-layer { width:var(--tw-margin-width); }
+.textual-workspace .gloss-margin-layer .tw-margin-card { left:var(--tw-cell-width); right:auto; width:calc(var(--tw-margin-width) - 2 * var(--tw-cell-width)); padding:0 0 var(--tw-margin-line); margin:0; border:0; border-radius:0; background:var(--tw-bg); color:var(--tw-ink); font:var(--tw-margin-font)/var(--tw-margin-line) ui-monospace,'Cascadia Mono',Consolas,monospace; }
+.textual-workspace .tw-margin-card button { padding:0; margin:0; border:0; background:transparent; color:inherit; font:inherit; line-height:var(--tw-margin-line); text-align:left; }
+.textual-workspace .tw-margin-definition,.textual-workspace .tw-margin-definition > :is(strong,span) { display:block; width:100%; }
+.textual-workspace .tw-margin-definition strong { color:var(--tw-focus); }
+.textual-workspace .tw-margin-glyph { display:inline-block; width:var(--tw-margin-cell); height:var(--tw-margin-line); line-height:var(--tw-margin-line); vertical-align:top; white-space:pre; }
+.textual-workspace .tw-margin-card[aria-current=true] { box-shadow:calc(-1 * var(--tw-margin-cell)) 0 0 var(--tw-selection); }
+.textual-workspace .tw-margin-passage { text-decoration:underline; }
+
+/* Native Blocks keep their DOM and authored styling data. Only Textual geometry changes. */
+.textual-workspace .tw-flint-editor .reactive-imported-list-item { padding-left:calc(4 * var(--tw-cell-width)); }
+.textual-workspace .tw-flint-editor .reactive-list-toggle { width:calc(2 * var(--tw-cell-width)); height:var(--tw-line-height); line-height:var(--tw-line-height); border-radius:0; }
+.textual-workspace .tw-flint-editor .reactive-checkbox { gap:var(--tw-cell-width); }
+.textual-workspace .tw-flint-editor .reactive-checkbox > input { margin:0; width:var(--tw-cell-width); height:var(--tw-line-height); }
+.textual-workspace .tw-flint-editor .reactive-table { border-collapse:separate; border-spacing:0; min-width:calc(var(--tw-table-columns,1) * 14 * var(--tw-cell-width))!important; width:round(down,100%,calc(var(--tw-table-columns,1) * var(--tw-cell-width))); }
+.textual-workspace .tw-flint-editor .reactive-table-cell { padding:var(--tw-line-height) var(--tw-cell-width); border:0; box-shadow:inset 1px 1px var(--tw-menu),inset -1px -1px var(--tw-menu); }
+.textual-workspace .tw-flint-editor .reactive-table-cell.table-guides-hidden { box-shadow:none; }
+.textual-workspace .tw-flint-editor .table-layout-toolbar { font:inherit; gap:var(--tw-cell-width); min-height:var(--tw-line-height); flex-wrap:wrap; }
+.textual-workspace .tw-flint-editor .table-cell-controls { right:0; gap:0; height:var(--tw-line-height); }
+.textual-workspace .tw-flint-editor .table-control { padding:0 var(--tw-cell-width); border:0; }
+.textual-workspace .tw-flint-editor :is(.reactive-image,.reactive-video,.reactive-iframe) { margin:0; padding:0; border:0; max-width:100%; width:round(down,100%,var(--tw-cell-width)); }
+.textual-workspace .tw-flint-editor :is(.reactive-image,.reactive-video,.reactive-iframe) > :is(img,iframe,video),.textual-workspace .tw-flint-editor video { display:block; box-sizing:content-box; width:100%; max-width:100%; margin:0; border:0; padding:0 0 var(--tw-island-pad,0px); background:var(--tw-bg); }
+.textual-workspace .tw-flint-editor .reactive-image > img { height:auto; max-height:none; object-fit:contain; }
+.textual-workspace .tw-flint-editor .reactive-video > iframe { height:auto; min-height:0; aspect-ratio:16/9; }
+.textual-workspace .tw-cardex .cardex-search-row,.textual-workspace .tw-cardex .cardex-toolbar { gap:var(--tw-line-height) var(--tw-cell-width); margin:0 0 var(--tw-line-height); }
+.textual-workspace .tw-cardex .cardex-table { border-collapse:separate; border-spacing:0; }
+.textual-workspace .tw-cardex .cardex-table :is(td,th) { border:0; box-shadow:inset 0 -1px var(--tw-menu); }
+.textual-workspace .tw-cardex input[type=file]::file-selector-button { font:inherit; border:0; border-radius:0; padding:0 var(--tw-cell-width); line-height:var(--tw-line-height); }
+.textual-workspace .tw-cardex .cardex-image-drop { padding:var(--tw-line-height) var(--tw-cell-width); border:0; outline:1px dashed var(--tw-menu); outline-offset:-1px; }
+.textual-workspace[data-textual-narrow] .tw-cardex .cardex-fields { grid-template-columns:minmax(0,1fr); }
+.textual-workspace[data-textual-narrow] .tw-cardex .cardex-fields > label { color:var(--tw-focus); }
+/* Pair boundaries use one complete main cell, preventing half-pixel rounding drift. */
+.textual-workspace .tw-margin-pair { display:inline-flex; vertical-align:top; width:calc(2 * var(--tw-margin-cell)); height:var(--tw-margin-line); }
+.textual-workspace .tw-margin-pair .tw-margin-glyph { flex:0 0 50%; width:50%; }
+.textual-workspace .tw-secondary::after { content:''; position:absolute; inset:0; outline:3px double var(--tw-menu); outline-offset:-3px; pointer-events:none; z-index:9; }
+.textual-workspace .tw-secondary-slot,.textual-workspace .tw-secondary-slot > [data-selection-toolbar] { height:100%; }
+.textual-workspace .tw-secondary-slot[hidden] { display:none; }
+.textual-workspace .tw-cardex .cardex-image { gap:var(--tw-line-height) var(--tw-cell-width); padding:var(--tw-line-height) var(--tw-cell-width); border:0; border-radius:0; outline:1px dashed var(--tw-menu); outline-offset:-1px; }
+.textual-workspace .tw-cardex .cardex-image img { width:calc(8 * var(--tw-cell-width)); height:calc(4 * var(--tw-line-height)); }
+.textual-workspace .tw-cardex .cardex-image input { max-width:calc(28 * var(--tw-cell-width)); }
+.textual-workspace .tw-cardex .cardex-alias { gap:var(--tw-cell-width); margin-bottom:var(--tw-line-height); }
+.textual-workspace .tw-cardex .cardex-strata { font:inherit; line-height:var(--tw-line-height); gap:var(--tw-cell-width); color:var(--tw-ink); }
+.textual-workspace .tw-cardex .cardex-search-form { gap:var(--tw-line-height) var(--tw-cell-width); margin:var(--tw-line-height) 0; }
+.textual-workspace .tw-cardex .cardex-advanced { gap:var(--tw-line-height) var(--tw-cell-width); padding:var(--tw-line-height) var(--tw-cell-width); border-radius:0; background:var(--tw-surface); grid-template-columns:repeat(auto-fit,minmax(calc(20 * var(--tw-cell-width)),1fr)); }
+.textual-workspace .tw-cardex :is(.cardex-advanced,.cardex-semantic-form) label { gap:0; }
+.textual-workspace .tw-cardex .cardex-description>button { font:inherit; margin:0; }
+.textual-workspace .tw-cardex .cardex-description:not(.expanded) .cardex-local--description { max-height:calc(8 * var(--tw-line-height)); }
+.textual-workspace .tw-cardex .cardex-semantic-form { margin:var(--tw-line-height) 0; }
+.textual-workspace .tw-cardex .cardex-semantic-form fieldset { gap:var(--tw-line-height); }
+.textual-workspace .tw-cardex .cardex-semantic-form textarea { min-height:calc(4 * var(--tw-line-height)); }
+.textual-workspace .tw-cardex .cardex-detail-list article { padding:var(--tw-line-height) 0; gap:var(--tw-line-height) var(--tw-cell-width); border:0; box-shadow:inset 0 -1px var(--tw-menu); }
+.textual-workspace .tw-cardex .cardex-detail-list article p { margin:0; }
+.textual-workspace .tw-cardex-caption { position:absolute; left:var(--tw-cell-width); top:var(--tw-line-height); height:var(--tw-line-height); color:var(--tw-focus); font-weight:bold; }
+.textual-workspace .tw-flint[data-cardex-covered] > :is(.tw-flint-menu,.tw-title,.tw-flint-tabs,.tw-flint-status,.tw-flint-surfaces) { visibility:hidden; }
+/* Intrinsic labels round outwards to whole measured columns without JS layout reads. */
+@supports (width:calc-size(max-content,round(up,size,1px))) {
+ .textual-workspace :is(button,select) { width:calc-size(max-content,round(up,size,var(--tw-cell-width))); max-width:100%; }
+ /* Marginalia intentionally uses its half-size grid; glyph runs supply its width. */
+ .textual-workspace .tw-margin-card button { width:auto; }
+ .textual-workspace .tw-margin-card .tw-margin-definition { width:100%; }
+}

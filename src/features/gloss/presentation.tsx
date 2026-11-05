@@ -104,27 +104,27 @@ function createGlossViewModel(props:{argumentState:ArgumentState;graphState:Glos
    </div>
   </aside>
  </>;
- return {Graphical,props,index,selected,setSelected,query,setQuery,type,setType,types,filtered,message,navigate,remove,relationships,graphEnabled,argumentEnabled,
+ return {Graphical,Margin:(p:{scrollport:HTMLElement;metrics:()=>{rowHeight:number;gap:number};card:(p:GlossMarginCardProps)=>JSX.Element})=><GlossMargin index={index} session={session} {...p}/>,props,index,selected,setSelected,query,setQuery,type,setType,types,filtered,message,navigate,remove,relationships,graphEnabled,argumentEnabled,
  Graph:()=> <GlossGraphView navigationEnabled={editor.features.glossGraphNavigation} active={graphActive} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}} hostPort={()=>session.host.port} index={index} state={props.graphState} registerState={props.registerState} diagnostics={graphDiagnostics} select={selectRelated} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}}/>,
  Argument:()=> <GlossArgumentView index={index} state={props.argumentState} registerState={props.registerState} diagnostics={argumentDiagnostics} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}} reveal={id=>selectRelated(id,true)} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}}/>};
 
 }
 
-type CardProps={entry:GlossEntry;occurrence:GlossOccurrence;ref?:(el:HTMLElement)=>void};
+export type GlossMarginCardProps={entry:GlossEntry;occurrence:GlossOccurrence;ref?:(el:HTMLElement)=>void};
 /** Underneath mode uses native flow, not measured offsets. Authored pages/tables
  * retain their internal layout: their notes follow the whole page/table. */
-function GlossBelow(props:{index:GlossSessionIndex;session:RetainedDocumentSession;card:(p:CardProps)=>JSX.Element}){
+function GlossBelow(props:{index:GlossSessionIndex;session:RetainedDocumentSession;card:(p:GlossMarginCardProps)=>JSX.Element}){
  const [mounted,setMounted]=createSignal(0);const e=props.index.editor;
  onCleanup(e.mounts.subscribe(key=>{if(props.index.containsOccurrence(key))setMounted(n=>n+1);}));
- const groups=createMemo(()=>{mounted();const groups=new Map<Element,CardProps[]>();for(const entry of props.index.rows[0]())for(const occurrence of entry.occurrences()){
+ const groups=createMemo(()=>{mounted();const groups=new Map<Element,GlossMarginCardProps[]>();for(const entry of props.index.rows[0]())for(const occurrence of entry.occurrences()){
   const root=e.mounts.get(occurrence.nodeKey)?.root;if(!root)continue;
   const target=root.closest<HTMLElement>('.reactive-page,[data-block-type="table-block"]')??root;const list=groups.get(target)??[];list.push({entry,occurrence});groups.set(target,list);
  }return [...groups].map(([target,cards])=>({target,cards}));});
  return <For each={groups()}>{group=>{const slot=document.createElement('div');slot.className='gloss-below';slot.setAttribute('aria-label','Glosses for preceding passage');group.target.after(slot);onCleanup(()=>slot.remove());return <Portal mount={slot}><For each={group.cards}>{card=><props.card {...card}/>}</For></Portal>;}}</For>;
 }
 
-interface MarginItem extends CardProps {id:string}
-function GlossMargin(props:{index:GlossSessionIndex;session:RetainedDocumentSession;scrollport:HTMLElement;card:(p:CardProps)=>JSX.Element}){
+interface MarginItem extends GlossMarginCardProps {id:string}
+function GlossMargin(props:{index:GlossSessionIndex;session:RetainedDocumentSession;scrollport:HTMLElement;card:(p:GlossMarginCardProps)=>JSX.Element;metrics?:()=>{rowHeight:number;gap:number}}){
  const {index,session,scrollport}=props,e=index.editor,[visible,setVisible]=createSignal<MarginItem[]>([]);
  let records:MarginItem[]=[],frame=0,alive=true,layer!:HTMLDivElement;
  let byContent=new Map<string,MarginItem[]>(),byNode=new Map<string,MarginItem[]>();
@@ -147,6 +147,7 @@ function GlossMargin(props:{index:GlossSessionIndex;session:RetainedDocumentSess
  };
  createEffect(()=>{const next:MarginItem[]=[];for(const entry of index.rows[0]())for(const occurrence of entry.occurrences())next.push({id:`${occurrence.nodeKey}:${occurrence.segmentId}`,entry,occurrence});const old=new Map(records.map(r=>[r.id,r])),nextNodes=new Set(next.map(r=>r.occurrence.nodeKey));for(const r of records)if(!nextNodes.has(r.occurrence.nodeKey))e.measurements.invalidateRanges(r.occurrence.nodeKey);records=next.map(r=>{const prior=old.get(r.id);if(!prior)return r;prior.occurrence=r.occurrence;return prior;}).sort((a,b)=>a.occurrence.order-b.occurrence.order||(index.range(a.occurrence)?.start??0)-(index.range(b.occurrence)?.start??0));byContent=new Map();byNode=new Map();for(const r of records){const list=byContent.get(r.occurrence.contentKey)??[];list.push(r);byContent.set(r.occurrence.contentKey,list);const nodes=byNode.get(r.occurrence.nodeKey)??[];nodes.push(r);byNode.set(r.occurrence.nodeKey,nodes);}untrack(()=>bind());});
  createEffect(()=>{session.host.activity();session.host.coordinates.scale();untrack(()=>{for(const key of byNode.keys())e.measurements.invalidateRanges(key);schedule();});});
+ createEffect(()=>{props.metrics?.();schedule();});
  function layout(stamp:number){frame=0;if(!alive||!session.host.activity().visible)return;diagnostics.frames++;const begun=performance.now();
   const origin=scrollport.getBoundingClientRect(),scale=session.host.coordinates.scale()||1,boxes=new Map<string,DOMRect>(),positions:{item:MarginItem;top:number;height:number}[]=[];let bottom=-Infinity;
   const roots=new Set<Element>();
@@ -155,7 +156,7 @@ function GlossMargin(props:{index:GlossSessionIndex;session:RetainedDocumentSess
    let box=boxes.get(k);if(!box){diagnostics.blockReads++;boxes.set(k,box=h.root.getBoundingClientRect());}
    const revision=e.repository.readState().contents[item.occurrence.contentKey]?.revision??0,previous=e.measurements.rangeDiagnostics.reads;
    const rect=e.measurements.retainedRangeRects(k,range.start,range.end,revision,box,scale,stamp)[0];diagnostics.anchorReads+=e.measurements.rangeDiagnostics.reads-previous;if(!rect)continue;
-   const anchor=(rect.top-origin.top)/scale+scrollport.scrollTop,top=Math.max(anchor,bottom+8),height=heights.get(item.id)??92;positions.push({item,top,height});bottom=top+height;
+   const anchor=(rect.top-origin.top)/scale+scrollport.scrollTop,metrics=props.metrics?.(),raw=Math.max(anchor,bottom+(metrics?.gap??8)),top=metrics?Math.ceil(raw/metrics.rowHeight)*metrics.rowHeight:raw,height=heights.get(item.id)??92;positions.push({item,top,height});bottom=top+height;
   }
   // Writes after all reads. Keep previous positions when unchanged.
   for(const {item,top}of positions){const card=cards.get(item.id);if(card&&card.style.top!==`${top}px`)card.style.top=`${top}px`;}

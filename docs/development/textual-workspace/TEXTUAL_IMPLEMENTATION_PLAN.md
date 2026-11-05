@@ -2,7 +2,7 @@
 
 **Current direction: four increments; accepted investigation is the baseline.** This plan supersedes the previous eight stages and exhaustive requalification proposals. Do not repeat the source audit or regenerate inventories. Share the engine, separate the views, preserve existing behaviour.
 
-**Progress:** Increments 1 and 2 are accepted. Increment 3 instrument integration is implemented; see [qualification](TEXTUAL_INCREMENT_3_QUALIFICATION.md). Increment 4 has not begun.
+**Progress:** Increments 1–3 are accepted. Increment 4 is implemented; see [qualification](TEXTUAL_INCREMENT_4_QUALIFICATION.md).
 
 ## Isolation boundaries
 
@@ -80,3 +80,12 @@ S9 qualification exposed an existing blanket opaque-application switch guard in 
 S9 source-return adapter: `features/cardex/details.tsx` reports successful navigation through an optional callback. The existing Instrument publishes that event; the Textual panel yields to Flint. Graphical callbacks/default behavior remain unchanged. This avoids treating window stacking as a navigation event. Explicit source navigation clears temporary occurrence filtering before restoring native Flint focus, so a filter cannot leave the destination hidden; ordinary application switching retains the current view. The browser flow covers navigation after References occurrence focusing.
 
 Increment 3 uses the existing measured geometry and retains the graphical defaults. Qualification is recorded in [TEXTUAL_INCREMENT_3_QUALIFICATION.md](TEXTUAL_INCREMENT_3_QUALIFICATION.md), with changed-file boundaries, focused tests, actual browser flows and work counters. Subsequent visual polish should follow the supplied framed-pane reference, including hard-edged cell-aligned shadows, denser chrome and persistent side panes. No draggable/overlapping Textual window behavior or new shortcut bindings are implied by the mockup.
+
+## Increment 4 implementation boundaries — 2026-11-05
+
+Increment 3 is accepted. S7: `features/gloss/presentation.tsx` will expose its existing margin renderer to an optional presenter and accept optional row-pitch/gap metrics. Textual supplies its own cards, scrollport and half-grid metrics; graphical defaults retain continuous placement and the existing gap. This reuses the session index, visibility tracking, range cache, invalidation and navigation instead of creating another annotation/geometry system. Focused margin placement tests, scroll/zoom browser checks and the existing Gloss presentation test cover this boundary.
+
+All other planned changes are confined to `features/textual/`: fixed pane allocation, retained secondary regions, scoped controls/frames/shadows and a local native-media/table sizing adapter. Native renderers and authored metadata remain unchanged. The adapter observes native media dimensions and structural mounts, never scans the repository or performs whole-document measurement during typing. No new window manager or keyboard bindings are introduced. Graphical restoration, exact retained DOM identity and bounded-work counters are explicit acceptance checks.
+
+
+Increment 4 actual boundary: the optional margin renderer/metrics in S7 were the only shared implementation change. All layout, media observation, control styling and focus-owner release adapters remain Textual-only. Persistent panes use separate mount slots so one view's cleanup cannot remove another view's portal. The media adapter handles removed subtrees locally; Cell edits and SVG redraws do not traverse unrelated media. Focused browser qualification covers normal/zoom/narrow layouts, cached scrolling, native graph output, editing, foreground Cardex and Desktop restoration. See [Increment 4 results](TEXTUAL_INCREMENT_4_QUALIFICATION.md).

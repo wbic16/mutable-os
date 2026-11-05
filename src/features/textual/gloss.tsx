@@ -1,10 +1,15 @@
+import {Portal} from 'solid-js/web';
+import {TextualMarginalia} from './marginalia';
+import {textualDocumentLayout,showFullDocument} from './layout';
 import {For,Show} from 'solid-js';
 import type {GlossViewModel} from '../gloss/presentation';
 /** Index, occurrence identity, drafts and navigation remain owned by Gloss. */
 export function TextualGloss(props:{model:GlossViewModel}) {
- const m=props.model,tab=m.props.graphState.tab;
- return <aside class="tw-gloss tw-instrument" aria-label="Textual Gloss Explorer" hidden={!m.props.references}>
-  <header><strong>Gloss Explorer</strong><button onClick={m.props.closeReferences}>Close</button></header>
+ const m=props.model,tab=m.props.graphState.tab,layout=textualDocumentLayout(m.props.session);
+ const close=()=>{m.props.closeReferences();queueMicrotask(()=>{const e=m.props.editor,key=e.focus.state.focusedKey;if(key&&m.props.session.projection.node(key)){const h=e.mounts.get(key),range=h?.captureInlineSelection?.()??e.mounts.inlineSelection(key);h?.focus();if(range)h?.restoreInlineSelection?.(range);}});};
+ const passage=(entry:Parameters<typeof m.navigate>[0])=>{showFullDocument(m.props.editor);void m.navigate(entry).then(()=>{if(layout()?.panes.fullscreen)close();});};
+ return <><TextualMarginalia model={m}/><Show when={layout()?.secondary} keyed>{mount=><Portal mount={mount}><aside class="tw-gloss tw-instrument" aria-label="Textual Gloss Explorer" hidden={!m.props.references}>
+  <header><strong>Gloss Explorer</strong><button onPointerDown={e=>e.preventDefault()} onClick={close}>Close</button></header>
   <nav class="tw-tool-row"><button aria-pressed={tab[0]()==='references'} onClick={()=>tab[1]('references')}>Glosses</button><Show when={m.graphEnabled}><button disabled={!!m.relationships?.draft()} aria-pressed={tab[0]()==='graph'} onClick={()=>tab[1]('graph')}>Graph</button></Show><Show when={m.argumentEnabled}><button disabled={!!m.relationships?.draft()} aria-pressed={tab[0]()==='argument'} onClick={()=>tab[1]('argument')}>Argument</button></Show></nav>
   <Show when={tab[0]()==='graph'}><div class="tw-native-island"><m.Graph/></div></Show><Show when={tab[0]()==='argument'}><div class="tw-native-island"><m.Argument/></div></Show>
   <Show when={tab[0]()==='references'}>
@@ -13,9 +18,9 @@ export function TextualGloss(props:{model:GlossViewModel}) {
    <p>{m.filtered().length} Glosses</p>
    <div class="tw-instrument-body"><For each={m.filtered()}>{entry=><article class="gloss-register-row" tabIndex={-1} data-gloss-id={entry.localId} aria-current={m.selected()===entry.localId?'true':undefined}>
     <strong>{entry.data().type||'Note'}: {entry.data().body}</strong><small>{entry.occurrences().length} occurrence(s)</small>
-    <button disabled={!entry.occurrences().length} onClick={()=>void m.navigate(entry)}>Passage</button><button onClick={e=>void m.navigate(entry,undefined,true,e.currentTarget)}>Edit</button><button onClick={e=>m.remove(entry,e.currentTarget)}>Delete</button>
+    <button disabled={!entry.occurrences().length} onClick={()=>passage(entry)}>Passage</button><button onClick={e=>void m.navigate(entry,undefined,true,e.currentTarget)}>Edit</button><button onClick={e=>m.remove(entry,e.currentTarget)}>Delete</button>
     <Show when={m.relationships}>{ui=>{const Groups=ui().Groups;return <Groups entry={entry}/>;}}</Show>
    </article>}</For></div>
   </Show><p role="status">{m.message()}</p>
- </aside>;
+ </aside></Portal>}</Show></>;
 }
