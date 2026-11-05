@@ -1,7 +1,7 @@
 /** Rebuildable Library presentation cache. Never used as storage/identity proof.
  * Verified discovery, Open, Save and relocation continue through NativeVaultStore.
  */
-import { promises as fs } from 'node:fs';
+import { promises as fs } from './phext-fs.mjs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { hash } from '../src/persistence/managed-pair.mjs';
