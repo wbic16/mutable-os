@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from "express";
 import path from "path";
 import multer, { type FileFilterCallback } from 'multer';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import bodyParser from 'body-parser';
 import fs from "fs";
 import { RecordId, Surreal, Table } from "surrealdb";
@@ -249,11 +249,21 @@ app.use('/image-backgrounds', express.static(path.join(__dirname, baseBackground
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb'}));
 
+// PhextVFS Phase 3b: with the phextVfs flag on, the legacy upload
+// endpoint and /uploads static route route into the Cavern phext
+// (server/phext-uploads.mjs, loaded by URL like the other phext
+// modules). Flag off, this stays undefined and both routes keep
+// their exact disk behavior.
+const phextUploads = featureFlags.phextVfs
+  ? await import(pathToFileURL(path.resolve('server/phext-uploads.mjs')).href)
+  : undefined;
+
 const cavern = featureFlags.cavernStartup ? createCavernLifecycle() : undefined;
 if (cavern) {
   app.use('/api/cavern', cavern.router);
   app.use('/api', cavern.middleware, (_req, res) => { res.status(404).json({ Success: false, Error: 'This service is unavailable in the current Cavern.' }); });
   app.use('/upload', cavern.middleware);
+  if (phextUploads) app.use('/uploads', phextUploads.createPhextUploadsStatic({ currentRoot: () => cavern.current()?.path }));
   app.use('/uploads', (req, res, next) => {
     const selected = cavern.current();
     if (!selected) { res.sendStatus(409); return; }
@@ -296,7 +306,20 @@ app.use("/api", createWorkspaceStoreRouter({
 }
 
 
-const storage = multer.diskStorage({
+// PhextVFS Phase 3b: behind the flag, multer stores through the
+// phext-aware engine (VFS-resident for a phext-mode Cavern, disk
+// otherwise, same destination/session contract as the callback
+// below). Flag off keeps the original diskStorage untouched.
+const storage = phextUploads ? phextUploads.createPhextUploadStorage({
+  destinationFor: (req: Request) => {
+    if (cavern) {
+      const selected = cavern.current();
+      if (!selected || req.header('X-Mutable-Cavern') !== selected.session) throw new Error('Choose the current Cavern before uploading.');
+      return { root: selected.path, directory: path.join(selected.path, 'uploads') };
+    }
+    return { directory: 'uploads' };
+  },
+}) : multer.diskStorage({
   destination: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
     if (cavern) {
       const selected = cavern.current();
