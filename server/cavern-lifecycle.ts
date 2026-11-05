@@ -117,7 +117,7 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
         } catch { /* a phext-born Cavern has no prior record */ }
         vfs.writeFile('/.control/phext-strata.json', JSON.stringify({
           v: 1,
-          phextBacked: { documents: 1, pairJournals: 2, knowledge: 3, history: 4, services: 5, assets: 6, control: 7 },
+          phextBacked: { documents: 1, pairJournals: 2, knowledge: 3, history: 4, services: 5, assets: 6, control: 7, legacyDocumentStores: 1, documentSavesJournal: 3, uploads: 1 },
           onDisk: preservedOnDisk,
         }));
         vfs.flush();
