@@ -15,8 +15,9 @@ describe('Textual measured grid', () => {
     expect(()=>cellStyle(measuredGrid(100,100,10,20),{col:.5,row:0,widthCells:2,heightCells:1})).toThrow();
   });
   it('bounds preferences and handles corrupt local values', () => {
-    expect(normalisePreferences(null)).toEqual({zoom:1,palette:'borland'});
-    expect(normalisePreferences({zoom:Infinity,palette:'other'})).toEqual({zoom:1,palette:'borland'});
-    expect(normalisePreferences({zoom:20,palette:'paper'})).toEqual({zoom:2,palette:'paper'});
+    expect(normalisePreferences({readingWidth:0}).readingWidth).toBe(0);
+    expect(normalisePreferences(null)).toEqual({zoom:1,palette:'borland',readingWidth:88});
+    expect(normalisePreferences({zoom:Infinity,palette:'other'})).toEqual({zoom:1,palette:'borland',readingWidth:88});
+    expect(normalisePreferences({zoom:20,palette:'paper'})).toEqual({zoom:2,palette:'paper',readingWidth:88});
   });
 });

@@ -1,0 +1,89 @@
+{
+  "normal": {
+    "cw": 9.640625,
+    "ch": 20,
+    "reading": 88,
+    "rows": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "rowSteps": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "margin": [
+      18,
+      25,
+      32,
+      38,
+      44,
+      50,
+      57,
+      63
+    ],
+    "heading": "16px"
+  },
+  "zoom": {
+    "cw": 10.609375,
+    "ch": 22,
+    "reading": 88,
+    "rows": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "rowSteps": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "margin": [
+      19,
+      26,
+      34,
+      40,
+      46,
+      52,
+      59,
+      66
+    ],
+    "heading": "17.6px"
+  },
+  "masterDetail": true,
+  "localKeyboard": true,
+  "filters": true,
+  "editAndRelationship": true,
+  "deleteUndo": true,
+  "graphArgumentTabs": true,
+  "marginaliaInspect": true,
+  "widthToggle": true,
+  "typingSelectionUndoRedo": true,
+  "narrowReturn": true,
+  "desktopRestoration": true,
+  "work": {
+    "snapshots": 0,
+    "projections": 0,
+    "rebuilds": 0,
+    "referenceRebuilds": 0
+  }
+}

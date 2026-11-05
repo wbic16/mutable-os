@@ -1,3 +1,4 @@
+import {TextualWorkspaceContext} from './layout';
 import { Dynamic, Portal } from 'solid-js/web';
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { cellStyle, loadPreferences, measuredGrid, normalisePreferences, savePreferences, type CellRect, type TextualGrid } from './grid';
@@ -9,6 +10,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
   const [preferences, setPreferences] = createSignal(loadPreferences());
   const [grid, setGrid] = createSignal<TextualGrid>();
   const [menu, setMenu] = createSignal(false);
+  const [statusSlot,setStatusSlot]=createSignal<HTMLElement>();
   const [error, setError] = createSignal('');
   let frame = 0, alive = true, metrics: { width: number; height: number } | undefined;
   const schedule = (fontChanged = false) => {
@@ -52,7 +54,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
   const keys = (event: KeyboardEvent) => {
     if (event.isComposing) return;
     if (event.key === 'Escape' && menu()) { event.preventDefault(); event.stopPropagation(); closeMenu(); }
-    if (event.key === 'Tab' && !(event.target instanceof Element && event.target.closest('[data-document-session],input,textarea,select,[role=dialog]'))) {
+    if (event.key === 'Tab' && !(event.target instanceof Element && event.target.closest('[data-document-session],input,textarea,select,[role=dialog],[data-native-context-menu]'))) {
       const targets = [...root.querySelectorAll<HTMLElement>('button:not(:disabled)')].filter(el => el.getClientRects().length);
       const i = targets.indexOf(root.ownerDocument.activeElement as HTMLElement);
       if (targets.length && (event.shiftKey ? i <= 0 : i < 0 || i === targets.length - 1)) {
@@ -64,12 +66,13 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
     { label: 'Return to Desktop', run: props.returnDesktop },
     { label: 'Zoom in', run: () => zoom(.1) },
     { label: 'Zoom out', run: () => zoom(-.1) },
+    { label: `Reading width: ${preferences().readingWidth||'Full'}${preferences().readingWidth?' cells':''}`, run:()=>preference({readingWidth:preferences().readingWidth?0:88}) },
     { label: 'Reset zoom', run: () => preference({ zoom: 1 }) },
     { label: `Palette: ${preferences().palette === 'paper' ? 'Paper' : 'Borland'}`, run: () => preference({ palette: preferences().palette === 'paper' ? 'borland' : 'paper' }) },
   ];
-  return <Portal><div ref={root} class="textual-workspace" data-textual-palette={preferences().palette} data-textual-narrow={columns()<90||undefined} data-columns={columns()} data-rows={rows()}
+  return <TextualWorkspaceContext.Provider value={{preferences,status:statusSlot}}><Portal><div ref={root} class="textual-workspace" data-textual-palette={preferences().palette} data-textual-narrow={columns()<90||undefined} data-columns={columns()} data-rows={rows()}
     role="region" aria-label="Textual Workspace" tabIndex={-1} onKeyDown={keys}
-    style={{ '--tw-grid-width':`${columns()*(grid()?.cellWidthPx??0)}px`, '--tw-grid-height':`${rows()*(grid()?.cellHeightPx??0)}px`, '--tw-font-size': `${16 * preferences().zoom}px`, '--tw-line-height': `${20 * preferences().zoom}px`, '--tw-cell-width': `${grid()?.cellWidthPx ?? 0}px` }}>
+    style={{ '--tw-reading-cells':String(preferences().readingWidth||100000), '--tw-grid-width':`${columns()*(grid()?.cellWidthPx??0)}px`, '--tw-grid-height':`${rows()*(grid()?.cellHeightPx??0)}px`, '--tw-font-size': `${16 * preferences().zoom}px`, '--tw-line-height': `${20 * preferences().zoom}px`, '--tw-cell-width': `${grid()?.cellWidthPx ?? 0}px` }}>
     {/* Match the per-Cell inline fragments: Chrome rounds their advances differently from one long Text node. */}
     <span ref={probe} class="tw-font-probe" aria-hidden="true">{Array.from({length:256},()=> <span>M</span>)}</span>
     <Show when={grid() && columns() >= 20 && rows() >= 8} fallback={<div class="tw-small"><p>{error() || 'Enlarge the window or reduce font zoom to show the grid.'}</p><button onClick={() => zoom(-.1)}>Zoom out</button><button onClick={props.returnDesktop}>Return to Desktop</button></div>}>
@@ -83,11 +86,11 @@ export function TextualWorkspace(props: { returnDesktop(): void; notice?: string
       </div>
       </>}>{view=><Dynamic component={view()} grid={grid()!}/>}</Show>
       <footer class="tw-cell tw-status" style={rect({col:0,row:rows()-1,widthCells:columns(),heightCells:1})}>
-        <button aria-label="Zoom out" onClick={() => zoom(-.1)}>−</button><span>{Math.round(preferences().zoom*100)}%</span><button aria-label="Zoom in" onClick={() => zoom(.1)}>+</button><span>{columns()} × {rows()}</span><span role="status">{props.notice}</span>
+        <button aria-label="Zoom out" onClick={() => zoom(-.1)}>−</button><span>{Math.round(preferences().zoom*100)}%</span><button aria-label="Zoom in" onClick={() => zoom(.1)}>+</button><span>{columns()} × {rows()}</span><span ref={setStatusSlot} class="tw-app-status"/><Show when={props.notice}><span role="status">{props.notice}</span></Show>
       </footer>
-      <Show when={menu()}><div class="tw-cell tw-popup" aria-label="Workspace actions" style={rect({col:0,row:1,widthCells:Math.min(28,columns()),heightCells:Math.min(7,rows()-2)})}>
+      <Show when={menu()}><div class="tw-cell tw-popup" aria-label="Workspace actions" style={rect({col:0,row:1,widthCells:Math.min(28,columns()),heightCells:Math.min(8,rows()-2)})}>
         <For each={actions()}>{action => <button onClick={() => { action.run(); closeMenu(); }}>{action.label}</button>}</For>
       </div></Show>
     </Show>
-  </div></Portal>;
+  </div></Portal></TextualWorkspaceContext.Provider>;
 }

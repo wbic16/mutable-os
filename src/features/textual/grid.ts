@@ -13,12 +13,12 @@ export function cellStyle(grid: TextualGrid, rect: CellRect) {
   return { left: `${rect.col * grid.cellWidthPx}px`, top: `${rect.row * grid.cellHeightPx}px`,
     width: `${rect.widthCells * grid.cellWidthPx}px`, height: `${rect.heightCells * grid.cellHeightPx}px` };
 }
-export interface TextualPreferences { zoom: number; palette: 'borland' | 'paper' }
+export interface TextualPreferences { zoom: number; palette: 'borland' | 'paper'; readingWidth:0|88 }
 const preferenceKey = 'mutable.textual.preferences.v1';
 export function normalisePreferences(value: unknown): TextualPreferences {
   const v = value as Partial<TextualPreferences> | null;
   return { zoom: typeof v?.zoom === 'number' && Number.isFinite(v.zoom) ? Math.round(Math.min(2, Math.max(.75, v.zoom)) * 20) / 20 : 1,
-    palette: v?.palette === 'paper' ? 'paper' : 'borland' };
+    palette: v?.palette === 'paper' ? 'paper' : 'borland', readingWidth:v?.readingWidth===0?0:88 };
 }
 export function loadPreferences(): TextualPreferences {
   try { return normalisePreferences(JSON.parse(localStorage.getItem(preferenceKey) ?? 'null')); } catch { return normalisePreferences(null); }

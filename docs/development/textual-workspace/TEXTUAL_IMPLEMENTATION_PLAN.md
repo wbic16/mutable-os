@@ -89,3 +89,7 @@ All other planned changes are confined to `features/textual/`: fixed pane alloca
 
 
 Increment 4 actual boundary: the optional margin renderer/metrics in S7 were the only shared implementation change. All layout, media observation, control styling and focus-owner release adapters remain Textual-only. Persistent panes use separate mount slots so one view's cleanup cannot remove another view's portal. The media adapter handles removed subtrees locally; Cell edits and SVG redraws do not traverse unrelated media. Focused browser qualification covers normal/zoom/narrow layouts, cached scrolling, native graph output, editing, foreground Cardex and Desktop restoration. See [Increment 4 results](TEXTUAL_INCREMENT_4_QUALIFICATION.md).
+
+## Visual refinement boundaries — 2026-11-05
+
+No additional shared-code modifications were required. The compact Gloss master-detail, summaries, reading-width preference, semantic styling and consolidated chrome live entirely in `features/textual/`. A Textual-local context supplies the existing preferences and status mount; the existing layout handle opens the Gloss pane from a margin summary. This avoids adding presentation branches to graphical views or changing shared controllers. Existing Gloss commands, retained editor DOM and margin geometry/cache remain authoritative. Focused interaction and bounded-work checks, including Desktop restoration, passed; see [visual refinement qualification](TEXTUAL_VISUAL_REFINEMENT_QUALIFICATION.md). No new implementation phase is implied.

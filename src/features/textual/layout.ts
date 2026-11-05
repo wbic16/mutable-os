@@ -1,18 +1,19 @@
 import type {ReactiveEditor} from '../../reactive-editor/editor';
-import {createSignal, type Accessor,type Setter} from 'solid-js';
+import {createSignal, createContext, useContext, type Accessor,type Setter} from 'solid-js';
 import type {RetainedDocumentSession} from '../../application/document-sessions';
-import type {TextualGrid} from './grid';
+import type {TextualGrid,TextualPreferences} from './grid';
 
 /** Fixed Flint splits only. All origins and extents are main-grid cell indices. */
-export function flintPanes(grid:TextualGrid, margin:boolean, secondary:boolean, fullSize=false) {
+export function flintPanes(grid:TextualGrid, margin:boolean, secondary:boolean, fullSize=false,readingWidth=88) {
  const width=Math.max(1,grid.columns-2), split=secondary&&width>=108;
- const right=split?36:0;
- const left=margin&&width-right>=82?(fullSize?24:16):0;
+ let right=split?36:0;
+ let left=margin&&width-right>=82?(fullSize?24:16):0;
+ if(readingWidth){let extra=Math.max(0,width-right-left-readingWidth-4);if(right){const n=Math.min(extra,52-right);right+=n;extra-=n;}if(left)left+=Math.min(extra,24-left);}
  return {width,right,left,document:width-right-left,secondary:split?right:width,fullscreen:secondary&&!split};
 }
 export interface TextualDocumentLayout {
  grid:TextualGrid; panes:ReturnType<typeof flintPanes>; fullSize:boolean;
- scrollport:HTMLElement; secondary:HTMLElement;
+ scrollport:HTMLElement; secondary:HTMLElement; showGloss():void;
 }
 const layouts=new WeakMap<RetainedDocumentSession,[Accessor<TextualDocumentLayout|undefined>,Setter<TextualDocumentLayout|undefined>]>();
 function signal(session:RetainedDocumentSession) {
@@ -25,3 +26,6 @@ export function setTextualDocumentLayout(session:RetainedDocumentSession,value:T
 export function showFullDocument(editor:ReactiveEditor) {
  editor.concertina.claim('textual/source-navigation');editor.concertina.clearAll();
 }
+
+export const TextualWorkspaceContext=createContext<{preferences:Accessor<TextualPreferences>;status:Accessor<HTMLElement|undefined>}>();
+export const useTextualWorkspace=()=>useContext(TextualWorkspaceContext);

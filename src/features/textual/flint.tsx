@@ -1,4 +1,5 @@
-import {flintPanes,setTextualDocumentLayout,showFullDocument} from './layout';
+import {Portal} from 'solid-js/web';
+import {flintPanes,setTextualDocumentLayout,showFullDocument,useTextualWorkspace} from './layout';
 import {nativeIslands} from './native-islands';
 import {glossPresentationControls} from '../gloss/presentation-context';
 import {TextualReferences} from './references';
@@ -32,6 +33,7 @@ export function TextualFlint(props:{session:WorkspaceSession;grid:TextualGrid}) 
     {port=><FlintHost covered={!!card()} openCardex={()=>void run(openCardex)} port={port} session={props.session} grid={props.grid} applications={<Show when={registry.ports().length>1}><select aria-label="Flint application" value={port.key} onChange={e=>{const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);setChosen(e.currentTarget.value);}}><For each={registry.ports()}>{(app,index)=><option value={app.key}>Flint {index()+1}</option>}</For></select></Show>}/>}</Show><Show when={card()} keyed>{port=><TextualCardex editor={editor} port={port} choose={chooseCardex} close={closeCardex}/>}</Show></>;
 }
 function FlintHost(props:{covered:boolean;openCardex():void;port:DocumentApplicationPort;session:WorkspaceSession;grid:TextualGrid;applications:import('solid-js').JSX.Element}) {
+  const workspace=useTextualWorkspace();
   const editor=props.session.editor, port=props.port, presentations=editor.documentSessions!.presentations;
   let root!:HTMLDivElement, slot!:HTMLDivElement, viewport!:HTMLDivElement, surfaces!:HTMLDivElement,secondary!:HTMLDivElement,glossSurface!:HTMLDivElement;
   const [mounted,setMounted]=createSignal(false),[error,setError]=createSignal(''),[busy,setBusy]=createSignal(false),[menu,setMenu]=createSignal<'file'|'edit'|'format'|'block'|'tools'>();
@@ -41,9 +43,9 @@ function FlintHost(props:{covered:boolean;openCardex():void;port:DocumentApplica
   const [creating,setCreating]=createSignal(false),[references,setReferences]=createSignal(false),[fullSize,setFullSize]=createSignal(false);
   const gloss=()=>{const s=document();return s&&glossPresentationControls(s);};
   const secondaryOpen=()=>references()||!!(gloss()?.active()&&gloss()?.references());
-  const panes=createMemo(()=>flintPanes(props.grid,!!gloss()?.active(),secondaryOpen(),fullSize()));
+  const panes=createMemo(()=>flintPanes(props.grid,!!gloss()?.active(),secondaryOpen(),fullSize(),workspace?.preferences().readingWidth??88));
   createEffect(()=>{if(!mounted())return;const s=document();if(!s)return;
-    createEffect(()=>setTextualDocumentLayout(s,{grid:props.grid,panes:panes(),fullSize:fullSize(),scrollport:viewport,secondary:glossSurface}));
+    createEffect(()=>setTextualDocumentLayout(s,{grid:props.grid,panes:panes(),fullSize:fullSize(),scrollport:viewport,secondary:glossSurface,showGloss:()=>{setReferences(false);const c=gloss();if(c&&!c.references())c.toggleReferences();}}));
     onCleanup(()=>setTextualDocumentLayout(s,undefined));
   });
   createEffect(()=>{if(!mounted())return;const s=document();if(!s)return;
@@ -98,20 +100,19 @@ function FlintHost(props:{covered:boolean;openCardex():void;port:DocumentApplica
       <button aria-expanded={menu()==='file'} onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('file')}>File</button>
       <button aria-expanded={menu()==='edit'} onPointerDown={e=>e.preventDefault()} onClick={()=>{remember();setMenu(menu()==='edit'?undefined:'edit');}}>Edit</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('format')}>Format</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('block')}>Block</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('tools')}>Tools</button><fieldset class="tw-flint-applications" disabled={busy()}>{props.applications}</fieldset>
     </nav>
-    <div class="tw-cell tw-title" style={rect(1,1,props.grid.columns-2,1)}>Flint · {port.application.properties()?.title??'No Document'}</div>
-    <nav class="tw-cell tw-flint-tabs" aria-label="Documents" style={rect(1,2,props.grid.columns-2,1)}>
+    <nav class="tw-cell tw-flint-tabs" aria-label="Documents" style={rect(1,1,props.grid.columns-2,1)}><strong class="tw-app-identity">Flint</strong>
       <For each={port.tabs()}>{tab=><button disabled={busy()} aria-current={tab.key===port.activeTab()?'page':undefined} onPointerDown={e=>e.preventDefault()} onClick={()=>choose(tab.key)} title={tab.title}>{tab.title}{tab.dirty?' *':''}</button>}</For>
     </nav>
-    <div class="tw-cell tw-document-frame tw-frame" style={rect(1+panes().left,4,panes().document,props.grid.rows-7)} hidden={panes().fullscreen}/>
-    <Show when={panes().left}><div class="tw-cell tw-frame" style={rect(1,4,panes().left,props.grid.rows-7)} hidden={panes().fullscreen}/><header class="tw-cell tw-margin-heading" style={rect(1,3,panes().left,1)}><span>Notes</span><button aria-label="Marginalia text size" title={fullSize()?'Use half-size notes':'Use full-size notes'} onClick={()=>setFullSize(v=>!v)}>{fullSize()?'Full':'Half'}</button></header></Show>
-    <div ref={viewport} class="tw-cell tw-flint-editor" data-gloss-scrollport inert={panes().fullscreen} style={{...rect(1,4,panes().width-panes().right,props.grid.rows-7),visibility:panes().fullscreen?'hidden':'visible','--tw-margin-width':`${panes().left*props.grid.cellWidthPx}px`,'--tw-margin-cell':`${props.grid.cellWidthPx/(fullSize()?1:2)}px`,'--tw-margin-line':`${props.grid.cellHeightPx/(fullSize()?1:2)}px`,'--tw-margin-font':`calc(var(--tw-font-size) / ${fullSize()?1:2})`,'--tw-prose-width':`${Math.max(1,panes().document-4)*props.grid.cellWidthPx}px`}}>
+    <div class="tw-cell tw-document-frame tw-frame" style={rect(1+panes().left,3,panes().document,props.grid.rows-4)} hidden={panes().fullscreen}/>
+    <Show when={panes().left}><div class="tw-cell tw-frame" style={rect(1,3,panes().left,props.grid.rows-4)} hidden={panes().fullscreen}/><header class="tw-cell tw-margin-heading" style={rect(1,2,panes().left,1)}><span>Notes</span><button aria-label="Marginalia text size" title={fullSize()?'Use half-size notes':'Use full-size notes'} onClick={()=>setFullSize(v=>!v)}>{fullSize()?'Full':'Half'}</button></header></Show>
+    <div ref={viewport} class="tw-cell tw-flint-editor" data-gloss-scrollport inert={panes().fullscreen} style={{...rect(1,3,panes().width-panes().right,props.grid.rows-4),visibility:panes().fullscreen?'hidden':'visible','--tw-margin-width':`${panes().left*props.grid.cellWidthPx}px`,'--tw-margin-cell':`${props.grid.cellWidthPx/(fullSize()?1:2)}px`,'--tw-margin-line':`${props.grid.cellHeightPx/(fullSize()?1:2)}px`,'--tw-margin-font':`calc(var(--tw-font-size) / ${fullSize()?1:2})`,'--tw-prose-width':`${Math.max(1,panes().document-4)*props.grid.cellWidthPx}px`}}>
       <div ref={slot} class="tw-flint-slot"/>
       <Show when={!document()}><p>Select a Document to begin.</p></Show>
     </div>
-    <div ref={secondary} class="tw-cell tw-secondary tw-frame" aria-label="Secondary region" hidden={!secondaryOpen()} style={rect(panes().fullscreen?1:props.grid.columns-1-panes().secondary,4,panes().secondary,props.grid.rows-7)}>
+    <div ref={secondary} class="tw-cell tw-secondary tw-frame" aria-label="Secondary region" hidden={!secondaryOpen()} style={rect(panes().fullscreen?1:props.grid.columns-1-panes().secondary,3,panes().secondary,props.grid.rows-4)}>
       <div ref={glossSurface} class="tw-secondary-slot" hidden={references()}/><div class="tw-secondary-slot" hidden={!references()}><Show when={references()}><div data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))}><TextualReferences docked clearFocus={()=>showFullDocument(editor)} knowledge={port.application.knowledge} entities={port.application.entities} restore={focus} close={restore=>{if(restore===false&&!panes().fullscreen)return;setReferences(false);if(restore!==false)focus();}}/></div></Show></div>
     </div>
-    <div class="tw-cell tw-flint-status" role="status" style={rect(1,props.grid.rows-2,props.grid.columns-2,1)}>{error()||styles()?.notice()|| (busy()?'Saving…':port.application.properties()?.unsaved?'Modified · Ctrl/Cmd+S to save':port.application.properties()?.location?.filename??'Ready')}</div>
+    <Show when={workspace?.status()} keyed>{status=><Portal mount={status}><div class="tw-flint-status" role="status" hidden={props.covered}>{error()||styles()?.notice()|| (busy()?'Saving…':port.application.properties()?.unsaved?'Modified · Ctrl/Cmd+S to save':port.application.properties()?.location?.filename??'Ready')}</div></Portal>}</Show>
     <Show when={menu()}><div data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))} class="tw-cell tw-popup tw-flint-popup" style={{...rect(12,1,Math.min(42,props.grid.columns-12),Math.min(menu()==='edit'?6:24,props.grid.rows-3)),height:'auto','max-height':`${Math.min(menu()==='edit'?6:24,props.grid.rows-3)*props.grid.cellHeightPx}px`}}>
       <Show when={menu()!=='edit'&&items()} keyed>{list=><TextualCommandMenu items={list} close={closeMenu} execute={action=>{setMenu(undefined);focus();void run(action);}}/>}</Show>
       <Show when={menu()==='edit'}><button onPointerDown={e=>e.preventDefault()} onClick={()=>history('undo')}>Undo</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>history('redo')}>Redo</button><button onClick={()=>{closeMenu();const key=target();if(key)editor.find.open(key);}}>Find</button><button onClick={closeMenu}>Close menu</button></Show>
