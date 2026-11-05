@@ -282,3 +282,16 @@
 .textual-workspace .tw-menu-input label,.textual-workspace .tw-menu-input input { display:block; height:var(--tw-line-height); line-height:var(--tw-line-height); }
 .textual-workspace .tw-command-menu .tw-menu-input button { display:inline-block; width:auto; }
 .textual-workspace .tw-menu-error { position:absolute; bottom:var(--tw-line-height); left:var(--tw-cell-width); z-index:100; background:var(--tw-menu); color:var(--tw-menu-ink); padding:0 var(--tw-cell-width); }
+
+.textual-workspace .tw-vault { display:flex; flex-direction:column; overflow:hidden; padding:var(--tw-line-height) var(--tw-cell-width); background:var(--tw-bg); }
+.textual-workspace .tw-vault[hidden] { display:none; }
+.textual-workspace .tw-vault[data-overlay] { z-index:12; box-shadow:var(--tw-cell-width) var(--tw-line-height) 0 var(--tw-shadow); }
+.textual-workspace .tw-vault > header { display:flex; justify-content:space-between; color:var(--tw-focus); }
+.textual-workspace .tw-vault-actions { display:flex; flex-wrap:wrap; margin:var(--tw-line-height) 0; }
+.textual-workspace .tw-vault-actions button { padding:0 .5ch; }
+.textual-workspace .tw-vault-tree { flex:1; min-height:0; overflow:auto; }
+.textual-workspace .tw-vault summary { cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.textual-workspace .tw-vault-children { padding-left:var(--tw-cell-width); }
+.textual-workspace .tw-vault .tw-vault-file { display:block; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; padding:0; background:transparent; color:inherit; }
+.textual-workspace .tw-vault .tw-vault-file[aria-current=page],.textual-workspace .tw-vault .tw-vault-file:hover { background:var(--tw-selection); color:#001044; }
+.textual-workspace .tw-vault p { margin:0; overflow-wrap:anywhere; }

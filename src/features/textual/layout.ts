@@ -4,12 +4,12 @@ import type {RetainedDocumentSession} from '../../application/document-sessions'
 import type {TextualGrid,TextualPreferences} from './grid';
 
 /** Fixed Flint splits only. All origins and extents are main-grid cell indices. */
-export function flintPanes(grid:TextualGrid, margin:boolean, secondary:boolean, fullSize=false,readingWidth=88) {
- const width=Math.max(1,grid.columns-2), split=secondary&&width>=108;
+export function flintPanes(grid:TextualGrid, margin:boolean, secondary:boolean, fullSize=false,readingWidth=88,vaultVisible=false) {
+ const width=Math.max(1,grid.columns-2),vaultWidth=vaultVisible?Math.min(28,width):0,vault=vaultVisible&&width>=80?vaultWidth:0,available=width-vault,split=secondary&&available>=108;
  let right=split?36:0;
- let left=margin&&width-right>=82?(fullSize?24:16):0;
- if(readingWidth){let extra=Math.max(0,width-right-left-readingWidth-4);if(right){const n=Math.min(extra,52-right);right+=n;extra-=n;}if(left)left+=Math.min(extra,24-left);}
- return {width,right,left,document:width-right-left,secondary:split?right:width,fullscreen:secondary&&!split};
+ let left=margin&&available-right>=82?(fullSize?24:16):0;
+ if(readingWidth){let extra=Math.max(0,available-right-left-readingWidth-4);if(right){const n=Math.min(extra,52-right);right+=n;extra-=n;}if(left)left+=Math.min(extra,24-left);}
+ return {width,right,left,vault,vaultWidth,vaultOverlay:vaultVisible&&!vault,document:available-right-left,secondary:split?right:available,fullscreen:secondary&&!split};
 }
 export interface TextualDocumentLayout {
  grid:TextualGrid; panes:ReturnType<typeof flintPanes>; fullSize:boolean;

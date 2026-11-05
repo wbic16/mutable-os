@@ -1,3 +1,4 @@
+import {TextualVault,textualVaultVisible,rememberTextualVault} from './vault';
 import {Portal} from 'solid-js/web';
 import {flintPanes,setTextualDocumentLayout,showFullDocument,useTextualWorkspace} from './layout';
 import {nativeIslands} from './native-islands';
@@ -39,13 +40,15 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
   let root!:HTMLDivElement, slot!:HTMLDivElement, viewport!:HTMLDivElement, surfaces!:HTMLDivElement,secondary!:HTMLDivElement,glossSurface!:HTMLDivElement;
   const [mounted,setMounted]=createSignal(false),[error,setError]=createSignal(''),[busy,setBusy]=createSignal(false),[menu,setMenu]=createSignal<'file'|'edit'|'format'|'block'|'tools'>();
   const document=createMemo(()=>port.session());
+  const [vaultVisible,setVaultVisible]=createSignal(textualVaultVisible(port.application.vault));
+  const toggleVault=()=>{remember();const visible=!vaultVisible();setVaultVisible(visible);if(port.application.vault)rememberTextualVault(port.application.vault,visible);queueMicrotask(focus);};
   const styles=()=>{const s=document();return s?documentStylePorts(editor).get(s.rootKey):undefined;};
   const [items,setItems]=createSignal<TextualMenuItem[]>([]);
   const [menuAnchor,setMenuAnchor]=createSignal<HTMLElement>();
   const [creating,setCreating]=createSignal(false),[references,setReferences]=createSignal(false),[fullSize,setFullSize]=createSignal(false);
   const gloss=()=>{const s=document();return s&&glossPresentationControls(s);};
   const secondaryOpen=()=>references()||!!(gloss()?.active()&&gloss()?.references());
-  const panes=createMemo(()=>flintPanes(props.grid,!!gloss()?.active(),secondaryOpen(),fullSize(),workspace?.preferences().readingWidth??88));
+  const panes=createMemo(()=>flintPanes(props.grid,!!gloss()?.active(),secondaryOpen(),fullSize(),workspace?.preferences().readingWidth??88,vaultVisible()));
   createEffect(()=>{if(!mounted())return;const s=document();if(!s)return;
     createEffect(()=>setTextualDocumentLayout(s,{grid:props.grid,panes:panes(),fullSize:fullSize(),scrollport:viewport,secondary:glossSurface,showGloss:()=>{setReferences(false);const c=gloss();if(c&&!c.references())c.toggleReferences();}}));
     onCleanup(()=>setTextualDocumentLayout(s,undefined));
@@ -94,7 +97,7 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
       setError('');
     }catch(e){setError(String(e));}});
   });
-  createEffect(()=>{props.grid;const s=document();if(!s)return;const frame=requestAnimationFrame(()=>presentations.restorePosition(s));onCleanup(()=>cancelAnimationFrame(frame));});
+  createEffect(()=>{props.grid;vaultVisible();const s=document();if(!s)return;const frame=requestAnimationFrame(()=>presentations.restorePosition(s));onCleanup(()=>cancelAnimationFrame(frame));});
   const history=(direction:'undo'|'redo')=>{setMenu(undefined);focus();editor.repository[direction]();};
   const closeMenu=()=>{setMenu(undefined);focus();};
   return <div ref={root} class="tw-flint" inert={props.covered} data-cardex-covered={props.covered||undefined} data-secondary-fullscreen={panes().fullscreen||undefined} data-mwm-window={port.windowId()} onKeyDown={e=>{if(e.key==='Escape'&&menu()){e.preventDefault();closeMenu();}}}>
@@ -102,16 +105,17 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
       <button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='file'} onClick={e=>openCommands('file',e.currentTarget)}>File</button>
       <button aria-expanded={menu()==='edit'} onPointerDown={e=>e.preventDefault()} onClick={e=>{if(menu()==='edit'){closeMenu();return;}setMenuAnchor(e.currentTarget);remember();setItems([{label:'Undo',shortcut:'Ctrl/Cmd+Z',run:()=>history('undo')},{label:'Redo',shortcut:'Ctrl/Cmd+Shift+Z',run:()=>history('redo')},{label:'Find',separatorBefore:true,run:()=>{const key=target();if(key)editor.find.open(key);}}]);setMenu('edit');}}>Edit</button><button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='format'} onClick={e=>openCommands('format',e.currentTarget)}>Format</button><button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='block'} onClick={e=>openCommands('block',e.currentTarget)}>Block</button><button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='tools'} onClick={e=>openCommands('tools',e.currentTarget)}>Tools</button><fieldset class="tw-flint-applications" disabled={busy()}>{props.applications}</fieldset>
     </nav>
-    <nav class="tw-cell tw-flint-tabs" aria-label="Documents" style={rect(1,1,props.grid.columns-2,1)}><strong class="tw-app-identity">Flint</strong>
+    <nav class="tw-cell tw-flint-tabs" aria-label="Documents" style={rect(1,1,props.grid.columns-2,1)}><Show when={port.application.vault}><button aria-label="Toggle Vault explorer" aria-expanded={vaultVisible()} onPointerDown={e=>e.preventDefault()} onClick={toggleVault}>{vaultVisible()?'◂ Vault':'▸ Vault'}</button></Show><strong class="tw-app-identity">Flint</strong>
       <For each={port.tabs()}>{tab=><button disabled={busy()} aria-current={tab.key===port.activeTab()?'page':undefined} onPointerDown={e=>e.preventDefault()} onClick={()=>choose(tab.key)} title={tab.title}>{tab.title}{tab.dirty?' *':''}</button>}</For>
     </nav>
-    <div class="tw-cell tw-document-frame tw-frame" style={rect(1+panes().left,3,panes().document,props.grid.rows-4)} hidden={panes().fullscreen}/>
-    <Show when={panes().left}><div class="tw-cell tw-frame" style={rect(1,3,panes().left,props.grid.rows-4)} hidden={panes().fullscreen}/><header class="tw-cell tw-margin-heading" style={rect(1,2,panes().left,1)}><span>Notes</span><button aria-label="Marginalia text size" title={fullSize()?'Use half-size notes':'Use full-size notes'} onClick={()=>setFullSize(v=>!v)}>{fullSize()?'Full':'Half'}</button></header></Show>
-    <div ref={viewport} class="tw-cell tw-flint-editor" data-gloss-scrollport inert={panes().fullscreen} style={{...rect(1,3,panes().width-panes().right,props.grid.rows-4),visibility:panes().fullscreen?'hidden':'visible','--tw-margin-width':`${panes().left*props.grid.cellWidthPx}px`,'--tw-margin-cell':`${props.grid.cellWidthPx/(fullSize()?1:2)}px`,'--tw-margin-line':`${props.grid.cellHeightPx/(fullSize()?1:2)}px`,'--tw-margin-font':`calc(var(--tw-font-size) / ${fullSize()?1:2})`,'--tw-prose-width':`${Math.max(1,panes().document-4)*props.grid.cellWidthPx}px`}}>
+    <Show when={port.application.vault}>{vault=><aside class="tw-cell tw-frame tw-vault" aria-label="Vault explorer" hidden={!vaultVisible()} data-overlay={panes().vaultOverlay||undefined} style={rect(1,3,Math.max(1,panes().vaultWidth),props.grid.rows-4)}><TextualVault vault={vault()} activeLocation={()=>port.application.files?.location()} collapse={toggleVault} create={()=>{remember();setCreating(true);}} opened={()=>{if(panes().vaultOverlay)toggleVault();else queueMicrotask(focus);}}/></aside>}</Show>
+    <div class="tw-cell tw-document-frame tw-frame" style={rect(1+panes().vault+panes().left,3,panes().document,props.grid.rows-4)} hidden={panes().fullscreen}/>
+    <Show when={panes().left}><div class="tw-cell tw-frame" style={rect(1+panes().vault,3,panes().left,props.grid.rows-4)} hidden={panes().fullscreen}/><header class="tw-cell tw-margin-heading" style={rect(1+panes().vault,2,panes().left,1)}><span>Notes</span><button aria-label="Marginalia text size" title={fullSize()?'Use half-size notes':'Use full-size notes'} onClick={()=>setFullSize(v=>!v)}>{fullSize()?'Full':'Half'}</button></header></Show>
+    <div ref={viewport} class="tw-cell tw-flint-editor" data-gloss-scrollport inert={panes().fullscreen} style={{...rect(1+panes().vault,3,panes().width-panes().vault-panes().right,props.grid.rows-4),visibility:panes().fullscreen?'hidden':'visible','--tw-margin-width':`${panes().left*props.grid.cellWidthPx}px`,'--tw-margin-cell':`${props.grid.cellWidthPx/(fullSize()?1:2)}px`,'--tw-margin-line':`${props.grid.cellHeightPx/(fullSize()?1:2)}px`,'--tw-margin-font':`calc(var(--tw-font-size) / ${fullSize()?1:2})`,'--tw-prose-width':`${Math.max(1,panes().document-4)*props.grid.cellWidthPx}px`}}>
       <div ref={slot} class="tw-flint-slot"/>
       <Show when={!document()}><p>Select a Document to begin.</p></Show>
     </div>
-    <div ref={secondary} class="tw-cell tw-secondary tw-frame" aria-label="Secondary region" hidden={!secondaryOpen()} style={rect(panes().fullscreen?1:props.grid.columns-1-panes().secondary,3,panes().secondary,props.grid.rows-4)}>
+    <div ref={secondary} class="tw-cell tw-secondary tw-frame" aria-label="Secondary region" hidden={!secondaryOpen()} style={rect(panes().fullscreen?1+panes().vault:props.grid.columns-1-panes().secondary,3,panes().secondary,props.grid.rows-4)}>
       <div ref={glossSurface} class="tw-secondary-slot" hidden={references()}/><div class="tw-secondary-slot" hidden={!references()}><Show when={references()}><div data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))}><TextualReferences docked clearFocus={()=>showFullDocument(editor)} knowledge={port.application.knowledge} entities={port.application.entities} restore={focus} close={restore=>{if(restore===false&&!panes().fullscreen)return;setReferences(false);if(restore!==false)focus();}}/></div></Show></div>
     </div>
     <Show when={workspace?.status()} keyed>{status=><Portal mount={status}><div class="tw-flint-status" role="status" hidden={props.covered}>{error()||styles()?.notice()|| (busy()?'Saving…':port.application.properties()?.unsaved?'Modified · Ctrl/Cmd+S to save':port.application.properties()?.location?.filename??'Ready')}</div></Portal>}</Show>

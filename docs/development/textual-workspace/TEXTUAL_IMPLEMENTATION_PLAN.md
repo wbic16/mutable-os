@@ -110,3 +110,7 @@ Font preferences, UI and CSS remain under Textual. Font changes preserve canonic
 ## Menu refinement boundaries — 2026-11-05
 
 No shared non-Textual code changes. Dedicated Textual menu rendering consumes existing action models, lazy children and input callbacks. Content-derived grid geometry replaces the fixed popup wrapper; Workspace and Flint reuse the same renderer. Scoped CSS leaves graphical menus untouched. Focused renderer tests and a trusted browser flow cover dispatch, selection/typing/Undo, font/zoom geometry, retained identity, Desktop restoration and zero snapshots/projection rebuilds. See [qualification](TEXTUAL_MENU_REFINEMENT_QUALIFICATION.md).
+
+## Vault explorer restoration — 2026-11-05
+
+No shared-code impact. A dedicated Textual Vault view reuses `ApplicationVault` and existing document-session operations. Left-pane geometry extends the existing Textual split calculation; graphical Flint remains unchanged. Tests cover file dispatch, retained selection/DOM, collapse/reopen, narrow layout, Desktop return, and zero scans/row mutations during typing. See [fix qualification](TEXTUAL_VAULT_EXPLORER_FIX.md).
