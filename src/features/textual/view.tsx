@@ -100,7 +100,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:b
     {/* Match the per-Cell inline fragments: Chrome rounds their advances differently from one long Text node. */}
     <span ref={probe} class="tw-font-probe" aria-hidden="true">{Array.from({length:256},()=> <span>M</span>)}</span>
     <Show when={grid() && columns() >= 20 && rows() >= 8} fallback={<div class="tw-small"><p>{error() || 'Enlarge the window or reduce font zoom to show the grid.'}</p><button onClick={() => zoom(-.1)}>Zoom out</button><button onClick={props.returnDesktop}>Return to Desktop</button></div>}>
-      <nav class="tw-cell tw-menu-bar" aria-label="Workspace menu" style={rect({col:0,row:0,widthCells:columns(),heightCells:1})}>
+      <nav class="tw-cell tw-menu-bar" aria-label="Workspace menu">
         <button ref={menuAnchor} style={{width: `${11*(grid()?.cellWidthPx??0)}px`}} aria-haspopup="true" aria-expanded={menu()} onClick={() => setMenu(!menu())}>Workspace</button>
       </nav>
       <Show when={props.application} fallback={<>
@@ -109,7 +109,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:b
         <p>No application selected.</p><button style={{width: `${19*(grid()?.cellWidthPx??0)}px`}} onClick={props.returnDesktop}>Return to Desktop</button>
       </div>
       </>}>{view=><Dynamic component={view()} grid={grid()!}/>}</Show>
-      <footer class="tw-cell tw-status" style={rect({col:0,row:rows()-1,widthCells:columns(),heightCells:1})}>
+      <footer class="tw-cell tw-status">
         <button aria-label="Zoom out" onClick={() => zoom(-.1)}>−</button><span>{Math.round(preferences().zoom*100)}%</span><button aria-label="Zoom in" onClick={() => zoom(.1)}>+</button><span>{columns()} × {rows()}</span><span ref={setStatusSlot} class="tw-app-status"/><Show when={props.notice}><span role="status">{props.notice}</span></Show>
       </footer>
       <Show when={menu()}><TextualCommandMenu items={actions()} grid={grid()!} anchor={menuAnchor} label="Workspace actions" close={closeMenu} execute={action=>{closeMenu();action();}}/></Show>

@@ -13,11 +13,12 @@
 .textual-workspace button { font:inherit; line-height:inherit; letter-spacing:0; border:0; border-radius:0; margin:0; padding:0 var(--tw-cell-width); background:var(--tw-menu); color:var(--tw-menu-ink); cursor:pointer; }
 .textual-workspace button:focus-visible { outline:2px solid var(--tw-focus); outline-offset:-2px; }
 .textual-workspace .tw-menu-bar,.textual-workspace .tw-status,.textual-workspace .tw-popup { background:var(--tw-menu); color:var(--tw-menu-ink); }
-.textual-workspace .tw-menu-bar { overflow:hidden; }
+/* Edge bars cover the viewport remainder outside the whole-cell content grid. */
+.textual-workspace .tw-menu-bar { left:0; right:0; top:0; height:var(--tw-line-height); overflow:hidden; }
 .textual-workspace .tw-title { color:var(--tw-focus); font-weight:bold; white-space:nowrap; overflow:hidden; }
 .textual-workspace .tw-content { overflow:auto; }
 .textual-workspace p { margin:0; padding:0; }
-.textual-workspace .tw-status { display:flex; align-items:center; overflow:hidden; white-space:nowrap; gap:var(--tw-cell-width); }
+.textual-workspace .tw-status { left:0; right:0; bottom:0; height:var(--tw-line-height); display:flex; align-items:center; overflow:hidden; white-space:nowrap; gap:var(--tw-cell-width); }
 .textual-workspace .tw-popup { overflow:auto; }
 .textual-workspace .tw-popup button { display:block; width:100%; text-align:left; white-space:nowrap; }
 .textual-workspace .tw-popup button:hover { background:#00caca; color:#001044; }
