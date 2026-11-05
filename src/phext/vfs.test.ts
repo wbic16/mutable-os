@@ -264,4 +264,45 @@ describe("PhextVFS integrity (L9 checksums)", () => {
     writeFileSync(path, "just a scroll\u0017another scroll");
     expect(() => PhextVFS.open(path)).toThrow(/Not a PhextVFS file/);
   });
+
+  it("two instances over one file keep each other's strata across flushes", () => {
+    const path = freshPath();
+    const a = PhextVFS.create(path);
+    a.writeFile("/doc.txt", "from a");
+    a.flush();
+    // A second instance opens the same file (the knowledge worker's
+    // relationship to the lifecycle's instance in Phase 4).
+    const b = PhextVFS.open(path);
+    // Disjoint writes, interleaved flushes: neither may lose the
+    // other's generation.
+    b.writeFile("/.mutable/entities/e1.json", '{"guid":"e1"}');
+    b.flush();
+    a.writeFile("/other.txt", "a again");
+    a.flush();
+    b.writeFile("/.mutable/entities/e2.json", '{"guid":"e2"}');
+    b.flush();
+    a.close();
+    b.close();
+
+    const cold = PhextVFS.open(path);
+    expect(cold.readTextFile("/doc.txt")).toBe("from a");
+    expect(cold.readTextFile("/other.txt")).toBe("a again");
+    expect(cold.readTextFile("/.mutable/entities/e1.json")).toBe('{"guid":"e1"}');
+    expect(cold.readTextFile("/.mutable/entities/e2.json")).toBe('{"guid":"e2"}');
+    cold.close();
+  });
+
+  it("an instance refuses to adopt a foreign non-VFS generation at flush", () => {
+    const path = freshPath();
+    const vfs = PhextVFS.create(path);
+    vfs.writeFile("/doc.txt", "mine");
+    vfs.flush();
+    // Another writer replaces the file with something that is not a
+    // PhextVFS generation at all.
+    writeFileSync(path, "just a scroll\u0017another scroll");
+    vfs.writeFile("/more.txt", "more");
+    expect(() => vfs.flush()).toThrow(/not a PhextVFS file/);
+    // close() attempts a final flush and refuses the same generation.
+    expect(() => vfs.close()).toThrow(/not a PhextVFS file/);
+  });
 });

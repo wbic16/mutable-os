@@ -7,6 +7,8 @@ import {stat} from 'node:fs/promises';
 import { Router, json } from 'express';
 import { openSqliteFoundation, runCardexRegex } from '../src/knowledge-sqlite/client.mjs';
 import { entityCommand } from '../src/knowledge-sqlite/entities.mjs';
+// @ts-ignore - plain .mjs module, no type declarations (house pattern).
+import { phextKnowledgeFor } from '../src/knowledge-sqlite/phext-registry.mjs';
 import { NativeVaultStore } from './native-vault-store.mjs';
 import { createSavedIndexer } from './sqlite-saved-indexer';
 import {SqliteSavedScopes} from './sqlite-saved-scope';
@@ -27,6 +29,14 @@ export class SqliteKnowledgeHost {
   }
   private serialize<T>(action:()=>Promise<T>):Promise<T> {
     const work=this.control.then(action);this.control=work.then(()=>{},()=>{});return work;
+  }
+  /** Existence probe for the vault's knowledge store (never establishes
+   * anything): disk mode resolves .mutable/mutable.db; PhextVFS Phase 4
+   * phext knowledge mode resolves the Cavern phext instead. */
+  private async knowledgeProbe(vaultPath:string){
+    const root=await this.store.resolve(vaultPath);
+    if(phextKnowledgeFor(root)){await stat(path.join(root,'cavern.phext'));return;}
+    await this.store.resolve(path.posix.join(vaultPath,'.mutable/mutable.db'));
   }
   async acquire(vault:string,policy=normalizePolicy()) {
     return this.acquireContext(vault,policy);
@@ -150,7 +160,7 @@ export class SqliteKnowledgeHost {
       if(typeof body.vault!=='string'||!['authority-import','create','rename','update','alias-add','alias-update','alias-remove'].includes(body.request?.op))throw Error('Invalid Entity mutation');
       signal?.throwIfAborted();
       // Do not establish a new Vault as a side effect of choosing a name.
-      await this.store.resolve(path.posix.join(body.vault,'.mutable/mutable.db'));
+      await this.knowledgeProbe(body.vault);
       return await this.foreground(async()=>{
         const opened=await this.acquireContext(body.vault,normalizePolicy(body.policy),true);
         try{
@@ -170,8 +180,16 @@ export class SqliteKnowledgeHost {
     if(typeof body.vault!=='string')throw Error('Select a Vault');
     if((['save','delete','restore','bulk-state'].includes(body.request?.op)||body.request?.op==='semantic'&&body.request?.command?.op!=='get')&&this.options.readOnly)throw Error('Cardex is read-only');
     if(body.request?.op==='save'&&body.request.imageRef){if(!this.options.verifyCardexImage)throw Error('Managed image storage unavailable');await this.options.verifyCardexImage(body.request.imageRef);}
-    const file=await this.store.resolve(path.posix.join(body.vault,'.mutable/mutable.db'));
+    await this.knowledgeProbe(body.vault);
     if(body.request?.op==='search'&&body.request.filters?.mode==='regex'){
+      const root=await this.store.resolve(body.vault);
+      if(phextKnowledgeFor(root)){
+        // Phext knowledge mode has no on-disk mutable.db: run the regex
+        // against the writer foundation's ephemeral replica, holding
+        // the foreground lease so the replica outlives the search.
+        return this.foreground(async()=>{const opened=await this.acquireContext(body.vault,normalizePolicy(body.policy),true);try{signal?.throwIfAborted();const file=await this.entry(opened.lease).client!.knowledgeCacheFile();if(!file)throw Error('Cardex regex search unavailable');return await runCardexRegex(file,body.request,signal);}finally{await this.release(opened.lease);}});
+      }
+      const file=await this.store.resolve(path.posix.join(body.vault,'.mutable/mutable.db'));
       // Establish/migrate normally, then release the foreground gate before isolated regex evaluation.
       await this.foreground(async()=>{const opened=await this.acquireContext(body.vault,normalizePolicy(body.policy),true);await this.release(opened.lease);});
       return runCardexRegex(file,body.request,signal);
@@ -186,7 +204,7 @@ export class SqliteKnowledgeHost {
     const mutation=['create','update','archive','restore'].includes(body.request?.op);
     if(mutation&&this.options.readOnly)throw Error('Thesis is read-only');
     // Selecting Thesis does not establish another Vault implicitly.
-    await this.store.resolve(path.posix.join(body.vault,'.mutable/mutable.db'));
+    await this.knowledgeProbe(body.vault);
     return this.foreground(async()=>{
       const opened=await this.acquireContext(body.vault,normalizePolicy(body.policy),true);
       try{signal?.throwIfAborted();const e=this.entry(opened.lease);if(!e.client)throw Error('Thesis storage unavailable');return await e.client.propositions(body.request,signal);}
@@ -197,7 +215,7 @@ export class SqliteKnowledgeHost {
   async academic(request:any,signal?:AbortSignal){
     if(this.closed||this.options.entitiesEnabled===false||this.options.readOnly)throw Error('Scholarly storage unavailable');
     if(!['deterministic-review','pdf-snapshot','pdf-commit','resource-context','resource-review','iiif-snapshot','iiif-associated','iiif-commit','scholarly-lookup','scholarly-commit','scholarly-backlinks','wiki-snapshot','wiki-context','wiki-commit','wiki-review'].includes(request?.op))throw Error('Invalid scholarly operation');
-    await this.store.resolve('.mutable/mutable.db');
+    await this.knowledgeProbe('.');
     return this.foreground(async()=>{
       const opened=await this.acquireContext('.',normalizePolicy(undefined),true);
       try{signal?.throwIfAborted();return await this.entry(opened.lease).client!.entities(request,signal);}
@@ -210,7 +228,8 @@ export class SqliteKnowledgeHost {
     if(this.closed || this.options.entitiesEnabled===false)throw Error('Canonical Entity service is unavailable');
     if(typeof body.vault!=='string' || !(archive || ['search','get','authority-lookup'].includes(body.request?.op)))throw Error('Invalid Entity lookup');
     signal?.throwIfAborted();
-    const root=await this.store.resolve(body.vault),file=await this.store.resolve(path.posix.join(body.vault,'.mutable/mutable.db'));
+    const root=await this.store.resolve(body.vault),phext=phextKnowledgeFor(root);
+    const file=phext?path.join(root,'cavern.phext'):await this.store.resolve(path.posix.join(body.vault,'.mutable/mutable.db'));
     const stamp=await stat(file),identity=`${stamp.dev}:${stamp.ino}`;
     let reader=this.readers.get(root);
     if(reader && reader.identity!==identity){

@@ -332,6 +332,38 @@ export class PhextLattice {
     this.overlay.clear();
   }
 
+  /**
+   * Rebase onto a newer base buffer (Phase 4 multi-instance support):
+   * the base index is rebuilt from `buffer`, and every overlay slot is
+   * re-applied on top of it — a modification of a scroll the new base
+   * no longer holds becomes an insertion, a tombstone for a scroll the
+   * new base no longer holds is dropped (the delete has already
+   * happened), and content is carried verbatim. This lets two
+   * PhextLattice instances over one file adopt each other's saved
+   * generations without losing their own unsaved edits, provided each
+   * writer owns disjoint scrolls (in Mutable: disjoint VFS strata).
+   */
+  rebaseFromBuffer(buffer: Buffer): void {
+    const slots = [...this.overlay.values()];
+    this.buffer = buffer;
+    this.buildIndex();
+    this.overlay.clear();
+    for (const slot of slots) {
+      const key = formatCoordinate(slot.coordinate);
+      if (slot.entry.kind === "deleted") {
+        if (this.spans.has(key)) this.overlay.set(key, slot);
+      } else {
+        this.overlay.set(key, {
+          coordinate: slot.coordinate,
+          entry: {
+            kind: this.spans.has(key) ? "modified" : "inserted",
+            content: slot.entry.content,
+          },
+        });
+      }
+    }
+  }
+
   /** First index in `ordered` whose coordinate is >= `coordinate`. */
   private lowerBound(coordinate: PhextCoordinate): number {
     let low = 0;

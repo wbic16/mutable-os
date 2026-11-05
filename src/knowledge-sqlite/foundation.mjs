@@ -11,6 +11,8 @@ import { canonicalPropositions, propositionMutation } from './propositions.mjs';
 import { canonicalEntities, entityMutation } from './entities.mjs';
 import { canonicalLedger } from './canonical-ledger.mjs';
 import { canonicalSemantics, semanticMutation } from './semantics.mjs';
+import { openPhextFoundation } from './phext-foundation.mjs';
+import { phextKnowledgeFor } from './phext-registry.mjs';
 import * as indexing from './reconcile.mjs';
 function checkFiles(home, kind = 'mutable') {
   for (const suffix of ['', '-wal', '-shm', '-journal']) regularFile(path.join(home, `${kind}.db${suffix}`), true);
@@ -30,7 +32,28 @@ function initialize(file, kind, vaultGuid) {
   } finally { db?.close(); if (fs.existsSync(temporary)) fs.unlinkSync(temporary); }
 }
 
+/**
+ * PhextVFS Phase 4 mode resolution. Phext knowledge mode is entered
+ * only with a live PhextVFS instance: injected by the knowledge
+ * worker (context.phextVfs) or registered for this vault by the
+ * Cavern lifecycle (phext-registry.mjs). An `options.phextKnowledge`
+ * request with no instance available fails closed — knowledge mode
+ * is never silently downgraded to disk. With no phext signal at all,
+ * behavior is exactly the disk foundation's.
+ */
+function resolvePhextKnowledge(options, context) {
+ if(context?.phextVfs)return{vfs:context.phextVfs,phextPath:context.phextPath};
+ const registered=options?.vault?phextKnowledgeFor(options.vault):undefined;
+ if(registered)return registered;
+ if(options?.phextKnowledge)throw Error('Phext knowledge mode requires a PhextVFS instance; open through the knowledge worker or register one');
+ return undefined;
+}
 export function openFoundation(options = {}, context = {}) {
+ const phext=resolvePhextKnowledge(options,context);
+ if(phext){
+  if(!isMainThread){if(!context.scopeValidated)throw Error('Vault scope was not verified by the host');return openPhextFoundation(options,{...context,phext});}
+  const release=lockVaultEstablishment();try{inspectVaultScope(options.vault,{phextKnowledge:true});return openPhextFoundation(options,{...context,phext});}finally{release();}
+ }
  if(!isMainThread){if(!context.scopeValidated)throw Error('Vault scope was not verified by the host');return openValidatedFoundation(options,context);}
  const release=lockVaultEstablishment();try{inspectVaultScope(options.vault);return openValidatedFoundation(options,context);}finally{release();}
 }
