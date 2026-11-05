@@ -44,6 +44,8 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
   const [choosing, setChoosing] = createSignal(false), [mode, setMode] = createSignal<'open' | 'create'>('open');
   const [busy, setBusy] = createSignal(true), [error, setError] = createSignal('');
   const [folder, setFolder] = createSignal(''), [name, setName] = createSignal('');
+  const [phextOpen, setPhextOpen] = createSignal(false), [phextTarget, setPhextTarget] = createSignal('');
+  let phextFile: File | undefined;
   const [target, setTarget] = createSignal<Target>(), [index, setIndex] = createSignal<any>();
   let alive = true, polling = false, generation: string | undefined;
   // Every managed request is bound to the active server context, fencing stale tabs.
@@ -72,7 +74,28 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
   };
   const choose = (next: 'open' | 'create' = 'open') => {
     if (busy()) return;
-    setMode(next); setFolder(''); setName(''); setTarget(undefined); setError(''); setChoosing(true);
+    setMode(next); setFolder(''); setName(''); setTarget(undefined); setError(''); setPhextOpen(false); setChoosing(true);
+  };
+  // Phase 5: open a Cavern from a received .phext / .phext.xz. The
+  // server verifies (and unlocks) the file, installs it into the
+  // target folder, then hands off to the normal establish flow.
+  const openFromPhext = async () => {
+    if (!phextFile) { setError('Choose a .phext or .phext.xz file.'); return; }
+    if (!safeToSwitch()) return;
+    setBusy(true); setError('');
+    try {
+      const form = new FormData();
+      form.append('phext', phextFile);
+      form.append('target', phextTarget());
+      const response = await originalFetch('/api/cavern/open-phext', { method: 'POST', body: form });
+      const result = await response.json().catch(() => undefined);
+      if (!response.ok || result?.Success === false || !result?.Data) {
+        throw new Error(typeof result?.Error === 'string' && result.Error ? result.Error : 'Mutable could not open a Cavern from that phext.');
+      }
+      if (!alive) return;
+      apply(result.Data); setChoosing(false); setPhextOpen(false); phextFile = undefined;
+    } catch (e) { if (alive) setError(String(e)); }
+    finally { if (alive) setBusy(false); }
   };
   const safeToSwitch = () => {
     if (!current()) return true;
@@ -152,8 +175,8 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
   }</For></div></Show>;
   const chooser = () => <section class="cavern-card" role={current() ? 'dialog' : undefined} aria-modal={current() ? true : undefined} aria-label="Cavern setup" aria-busy={busy()}>
     <Show when={!choosing()} fallback={<>
-      <h1>{target() ? 'Set up this folder as a Cavern?' : mode() === 'create' ? 'Create New Cavern' : 'Open Cavern'}</h1>
-      <Show when={target()} keyed fallback={<form onSubmit={e => { e.preventDefault(); submit(); }}>
+      <h1>{phextOpen() ? 'Open Cavern from a Phext' : target() ? 'Set up this folder as a Cavern?' : mode() === 'create' ? 'Create New Cavern' : 'Open Cavern'}</h1>
+      <Show when={phextOpen()} fallback={<Show when={target()} keyed fallback={<form onSubmit={e => { e.preventDefault(); submit(); }}>
         <Show when={mode() === 'create'}><label>Cavern Name<input autofocus value={name()} disabled={busy()} onInput={e => setName(e.currentTarget.value)} placeholder="Leonardo Research" /></label></Show>
         <label>{mode() === 'create' ? 'Location (parent folder)' : 'Folder location'}<div class="cavern-location"><input autofocus={mode() === 'open'} value={folder()} disabled={busy()} onInput={e => setFolder(e.currentTarget.value)} placeholder="Choose a folder or enter its path" /><button type="button" disabled={busy()} onClick={() => void select()}>Browse…</button></div></label>
         <Show when={mode() === 'create' && folder() && name().trim()}><p>Resulting location: <code>{createPath()}</code></p></Show>
@@ -161,10 +184,17 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
       </form>}>{resolved => <>
         <p>{mode() === 'create' ? 'This folder already exists. Mutable can set it up as a Cavern.' : 'Mutable will add the infrastructure it needs to this folder.'} Existing files will remain in place.</p><code>{resolved.path}</code>
         <div class="cavern-actions"><button class="cavern-primary" disabled={busy()} onClick={() => void establish(resolved, mode(), true)}>Set Up as Cavern</button><button disabled={busy()} onClick={() => { setTarget(undefined); setError(''); }}>{mode() === 'create' ? 'Choose Another Location' : 'Cancel'}</button></div>
-      </>}</Show>
+      </>}</Show>}>
+      <form onSubmit={e => { e.preventDefault(); void openFromPhext(); }}>
+        <p>A Cavern shared as one file: the raw <code>.phext</code>, or the sealed <code>.phext.xz</code> (its integrity is verified before anything is written). It is installed into a new, empty folder and opened.</p>
+        <label>Cavern phext file<input type="file" accept=".phext,.xz" disabled={busy()} onChange={e => { phextFile = e.currentTarget.files?.[0]; }} /></label>
+        <label>New folder for this Cavern<input autofocus value={phextTarget()} disabled={busy()} onInput={e => setPhextTarget(e.currentTarget.value)} placeholder="Enter the path of an empty folder" /></label>
+        <div class="cavern-actions"><button type="submit" class="cavern-primary" disabled={busy() || !phextTarget().trim()}>Open Cavern from Phext</button><button type="button" disabled={busy()} onClick={() => { setPhextOpen(false); setChoosing(false); setError(''); }}>Cancel</button></div>
+      </form>
+      </Show>
     </>}>
       <Show when={recovery()} keyed fallback={<><small>MUTABLE OS</small><h1>Welcome to Mutable OS</h1><p>Mutable stores your documents, objects and knowledge in a Cavern: an ordinary folder on your computer.</p></>}>{r => <><h1>Cavern unavailable</h1><p>Mutable could not open the previously selected Cavern:</p><code>{r.path}</code><p>{r.error}</p><button disabled={busy()} onClick={() => { choose('open'); void select(); }}>Locate Cavern…</button></>}</Show>
-      <div class="cavern-options"><div><h2>Create a New Cavern</h2><p>Create a new folder and set it up for Mutable OS.</p><button class="cavern-primary" disabled={busy()} onClick={() => choose('create')}>Create</button></div><div><h2>Open a Folder as a Cavern</h2><p>Use an existing folder as a Mutable Cavern.</p><button class="cavern-primary" disabled={busy()} onClick={() => { choose('open'); void select(); }}>Open</button></div></div>
+      <div class="cavern-options"><div><h2>Create a New Cavern</h2><p>Create a new folder and set it up for Mutable OS.</p><button class="cavern-primary" disabled={busy()} onClick={() => choose('create')}>Create</button></div><div><h2>Open a Folder as a Cavern</h2><p>Use an existing folder as a Mutable Cavern.</p><button class="cavern-primary" disabled={busy()} onClick={() => { choose('open'); void select(); }}>Open</button></div><div><h2>Open a Cavern from a Phext</h2><p>Unlock a Cavern shared as a single .phext or sealed .phext.xz file.</p><button class="cavern-primary" disabled={busy()} onClick={() => { setMode('open'); setTarget(undefined); setError(''); setPhextOpen(true); setChoosing(true); }}>Open from Phext…</button></div></div>
       {recents()}
       <Show when={current()}><button disabled={busy()} onClick={() => { setChoosing(false); setError(''); }}>Return to Mutable OS</button></Show>
     </Show>
@@ -190,6 +220,27 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
 export function CavernControl() {
   const cavern = useCurrentCavern();
   const [open, setOpen] = createSignal(false);
+  const [dlError, setDlError] = createSignal('');
+  // Phase 5: Download Cavern — the raw phext, or the xz-sealed form
+  // (sealed at export time from the current uncompressed state).
+  const download = async (format: 'phext' | 'xz') => {
+    setDlError('');
+    try {
+      const response = await fetch(`/api/cavern/download?format=${format}`);
+      if (!response.ok) {
+        const result = await response.json().catch(() => undefined);
+        throw new Error(typeof result?.Error === 'string' && result.Error ? result.Error : 'The Cavern download failed.');
+      }
+      const blob = await response.blob();
+      const filename = /filename="([^"]+)"/.exec(response.headers.get('Content-Disposition') || '')?.[1]
+        || `${cavern!.current()!.name}.phext${format === 'xz' ? '.xz' : ''}`;
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url; anchor.download = filename; anchor.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      setOpen(false);
+    } catch (e) { setDlError(String(e)); }
+  };
   let root!: HTMLDivElement;
   onMount(() => {
     if (!cavern) return;
@@ -204,6 +255,8 @@ export function CavernControl() {
     <Show when={open()}><section class="cavern-menu" aria-label="Current Cavern settings"><strong>{cavern!.current()!.name}</strong><code>{cavern!.current()!.path}</code>
       <button onClick={() => act(() => cavern!.choose('open'))}>Open Another Cavern…</button><button onClick={() => act(() => cavern!.choose('create'))}>Create New Cavern…</button>
       <button onClick={() => act(() => cavern!.reveal())}>Reveal Cavern in {navigator.platform.includes('Mac') ? 'Finder' : 'File Manager'}</button>
+      <button onClick={() => void download('phext')}>Download Cavern (.phext)</button><button onClick={() => void download('xz')}>Download Sealed Cavern (.phext.xz)</button>
+      <Show when={dlError()}><p class="cavern-error" role="alert">{dlError()}</p></Show>
       <Show when={cavern!.recent().length > 1}><h3>Recent Caverns</h3><For each={cavern!.recent()}>{c => <button disabled={c.cavernGuid === cavern!.current()!.cavernGuid} onClick={() => act(() => cavern!.open(c.path))}><strong>{c.name}</strong><small>{c.path}</small></button>}</For></Show>
     </section></Show>
   </div></Show>;
