@@ -1,5 +1,6 @@
 import { For, Show, createContext, createSignal, onCleanup, onMount, useContext, untrack, type JSX } from 'solid-js';
 import './cavern-startup.css';
+import { currentSettingsCapture } from './settings-snapshot';
 
 export type CurrentCavern = { path: string; name: string; cavernGuid: string; session: string };
 type Target = { path: string; name: string; state: 'missing' | 'folder' | 'cavern' };
@@ -221,6 +222,18 @@ export function CavernControl() {
   const cavern = useCurrentCavern();
   const [open, setOpen] = createSignal(false);
   const [dlError, setDlError] = createSignal('');
+  const [settingsNote, setSettingsNote] = createSignal('');
+  // Settings bundle: ship a COPY of the current settings into this
+  // Cavern's phext (explicit action; opening a Cavern never imports
+  // settings back). The server validates all four domains before
+  // writing the L7 settings tree.
+  const updateShippedSettings = async () => {
+    setDlError(''); setSettingsNote('');
+    try {
+      const data = await request('settings/capture', { settings: currentSettingsCapture() });
+      setSettingsNote(`Settings copy updated in this Cavern (${data.settings.fields} fields, ${new Date(data.settings.updatedUtc).toLocaleString()}).`);
+    } catch (e) { setDlError(String(e)); }
+  };
   // Phase 5: Download Cavern — the raw phext, or the xz-sealed form
   // (sealed at export time from the current uncompressed state).
   const download = async (format: 'phext' | 'xz') => {
@@ -256,6 +269,8 @@ export function CavernControl() {
       <button onClick={() => act(() => cavern!.choose('open'))}>Open Another Cavern…</button><button onClick={() => act(() => cavern!.choose('create'))}>Create New Cavern…</button>
       <button onClick={() => act(() => cavern!.reveal())}>Reveal Cavern in {navigator.platform.includes('Mac') ? 'Finder' : 'File Manager'}</button>
       <button onClick={() => void download('phext')}>Download Cavern (.phext)</button><button onClick={() => void download('xz')}>Download Sealed Cavern (.phext.xz)</button>
+      <button onClick={() => void updateShippedSettings()}>Update Shipped Settings</button>
+      <Show when={settingsNote()}><p role="status">{settingsNote()}</p></Show>
       <Show when={dlError()}><p class="cavern-error" role="alert">{dlError()}</p></Show>
       <Show when={cavern!.recent().length > 1}><h3>Recent Caverns</h3><For each={cavern!.recent()}>{c => <button disabled={c.cavernGuid === cavern!.current()!.cavernGuid} onClick={() => act(() => cavern!.open(c.path))}><strong>{c.name}</strong><small>{c.path}</small></button>}</For></Show>
     </section></Show>

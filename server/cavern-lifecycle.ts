@@ -17,6 +17,7 @@ import { createDocumentStoreRouter } from './document-store.js';
 import { createWorkspaceStoreRouter } from './workspace-store.js';
 import { featureFlags } from '../src/configuration.js';
 import { createManagedAssetService } from './managed-assets-router.mjs';
+import { validateSettingsCapture, writeSettingsBundle, readSettingsBundle } from './phext-settings.mjs';
 import { normalizePolicy } from '../src/knowledge/policy.js';
 
 type Cavern = { path: string; name: string; cavernGuid: string; session: string };
@@ -333,6 +334,28 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
         ...(format === 'xz' ? { 'X-Cavern-Sealed-Bytes': String(body.length) } : {}),
       });
       res.send(body);
+    } catch (error) {
+      res.status((error as any).status || 409).json({ Success: false, Error: (error as Error).message });
+    }
+  });
+  // Settings bundle (audit Part 2): capture is an explicit user
+  // action — the client sends the four domains' current values,
+  // the whole payload is validated before anything is written,
+  // and the L7 /.control/settings tree is rewritten in the open
+  // Cavern's phext. The read route returns the shipped copy for
+  // viewing; opening a Cavern never imports it.
+  route('post', '/settings/capture', req => serial(async () => {
+    if (!current || !runtime) fail('Choose a Cavern first.');
+    await runtime.phextReady;
+    const bundle = validateSettingsCapture(req.body?.settings);
+    const outcome = writeSettingsBundle(runtime.phextVfs, bundle);
+    return { settings: { updatedUtc: outcome.updatedUtc, fields: outcome.written } };
+  }));
+  router.get('/settings', async (_req, res) => {
+    try {
+      if (!current || !runtime) fail('Choose a Cavern first.');
+      await runtime!.phextReady;
+      res.json({ Success: true, Data: { settings: readSettingsBundle(runtime!.phextVfs) } });
     } catch (error) {
       res.status((error as any).status || 409).json({ Success: false, Error: (error as Error).message });
     }
