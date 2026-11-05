@@ -1,0 +1,29 @@
+{
+  "toolWork": {
+    "snapshots": 0,
+    "projections": 0,
+    "projectionRebuilds": 0,
+    "referenceRebuilds": 0
+  },
+  "lerTrustedSearchAndLink": true,
+  "lerCancel": true,
+  "glossCreateEditNavigation": true,
+  "glossGraphArgumentEntry": true,
+  "referencesEntityInventory": true,
+  "referencesSourceReturn": true,
+  "nativeReferenceAuthoring": true,
+  "cardexSearchEditSave": true,
+  "cardexDirtyDesktopRoundTrip": true,
+  "retainedFlintIdentity": true,
+  "cardexDocumentNavigation": true,
+  "cardexTypingWorkspaceSnapshots": 0,
+  "cardexTypingWorkspaceChanges": 0,
+  "cardexRequests": [
+    "context",
+    "search",
+    "get",
+    "claims",
+    "save",
+    "documents"
+  ]
+}

@@ -1,3 +1,5 @@
+import {Dynamic} from 'solid-js/web';
+import {useInstrumentPresentations} from '../../rendering/instrument-presentations';
 import {LerSession,type LerSource} from './ler-session';
 import {LiveEntityQuery} from './live-entity-query';
 import type {LiveDocumentEntities} from '../../feature-api/live-entities';
@@ -17,7 +19,8 @@ import './entity-search.css';
 import './ler-view.css';
 
 /** Target, query, and resolved identity are deliberately independent session state. */
-export function LerSearch(props:{api:AnnotationCapabilities;panel:PanelSession;completion?:{session:CompletionSession;target():EntitySearchData;adjust(edge:'start'|'end',direction:-1|1,word:boolean):void;controls(value:{run(id:string):boolean;busy():boolean;canClose():boolean}|undefined):void}}) {
+function createLerModel(props:{api:AnnotationCapabilities;panel:PanelSession;completion?:{session:CompletionSession;target():EntitySearchData;adjust(edge:'start'|'end',direction:-1|1,word:boolean):void;controls(value:{run(id:string):boolean;busy():boolean;canClose():boolean}|undefined):void}}) {
+ const presenters=useInstrumentPresentations();
  const {api,panel,completion}=props;
  const activity=useManagedViewActivity(),owner=useManagedWindowOwner();
  const [target,setTarget]=createSignal<EntitySearchData>({...panel.data as EntitySearchData});
@@ -144,7 +147,8 @@ export function LerSearch(props:{api:AnnotationCapabilities;panel:PanelSession;c
   if(initial?.createName){setCanonicalName(initial.createName);setCreateForm(true);session.view('create');}
   if(initial?.authority)session.view('authority');
   if(initial?.entityId){if(initial.review)select(initial.entityId,false,true);else void showDetails(initial.entityId);}
-  const mount=panel.mountWidget(root,()=>commandFocus());if(!completion?.session.source.inline)commandFocus();
+  const entryFocus=()=>presenters?.()?.entityEntry==='query'?editQuery():commandFocus();
+  const mount=panel.mountWidget(root,entryFocus);if(!completion?.session.source.inline)entryFocus();
   panel.allowDocumentInput(true);
   const invalidate=()=>{if(editing)return;setValid(false);setError('The original target changed. Select a new target before linking.');};
   let stop:()=>void;
@@ -296,7 +300,33 @@ export function LerSearch(props:{api:AnnotationCapabilities;panel:PanelSession;c
    session.view('results');session.mode('edit');input.focus();input.select();
   }
  };
- return <div ref={root} class="reactive-entity-search ler-instrument" classList={{'reactive-entity-search--embedded':!!completion}} role="dialog" aria-modal="false" aria-label="Link Entity Reference" data-native-context-menu onKeyDown={keys}
+ const GraphicalAdvanced=()=> <>
+   <Show when={session.state.view==='commands'}><div class="ler-command-list">
+    <button disabled={!pageRows()[current()]||working()} onClick={()=>select(pageRows()[current()].id,false,true)}>Prepare entity</button><button onClick={expand}>Expand original selection</button><button onClick={review}>Review other mention text</button><button onClick={createFormOpen}>+ Create Entity</button><button onClick={()=>session.view('source')}>Source range controls</button><button onClick={()=>{setScope('live');session.view('results');commandFocus();}}>Browse Document Entities</button><button onClick={reset}>Reset to original targets</button>
+    <Show when={pageRows()[current()]&&!target().workstation?.scry}><button disabled={!valid()||target().entityRanges.length!==1||candidates().state.enabled} onClick={()=>select(pageRows()[current()].id,true)}>Replace &amp; Link</button></Show>
+    <Show when={completion}><button onClick={()=>{if(usageScope())clearUsage(usageScope()!);setRetry(n=>n+1);}}>Clear usage history</button><Show when={service}><button onClick={()=>{setAuthority(true);session.view('authority');}}>External authorities…</button></Show></Show>
+    <p>Enter links · Shift+Enter prepares · → inspects · F2 edits</p><p>{api.bindings.label('entity.toggleMode')} toggles Query / Command mode</p><p>{api.bindings.label('entity.createFromQuery')} creates from the query and links the source</p><p>* toggles match · @ cycles fields · ~ cycles scopes · / commands</p><p>Numbers 0–9 link in Command mode. Other text starts query editing. | is reserved for future composition.</p>
+   </div></Show>
+
+   <Show when={session.state.view==='source'}>
+    <p>Current target: {target().entityQuery}</p>
+   <details class="entity-boundaries"><summary>Source range controls and shortcuts</summary><For each={['start','end'] as const}>{edge=><For each={[false,true]}>{word=><div><span>{edge==='start'?'Start':'End'} · {word?'word':'character'}: </span><For each={[-1,1] as const}>{d=><button disabled={!valid()||working()} onPointerDown={e=>e.preventDefault()} onClick={()=>adjust(edge,d,word)}>{edge} {d<0?'back':'forward'} {word?'word':'character'}</button>}</For><Show when={completion?.session.source.brackets}><kbd>{edge==='end'&&word?'Alt/Option+←/→ (Ctrl+←/→)':`Ctrl${edge==='start'?'+Alt':''}${word?'':'+Shift'}+←/→`}</kbd></Show></div>}</For>}</For></details>
+
+    <Show when={completion?.session.state.queryMode==='independent'}><button onClick={()=>completion?.session.follow()}>Resume following source</button></Show>
+    <Show when={target().workstation?.scry?.keepLiteral}><button disabled={working()||creating()} onClick={()=>{target().workstation?.scry?.keepLiteral?.();close();}}>Keep literal brackets</button></Show>
+   </Show>
+   <Show when={session.state.view==='create'&&createForm()}><section aria-label="Create canonical Entity"><label>Canonical name<input aria-label="Canonical name" value={canonicalName()} disabled={!!attempt()} maxLength={1000} onInput={e=>setCanonicalName(e.currentTarget.value)}/></label><button disabled={working()||!!created()||(!valid()&&!attempt())} onClick={create}>{creating()?'Creating…':attempt()?'Retry creation and link':'Create and link'}</button><p role="status">{outcome()}</p><small>Creation is independent of linking. Cancel after dispatch cannot undo creation.</small></section></Show>
+   <Show when={created()&&!valid()}><button onPointerDown={e=>e.preventDefault()} disabled={working()} onClick={recover}>Bind to new selection</button></Show>
+   <Show when={session.state.view==='details'&&details()}>{entity=><section aria-label="Canonical Entity details"><strong>{entity().displayName??entity().name}</strong><small>{entity().id}</small><Show when={live()?.snapshotValue().rows.find(r=>r.id===entity().id)}>{row=><div><p>{row().occurrences} linked occurrences · {row().blockReferences} block references</p><For each={row().forms}>{form=><p>{form}</p>}</For></div>}</Show>
+    <label>Preferred name<input aria-label="Preferred name" value={rename()} onInput={e=>setRename(e.currentTarget.value)}/></label><button disabled={working()} onClick={()=>void run(async()=>{setDetails(await service!.rename({id:entity().id,name:rename(),expected:entity().revision,operationId:crypto.randomUUID()}));live()?.refresh();setRetry(n=>n+1);})}>Update name</button>
+    <For each={entity().aliases}>{a=><div>{a.name} <small>{a.origin}</small><button onClick={()=>{setAliasEdit(a);setAliasName(a.name);}}>Edit alias</button><button disabled={working()} onClick={()=>void run(async()=>{setDetails(await service!.alias({op:'alias-remove',id:a.id,entityId:entity().id,expected:a.revision,operationId:crypto.randomUUID()}));live()?.refresh();setRetry(n=>n+1);})}>Remove alias</button></div>}</For>
+    <label>Explicit alias<input aria-label="Explicit alias" value={aliasName()} onInput={e=>setAliasName(e.currentTarget.value)}/></label><button disabled={working()||!aliasName().trim()} onClick={()=>void run(async()=>{const a=aliasEdit();setDetails(await service!.alias({op:a?'alias-update':'alias-add',id:a?.id??crypto.randomUUID(),entityId:entity().id,name:aliasName(),expected:a?.revision,operationId:crypto.randomUUID()}));setAliasEdit(undefined);setAliasName('');live()?.refresh();setRetry(n=>n+1);})}>{aliasEdit()?'Update alias':'Add alias'}</button><button onClick={()=>{setAliasEdit(undefined);setAliasName('');}}>Clear alias input</button>
+   </section>}</Show>
+
+   <Show when={session.state.view==='review'}><Show when={candidates()} keyed>{candidate=><EntityCandidatesPanel compact expansion={expansion()} session={candidate} bind={()=>{const entity=session.state.prepared;if(entity)select(entity.id);}}/>}</Show></Show>
+   <Show when={session.state.view==='authority'&&authority()&&service}><AuthorityPanel service={service!} query={query()} guard={fn=>acquisitionGuard=fn} imported={e=>{setCreated(e);setDetails(e);setRename(e.name);session.prepare(e);setOutcome('Created but not linked');}}/></Show>
+ </>;
+ const Graphical=()=> <div ref={root} class="reactive-entity-search ler-instrument" classList={{'reactive-entity-search--embedded':!!completion}} role="dialog" aria-modal="false" aria-label="Link Entity Reference" data-native-context-menu onKeyDown={keys}
   style={completion?{}:{left:`${(floating?.rectangle()??position()).x}px`,top:`${(floating?.rectangle()??position()).y}px`,width:`${floating?.rectangle().width??(resize.preview()??size())?.width??width}px`,height:`${floating?.rectangle().height??(resize.preview()??size())?.height??480}px`}}>
   <Show when={!completion}><header class="reactive-entity-search__header" data-window-move tabIndex={floating?0:undefined} onKeyDown={e=>{if(floating&&e.target===e.currentTarget){if(!floating.mode()&&e.key.startsWith("Arrow"))floating.keyboard("move");floating.keyDown(e);}}} onBlur={()=>floating?.cancel()} onLostPointerCapture={e=>floating?.cancelPointer(e)} onPointerDown={e=>{if(e.button!==0||(e.target as Element).closest('button'))return;if(floating){floating.beginMove(e);return;}drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:position().x,top:position().y};e.currentTarget.setPointerCapture?.(e.pointerId);e.preventDefault();}} onPointerMove={e=>{if(floating){floating.movePointer(e);return;}if(drag?.id===e.pointerId)setPosition({x:Math.max(8,Math.min(window.innerWidth-80,drag.left+e.clientX-drag.x)),y:Math.max(8,Math.min(window.innerHeight-60,drag.top+e.clientY-drag.y))});}} onPointerUp={e=>floating?floating.endPointer(e):drag=undefined} onPointerCancel={e=>floating?floating.cancelPointer(e):drag=undefined}>
    <strong>Link Entity Reference</strong><button onClick={close}>Cancel</button>
@@ -324,29 +354,7 @@ export function LerSearch(props:{api:AnnotationCapabilities;panel:PanelSession;c
     </div>
     <div class="ler-actions"><button disabled={!pageRows()[current()]||working()} onClick={()=>select(pageRows()[current()].id)}>Link {accepted()>1?accepted():''}</button><button disabled={!pageRows()[current()]||working()} onClick={()=>select(pageRows()[current()].id,false,true)}>Prepare entity</button><button disabled={!pageRows()[current()]||working()} onClick={()=>showDetails(pageRows()[current()].id)}>Details / aliases</button></div>
    </Show>
-   <Show when={session.state.view==='commands'}><div class="ler-command-list">
-    <button disabled={!pageRows()[current()]||working()} onClick={()=>select(pageRows()[current()].id,false,true)}>Prepare entity</button><button onClick={expand}>Expand original selection</button><button onClick={review}>Review other mention text</button><button onClick={createFormOpen}>+ Create Entity</button><button onClick={()=>session.view('source')}>Source range controls</button><button onClick={()=>{setScope('live');session.view('results');commandFocus();}}>Browse Document Entities</button><button onClick={reset}>Reset to original targets</button>
-    <Show when={pageRows()[current()]&&!target().workstation?.scry}><button disabled={!valid()||target().entityRanges.length!==1||candidates().state.enabled} onClick={()=>select(pageRows()[current()].id,true)}>Replace &amp; Link</button></Show>
-    <Show when={completion}><button onClick={()=>{if(usageScope())clearUsage(usageScope()!);setRetry(n=>n+1);}}>Clear usage history</button><Show when={service}><button onClick={()=>{setAuthority(true);session.view('authority');}}>External authorities…</button></Show></Show>
-    <p>Enter links · Shift+Enter prepares · → inspects · F2 edits</p><p>{api.bindings.label('entity.toggleMode')} toggles Query / Command mode</p><p>{api.bindings.label('entity.createFromQuery')} creates from the query and links the source</p><p>* toggles match · @ cycles fields · ~ cycles scopes · / commands</p><p>Numbers 0–9 link in Command mode. Other text starts query editing. | is reserved for future composition.</p>
-   </div></Show>
-   <Show when={session.state.view==='source'}>
-    <p>Current target: {target().entityQuery}</p>
-   <details class="entity-boundaries"><summary>Source range controls and shortcuts</summary><For each={['start','end'] as const}>{edge=><For each={[false,true]}>{word=><div><span>{edge==='start'?'Start':'End'} · {word?'word':'character'}: </span><For each={[-1,1] as const}>{d=><button disabled={!valid()||working()} onPointerDown={e=>e.preventDefault()} onClick={()=>adjust(edge,d,word)}>{edge} {d<0?'back':'forward'} {word?'word':'character'}</button>}</For><Show when={completion?.session.source.brackets}><kbd>{edge==='end'&&word?'Alt/Option+←/→ (Ctrl+←/→)':`Ctrl${edge==='start'?'+Alt':''}${word?'':'+Shift'}+←/→`}</kbd></Show></div>}</For>}</For></details>
-
-    <Show when={completion?.session.state.queryMode==='independent'}><button onClick={()=>completion?.session.follow()}>Resume following source</button></Show>
-    <Show when={target().workstation?.scry?.keepLiteral}><button disabled={working()||creating()} onClick={()=>{target().workstation?.scry?.keepLiteral?.();close();}}>Keep literal brackets</button></Show>
-   </Show>
-   <Show when={session.state.view==='create'&&createForm()}><section aria-label="Create canonical Entity"><label>Canonical name<input aria-label="Canonical name" value={canonicalName()} disabled={!!attempt()} maxLength={1000} onInput={e=>setCanonicalName(e.currentTarget.value)}/></label><button disabled={working()||!!created()||(!valid()&&!attempt())} onClick={create}>{creating()?'Creating…':attempt()?'Retry creation and link':'Create and link'}</button><p role="status">{outcome()}</p><small>Creation is independent of linking. Cancel after dispatch cannot undo creation.</small></section></Show>
-   <Show when={created()&&!valid()}><button onPointerDown={e=>e.preventDefault()} disabled={working()} onClick={recover}>Bind to new selection</button></Show>
-   <Show when={session.state.view==='details'&&details()}>{entity=><section aria-label="Canonical Entity details"><strong>{entity().displayName??entity().name}</strong><small>{entity().id}</small><Show when={live()?.snapshotValue().rows.find(r=>r.id===entity().id)}>{row=><div><p>{row().occurrences} linked occurrences · {row().blockReferences} block references</p><For each={row().forms}>{form=><p>{form}</p>}</For></div>}</Show>
-    <label>Preferred name<input aria-label="Preferred name" value={rename()} onInput={e=>setRename(e.currentTarget.value)}/></label><button disabled={working()} onClick={()=>void run(async()=>{setDetails(await service!.rename({id:entity().id,name:rename(),expected:entity().revision,operationId:crypto.randomUUID()}));live()?.refresh();setRetry(n=>n+1);})}>Update name</button>
-    <For each={entity().aliases}>{a=><div>{a.name} <small>{a.origin}</small><button onClick={()=>{setAliasEdit(a);setAliasName(a.name);}}>Edit alias</button><button disabled={working()} onClick={()=>void run(async()=>{setDetails(await service!.alias({op:'alias-remove',id:a.id,entityId:entity().id,expected:a.revision,operationId:crypto.randomUUID()}));live()?.refresh();setRetry(n=>n+1);})}>Remove alias</button></div>}</For>
-    <label>Explicit alias<input aria-label="Explicit alias" value={aliasName()} onInput={e=>setAliasName(e.currentTarget.value)}/></label><button disabled={working()||!aliasName().trim()} onClick={()=>void run(async()=>{const a=aliasEdit();setDetails(await service!.alias({op:a?'alias-update':'alias-add',id:a?.id??crypto.randomUUID(),entityId:entity().id,name:aliasName(),expected:a?.revision,operationId:crypto.randomUUID()}));setAliasEdit(undefined);setAliasName('');live()?.refresh();setRetry(n=>n+1);})}>{aliasEdit()?'Update alias':'Add alias'}</button><button onClick={()=>{setAliasEdit(undefined);setAliasName('');}}>Clear alias input</button>
-   </section>}</Show>
-
-   <Show when={session.state.view==='review'}><Show when={candidates()} keyed>{candidate=><EntityCandidatesPanel compact expansion={expansion()} session={candidate} bind={()=>{const entity=session.state.prepared;if(entity)select(entity.id);}}/>}</Show></Show>
-   <Show when={session.state.view==='authority'&&authority()&&service}><AuthorityPanel service={service!} query={query()} guard={fn=>acquisitionGuard=fn} imported={e=>{setCreated(e);setDetails(e);setRename(e.name);session.prepare(e);setOutcome('Created but not linked');}}/></Show>
+   <GraphicalAdvanced/>
   </div>
   <Show when={error()}><p role="alert" class="ler-error">{error()}</p></Show>
   <div class="ler-status" role="status"><Show when={searchScope()==='live'} fallback={<>{busy()?'Resolving…':`${rows().length} candidates`}{result()&&!result()!.complete?' · incomplete coverage':''}</>}>
@@ -357,6 +365,14 @@ export function LerSearch(props:{api:AnnotationCapabilities;panel:PanelSession;c
   <footer><button disabled={!page()} onClick={()=>{setPage(n=>n-1);navigate(0);}}>Previous page</button><span>Page {page()+1}</span><button disabled={(page()+1)*10>=rows().length} onClick={()=>{setPage(n=>n+1);navigate(0);}}>Next page</button><span>Enter links {accepted()} · ⇧Enter prepares</span></footer>
   <Show when={!completion}><FloatingWindowResizeHandle controller={resize} class="reactive-entity-search__resize" label="Resize Entity Search window"/></Show>
  </div>;
+ return {Graphical,api,panel,session,completion,target,query,setQuery,stream,setStream,match,setMatch,searchScope,setScope,scopes,
+ rows,pageRows,current,page,setPage,navigate,busy,working,valid,error,result,close,keys,select,showDetails,review,expand,refresh,reset,adoptSelection,
+ createFormOpen,create,canonicalName,setCanonicalName,attempt,created,creating,outcome,recover,accepted,commandFocus,editQuery,setComposing,
+ refs:{root:(el:HTMLDivElement)=>root=el,input:(el:HTMLInputElement)=>input=el,list:(el:HTMLDivElement)=>list=el,body:(el:HTMLDivElement)=>body=el},
+ // Less frequent operations keep their existing form controls and validation.
+ details:()=>details(),
+ advanced:GraphicalAdvanced};
+
 }
 export function snapshotTarget(ranges:readonly {nodeKey:string;start:number;end:number}[],api:AnnotationCapabilities):EntitySearchData {
  const valid=ranges.filter(r=>r.end>r.start);if(!valid.length)throw Error('Select nonempty text in this Document');
@@ -364,3 +380,9 @@ export function snapshotTarget(ranges:readonly {nodeKey:string;start:number;end:
  return {entityRanges:snapshots,entityRevision:api.revision(),entityQuery:snapshots.map(r=>api.text(r.nodeKey)!.cells.slice(r.start,r.end).map(c=>c.text).join('')).join(' ')};
 }
 function wordBoundaries(text:string){const graphemes=new Set(graphemeBoundaries(text));let at=0;const out=[0];for(const part of new Intl.Segmenter(undefined,{granularity:'word'}).segment(text)){at+=[...part.segment].length;if(graphemes.has(at))out.push(at);}return out;}
+
+export type LerModel=ReturnType<typeof createLerModel>;
+export function LerSearch(props:Parameters<typeof createLerModel>[0]) {
+ const model=createLerModel(props),views=useInstrumentPresentations();
+ return <Dynamic component={views?.()?.ler??model.Graphical} model={model}/>;
+}

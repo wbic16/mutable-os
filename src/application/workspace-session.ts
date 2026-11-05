@@ -1,3 +1,4 @@
+import {canPresentCardex} from './cardex-presentation-ports';
 import { documentApplicationPorts } from "./document-application-ports";
 import { createSpatialActions, supportsSpatial } from "./spatial-actions";
 import type { ReactiveEditorConfiguration } from "../configuration";
@@ -138,6 +139,7 @@ export class WorkspaceSession {
         (typeof document !== "undefined" && document.querySelector('[role="dialog"]')) ||
         Object.values(this.projection.state.nodes).some(node => editor.mounts.get(node.key) &&
           !editor.registry.hasCapability(node.viewType, "spatial-document-compatible") && node.viewType !== "youtube-video-block" &&
+          !canPresentCardex(editor,node.key,this.presentation.active(),name) &&
           (editor.mounts.get(node.key)?.inputPolicy === "opaque-widget" || editor.registry.hasCapability(node.viewType, "opaque-widget")))) {
       this.noticeSignal[1]("Finish or close the open panel, draft or embedded application before switching presentations."); return false;
     }

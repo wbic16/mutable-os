@@ -1,3 +1,6 @@
+import {InstrumentPresentationContext} from '../rendering/instrument-presentations';
+import {TextualLer,TextualCompletion} from '../features/textual/entity-tools';
+import {TextualGloss} from '../features/textual/gloss';
 import {ownApplicationPresentationSurface} from '../rendering/application-presentation-surface';
 import { TextualFlint } from '../features/textual/flint';
 import { documentApplicationPorts } from './document-application-ports';
@@ -64,7 +67,7 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
       camera: actions.camera, arrange: actions.arrange, available: actions.available, ownInteraction: actions.ownInteraction, returnDesktop: actions.returnDesktop,
       document: actions.document, renderDocument: () => <DocumentSlot />, displayedSize: () => spatialResize()?.presentedSize() }} />;
   };
-  return <WindowManagerPlane manager={props.session.windowManager} suspended={presentation.active() === "textual"}><ReactiveViewProvider editor={editor} projection={projection}
+  return <InstrumentPresentationContext.Provider value={()=>presentation.active()==='textual'?{entityEntry:'query',ler:TextualLer,completion:TextualCompletion,gloss:TextualGloss}:undefined}><WindowManagerPlane manager={props.session.windowManager} suspended={presentation.active() === "textual"}><ReactiveViewProvider editor={editor} projection={projection}
     coordinates={{ scale: () => presentation.active() === "canvas" ? input.camera().zoom : 1 }}
     windowGeometry={key => presentation.active() === "canvas" ? geometry(key) : presentation.active() === "spatial" ? spatialGeometry(key) : undefined}>
     <Show when={editor.features.desktopApplicationIcons && presentation.active() === "desktop"}>
@@ -87,5 +90,5 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
     <Show when={props.session.documentSessions?.detachment}>{controller=><DetachedDocumentWindows controller={controller()}/>}</Show>
     <ReactiveViewLayers editor={editor} projection={projection} />
     <Show when={presentation.active() === "textual"}><TextualWorkspace ownSurface={element=>props.session.windowManager?ownApplicationPresentationSurface(props.session.windowManager,element):()=>{}} application={TextualApplication} beforeZoom={()=>{for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);}}} returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
-  </ReactiveViewProvider></WindowManagerPlane>;
+  </ReactiveViewProvider></WindowManagerPlane></InstrumentPresentationContext.Provider>;
 }

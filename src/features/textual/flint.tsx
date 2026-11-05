@@ -1,3 +1,7 @@
+import {glossPresentationControls} from '../gloss/presentation-context';
+import {TextualReferences} from './references';
+import {TextualCardex} from './cardex';
+import {cardexPresentationPorts} from '../../application/cardex-presentation-ports';
 import {windowManagerForDocument} from '../../application/window-lifecycle';
 import {textualFileActions} from './file-actions';
 import {TextualNewDocument} from './new-document';
@@ -16,22 +20,34 @@ export function TextualFlint(props:{session:WorkspaceSession;grid:TextualGrid}) 
   const editor=props.session.editor, registry=documentApplicationPorts(editor);
   const [chosen,setChosen]=createSignal<string|undefined>(registry.ports().find(p=>p.windowId()===props.session.windowManager?.registry.activeWindowId)?.key);
   const current=createMemo(()=>registry.ports().find(p=>p.key===chosen())??registry.ports()[0]);
-  const [error,setError]=createSignal('');
+  const [error,setError]=createSignal(''),[cardex,setCardex]=createSignal<string>();
+  const cards=cardexPresentationPorts(editor),card=createMemo(()=>cards.ports().find(p=>p.key===cardex()));
+  const chooseCardex=(key:string)=>{const port=cards.ports().find(p=>p.key===key);if(port?.windowKey)editor.windowManager?.lifecycle.reveal(port.windowKey);setCardex(port?.key);};
+  const closeCardex=(navigation?:string|true)=>{if(typeof navigation==='string')setChosen(navigation);if(navigation)editor.concertina.clearAll();setCardex(undefined);queueMicrotask(()=>{const session=current()?.session();if(session){if(navigation)editor.documentSessions?.presentations.remember(session);editor.documentSessions?.presentations.restorePosition(session,true);const key=editor.focus.state.focusedKey;if(key&&session.projection.node(key)){const mount=editor.mounts.get(key),range=mount?.captureInlineSelection?.()??editor.mounts.inlineSelection(key);mount?.focus();if(range)mount?.restoreInlineSelection?.(range);}}});};
+  const openCardex=async()=>{if(!cards.ports().length)await editor.commandRegistry.execute('cardex.open',{targetKey:props.session.projection.state.rootKey,args:undefined});queueMicrotask(()=>{const port=cards.ports()[0];if(port)chooseCardex(port.key);});};
   const run=async(action:()=>unknown)=>{try{setError('');await action();}catch(e){setError(String(e));}};
-  return <Show when={current()} keyed fallback={<div class="tw-cell" style={cellStyle(props.grid,{col:1,row:3,widthCells:props.grid.columns-2,heightCells:3})}>No Flint application is open. <button disabled={!editor.documentSessions} onClick={()=>void run(()=>editor.commandRegistry.execute('flint.open',{targetKey:props.session.projection.state.rootKey,args:undefined}))}>Open Flint</button><p role="status">{error()||(!editor.documentSessions?'Textual Flint requires retained Document sessions and the Window Manager.':'')}</p></div>}>
-    {port=><FlintHost port={port} session={props.session} grid={props.grid} applications={<Show when={registry.ports().length>1}><select aria-label="Flint application" value={port.key} onChange={e=>{const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);setChosen(e.currentTarget.value);}}><For each={registry.ports()}>{(app,index)=><option value={app.key}>Flint {index()+1}</option>}</For></select></Show>}/>}</Show>;
+  return <><Show when={current()} keyed fallback={<div class="tw-cell" style={cellStyle(props.grid,{col:1,row:3,widthCells:props.grid.columns-2,heightCells:3})}>No Flint application is open. <button disabled={!editor.features.cardex} onClick={()=>void run(openCardex)}>Cardex</button> <button disabled={!editor.documentSessions} onClick={()=>void run(()=>editor.commandRegistry.execute('flint.open',{targetKey:props.session.projection.state.rootKey,args:undefined}))}>Open Flint</button><p role="status">{error()||(!editor.documentSessions?'Textual Flint requires retained Document sessions and the Window Manager.':'')}</p></div>}>
+    {port=><FlintHost openCardex={()=>void run(openCardex)} port={port} session={props.session} grid={props.grid} applications={<Show when={registry.ports().length>1}><select aria-label="Flint application" value={port.key} onChange={e=>{const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);setChosen(e.currentTarget.value);}}><For each={registry.ports()}>{(app,index)=><option value={app.key}>Flint {index()+1}</option>}</For></select></Show>}/>}</Show><Show when={card()} keyed>{port=><TextualCardex editor={editor} port={port} choose={chooseCardex} close={closeCardex}/>}</Show></>;
 }
-function FlintHost(props:{port:DocumentApplicationPort;session:WorkspaceSession;grid:TextualGrid;applications:import('solid-js').JSX.Element}) {
+function FlintHost(props:{openCardex():void;port:DocumentApplicationPort;session:WorkspaceSession;grid:TextualGrid;applications:import('solid-js').JSX.Element}) {
   const editor=props.session.editor, port=props.port, presentations=editor.documentSessions!.presentations;
   let root!:HTMLDivElement, slot!:HTMLDivElement, viewport!:HTMLDivElement, surfaces!:HTMLDivElement;
-  const [mounted,setMounted]=createSignal(false),[error,setError]=createSignal(''),[busy,setBusy]=createSignal(false),[menu,setMenu]=createSignal<'file'|'edit'|'format'|'block'>();
+  const [mounted,setMounted]=createSignal(false),[error,setError]=createSignal(''),[busy,setBusy]=createSignal(false),[menu,setMenu]=createSignal<'file'|'edit'|'format'|'block'|'tools'>();
   const document=createMemo(()=>port.session());
   const styles=()=>{const s=document();return s?documentStylePorts(editor).get(s.rootKey):undefined;};
   const [items,setItems]=createSignal<BlockMenuItem[]>([]);
-  const [creating,setCreating]=createSignal(false);
+  const [creating,setCreating]=createSignal(false),[references,setReferences]=createSignal(false);
   const target=()=>[editor.focus.state.focusedKey,editor.focus.state.lastFocusedKey].find(key=>key&&document()?.projection.node(key))??document()?.rootKey;
-  const openCommands=(kind:'format'|'block'|'file')=>{remember();styles()?.capture();try{
-    if(kind==='file')setItems(textualFileActions(port,save,()=>setCreating(true)));
+  const openCommands=(kind:'format'|'block'|'file'|'tools')=>{remember();styles()?.capture();try{
+    if(kind==='tools')setItems([
+      {label:'Scry / Link Entity',disabled:!editor.features.autocompleteWorkstation,run:()=>{const key=target();if(key)editor.commandRegistry.execute('autocomplete.open',{targetKey:key,args:undefined});}},
+      {label:'New Gloss',disabled:!editor.features.glossMode,run:()=>{const key=target();if(key)editor.commandRegistry.execute('gloss.create',{targetKey:key,args:undefined});}},
+      {label:'Gloss Mode',disabled:!editor.features.glossPresentation,run:()=>{const s=document();if(s)glossPresentationControls(s)?.toggle();}},
+      {label:'Gloss Explorer',disabled:!editor.features.glossPresentation,run:()=>{const s=document(),controls=s&&glossPresentationControls(s);if(controls){if(!controls.active())controls.toggle();else controls.toggleReferences();}}},
+      {label:'References & Search',run:()=>{setReferences(true);}},
+      {label:'Cardex',disabled:!editor.features.cardex,run:props.openCardex}
+    ]);
+    else if(kind==='file')setItems(textualFileActions(port,save,()=>setCreating(true)));
     else if(kind==='block'){const key=target();setItems(key?blockMenuItems(editor,key):[]);}
     else {const tools=styles()?.tools()??[];setItems([...new Set(tools.map(t=>t.toolset))].map<BlockMenuItem>(group=>({label:group,children:tools.filter(t=>t.toolset===group&&t.run).map(t=>({label:t.label,disabled:t.disabled?.(),run:t.run}))})).concat([{label:'Colours',children:[{label:'Text colour',input:{label:'CSS colour',value:'#ff0000',submit:value=>styles()?.annotate('text/colour',value)}},{label:'Background colour',input:{label:'CSS colour',value:'#ffff00',submit:value=>styles()?.annotate('text/background-colour',value)}}]}] as BlockMenuItem[]));}
     setMenu(kind);
@@ -65,7 +81,7 @@ function FlintHost(props:{port:DocumentApplicationPort;session:WorkspaceSession;
   return <div ref={root} class="tw-flint" data-mwm-window={port.windowId()} onKeyDown={e=>{if(e.key==='Escape'&&menu()){e.preventDefault();closeMenu();}}}>
     <nav data-cross-text-controls data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))} class="tw-cell tw-flint-menu" aria-label="Flint menu" style={rect(12,0,props.grid.columns-12,1)}>
       <button aria-expanded={menu()==='file'} onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('file')}>File</button>
-      <button aria-expanded={menu()==='edit'} onPointerDown={e=>e.preventDefault()} onClick={()=>{remember();setMenu(menu()==='edit'?undefined:'edit');}}>Edit</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('format')}>Format</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('block')}>Block</button><fieldset class="tw-flint-applications" disabled={busy()}>{props.applications}</fieldset>
+      <button aria-expanded={menu()==='edit'} onPointerDown={e=>e.preventDefault()} onClick={()=>{remember();setMenu(menu()==='edit'?undefined:'edit');}}>Edit</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('format')}>Format</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('block')}>Block</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('tools')}>Tools</button><fieldset class="tw-flint-applications" disabled={busy()}>{props.applications}</fieldset>
     </nav>
     <div class="tw-cell tw-title" style={rect(1,1,props.grid.columns-2,1)}>Flint · {port.application.properties()?.title??'No Document'}</div>
     <nav class="tw-cell tw-flint-tabs" aria-label="Documents" style={rect(1,2,props.grid.columns-2,1)}>
@@ -81,6 +97,7 @@ function FlintHost(props:{port:DocumentApplicationPort;session:WorkspaceSession;
       <Show when={menu()==='edit'}><button onPointerDown={e=>e.preventDefault()} onClick={()=>history('undo')}>Undo</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>history('redo')}>Redo</button><button onClick={()=>{closeMenu();const key=target();if(key)editor.find.open(key);}}>Find</button><button onClick={closeMenu}>Close menu</button></Show>
     </div></Show>
     <Show when={creating()&&port.application.vault}>{vault=><TextualNewDocument vault={vault()} grid={props.grid} close={()=>{setCreating(false);focus();}}/>}</Show>
+    <Show when={references()}><div data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))}><TextualReferences knowledge={port.application.knowledge} entities={port.application.entities} restore={focus} close={restore=>{setReferences(false);if(restore!==false)focus();}}/></div></Show>
     <div ref={surfaces} class="tw-flint-surfaces"/>
     <Show when={port.prompt()} keyed>{prompt=><TextualSavePrompt prompt={prompt} grid={props.grid}/>}</Show>
   </div>;

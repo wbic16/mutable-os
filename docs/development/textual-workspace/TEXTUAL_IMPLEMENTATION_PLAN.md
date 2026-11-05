@@ -2,7 +2,7 @@
 
 **Current direction: four increments; accepted investigation is the baseline.** This plan supersedes the previous eight stages and exhaustive requalification proposals. Do not repeat the source audit or regenerate inventories. Share the engine, separate the views, preserve existing behaviour.
 
-**Progress:** Increment 1 shell foundation is implemented; see its [concise qualification](TEXTUAL_INCREMENT_1_QUALIFICATION.md). Dedicated Flint hosting and tool views remain in increments 2 and 3.
+**Progress:** Increments 1 and 2 are accepted. Increment 3 instrument integration is implemented; see [qualification](TEXTUAL_INCREMENT_3_QUALIFICATION.md). Increment 4 has not begun.
 
 ## Isolation boundaries
 
@@ -70,3 +70,13 @@ For each increment, test new code and changed integration boundaries, then stop 
 Critical checks: measured character-cell layout/zoom; existing Flint functionality; unchanged graphical Workspaces; accessible functional Scry/Gloss/References/Cardex; no unnecessary editor remounts, repository snapshots or expensive typing/switching work. Compare scoped counters and representative browser interaction, not arbitrary frame settling. Preserve a cheap before/after graphical fixture for every shared boundary; screenshots alone do not prove editing/lifecycle correctness.
 
 Each qualification note contains only changed files/register IDs, tests and results, outstanding issues and next action. Feature-flag rollback must preserve canonical data and graphical preferences. Do not lower old assertions or update graphical snapshots to conceal a regression. Escalate a concrete ownership/caret/persistence blocker; do not expand the investigation speculatively.
+
+## Increment 3 implementation boundaries — 2026-11-05
+
+Increment 2 is accepted. S6: the LER and Scry view files expose their existing controller model to an optional presentation factory. S7: Gloss register navigation/filter state is exposed similarly; the compact authoring input reuses the current controller and temporary SVG decorations, with only its portal parent adapted. S8: References calls the existing application knowledge/backlink APIs. S9: Cardex exposes its current instrument state/actions and retained field/search/detail DOM slots; Textual supplies independent chrome without recreating field editors or mutation receipts. S11: a small optional presentation context at the Workspace composition boundary selects these factories; graphical defaults are unchanged. No alternative window manager or generalized layout framework is introduced. Focused instrument flows and existing affected tests will qualify these boundaries.
+
+S9 qualification exposed an existing blanket opaque-application switch guard in `workspace-session.ts`. Permit only a registered, retained Cardex Instrument on Desktop↔Textual routes, after its existing Window lifecycle and in-flight operation checks pass. Dirty drafts and retry receipts stay with the same controller; other applications/routes retain the original guard. The browser round-trip and a focused admission test cover this exception.
+
+S9 source-return adapter: `features/cardex/details.tsx` reports successful navigation through an optional callback. The existing Instrument publishes that event; the Textual panel yields to Flint. Graphical callbacks/default behavior remain unchanged. This avoids treating window stacking as a navigation event. Explicit source navigation clears temporary occurrence filtering before restoring native Flint focus, so a filter cannot leave the destination hidden; ordinary application switching retains the current view. The browser flow covers navigation after References occurrence focusing.
+
+Increment 3 uses the existing measured geometry and retains the graphical defaults. Qualification is recorded in [TEXTUAL_INCREMENT_3_QUALIFICATION.md](TEXTUAL_INCREMENT_3_QUALIFICATION.md), with changed-file boundaries, focused tests, actual browser flows and work counters. Subsequent visual polish should follow the supplied framed-pane reference, including hard-edged cell-aligned shadows, denser chrome and persistent side panes. No draggable/overlapping Textual window behavior or new shortcut bindings are implied by the mockup.

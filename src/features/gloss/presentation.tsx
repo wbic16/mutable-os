@@ -1,3 +1,5 @@
+import {Dynamic} from 'solid-js/web';
+import {useInstrumentPresentations} from '../../rendering/instrument-presentations';
 import {GlossArgumentView} from './argument-view';
 import {createArgumentState,createArgumentDiagnostics,type ArgumentState} from './argument';
 import {GlossGraphView,createGlossGraphState,type GlossGraphState} from './graph-view';
@@ -9,7 +11,7 @@ import type {RetainedDocumentSession} from '../../application/document-sessions'
 import {ancestorPath,type SearchMatch} from '../../runtime/text-search';
 import {revealMatch} from '../../runtime/reveal-match';
 import {GlossSessionIndex,type GlossEntry,type GlossOccurrence} from './session-index';
-import {GlossPresentationContext} from './presentation-context';
+import {GlossPresentationContext,ownGlossPresentation} from './presentation-context';
 import './presentation.css';
 
 /** Presentation lives in the retained render root. Children are never conditional,
@@ -18,7 +20,9 @@ export function GlossPresentation(props:{editor:ReactiveEditor;session:RetainedD
  const {editor,session}=props,enabled=editor.features.glossMode&&editor.features.glossPresentation;
  const [active,setActive]=createSignal(false),[narrow,setNarrow]=createSignal(false),[drawer,setDrawer]=createSignal(false),[fallback,setFallback]=createSignal(false);
  const registerState=createGlossRegisterState(),graphState=createGlossGraphState(),argumentState=createArgumentState();
- const controls={active,narrow,references:()=>!narrow()||drawer(),toggle:()=>setActive(v=>!v),toggleReferences:()=>setDrawer(v=>!v)};
+ const presenters=useInstrumentPresentations();
+ const controls={active,narrow,references:()=>presenters?.()?.gloss?drawer():!narrow()||drawer(),toggle:()=>{setActive(v=>!v);if(active()&&presenters?.()?.gloss)setDrawer(true);},toggleReferences:()=>setDrawer(v=>!v)};
+ if(enabled)onCleanup(ownGlossPresentation(session,controls));
  let alive=true;
  onMount(()=>{if(!enabled)return;setFallback(!session.element.querySelector('.reactive-document-occurrence'));
   const resize=()=>{if(!alive)return;let parent=session.element.parentElement;while(parent&&!parent.clientWidth)parent=parent.parentElement;const width=active()?session.element.clientWidth:parent?.clientWidth??0;if(!width)return;setNarrow(width<980||!!session.element.querySelector('.reactive-page'));};
@@ -35,7 +39,8 @@ export function GlossPresentation(props:{editor:ReactiveEditor;session:RetainedD
  </GlossPresentationContext.Provider>;
 }
 
-function GlossViews(props:{argumentState:ArgumentState;graphState:GlossGraphState;registerState:GlossRegisterState;editor:ReactiveEditor;session:RetainedDocumentSession;narrow:boolean;references:boolean;closeReferences():void}){
+function createGlossViewModel(props:{argumentState:ArgumentState;graphState:GlossGraphState;registerState:GlossRegisterState;editor:ReactiveEditor;session:RetainedDocumentSession;narrow:boolean;references:boolean;closeReferences():void}){
+ const views=useInstrumentPresentations();
  const {editor,session}=props,index=new GlossSessionIndex(editor,session.projection,session.rootKey);
  const graphEnabled=editor.features.glossMermaidGraph&&!!index.relationships,graphSelected=()=>graphEnabled&&props.graphState.tab[0]()==='graph'&&props.references,graphActive=()=>graphSelected()&&session.host.activity().visible;
  const argumentEnabled=editor.features.glossArgumentExplorer&&!!index.relationships,argumentSelected=()=>argumentEnabled&&props.graphState.tab[0]()==='argument'&&props.references,argumentActive=()=>argumentSelected()&&session.host.activity().visible,exploring=()=>graphSelected()||argumentSelected();
@@ -53,7 +58,7 @@ function GlossViews(props:{argumentState:ArgumentState;graphState:GlossGraphStat
   setSource(root);const port=session.element.querySelector<HTMLElement>('.reactive-document-occurrence__content')??root;setScrollport(port);port.dataset.glossScrollport='';
   onCleanup(()=>{delete port.dataset.glossScrollport;root?.classList.remove('gloss-source-with-margin');});
  });
- createEffect(()=>source()?.classList.toggle('gloss-source-with-margin',!props.narrow&&!exploring()));
+ createEffect(()=>source()?.classList.toggle('gloss-source-with-margin',!props.narrow&&!exploring()&&!views?.()?.gloss));
  onCleanup(()=>{live=false;index.dispose();delete (session.element as any).glossIndex;});
  const types=createMemo(()=>[...new Set(index.rows[0]().map(e=>e.data().type).filter(Boolean))].sort());
  const filtered=createMemo(()=>{const q=query().trim().toLocaleLowerCase(),t=type();return index.rows[0]().filter(e=>{const d=e.data();return (!t||d.type===t)&&(!q||`${d.type} ${d.body} ${d.alias}`.toLocaleLowerCase().includes(q));});});
@@ -78,7 +83,7 @@ function GlossViews(props:{argumentState:ArgumentState;graphState:GlossGraphStat
    <div class="gloss-card-actions"><button type="button" onClick={()=>void navigate(p.entry,p.occurrence)}>↖ Passage</button><button type="button" aria-expanded={expanded()} onClick={()=>setExpanded(v=>!v)}>{expanded()?'Less':'More'}</button></div>
   </article>;
  };
- return <>
+ const Graphical=()=> <>
   <Show when={!exploring()&&scrollport()}>{port=><Show when={props.narrow} fallback={<GlossMargin index={index} session={session} scrollport={port()} card={Card}/>}><GlossBelow index={index} session={session} card={Card}/></Show>}</Show>
   <aside tabindex="-1" class="gloss-register" aria-label="Local References" hidden={!props.references}>
    <header><h2>Local References</h2><Show when={props.narrow}><button type="button" aria-label="Close Local References" onClick={props.closeReferences}>×</button></Show></header>
@@ -99,6 +104,10 @@ function GlossViews(props:{argumentState:ArgumentState;graphState:GlossGraphStat
    </div>
   </aside>
  </>;
+ return {Graphical,props,index,selected,setSelected,query,setQuery,type,setType,types,filtered,message,navigate,remove,relationships,graphEnabled,argumentEnabled,
+ Graph:()=> <GlossGraphView navigationEnabled={editor.features.glossGraphNavigation} active={graphActive} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}} hostPort={()=>session.host.port} index={index} state={props.graphState} registerState={props.registerState} diagnostics={graphDiagnostics} select={selectRelated} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}}/>,
+ Argument:()=> <GlossArgumentView index={index} state={props.argumentState} registerState={props.registerState} diagnostics={argumentDiagnostics} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}} reveal={id=>selectRelated(id,true)} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}}/>};
+
 }
 
 type CardProps={entry:GlossEntry;occurrence:GlossOccurrence;ref?:(el:HTMLElement)=>void};
@@ -160,4 +169,10 @@ function GlossMargin(props:{index:GlossSessionIndex;session:RetainedDocumentSess
  const mount=e.mounts.subscribe(key=>{const items=byNode.get(key);if(items)bind(items);});
  onCleanup(()=>{alive=false;if(frame)cancelAnimationFrame(frame);stop();mount();intersection?.disconnect();cardResize?.disconnect();blockResize?.disconnect();scrollport.removeEventListener('scroll',schedule);window.removeEventListener('resize',font);document.fonts?.removeEventListener('loadingdone',font);for(const item of records)e.measurements.invalidateRanges(item.occurrence.nodeKey);delete (session.element as any).glossGeometry;});
  return <Portal mount={scrollport}><div ref={layer} class="gloss-margin-layer" aria-label="Gloss margin"><For each={visible()}>{item=><props.card entry={item.entry} occurrence={item.occurrence} ref={element=>{element.dataset.glossMarginKey=item.id;cards.set(item.id,element);cardResize?.observe(element);onCleanup(()=>{cardResize?.unobserve(element);cards.delete(item.id);heights.delete(item.id);});schedule();}}/>}</For></div></Portal>;
+}
+
+export type GlossViewModel=ReturnType<typeof createGlossViewModel>;
+function GlossViews(props:Parameters<typeof createGlossViewModel>[0]) {
+ const model=createGlossViewModel(props),views=useInstrumentPresentations();
+ return <Dynamic component={views?.()?.gloss??model.Graphical} model={model}/>;
 }

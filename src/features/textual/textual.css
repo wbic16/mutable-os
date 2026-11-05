@@ -41,9 +41,9 @@
 .textual-workspace .tw-flint-editor .reactive-list { gap:var(--tw-line-height); padding-left:calc(2 * var(--tw-cell-width)); border:0; }
 .textual-workspace .tw-flint-status { white-space:nowrap; overflow:hidden; }
 .textual-workspace .tw-flint-popup { z-index:2; }
-.textual-workspace .tw-popup { z-index:3; }
+.textual-workspace .tw-popup { z-index:10; }
 .textual-workspace select,.textual-workspace input { font:inherit; line-height:var(--tw-line-height); box-sizing:border-box; padding:0; border:0; border-radius:0; max-width:100%; background:var(--tw-surface); color:var(--tw-ink); }
-.textual-workspace .tw-dialog-shade { position:absolute; inset:0; z-index:5; background:#0008; }
+.textual-workspace .tw-dialog-shade { position:absolute; inset:0; z-index:30; background:#0008; }
 .textual-workspace .tw-save-dialog { padding:var(--tw-line-height) var(--tw-cell-width); overflow:auto; background:var(--tw-menu); color:var(--tw-menu-ink); }
 .textual-workspace .tw-save-dialog label { display:block; }
 .textual-workspace .tw-save-dialog input { width:calc(40 * var(--tw-cell-width)); }
@@ -63,3 +63,59 @@
    dedicated views are supplied; their graphical defaults are unchanged. */
 .textual-workspace .document-dialog { font:inherit; color:var(--tw-ink); background:var(--tw-bg); border-radius:0; }
 .textual-workspace .document-dialog__header { font:inherit; padding:var(--tw-line-height) var(--tw-cell-width); background:var(--tw-menu); color:var(--tw-menu-ink); }
+
+/* Increment 3 instrument chrome. All geometry derives from the existing cell metrics. */
+.textual-workspace .tw-instrument {
+ position:absolute; inset:calc(4 * var(--tw-line-height)) calc(2 * var(--tw-cell-width)) calc(3 * var(--tw-line-height));
+ z-index:6; display:flex; flex-direction:column; gap:var(--tw-line-height); box-sizing:border-box;
+ width:auto; height:auto; min-width:0; max-width:none; max-height:none; margin:0; padding:var(--tw-line-height) var(--tw-cell-width);
+ background:var(--tw-bg); color:var(--tw-ink); border:0; outline:1px solid var(--tw-menu); border-radius:0; box-shadow:none;
+ font:inherit; line-height:var(--tw-line-height); overflow:auto; pointer-events:auto;
+}
+.textual-workspace .tw-instrument header,.textual-workspace .tw-instrument footer,.textual-workspace .tw-tool-row { display:flex; flex-wrap:wrap; align-items:center; gap:0 var(--tw-cell-width); flex-shrink:0; }
+.textual-workspace .tw-instrument header { color:var(--tw-focus); background:var(--tw-bg); padding:0; font:inherit; }
+.textual-workspace .tw-instrument header button:last-child { margin-left:auto; }
+.textual-workspace .tw-instrument-body { min-height:calc(3 * var(--tw-line-height)); flex:1; overflow:auto; }
+.textual-workspace .tw-instrument label { font:inherit; display:inline-block; }
+.textual-workspace .tw-instrument input { width:calc(28 * var(--tw-cell-width)); }
+.textual-workspace .tw-instrument input[type=checkbox] { width:var(--tw-cell-width); }
+.textual-workspace .tw-instrument small { display:block; font:inherit; opacity:.85; }
+.textual-workspace .tw-instrument [role=option] { display:block; padding:0; margin-bottom:var(--tw-line-height); }
+.textual-workspace .tw-instrument [role=option][aria-selected=true],.textual-workspace .tw-instrument [aria-pressed=true] { background:var(--tw-focus); color:var(--tw-bg); }
+.textual-workspace .tw-scry .tw-ler { position:static; padding:0; outline:0; overflow:visible; }
+.textual-workspace .tw-ler-advanced { overflow:auto; }
+.textual-workspace .tw-references .tw-instrument-body > section > button { display:block; margin-bottom:var(--tw-line-height); text-align:left; }
+.textual-workspace .tw-gloss { left:auto; width:calc(48 * var(--tw-cell-width)); max-width:calc(100% - 4 * var(--tw-cell-width)); }
+.textual-workspace .tw-gloss[hidden] { display:none; }
+.textual-workspace .gloss-presenting { display:contents!important; }
+.textual-workspace .gloss-presenting .reactive-document-occurrence { grid-column:auto; width:100%; }
+.textual-workspace .tw-gloss .gloss-register-row { padding:var(--tw-line-height) 0; background:transparent; color:inherit; border:0; border-radius:0; font:inherit; }
+.textual-workspace .tw-native-island { flex:1; min-height:calc(12 * var(--tw-line-height)); overflow:auto; }
+.textual-workspace .gloss-input { background:var(--tw-menu); color:var(--tw-menu-ink); border:0; border-radius:0; font:inherit; padding:var(--tw-line-height) var(--tw-cell-width); width:calc(36 * var(--tw-cell-width)); z-index:20; }
+.textual-workspace .gloss-input textarea { font:inherit; line-height:var(--tw-line-height); background:var(--tw-surface); color:var(--tw-ink); }
+.textual-workspace .tw-cardex { inset:calc(2 * var(--tw-line-height)) var(--tw-cell-width); z-index:5; }
+.textual-workspace .tw-cardex .cardex-form { border:0; padding:0; margin:0; color:inherit; }
+.textual-workspace .tw-cardex .cardex-fields { display:grid; grid-template-columns:calc(18 * var(--tw-cell-width)) minmax(0,1fr); gap:var(--tw-line-height) var(--tw-cell-width); }
+.textual-workspace .tw-cardex .cardex-fields > label { font:inherit; }
+.textual-workspace .tw-cardex .cardex-local { padding:0; border:0; border-radius:0; background:var(--tw-bg); color:inherit; font:inherit; }
+.textual-workspace .tw-cardex .cardex-field-tools { display:flex; flex-wrap:wrap; gap:var(--tw-cell-width); padding:var(--tw-line-height) 0 0; margin:0; border:0; }
+.textual-workspace .tw-cardex .reactive-standoff-flow { font:inherit!important; line-height:var(--tw-line-height)!important; }
+.textual-workspace .tw-cardex .cardex-table-scroll { overflow:auto; }
+.textual-workspace .tw-cardex .cardex-table { font:inherit; color:inherit; background:var(--tw-bg); }
+.textual-workspace .tw-cardex .cardex-table th,.textual-workspace .tw-cardex .cardex-table td { padding:var(--tw-line-height) var(--tw-cell-width); font:inherit; color:inherit; }
+.textual-workspace .tw-cardex .cardex-search,.textual-workspace .tw-cardex .cardex-semantic { padding:0; background:transparent; color:inherit; }
+.textual-workspace .tw-cardex .cardex-toolbar { padding:0; gap:var(--tw-cell-width); flex-wrap:wrap; }
+/* Native Cardex field surfaces inherit Textual contrast; their editor DOM is retained. */
+.textual-workspace .tw-cardex .cardex-fields { border:0; padding:0; }
+.textual-workspace .tw-cardex .cardex-fields > label { padding-top:0; }
+.textual-workspace .tw-cardex .reactive-standoff-block { padding:0; border:0; border-radius:0; }
+.textual-workspace .tw-cardex .reactive-standoff-surface { background:var(--tw-surface); color:var(--tw-ink); padding:0 var(--tw-cell-width); border:0; border-radius:0; }
+.textual-workspace .tw-cardex .reactive-standoff-flow { min-height:var(--tw-line-height); }
+.textual-workspace .tw-cardex .cardex-local--description { min-height:calc(6 * var(--tw-line-height)); }
+.textual-workspace .tw-cardex .cardex-local--description .reactive-standoff-flow { min-height:calc(4 * var(--tw-line-height)); }
+.textual-workspace .tw-cardex .cardex-result { background:var(--tw-menu)!important; color:var(--tw-menu-ink); min-height:var(--tw-line-height); }
+.textual-workspace .tw-cardex .cardex-semantic-form { background:var(--tw-surface); color:var(--tw-ink); padding:var(--tw-line-height) var(--tw-cell-width); }
+.textual-workspace .tw-cardex textarea { background:var(--tw-surface); color:var(--tw-ink); font:inherit; line-height:var(--tw-line-height); }
+.textual-workspace .tw-gloss .gloss-register-row small { color:inherit; opacity:.85; }
+
+.textual-workspace .tw-cardex .reactive-standoff-surface { min-height:var(--tw-line-height); }

@@ -1,3 +1,4 @@
+import {applicationPresentationSurface} from '../../rendering/application-presentation-surface';
 import {createSignal} from 'solid-js';
 import {clone} from '../../block-tree/clone';
 import {glossChangeFor,glossOwner} from '../../block-tree/gloss-plan';
@@ -139,7 +140,7 @@ export class GlossController {
    const ids=[...new Set(props.map(p=>p.annotationId))];
    if(ids.length>1){const choose=doc.createElement('select');choose.setAttribute('aria-label','Gloss at this passage');for(const id of ids){const def=(this.editor.repository.readState().contents[d.owner].payload.linkedAnnotations as any)[id];const option=doc.createElement('option');option.value=id;option.textContent=def.value.slice(0,70)||'(empty Gloss)';choose.append(option);}choose.value=d.id;choose.onchange=()=>{const p=props.find(p=>p.annotationId===choose.value)!;this.open(d.key,{anchor:p.start,head:p.end+1},p.annotationId);};box.append(choose);}
   }
-  box.append(input,suggestions,status,buttons);doc.body.append(box);
+  box.append(input,suggestions,status,buttons);(this.editor.windowManager&&applicationPresentationSurface(this.editor.windowManager)||doc.body).append(box);
   // Session-only SVG geometry lives in the TextBlock's annotation layer.
   // Scrolling moves that layer natively; only the viewport popup is repositioned.
   const highlightOwner=d.range?'gloss-active-'+crypto.randomUUID():undefined;let highlightLive=!!highlightOwner;

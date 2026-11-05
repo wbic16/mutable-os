@@ -1,3 +1,5 @@
+import {Dynamic} from 'solid-js/web';
+import {useInstrumentPresentations} from '../../rendering/instrument-presentations';
 import {placeScry} from './placement';
 import {retainSourceHighlight} from './source-highlight';
 import {EntitySearch} from '../entity-references/search-view';
@@ -11,7 +13,8 @@ import type { CompletionSession } from './session';
 import {WindowGeometry} from '../../application/window-geometry';
 import {FloatingWindowResizeHandle} from '../../rendering/floating-window-resize';
 
-export function CompletionPopup(props:{editor:ReactiveEditor;panel:PanelSession;cancelled():void}) {
+function createCompletionModel(props:{editor:ReactiveEditor;panel:PanelSession;cancelled():void}) {
+ const presentations=useInstrumentPresentations();
  const data=props.panel.data as {session:CompletionSession;api:AnnotationCapabilities;entityData():EntitySearchData;adjust(edge:'start'|'end',direction:-1|1,word:boolean):void;controls(value:{run(id:string):boolean;busy():boolean;canClose():boolean}|undefined):void},s=data.session;
  const activity=useManagedViewActivity(),owner=useManagedWindowOwner(),[position,setPosition]=createSignal({x:8,y:8},{equals:(a,b)=>a.x===b.x&&a.y===b.y});
  const preferredSize=()=>s.state.kind==='entity'?{width:Math.min(560,window.innerWidth-16),height:500}:{width:Math.max(400,window.innerWidth*.75),height:560};
@@ -27,6 +30,7 @@ export function CompletionPopup(props:{editor:ReactiveEditor;panel:PanelSession;
   frame=0;if(!s.alive||floating.mode())return;
   const mount=props.editor.mounts.get(s.source.nodeKey),boundary=mount?.inlineBoundary?.(s.source.start);
   if(!mount?.root.isConnected||mount.root.closest('[hidden],[inert]')){close();return;}
+  if(presentations?.()?.completion)return;
   // Measure only the selected range, once per invalidated frame. A wrapped
   // selection is protected in full, not just its opening caret. No cell sweep.
   let rect:DOMRect|undefined;
@@ -71,7 +75,7 @@ export function CompletionPopup(props:{editor:ReactiveEditor;panel:PanelSession;
   if(s.state.expanded)input?.focus();
  });
  onCleanup(()=>{if(!owner)geometry.dispose();resize?.disconnect();cancelAnimationFrame(frame);document.removeEventListener('selectionchange',selection);document.removeEventListener('pointerdown',outside,true);document.removeEventListener('focusin',outside,true);window.removeEventListener('scroll',schedule,true);window.removeEventListener('resize',schedule);window.visualViewport?.removeEventListener('resize',schedule);window.visualViewport?.removeEventListener('scroll',schedule);props.cancelled();});
- return <div ref={root} class="autocomplete-workstation" role="region" aria-label="Autocomplete workstation" style={{left:`${floating.rectangle().x}px`,top:`${floating.rectangle().y}px`,width:`${floating.rectangle().width}px`,height:`${floating.rectangle().height}px`}}>
+ const Graphical=()=> <div ref={root} class="autocomplete-workstation" role="region" aria-label="Autocomplete workstation" style={{left:`${floating.rectangle().x}px`,top:`${floating.rectangle().y}px`,width:`${floating.rectangle().width}px`,height:`${floating.rectangle().height}px`}}>
   <header data-window-move data-scry-geometry tabIndex={0} title="Drag to move; arrow keys move, Enter commits, Escape cancels" onPointerDown={e=>{if(!(e.target as Element).closest('button'))floating.beginMove(e);}} onPointerMove={floating.movePointer} onPointerUp={floating.endPointer} onPointerCancel={floating.cancelPointer} onLostPointerCapture={floating.cancelPointer} onKeyDown={e=>{if(e.target!==e.currentTarget)return;if(!floating.mode()&&e.key.startsWith('Arrow'))floating.keyboard('move');floating.keyDown(e);}} onBlur={()=>floating.cancel()}><strong>{s.state.kind==='entity'?'Link Entity Reference':`Scry · ${s.state.kind}`}</strong><button aria-label="Close Autocomplete" onClick={close}>×</button></header>
   <Show when={s.state.kind==='entity'} fallback={
   <div class="autocomplete-body"><section class="autocomplete-controls" aria-label="Scry query and tools">
@@ -91,4 +95,11 @@ export function CompletionPopup(props:{editor:ReactiveEditor;panel:PanelSession;
   <footer>↑ ↓ select · Enter link · Esc cancel · Ctrl+A review · Drag the header to move</footer>
   <span data-scry-geometry><FloatingWindowResizeHandle controller={floating.resize} label="Resize Scry window"/></span>
  </div>;
+ return {Graphical,s,id,close,expand,props,refs:{root:(el:HTMLDivElement)=>root=el,input:(el:HTMLInputElement)=>input=el},
+ Entity:()=> <EntitySearch api={data.api} panel={{...props.panel,data:data.entityData()}} completion={{session:s,target:data.entityData,adjust:data.adjust,controls:data.controls}}/>};
+}
+export type CompletionModel=ReturnType<typeof createCompletionModel>;
+export function CompletionPopup(props:Parameters<typeof createCompletionModel>[0]) {
+ const model=createCompletionModel(props),views=useInstrumentPresentations();
+ return <Dynamic component={views?.()?.completion??model.Graphical} model={model}/>;
 }
