@@ -33,12 +33,15 @@
  *   record). The caller then hands the folder to the normal
  *   establish flow.
  *
- * HONESTY (Phase 3b pending): the legacy document/workspace stores
- * and the uploads endpoint are NOT phext-backed at runtime yet.
- * Their files are copied with the document tree during migration,
- * but the migration and strata records list them as remaining
- * on-disk strata — nothing here claims a fully-one-phext Cavern.
- * `caverns.json` is server installation state and is never touched.
+ * COVERAGE (Phase 3b): the legacy document/workspace stores, the
+ * recognized-document journal under `.mutable/document-saves`, and
+ * the uploads endpoint are phext-backed at runtime now, so
+ * migration copies their files into the phext like every other
+ * stratum and the migration/strata records list nothing for them —
+ * `onDisk` names only what a given Cavern actually left behind
+ * (symlinks, an unrecognized `.mutable` remnant), never a standing
+ * remainder. `caverns.json` is server installation state and is
+ * never touched.
  *
  * The PhextVFS class is passed in as `openVfs` (its statics: open /
  * create / openOrCreate) because this module is plain .mjs loaded by
@@ -85,16 +88,23 @@ export const STRATA_RECORD_PATH = '/.control/phext-strata.json';
 export const CAVERN_STATE_PATH = '/.control/cavern-state.json';
 export const FALLBACK_DIRNAME = '.mutable-disk-fallback';
 
-/** Strata whose runtime stores are phext-backed (Phases 2, 3a, 4). */
+/** Strata whose runtime stores are phext-backed (Phases 2, 3a, 3b, 4). */
 export const PHEXT_BACKED_STRATA = Object.freeze({
   documents: 1, pairJournals: 2, knowledge: 3, history: 4, services: 5, assets: 6, control: 7,
+  // Phase 3b: the legacy stores join at their natural VFS paths —
+  // the root-tree document/workspace stores ride stratum 1 with the
+  // documents, the recognized-document journal rides the `.mutable`
+  // stratum (3) whose root is its home, and uploads ride stratum 1
+  // paths with stratum 6's binary encoding (media ruling).
+  legacyDocumentStores: 1, documentSavesJournal: 3, uploads: 1,
 });
 
-/** The standing remainder, listed verbatim in every migration/strata record. */
-export const REMAINING_ON_DISK = Object.freeze([
-  'legacy document/workspace stores — files copied with the document tree, runtime still disk-backed (Phase 3b pending)',
-  'uploads/ — legacy upload endpoint, still disk-backed (Phase 3b pending)',
-]);
+/**
+ * The standing remainder: empty since Phase 3b. Per-Cavern
+ * remainders (symlinks, unrecognized `.mutable` remnants) are
+ * still computed from the manifest by remainingSummary().
+ */
+export const REMAINING_ON_DISK = Object.freeze([]);
 
 const BREAK_BYTES = new Set([0x01, 0x17, 0x18, 0x19, 0x1a, 0x1c, 0x1d, 0x1e, 0x1f]);
 
@@ -173,11 +183,12 @@ function classify(relPosix, size) {
       return parts[1].endsWith('shm') || size === 0 ? 'skip' : 'refuse';
     }
     if (GATES_MUTABLE_DIRS.has(parts[1])) return 'copy';
+    if (parts[1] === 'document-saves') return 'copy'; // Phase 3b: the recognized-document journal is shim-backed
     if (parts.length === 2 && OPERATIONAL_MUTABLE_FILES.has(parts[1])) return 'skip';
     return 'remaining';
   }
-  if (parts[0] === 'uploads') return 'remaining';
   if (parts[0] === FALLBACK_DIRNAME) return 'remaining';
+  // Phase 3b: uploads are phext-backed (embedded, binary encoding).
   return 'copy';
 }
 
@@ -204,8 +215,7 @@ const remainingSummary = manifest => {
   const specific = new Set();
   for (const entry of manifest) {
     if (entry.action !== 'remaining') continue;
-    if (entry.path.startsWith('.mutable/document-saves/')) specific.add('.mutable/document-saves/ — recognized-document journal, remains on disk');
-    else if (!entry.path.startsWith('uploads/')) specific.add(entry.path);
+    specific.add(entry.path);
   }
   return [...notes, ...specific];
 };
@@ -304,6 +314,21 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
         }
         smoke.history = historyEntry.path;
       }
+      // Phase 3b smoke: the legacy journal and an upload, byte-equal.
+      const journalEntry = copied.find(e => e.path.startsWith('.mutable/document-saves/'));
+      if (journalEntry) {
+        if (!vfs.readFile(`/${journalEntry.path}`).equals(fs.readFileSync(path.join(cavernRoot, journalEntry.path)))) {
+          throw Error(`Migration smoke read failed for document journal ${journalEntry.path}`);
+        }
+        smoke.documentSaves = journalEntry.path;
+      }
+      const uploadEntry = copied.find(e => e.path.startsWith('uploads/'));
+      if (uploadEntry) {
+        if (!vfs.readFile(`/${uploadEntry.path}`).equals(fs.readFileSync(path.join(cavernRoot, uploadEntry.path)))) {
+          throw Error(`Migration smoke read failed for upload ${uploadEntry.path}`);
+        }
+        smoke.upload = uploadEntry.path;
+      }
       const store = new PhextKnowledgeStore(vfs);
       const control = store.readControl();
       if (!control || control.vaultGuid !== knowledgeReport.vaultGuid) {
@@ -338,7 +363,7 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       filesCopied: copied.length,
       bytesCopied: copied.reduce((sum, e) => sum + e.size, 0),
       smoke: smokeReport,
-      converterVersions: { phextVfs: 1, knowledge: 'phext-knowledge-v1', migration: 'phase5' },
+      converterVersions: { phextVfs: 1, knowledge: 'phext-knowledge-v1', migration: 'phase5+3b' },
       fallback: FALLBACK_DIRNAME,
       onDisk,
     };
