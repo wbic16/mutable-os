@@ -6,50 +6,43 @@
  * (src/persistence/managed-pair.mjs) and the native document router
  * (server/native-document-store.mjs, vault-listing-cache.mjs,
  * collection-inventory.mjs, recognized-source.mjs) import their
- * `promises as fs` from here instead of node:fs. The facade dispatches
- * per path: a path under a registered Cavern root is served by the
- * Cavern's PhextVFS; everything else — including every path when
- * nothing is registered (the `phextVfs` flag off, the default) — falls
- * through to the real node:fs call, so flag-off behavior is
- * byte-for-byte the current disk behavior.
+ * `promises as fs` from here instead of node:fs.
  *
- * Registration mirrors Phase 2: cavern-lifecycle registers the Cavern's
- * VFS when the flag is on (registerPhextFs), next to the gates backend
- * registration, and unregisters on close (which flushes). The registry
- * itself lives on globalThis under a Symbol.for key: the native stores
- * reach production inside the esbuild bundle of
- * dist/server/native-document-store.mjs while the lifecycle loads this
- * source file by URL (the house pattern for shared .mjs modules), and
- * the two module instances must still see ONE registry.
+ * PHEXT-ONLY CUTOVER (2026-11-05): this facade has no disk mode and
+ * no fall-through. A path under a registered Cavern root is served
+ * by the Cavern's PhextVFS; a path no registered Cavern covers is an
+ * explicit error (code `ENOPHEXT`) — a Mutable store operating
+ * outside a Cavern phext is a programming error, never a silent
+ * disk write. The only real files the facade still serves are the
+ * ones that are real by construction inside a Cavern folder: the
+ * phext file family itself (`cavern.phext`, its `.bak`, its flock
+ * anchors) and the `.mutable-disk-fallback/` backup tree a
+ * conversion preserved (a backup inside the thing it backs up is
+ * not a backup).
+ *
+ * Registration mirrors Phase 2: cavern-lifecycle registers the
+ * Cavern's VFS at open (registerPhextFs), next to the gates backend
+ * registration, and unregisters on close (which flushes). The
+ * registry itself lives on globalThis under a Symbol.for key: the
+ * native stores reach production inside the esbuild bundle of
+ * dist/server/native-document-store.mjs while the lifecycle loads
+ * this source file by URL (the house pattern for shared .mjs
+ * modules), and the two module instances must still see ONE
+ * registry.
  *
  * ## Dispatch (Cavern-relative)
  *
- * The registration root itself is a real directory and always resolves
- * to real fs (except readdir/opendir of the root, which list the
- * virtual root — that is where the documents live — and read-only
- * opens of the root, whose sync() is the VFS flush). Below the root:
- *
- * - `.mutable/**` stays on real disk in this phase: the knowledge
- *   SQLite home, its establishment files and the listing cache are
- *   Phase 4 / establishment-owned. (Phase 3b carves out exactly two
- *   exceptions, below.)
- * - Phase 3b: `.mutable/document-saves/**` — the recognized-document
- *   journal, a legacy JSON store — is virtual, as is `.mutable`
- *   itself (the VFS home directory that merges strata 3/5/6), so the
- *   store's resolve() lstat-walk can enter it. The journal lands in
- *   the `.mutable` stratum at its natural path (the VFS dispatches
- *   by path; stratum 3's root *is* `.mutable`). No other `.mutable`
- *   path crosses: knowledge is phext-native since Phase 4 and never
- *   travels through this facade, and the discovery cache is retired
- *   in phext mode (vault-listing-cache.mjs), so its file is neither
- *   read nor written here.
- * - `cavern.phext`, `cavern.phext.bak` and `cavern.phext.anchor-*`
- *   are real files by construction.
- * - Everything else is virtual: the document tree (stratum 1),
- *   `.mutable-pair-*` journals (2), `.memory` (4), and
- *   `.mutable-relocations` / `.mutable-store.lock` (7 / 1) — the VFS
- *   dispatches by path as designed in Phase 1. The VFS-internal
- *   `/.control` registry directory is hidden from root listings.
+ * The registration root itself is a real directory (except
+ * readdir/opendir of the root, which list the virtual root — that
+ * is where the documents live — and read-only opens of the root,
+ * whose sync() is the VFS flush). Below the root everything is
+ * virtual — the document tree (stratum 1), `.mutable-pair-*`
+ * journals (2), the `.mutable` home merging strata 3/5/6 (the
+ * recognized-document journal under `.mutable/document-saves`
+ * included), `.memory` (4), `.mutable-relocations` /
+ * `.mutable-store.lock` (7 / 1) — except the real-by-construction
+ * files named above. The VFS-internal `/.control` registry
+ * directory is hidden from root listings.
  *
  * ## Locks stay real
  *
@@ -69,22 +62,29 @@
  *
  * The disk stores compare {dev, ino, size, mtimeNs, ctimeNs} stamps
  * and dev/ino signatures to detect change. The VFS has no inodes, so
- * each virtual path owns a random identity token plus a mutation
+ * each virtual node owns a random identity token plus a mutation
  * version, persisted in the L7 control stratum at
  * `/.control/fs-nodes.json` (the fs sibling of the gates backend's
- * gates-identities.json): tokens are stable for the life of the node,
- * are carried across renames (a rename rewrites the registry key
- * prefix), are shared by a hard link's two names, and are dropped on
- * unlink. mtimeNs/ctimeNs are derived deterministically from the
- * node's content hash (the index entry's SHA-256 for files, the child
- * listing for directories) mixed with its version: unchanged content
- * stamps identically across calls and restarts, any mutation —
- * including a rewrite with identical bytes — changes the stamp.
- * Directory versions bump on any mutation beneath them, so a scope
- * fence taken over a tree expires when anything in it changes, as the
- * disk fence does. There are no symlinks in a VFS: isSymbolicLink()
- * is always false, and root confinement is structural (VFS paths are
- * Cavern-relative and reject traversal).
+ * gates-identities.json). Since the cutover the registry is keyed
+ * by the node's phext COORDINATE — its address inside the phext
+ * (audit §1C row P9) — not by its path string: a rename carries the
+ * entry from the old address to the new one by resolved-address
+ * correspondence (the subtree is walked before and after the move),
+ * never by rewriting path prefixes, and a v1 path-keyed registry
+ * found in an older phext is converted in place on first load
+ * (upgrade-on-encounter, like every other legacy form). Tokens are
+ * stable for the life of the node, are shared by a hard link's two
+ * names, and are dropped on unlink. mtimeNs/ctimeNs are derived
+ * deterministically from the node's content hash (the index entry's
+ * SHA-256 for files, the child listing for directories) mixed with
+ * its version: unchanged content stamps identically across calls
+ * and restarts, any mutation — including a rewrite with identical
+ * bytes — changes the stamp. Directory versions bump on any
+ * mutation beneath them, so a scope fence taken over a tree expires
+ * when anything in it changes, as the disk fence does. There are no
+ * symlinks in a VFS: isSymbolicLink() is always false, and root
+ * confinement is structural (VFS paths are Cavern-relative and
+ * reject traversal).
  *
  * ## Durability
  *
@@ -370,30 +370,41 @@ class PhextFsBackend {
     if (rel === '' || rel.startsWith('..') || path.isAbsolute(rel)) return undefined;
     const parts = rel.split(path.sep);
     const first = parts[0];
-    if (first === '.mutable') {
-      // Phase 3b: only the .mutable home itself (a directory in the
-      // VFS) and the recognized-document journal beneath it cross
-      // into the phext. Every other .mutable path stays on disk —
-      // knowledge is phext-native (Phase 4), never fs-backed.
-      if (parts.length === 1 || parts[1] === 'document-saves') return '/' + parts.join('/');
-      return undefined;
-    }
-    if (first.startsWith('cavern.phext')) return undefined;
-    return '/' + rel.split(path.sep).join('/');
+    // Real by construction (see the header): the phext file family
+    // and the conversion fallback tree stay on real fs.
+    if (first.startsWith('cavern.phext') || first === '.mutable-disk-fallback') return undefined;
+    return '/' + parts.join('/');
   }
 
-  // ------------------------------------------------ node registry (L7)
+  // --------------------------------------- node registry (L7, by address)
+
+  /** The node's phext address — the registry key (audit §1C P9). */
+  coordinateFor(vfsPath) {
+    return this.vfs.stat(vfsPath)?.coordinate;
+  }
 
   loadNodes() {
     if (this.nodes) return this.nodes;
     this.nodes = new Map();
     try {
       const parsed = JSON.parse(this.vfs.readTextFile(NODES_PATH));
-      if (parsed && parsed.v === 1 && parsed.entries && typeof parsed.entries === 'object') {
-        for (const [key, value] of Object.entries(parsed.entries)) {
-          if (value && typeof value.token === 'string' && Number.isSafeInteger(value.version)) {
-            this.nodes.set(key, { token: value.token, version: value.version });
+      if (parsed && parsed.entries && typeof parsed.entries === 'object') {
+        if (parsed.v === 2) {
+          for (const [key, value] of Object.entries(parsed.entries)) {
+            if (value && typeof value.token === 'string' && Number.isSafeInteger(value.version)) {
+              this.nodes.set(key, { token: value.token, version: value.version });
+            }
           }
+        } else if (parsed.v === 1) {
+          // Upgrade-on-encounter: a pre-cutover registry keyed by
+          // path string is re-keyed by resolved coordinate in place;
+          // entries whose node no longer exists are dropped.
+          for (const [key, value] of Object.entries(parsed.entries)) {
+            if (!value || typeof value.token !== 'string' || !Number.isSafeInteger(value.version)) continue;
+            const coordinate = this.coordinateFor(key);
+            if (coordinate) this.nodes.set(coordinate, { token: value.token, version: value.version });
+          }
+          this.nodesDirty = true;
         }
       }
     } catch (error) {
@@ -404,16 +415,18 @@ class PhextFsBackend {
 
   saveNodes() {
     if (!this.nodes || !this.nodesDirty) return;
-    this.vfs.writeFile(NODES_PATH, JSON.stringify({ v: 1, entries: Object.fromEntries(this.nodes) }));
+    this.vfs.writeFile(NODES_PATH, JSON.stringify({ v: 2, entries: Object.fromEntries(this.nodes) }));
     this.nodesDirty = false;
   }
 
   nodeFor(vfsPath, assign = true) {
+    const coordinate = this.coordinateFor(vfsPath);
+    if (!coordinate) return undefined;
     const map = this.loadNodes();
-    let node = map.get(vfsPath);
+    let node = map.get(coordinate);
     if (!node && assign) {
       node = { token: randomBytes(16).toString('hex'), version: 1 };
-      map.set(vfsPath, node);
+      map.set(coordinate, node);
       this.nodesDirty = true;
     }
     return node;
@@ -421,35 +434,61 @@ class PhextFsBackend {
 
   /** Bump a node's version (and every ancestor directory's). */
   touch(vfsPath, self = true) {
-    const map = this.loadNodes();
     const targets = new Set();
     if (self) targets.add(vfsPath);
     const parts = vfsPath.split('/').filter(Boolean);
     for (let i = 1; i < parts.length; i++) targets.add('/' + parts.slice(0, i).join('/'));
     if (parts.length > 0) targets.add('/');
     for (const target of targets) {
-      const node = map.get(target);
-      if (node) node.version++;
-      else map.set(target, { token: randomBytes(16).toString('hex'), version: 1 });
+      const node = this.nodeFor(target, false);
+      if (node) { node.version++; this.nodesDirty = true; }
+      else if (this.nodeFor(target, true)) this.nodesDirty = true;
     }
-    this.nodesDirty = true;
   }
 
-  dropNode(vfsPath) {
-    if (this.loadNodes().delete(vfsPath)) this.nodesDirty = true;
+  /** Drop a node's identity; resolve its address before it vanishes. */
+  dropNode(vfsPath, coordinate = this.coordinateFor(vfsPath)) {
+    if (coordinate && this.loadNodes().delete(coordinate)) this.nodesDirty = true;
   }
 
-  /** Carry identity across a rename: rewrite the registry key prefix. */
-  moveNodeKeys(from, to) {
-    const map = this.loadNodes();
-    for (const key of [...map.keys()]) {
-      if (key === from || key.startsWith(from + '/')) {
-        const node = map.get(key);
-        map.delete(key);
-        map.set(to + key.slice(from.length), node);
-        this.nodesDirty = true;
+  /**
+   * Capture a subtree's identities in deterministic walk order
+   * (pre-order, children sorted by name — the VFS's listDir order),
+   * deleting their old address keys. Paired with assignSubtree
+   * after a rename: identity follows the RESOLVED ADDRESSES, so a
+   * moved node's token/version land on its new coordinate without
+   * any path-prefix rewriting.
+   */
+  captureSubtree(vfsPath) {
+    const captured = [];
+    const walk = current => {
+      const coordinate = this.coordinateFor(current);
+      const node = coordinate ? this.loadNodes().get(coordinate) : undefined;
+      if (coordinate && node) { this.loadNodes().delete(coordinate); this.nodesDirty = true; }
+      captured.push(node ?? null);
+      if (this.vfs.stat(current)?.type === 'directory') {
+        for (const entry of this.vfs.listDir(current)) {
+          walk(current === '/' ? `/${entry.name}` : `${current}/${entry.name}`);
+        }
       }
-    }
+    };
+    walk(vfsPath);
+    return captured;
+  }
+
+  assignSubtree(vfsPath, captured) {
+    let index = 0;
+    const walk = current => {
+      const node = captured[index++];
+      const coordinate = this.coordinateFor(current);
+      if (coordinate && node) { this.loadNodes().set(coordinate, node); this.nodesDirty = true; }
+      if (this.vfs.stat(current)?.type === 'directory') {
+        for (const entry of this.vfs.listDir(current)) {
+          walk(current === '/' ? `/${entry.name}` : `${current}/${entry.name}`);
+        }
+      }
+    };
+    walk(vfsPath);
   }
 
   // ------------------------------------------------------------ anchors
@@ -476,7 +515,7 @@ class PhextFsBackend {
     // operations() stats this directory from inside fence windows.
     let node;
     if (vfsPath === '/.mutable') {
-      node = this.loadNodes().get(vfsPath) ?? {
+      node = this.loadNodes().get(stat.coordinate) ?? {
         token: sha256Hex(Buffer.from(`phext-fs-mutable-home:${this.vfs.path}`)),
         version: 1,
       };
@@ -646,15 +685,17 @@ class PhextFsBackend {
     if (dest) {
       // POSIX replace semantics (ManagedPair's receipt publish renames
       // over the previous receipt); the exclusive primitive is below.
-      if (source.type === 'file' && dest.type === 'file') { this.vfs.unlink(to); this.dropNode(to); }
+      const destCoordinate = dest.coordinate;
+      if (source.type === 'file' && dest.type === 'file') { this.vfs.unlink(to); this.dropNode(to, destCoordinate); }
       else if (source.type === 'directory' && dest.type === 'directory') {
         if (this.vfs.listDir(to).length > 0) throw coded('ENOTEMPTY', `ENOTEMPTY: directory not empty, rename '${absTo}'`);
-        this.vfs.unlink(to); this.dropNode(to);
+        this.vfs.unlink(to); this.dropNode(to, destCoordinate);
       } else if (dest.type === 'directory') throw coded('EISDIR', `EISDIR: illegal operation on a directory, rename '${absTo}'`);
       else throw coded('ENOTDIR', `ENOTDIR: not a directory, rename '${absTo}'`);
     }
+    const captured = this.captureSubtree(from);
     this.vfs.rename(from, to);
-    this.moveNodeKeys(from, to);
+    this.assignSubtree(to, captured);
     // The moved node itself is unchanged (identity and version carry,
     // so its stamp survives the rename as on disk); only the two
     // parent chains observe a mutation.
@@ -667,8 +708,9 @@ class PhextFsBackend {
     const from = this.vfsPathFor(absFrom);
     const to = this.vfsPathFor(absTo);
     if (from === undefined || to === undefined) throw coded('EXDEV', 'Exclusive relocation crosses the phext boundary');
+    const captured = this.captureSubtree(from);
     this.vfs.rename(from, to);
-    this.moveNodeKeys(from, to);
+    this.assignSubtree(to, captured);
     this.touch(to, false);
     this.touch(from, false);
   }
@@ -694,7 +736,7 @@ class PhextFsBackend {
     if (!stat) throw coded('ENOENT', `ENOENT: no such file or directory, unlink '${vfsPath}'`);
     if (stat.type === 'directory') throw coded('EISDIR', `EISDIR: illegal operation on a directory, unlink '${vfsPath}'`);
     this.vfs.unlink(vfsPath);
-    this.dropNode(vfsPath);
+    this.dropNode(vfsPath, stat.coordinate);
     this.touch(vfsPath, false);
   }
 
@@ -765,17 +807,30 @@ class PhextFileHandle {
 /** node:fs constants, re-exported for facade consumers (Phase 3b). */
 export { constants };
 
-function dispatch(absPath) {
+/**
+ * Facade dispatch (cutover contract): a path no registered Cavern
+ * covers is an explicit ENOPHEXT error — there is no disk to fall
+ * through to. A path a Cavern covers but that names a real-by-
+ * construction file (the phext family, the fallback tree) is served
+ * by real fs; everything else is virtual.
+ */
+function backendFor(absPath) {
   const backend = phextFsBackendFor(absPath);
-  if (!backend) return undefined;
+  if (!backend) {
+    throw coded('ENOPHEXT', `No Cavern phext is registered for ${absPath}; Mutable stores only operate inside a Cavern phext`);
+  }
+  return backend;
+}
+
+function dispatch(absPath) {
+  const backend = backendFor(absPath);
   const vfsPath = backend.vfsPathFor(absPath);
   return vfsPath === undefined ? undefined : { backend, vfsPath };
 }
 
 /** readdir/opendir dispatch: the registered root lists the virtual root. */
 function dispatchListing(absPath) {
-  const backend = phextFsBackendFor(absPath);
-  if (!backend) return undefined;
+  const backend = backendFor(absPath);
   if (path.resolve(absPath) === backend.root) return { backend, vfsPath: '/' };
   const vfsPath = backend.vfsPathFor(absPath);
   return vfsPath === undefined ? undefined : { backend, vfsPath };
@@ -783,11 +838,10 @@ function dispatchListing(absPath) {
 
 export const promises = {
   async open(absPath, flags, mode) {
-    const backend = phextFsBackendFor(absPath);
-    if (backend && (backend.vfsPathFor(absPath) !== undefined || path.resolve(absPath) === backend.root)) {
-      return backend.open(absPath, flags);
-    }
-    return realFs.open(absPath, flags, mode);
+    const backend = backendFor(absPath);
+    // backend.open itself serves the real-by-construction paths and
+    // the root-read flush handle.
+    return backend.open(absPath, flags);
   },
   async readFile(absPath, options) {
     const hit = dispatch(absPath);
@@ -818,16 +872,22 @@ export const promises = {
     return hit ? hit.backend.statFor(hit.vfsPath, options) : realFs.stat(absPath, options);
   },
   async rename(absFrom, absTo) {
-    const backend = phextFsBackendFor(absFrom);
-    if (backend && backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
+    const backend = backendFor(absFrom);
+    if (backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
       return backend.rename(absFrom, absTo);
+    }
+    if (phextFsBackendFor(absTo) && phextFsBackendFor(absTo) !== backend) {
+      throw coded('EXDEV', 'Rename crosses Cavern phexts');
     }
     return realFs.rename(absFrom, absTo);
   },
   async link(absFrom, absTo) {
-    const backend = phextFsBackendFor(absFrom);
-    if (backend && backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
+    const backend = backendFor(absFrom);
+    if (backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
       return backend.link(absFrom, absTo);
+    }
+    if (phextFsBackendFor(absTo) && phextFsBackendFor(absTo) !== backend) {
+      throw coded('EXDEV', 'Link crosses Cavern phexts');
     }
     return realFs.link(absFrom, absTo);
   },
