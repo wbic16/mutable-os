@@ -222,16 +222,20 @@ it('stamps are stable, change on any rewrite, and identity survives rename', asy
   await expect(fs.lstat(file)).rejects.toMatchObject({ code: 'ENOENT' });
 });
 
-it('fallthrough: .mutable paths and unregistered roots stay on real disk', async () => {
+it('no fallthrough (cutover): .mutable paths are virtual, unregistered roots refuse with ENOPHEXT', async () => {
   const { root, vfs } = await fixture();
-  await realFs.mkdir(path.join(root, '.mutable'), { recursive: true });
-  await fs.writeFile(path.join(root, '.mutable', 'cache.json'), '{"on":"disk"}', { flag: 'wx', mode: 0o600 });
-  expect(await realFs.readFile(path.join(root, '.mutable', 'cache.json'), 'utf8')).toBe('{"on":"disk"}');
-  expect(vfs.stat('/.mutable/cache.json')).toBeUndefined(); // knowledge stratum untouched by the write
+  // The .mutable carve-out is gone: the path resolves inside the
+  // phext like everything else in the Cavern, and no real .mutable
+  // directory appears on disk.
+  await fs.writeFile(path.join(root, '.mutable', 'cache.json'), '{"on":"phext"}', { flag: 'wx', mode: 0o600 });
+  expect(vfs.readFile('/.mutable/cache.json').toString('utf8')).toBe('{"on":"phext"}');
+  await expect(realFs.stat(path.join(root, '.mutable'))).rejects.toMatchObject({ code: 'ENOENT' });
+  // A path no registered Cavern covers is an explicit refusal —
+  // never a silent write to real disk.
   const outside = await realFs.mkdtemp(path.join(os.tmpdir(), 'phext-fs-outside-'));
   cleanup.push(() => realFs.rm(outside, { recursive: true, force: true }));
-  await fs.writeFile(path.join(outside, 'plain.txt'), 'real');
-  expect(await realFs.readFile(path.join(outside, 'plain.txt'), 'utf8')).toBe('real');
+  await expect(fs.writeFile(path.join(outside, 'plain.txt'), 'real')).rejects.toMatchObject({ code: 'ENOPHEXT' });
+  await expect(realFs.stat(path.join(outside, 'plain.txt'))).rejects.toMatchObject({ code: 'ENOENT' });
 });
 
 it('a paired save through ManagedPair lands entirely in the phext', async () => {

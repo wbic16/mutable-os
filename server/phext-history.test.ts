@@ -2,10 +2,10 @@
 /**
  * PhextVFS Phase 2 consumer proof: the real history store — whose file
  * I/O is entirely stage-C gates ops — running on the phext backend.
- * The document itself stays on disk (Phase 3 territory); everything
- * under .memory/ lands in the Cavern's single cavern.phext, and the
- * timeline reads back after a cold reopen with a fresh PhextVFS, the
- * way a server restart would see it.
+ * The document lives in the Cavern's phext like everything else
+ * (phext-only cutover); everything under .memory/ lands there too,
+ * and the timeline reads back after a cold reopen with a fresh
+ * PhextVFS, the way a server restart would see it.
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
@@ -29,9 +29,10 @@ describe('history store on the phext gates backend', () => {
   it('appends records into the Cavern phext and reads the timeline back after a cold reopen', async () => {
     const root = await realpath(await mkdtemp(path.join(tmpdir(), 'phext-history-')));
     const phextPath = path.join(root, 'cavern.phext');
-    await writeFile(path.join(root, 'doc.json'), '{"type":"Document"}');
     const fs = await gates();
     let vfs = PhextVFS.openOrCreate(phextPath);
+    vfs.writeFile('/doc.json', '{"type":"Document"}');
+    vfs.flush();
     fs.registerPhextBackend({ root, vfs });
     cleanups.push(async () => {
       await fs.unregisterPhextBackend(root).catch(() => {});
