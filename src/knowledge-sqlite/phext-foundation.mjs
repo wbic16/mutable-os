@@ -25,11 +25,11 @@
  * mutation idempotency) are served from L3 by the ledger itself.
  *
  * Establishment (design §2.2/§4): the vaultGuid is minted once at
- * first establishment into the L7 control record and never
- * re-minted; detection is the phext + a valid control record; a
- * phext holding knowledge records but no control record is refused,
- * never auto-repaired — the fail-closed posture of
- * `inspectVaultScope`.
+ * first establishment into the control record (at the L3 root —
+ * see the placement note in phext-store.mjs) and never re-minted;
+ * detection is the phext + a valid control record; a phext holding
+ * knowledge records but no control record is refused, never
+ * auto-repaired — the fail-closed posture of `inspectVaultScope`.
  */
 import Database from 'better-sqlite3';
 import fs from 'node:fs';

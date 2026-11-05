@@ -7,8 +7,21 @@
  * propositions are single aggregate documents (Block row + its
  * StandoffProperty rows); undelivered receipts live in `outbox/`,
  * delivered audit entries in `audit/`; vault identity and the
- * knowledge epoch live in the L7 control record
- * `/.control/knowledge.json`.
+ * knowledge epoch live in the control record `knowledge.json` at the
+ * L3 root.
+ *
+ * Placement note (deviation from the design's L7 `/.control/`
+ * path, forced by a Phase 3a fact the design predates): phext-fs
+ * keeps its own node table at `/.control/fs-nodes.json`, written by
+ * the lifecycle's VFS instance, while the control record is written
+ * by the knowledge worker's instance. Two instances allocating
+ * slots in one directory from stale index views collide (both took
+ * slot 3; the later flush's index orphaned the other's file —
+ * reproduced in server/phext-knowledge-e2e.test.ts's history).
+ * Stratum 3 has exactly one writer — the knowledge layer — so the
+ * control record lives there; its content and semantics (format,
+ * vaultGuid, knowledgeEpoch, canonicalMutationCount) are exactly
+ * the design's L7 record.
  *
  * A record's content is exactly the shape `canonical-ledger.mjs`'s
  * `state()` produces — the row minus its integer `id`, with
@@ -48,7 +61,7 @@ export const identityOf = table => (table === 'Time' ? 'entityGuid' : 'guid');
 export const AUTHORED_ALIAS_ORIGINS = Object.freeze(['curated', 'imported']);
 
 export const KNOWLEDGE_FORMAT = 'phext-knowledge-v1';
-export const CONTROL_PATH = '/.control/knowledge.json';
+export const CONTROL_PATH = '/.mutable/knowledge.json';
 const L3_ROOT = '/.mutable';
 const L3_ROOT_COORDINATE = [3, 1, 1, 1, 1, 1, 1, 1, 1];
 
