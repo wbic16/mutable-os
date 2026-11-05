@@ -2,16 +2,13 @@ import {isNativeDocumentName,markdownProjectionName,isDerivedMarkdownName} from 
 import { RecognizedDocumentStore } from './recognized-document-store.mjs';
 /** C1a: tree-derived discovery and journalled, same-vault storage relocation.
  * No authored hierarchy, editor, save generation or global resource catalog. */
-import { constants as C, existsSync, realpathSync, lstatSync } from 'node:fs';
+import { constants as C, realpathSync, lstatSync } from 'node:fs';
 import { promises as fs, phextFsBackendFor } from './phext-fs.mjs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import { ManagedPair, hash, nativeFlock } from '../src/persistence/managed-pair.mjs';
 import { nativeKnowledgeJobs } from './native-knowledge-jobs';
 import { decodeNative } from '../src/persistence/native-resource';
-const exec=promisify(execFile), MAX=20*1024*1024, LIMIT=10000;
+const MAX=20*1024*1024, LIMIT=10000;
 const fail=(message,status=409)=>{throw Object.assign(new Error(message),{status,conflict:status===409});};
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const alias=s=>s.normalize('NFC').toLocaleLowerCase('en-US');
@@ -24,7 +21,7 @@ const operationId=id=>{if(typeof id!=='string'||! /^[a-zA-Z0-9-]{1,100}$/.test(i
 const absent=async p=>{try{await fs.lstat(p);return false;}catch(e){if(e.code==='ENOENT')return true;throw e;}};
 const sharedDiscovery = new Map();
 export class NativeVaultStore {
- constructor({root,readOnly=false,fault=async()=>{},helper,inspect,nativeDiscoveryWorker=true}={}) {
+ constructor({root,readOnly=false,fault=async()=>{},inspect,nativeDiscoveryWorker=true}={}) {
   this.root=path.resolve(root);
   try {if(lstatSync(root).isSymbolicLink())fail('Unsafe managed root',400);this.root=realpathSync(root);}catch(e){if(e.code!=='ENOENT')throw e;}
   this.readOnly=readOnly;this.fault=fault;this.shareDiscovery=!inspect&&nativeDiscoveryWorker;
@@ -33,8 +30,6 @@ export class NativeVaultStore {
    const r=decodeNative(bytes),root=r.contents[r.placements[r.rootPlacementKey].target.contentKey];
    return {inspection:{resourceId:r.resourceId,rootBlockId:String(root.payload.id),title:String(root?.payload.metadata?.title??'')},byteHash:hash(bytes)};
   });
-  const sibling=path.join(path.dirname(fileURLToPath(import.meta.url)),'native-path-move');
-  this.helper=helper??(existsSync(sibling)?sibling:path.join(path.dirname(fileURLToPath(import.meta.url)),'../dist/server/native-path-move'));
  }
  writable(){if(this.readOnly)fail('Server Documents are read-only',403);}
  async resolve(p,{missing=false}={}) {
@@ -219,12 +214,14 @@ export class NativeVaultStore {
  }
  async move(from,to) {
   await this.resolve(from);await this.resolve(to,{missing:true});
-  // PhextVFS Phase 3a: inside a registered Cavern the exclusive
-  // rename lives in the VFS (chunk scrolls move verbatim); the C
-  // helper remains the primitive on disk.
+  // Phext-only (cutover): the exclusive rename lives in the VFS
+  // (chunk scrolls move verbatim). The compiled native-path-move
+  // helper that performed it on disk is deleted with the rest of
+  // the disk I/O; a vault no Cavern phext covers cannot relocate.
   const backend=phextFsBackendFor(path.join(this.root,from));
-  if(backend){try{backend.renameExclusive(path.join(this.root,from),path.join(this.root,to));}catch(e){fail(`Exclusive relocation primitive failed: ${e.message}`,409);}await this.sync(path.posix.dirname(from));await this.sync(path.posix.dirname(to));return;}
-  try{await exec(this.helper,[this.root,from,to],{timeout:10000});}catch(e){fail(`Exclusive relocation primitive failed: ${e.stderr||e.message}`,e.code==='ENOENT'?503:409);}
+  if(!backend)fail('Exclusive relocation primitive failed: no Cavern phext is registered for this vault',503);
+  try{backend.renameExclusive(path.join(this.root,from),path.join(this.root,to));}catch(e){fail(`Exclusive relocation primitive failed: ${e.message}`,409);}
+  await this.sync(path.posix.dirname(from));await this.sync(path.posix.dirname(to));
  }
  async mkdir(vault,directory){this.writable();return this.lock(async()=>{relative(vault);relative(directory);if(!inside(vault,directory)||directory===vault)fail('Directory outside selected vault',400);await this.resolve(vault);await this.vacant(directory);for(const r of await this.records())if(!r.done)fail('Recover pending relocation first');await fs.mkdir(await this.resolve(directory,{missing:true}));await this.sync(path.posix.dirname(directory));return {directory};});}
  async checkResourceBytes(resources,moved=false) {
