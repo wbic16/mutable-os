@@ -45,11 +45,10 @@
  * URL from the source tree — the house pattern (phext-fs, gates) —
  * while PhextVFS itself is TypeScript owned by the lifecycle.
  */
-import { execFile } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { promisify } from 'node:util';
 import { isNativeDocumentName } from '../src/persistence/document-file-names.mjs';
 import { sliceNativeEnvelope } from './phext-fs.mjs';
 import { PhextKnowledgeStore } from '../src/knowledge-sqlite/phext-store.mjs';
@@ -57,9 +56,29 @@ import {
   convertDiskKnowledgeToPhext, dumpDiskKnowledge, dumpPhextKnowledge, exportPhextKnowledge,
 } from '../src/knowledge-sqlite/phext-convert.mjs';
 
-const run = promisify(execFile);
 const sha256Hex = data => createHash('sha256').update(data).digest('hex');
-const XZ_MAX_BUFFER = 1 << 30;
+
+/**
+ * Run a filter process over an in-memory buffer. Deliberately NOT
+ * execFile-with-input: that deadlocks against xz in this runtime
+ * (the child never sees stdin EOF while its stdout is piped).
+ * spawn + stdin.end(input) streams with real backpressure.
+ */
+function runFilter(command, args, input) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+    const out = [], err = [];
+    child.stdout.on('data', chunk => out.push(chunk));
+    child.stderr.on('data', chunk => err.push(chunk));
+    child.on('error', reject);
+    child.on('close', code => {
+      if (code === 0) resolve(Buffer.concat(out));
+      else reject(Error(`${command} exited with code ${code}: ${Buffer.concat(err).toString('utf8').trim()}`));
+    });
+    child.stdin.on('error', () => { /* EPIPE: the close handler reports the child's own error */ });
+    child.stdin.end(input);
+  });
+}
 
 export const MIGRATION_RECORD_PATH = '/.control/phext-migration.json';
 export const STRATA_RECORD_PATH = '/.control/phext-strata.json';
@@ -112,16 +131,14 @@ const canonText = value => JSON.stringify(canon(value));
  */
 export async function sealPhext(phextBytes) {
   const bytes = Buffer.isBuffer(phextBytes) ? phextBytes : Buffer.from(phextBytes);
-  const { stdout } = await run('xz', ['-z', '-c', '-6', '--check=sha256'], {
-    input: bytes, maxBuffer: XZ_MAX_BUFFER,
-  }).catch(error => { throw Error(`Sealing the Cavern phext failed: ${error.message}`); });
-  return Buffer.from(stdout);
+  return runFilter('xz', ['-z', '-c', '-6', '--check=sha256'], bytes)
+    .catch(error => { throw Error(`Sealing the Cavern phext failed: ${error.message}`); });
 }
 
 /** Verify a seal's integrity without decompressing (`xz -t`). */
 export async function verifySeal(sealedBytes) {
   const bytes = Buffer.isBuffer(sealedBytes) ? sealedBytes : Buffer.from(sealedBytes);
-  await run('xz', ['-t'], { input: bytes, maxBuffer: XZ_MAX_BUFFER })
+  await runFilter('xz', ['-t'], bytes)
     .catch(error => { throw Error(`The sealed phext failed its integrity check and was refused: ${error.message}`); });
   return true;
 }
@@ -130,9 +147,8 @@ export async function verifySeal(sealedBytes) {
 export async function unsealPhext(sealedBytes) {
   const bytes = Buffer.isBuffer(sealedBytes) ? sealedBytes : Buffer.from(sealedBytes);
   await verifySeal(bytes);
-  const { stdout } = await run('xz', ['-d', '-c'], { input: bytes, maxBuffer: XZ_MAX_BUFFER })
+  return runFilter('xz', ['-d', '-c'], bytes)
     .catch(error => { throw Error(`Unlocking the sealed phext failed: ${error.message}`); });
-  return Buffer.from(stdout);
 }
 
 // ------------------------------------------------------------- disk walking
@@ -145,13 +161,17 @@ const GATES_MUTABLE_DIRS = new Set(['jobs', 'publications', 'assets']);
  * copy (a VFS stratum writer takes it), knowledge (the 4.6
  * converter), skip (operational, no data), remaining (stays on disk,
  * honestly recorded), or refuse (a state migration cannot proceed
- * past — WAL sidecars of a live database).
+ * past — a WAL or journal sidecar that still holds uncheckpointed
+ * data; empty sidecars and -shm files are stale coordination
+ * artifacts left by readonly opens and are skipped).
  */
-function classify(relPosix) {
+function classify(relPosix, size) {
   const parts = relPosix.split('/');
   if (parts[0] === '.mutable') {
     if (parts.length === 2 && (parts[1] === 'mutable.db' || parts[1] === 'audit.db')) return 'knowledge';
-    if (parts.length === 2 && /^(mutable|audit)\.db-(wal|shm|journal)$/.test(parts[1])) return 'refuse';
+    if (parts.length === 2 && /^(mutable|audit)\.db-(wal|shm|journal)$/.test(parts[1])) {
+      return parts[1].endsWith('shm') || size === 0 ? 'skip' : 'refuse';
+    }
     if (GATES_MUTABLE_DIRS.has(parts[1])) return 'copy';
     if (parts.length === 2 && OPERATIONAL_MUTABLE_FILES.has(parts[1])) return 'skip';
     return 'remaining';
@@ -228,7 +248,7 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       manifest.push({ path: file.rel, size: 0, sha256: null, action: 'remaining', note: 'symlink — not followed, stays on disk' });
       continue;
     }
-    const action = classify(file.rel);
+    const action = classify(file.rel, file.size);
     if (action === 'refuse') {
       throw Error(`The knowledge database at ${file.rel} has a live WAL sidecar; open and close the Cavern once, then migrate`);
     }
@@ -416,7 +436,7 @@ export async function exportPhextCavernToDisk({ phextPath, openVfs, destination 
     try {
       const snapshot = exportPhextKnowledge({ store, vaultGuid: control.vaultGuid, destination: path.join(snapshotParent, 'snapshot') });
       const mutableTarget = path.join(destination, '.mutable');
-      fs.mkdirSync(mutableTarget);
+      fs.mkdirSync(mutableTarget, { recursive: true }); // gates-file copies may have created it already
       for (const name of ['mutable.db', 'audit.db']) fs.copyFileSync(path.join(snapshot.directory, name), path.join(mutableTarget, name));
       var knowledgeFiles = snapshot.files;
     } finally { fs.rmSync(snapshotParent, { recursive: true, force: true }); }
