@@ -330,6 +330,155 @@ Coverage and gates:
 - Gates on the final tree: typecheck 0, build 0, boot smoke HTTP 200
   with the flag off and with it temporarily flipped on (reverted).
 
+## PhextVFS Phase 4 (2026-11-05)
+
+The SQLite knowledge layer unravels into the Cavern phext, behind the
+same **`phextVfs` flag (default false)**. Flag off is byte-for-byte
+today's disk behavior (real `mutable.db`/`audit.db` in `.mutable`).
+Flag on, the phext is the only canonical store: canonical records
+live in L3 in the ledger's `state()` form, the audit trail is data in
+L3, and SQLite survives only as an **ephemeral replica** — a real
+migrations-built database in a fresh 0700 temp directory, populated
+from L3 at open (foreign-key checked), deleted at close, deletable
+mid-run without loss, never shipped. Every existing SQL consumer
+(entities, cardex, semantics, propositions, saved-facts,
+entity-lookup, package-data, the saved indexer) runs unchanged
+against the replica; consistency-critical surfaces (operation
+outcome, audit status, mutation idempotency) are served from L3.
+Working format is memory-resident throughout (Will's ruling); xz
+sealing is Phase 5 and is not built here. Design:
+`sqlite-unraveled-phase4-design.md` (goal workspace).
+
+**Step 4.4 (media carve-out) is CANCELLED** (Will, 2026-11-04 — the
+separate-media ruling was reversed; media is EMBEDDED): L6 keeps
+holding asset content exactly as Phase 2 built it, no catalog flip,
+no store home moves. The asset-continuity gate is folded into the
+Phase 4 E2E (a binary asset written to L6 before the knowledge work
+round-trips byte-identically after cold reopen).
+
+Modified upstream files:
+
+| File | Change | Reason | Rebase / re-apply note |
+| --- | --- | --- | --- |
+| `src/phext/lattice.ts` | Additive `PhextLattice.rebaseFromBuffer(buffer)`: rebuild the base from a foreign generation's bytes and re-apply this instance's overlay (modified/inserted kinds fixed up against the new base; tombstones for scrolls the foreign generation lacks are dropped). | Two VFS instances share one phext file (the lifecycle owns the document strata, the knowledge worker owns L3); a flush must merge onto generations the other instance saved instead of overwriting them. | One method beside `revert()`; no existing behavior changes (single-instance flushes never rebase — the fingerprint matches). |
+| `src/phext/vfs.ts` | `flush()` is generation-aware: under a cross-process flush mutex (tmpdir token file keyed by the phext's resolved path; dead-pid recovery; 30 s deadline → new `ELOCKED` error code), it validates a foreign generation (must carry an L9 manifest, else `EINTEGRITY` refusal), rebases onto it, recomputes L9 checksums over the merged state, and refreshes its disk fingerprint. | Same multi-instance coherence; checksums must cover the merged state, and a non-VFS generation must never be silently overwritten. | The flush internals split (`flush`/`flushLocked`/`acquireFlushMutex`); the public API is unchanged. If upstream rewrites `flush`, preserve: mutex → fingerprint compare → validate → rebase → checksum → save → fingerprint refresh. |
+| `src/knowledge-sqlite/foundation.mjs` | Phext mode resolution + branch at the head of `openFoundation`: an injected instance (worker) or a lifecycle-registered one enters `openPhextFoundation`; an explicit `phextKnowledge` request with no instance available throws (never silently downgrades to disk). Main-thread phext opens take the same establishment lock and the phext scope inspection. | One seam: every mutation module already calls only `ledger.mutate`, and every open already funnels through `openFoundation`. | ~25 lines above the untouched disk path; the disk branch is the original function verbatim. |
+| `src/knowledge-sqlite/vault-scope.mjs` | `inspectVaultScope` gains an optional `phextKnowledge` flag: `cavern.phext` counts as establishment infrastructure for ancestor/descendant overlap, a `.mutable` home without `mutable.db` is tolerated, and `existing` reflects the phext. Default behavior is byte-identical (same checks, same error strings). | A converted Cavern has knowledge in the phext and possibly no `.mutable` at all; the fail-closed posture (no auto-repair of partial homes) is preserved — only the missing-`mutable.db` case relaxes, and a present `mutable.db` must still be a private regular file. | Options-object addition; the two changed conditionals are guarded by the flag. |
+| `src/knowledge-sqlite/client.mjs` | Phext resolution before scope inspection (registry hit, explicit path, or `true` → `<vault>/cavern.phext`), injecting the resolved path into `workerData`; `restoreFrom` + phext is refused with an explicit error; the writer-lease answer becomes a flock on the writer lock's anchor file beside the phext (same anchor the gates backend computes for `/.mutable/writer.lock`; failures wrapped as `SQLite writer unavailable: …`, matching `paths.writerLock`); new `knowledgeCacheFile()` client method. | The host process is where the mode decision can be made once and ridden into the worker; the lease must exclude second writers across processes exactly as on disk. | Additive branches in `openSqliteFoundation` and the lease message handler; disk flow untouched. |
+| `src/knowledge-sqlite/worker-entry.mjs` | Phext branch at startup: opens its own `PhextVFS` instance (read-only → `open`, writer → `openOrCreate`), skips `prepareHome`, requests the lease with the phext path attached, passes the instance into `openFoundation` via context, refuses `restoreFrom`; `knowledge-cache-file` op returns the foundation's replica path; `close` also closes the VFS. | The worker is the L3 writer; its instance is disjoint from the lifecycle's by stratum ownership. | The disk startup path is the original code with an `if (phextPath)` fork in front of it. This file is esbuild-bundled, so the static `../phext/vfs.ts` import is safe here (and only here). |
+| `server/sqlite-knowledge-host.ts` | A `knowledgeProbe()` helper replaces the four `.mutable/mutable.db` existence probes (phext mode probes the real `cavern.phext` file instead); `entityLookup` takes its reader identity from the phext file's dev:ino in phext mode; the cardex regex branch runs `runCardexRegex` against the writer foundation's ephemeral replica while holding the foreground lease. Plus a static import of the phext registry. | The host's disk assumptions are exactly four probes, one identity stat, and one file path; each gets a phext twin with identical contracts. | Small, local hunks; every disk path is preserved verbatim behind the registry check. |
+| `server/cavern-lifecycle.ts` | In the flag-on block: dynamically import the phext registry and `registerPhextKnowledge({ root, phextPath, vfs })`; the strata record gains `knowledge: 3` and `onDisk` empties; `close()` unregisters knowledge between the phext-fs and gates unregisters; `inspect()` treats an existing `cavern.phext` as the established marker when the flag is on (a converted Cavern may have no `.mutable`). | Registration must complete inside `phextReady`, before `sql.establish` runs; the registry is how the host and client learn the mode. | Three small hunks beside the Phase 2/3a hunks; dynamic import is URL-based like the existing ones. |
+| `scripts/build-sqlite-foundation.mjs` | The five phext knowledge modules join the explicit dist copy list. | The dist staging copies modules by name; the copied `foundation.mjs`/`client.mjs` import them. | Five list entries. |
+
+Design as built (rationale in the new modules' headers):
+
+- **Ledger discipline ports unchanged.** A mutation is one overlay
+  generation + one flush (flush = commit); the receipt lands in the
+  L3 outbox in the same generation; outbox budgets (10,000 mutations
+  / 16 MiB, per-delivery 1,000 / 16 MiB) and the
+  differing-request refusal are the disk ledger's, line for line.
+  Delivery writes the audit entry and flushes, then deletes the
+  outbox entry and flushes again, with the disk protocol's
+  fingerprint checks (`payloadHash`, metadata equality, event
+  equality, changed-receipt guard) — a crash between the two flushes
+  redelivers by verification, proven by test. The mutation's SQL
+  work runs against the replica inside a transaction; if the flush
+  fails, the transaction rolls back and the overlay is reverted —
+  nothing is durable anywhere.
+- **L3 sync** is event-driven (captured after-states; proposition
+  aggregates rewritten whole) plus a per-mutation membership sweep,
+  so rows removed by SQL cascade — which produce no ledger events on
+  disk either — cannot linger in L3 and resurrect at replica
+  rebuild. **D3 as built:** a mutation applies its work to the
+  replica in the same transaction that produces its receipt events,
+  and every later open rebuilds its replica from L3, which is the
+  only shared state — there is no second copy to drift.
+- **D-decisions:** D2 audit = one file per mutation in `audit/`
+  (segment packing past ~10k mutations is noted in
+  `phext-store.mjs`, not built). D4 observed/recovered aliases are
+  never written to L3 (the replica rebuild simply lacks them until
+  the next reconcile re-derives them — asserted in the foundation
+  suite). D5 `actors/` is reserved and round-trips through the
+  converter/exporter for parity. D1 moot; D6 resolved toward the
+  phext (Phase 3b scope).
+- **Establishment and identity.** The `vaultGuid` is minted once at
+  first establishment into the control record
+  (`{format: "phext-knowledge-v1", vaultGuid, knowledgeEpoch,
+  canonicalMutationCount, createdUtc, strata: {knowledge: "phext"}}`)
+  and mirrored into the L3 root index scroll for one-lookup
+  discovery; conversion preserves it (never re-mints). Knowledge
+  present without a control record, or a corrupt record, refuses the
+  open — never auto-repairs. The establishment contention error is
+  the shared `lockVaultEstablishment` one, byte-identical
+  ("Another Vault establishment is in progress; retry",
+  `EWOULDBLOCK`) in both modes — asserted by test.
+  `knowledgeRevision()` stays `sqlRevision(replica)`, so
+  `sqlRevision` consumers (index epochs, saved-scope fences) work
+  unchanged.
+- **Deviation — control record placement.** The design's L7 path
+  (`/.control/knowledge.json`) was moved to the L3 root
+  (`/.mutable/knowledge.json`), content and semantics unchanged.
+  Reason: Phase 3a's phext-fs keeps `fs-nodes.json` in the same
+  `/.control` directory, written by the lifecycle's VFS instance,
+  while the control record is written by the worker's instance; two
+  instances allocating slots in one directory from stale index views
+  both took slot 3, and the later flush's index orphaned the control
+  record beside intact L3 records (bisected through the E2E below).
+  The VFS coherence rule this establishes: **one writer instance per
+  directory** — strata ownership is disjoint by layout (lifecycle:
+  L1/L2/L4/L5/L6/L7; worker: L3), and the control record belongs to
+  the knowledge writer. Any future cross-instance shared directory
+  needs merge-aware index rebasing first.
+- **Converter and export (4.6).** `convertDiskKnowledgeToPhext`
+  refuses a source that fails verification, cross-checks the two
+  audit representations (each delivered mutation's stored
+  `payloadHash` must equal the SHA-256 of its receipt payload, and
+  its `AuditEvent` rows must equal the receipt's events), then
+  verifies its own work — per-table counts and per-record SHA-256
+  over the canonical record text, dump vs L3 readback — before
+  returning a report. Undelivered outbox payloads migrate verbatim
+  and still deliver afterwards. The export materializes fresh
+  `mutable.db`/`audit.db` plus the standard
+  `mutable-sqlite-backup` manifest, so the unchanged
+  `restoreSnapshot` consumes it; an export → restore round trip is
+  dump-diff-equal in the converter suite. The phext foundation's
+  `backup()` is this export.
+- **Accepted difference:** a read-only phext foundation's replica
+  starts with an empty derived projection (on disk, the projection
+  persists in the shared file). The projection is rebuilt by the
+  reconcile pipeline in the instance that owns indexing — which the
+  host drives at Cavern open (the E2E asserts coverage complete
+  after a cold reopen + refresh). Canonical reads are unaffected.
+
+Coverage and gates:
+
+- New suites (14 tests): `src/knowledge-sqlite/phext-knowledge.test.ts`
+  (4.1 ledger semantics incl. crash-redelivery and outbox budgets;
+  4.2 cross-module scenarios + D4 + cold reopen + replica deletion;
+  4.3 audit surfaces; 4.5 establishment incl. byte-identical
+  contention), `src/knowledge-sqlite/phext-convert.test.ts` (4.6
+  above), `src/knowledge-sqlite/phext-worker.test.mjs` (production
+  worker path: establish/mutate/deliver, anchor-lease contention,
+  replica lifecycle, restore refusal, cold reopen, phext-only disk),
+  `server/phext-knowledge-e2e.test.ts` (real host + native routes:
+  establish → entity mutate → audit deliver → document save →
+  reconcile with complete coverage → cold reopen → projection
+  rebuild; L6 asset byte-identical; disk holds only the phext, its
+  `.bak` and anchors). Run the vitest suites serially — several
+  suites share the per-user establishment flock, and parallel files
+  can contend on it (the same reason `test:sqlite` runs
+  `--test-concurrency=1`).
+- Baselines hold: `test:sqlite` 131/131 (130 baseline + the worker
+  suite), phext vitest set 67/67, host/lifecycle suites
+  (cavern-lifecycle, sqlite-knowledge-host, entity-lookup,
+  entity-mutate) 14/14, typecheck 0, build 0, boot smoke HTTP 200
+  with the flag off and with it temporarily flipped on (reverted).
+  The application-services suites (foundation / academic /
+  encyclopedia) show load-dependent 5000 ms-timeout failures on this
+  VM **identically on the pristine base commit** (verified by
+  worktree comparison: same failing tests, same timeout mode;
+  academic passes 8/8 solo on both trees) — no Phase 4 delta.
+
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,
@@ -379,6 +528,27 @@ Coverage and gates:
 - `server/native-vault-store-lock.test.mjs` — the native vault store
   lock's fs-ext-absent regression suite (action runs, contention
   message, cross-process crash recovery).
+- `src/knowledge-sqlite/phext-registry.mjs` — the Phase 4 mode
+  registry (globalThis-held, per the phext-fs pattern): which Cavern
+  roots keep knowledge in the phext, registered by the lifecycle and
+  consulted by the client, the host and direct foundation opens.
+- `src/knowledge-sqlite/phext-store.mjs` — the L3 knowledge store:
+  canonical records / proposition aggregates / outbox / audit as
+  files in the phext over an injected PhextVFS instance, plus the
+  control record (see the Phase 4 section for its placement note).
+- `src/knowledge-sqlite/phext-ledger.mjs` — the canonical ledger
+  ported to L3 with its transaction discipline unchanged.
+- `src/knowledge-sqlite/phext-foundation.mjs` — the foundation swap:
+  same store shape as `foundation.mjs`, L3 canonical + ephemeral
+  replica; establishment and audit posture per the Phase 4 section.
+- `src/knowledge-sqlite/phext-convert.mjs` — disk→L3 conversion with
+  count/hash/fingerprint verification, and the L3→SQLite export in
+  `mutable-sqlite-backup` format (also the phext `backup()`).
+- `src/knowledge-sqlite/phext-knowledge.test.ts`,
+  `src/knowledge-sqlite/phext-convert.test.ts`,
+  `src/knowledge-sqlite/phext-worker.test.mjs`,
+  `server/phext-knowledge-e2e.test.ts` — the Phase 4 acceptance
+  suites; see the Phase 4 section above.
 - `src/phext/codec.test.ts`, `src/phext/document.test.ts`,
   `src/demo/phext-menu.test.tsx` — tests.
 - `deploy/deploy.sh`, `deploy/deploy.md`,
