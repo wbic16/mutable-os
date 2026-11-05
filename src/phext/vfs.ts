@@ -8,6 +8,9 @@
  * the path ↔ coordinate mapping, directory index scrolls, chunking,
  * checksums — built on the lattice engine (`lattice.ts`). It is wired
  * into no server path yet; Phase 2 adds the gates backend behind a flag.
+ * Phase 3a adds two operations the native document stores need:
+ * `rename` (exclusive, chunk-preserving) and caller-named chunk
+ * boundaries on `writeFile` (`slices`, one scroll run per slice).
  *
  * ## Strata (the library arm)
  *
@@ -456,11 +459,21 @@ export class PhextVFS {
    * `options.format` defaults to "text" for strings; for Buffers it
    * defaults to "text" as well — binary data must opt in explicitly so
    * non-UTF-8 bytes are never silently mangled.
+   *
+   * `options.slices` (Phase 3a, text format only) lets the caller name
+   * the chunk boundaries: the slices must partition `data` exactly
+   * (their concatenation is compared byte-for-byte), and each slice is
+   * stored as its own run of consecutive chunk scrolls — sub-split only
+   * when a single slice exceeds the chunk size — so reassembly by
+   * concatenation stays byte-identical while scroll boundaries carry
+   * caller meaning (e.g. one slice per block of a native document
+   * envelope). The index records the same whole-file size and SHA-256
+   * either way; nothing downstream can tell sliced from opaque writes.
    */
   writeFile(
     path: string,
     data: Buffer | string,
-    options: { format?: PhextVfsFileFormat } = {},
+    options: { format?: PhextVfsFileFormat; slices?: readonly Buffer[] } = {},
   ): void {
     this.assertOpen();
     const format = options.format ?? "text";
@@ -499,7 +512,9 @@ export class PhextVFS {
       ? existing.slot
       : allocateSlot(parentIndex);
     const fileAddress = [...parent.address, slot];
-    const chunkTexts = encodeChunks(bytes, format, this.chunkSize);
+    const chunkTexts = options.slices !== undefined
+      ? encodeSlices(bytes, options.slices, format, this.chunkSize, path)
+      : encodeChunks(bytes, format, this.chunkSize);
     chunkTexts.forEach((text, i) => {
       try {
         this.lattice.writeScroll(chunkCoordinate(library, fileAddress, i + 1), text);
@@ -633,6 +648,111 @@ export class PhextVFS {
       }
     }
     this.writeIndex(node.library, parentAddr, parentIdx);
+  }
+
+  /**
+   * Rename a file or directory (Phase 3a), with the exclusive semantics
+   * of the native store's relocation primitive (renameat2
+   * RENAME_NOREPLACE): the destination must not exist, and a directory
+   * moves with everything beneath it. File chunk scrolls are copied
+   * verbatim to the destination address, so a sliced file keeps its
+   * chunk boundaries and every byte; only the index entries change.
+   * Callers that want POSIX replace semantics unlink the destination
+   * first (the phext-fs facade does exactly that).
+   */
+  rename(fromPath: string, toPath: string): void {
+    this.assertOpen();
+    const fromParts = splitPath(fromPath);
+    const toParts = splitPath(toPath);
+    if (fromParts.length === 0 || toParts.length === 0) {
+      throw new PhextVfsError("EINVAL", "Cannot rename a stratum root");
+    }
+    if (toPath === fromPath || toPath.startsWith(`${fromPath}/`)) {
+      throw new PhextVfsError("EINVAL", `Cannot rename ${fromPath} into itself`);
+    }
+    const source = this.resolve(fromPath);
+    if (source === undefined) {
+      throw new PhextVfsError("ENOENT", `No such file or directory: ${fromPath}`);
+    }
+    if (this.resolve(toPath) !== undefined) {
+      throw new PhextVfsError("EEXIST", `Destination already exists: ${toPath}`);
+    }
+    if (source.type === "file") {
+      this.moveFileEntry(fromPath, source, toPath);
+      return;
+    }
+    this.mkdir(toPath);
+    for (const child of this.listDir(fromPath)) {
+      this.rename(`${fromPath}/${child.name}`, `${toPath}/${child.name}`);
+    }
+    this.unlink(fromPath);
+  }
+
+  /** Move one file's index entry, copying its chunk scrolls verbatim. */
+  private moveFileEntry(
+    fromPath: string,
+    node: Extract<ResolvedNode, { type: "file" }>,
+    toPath: string,
+  ): void {
+    const { library, rel, mutableHome } = dispatch(toPath);
+    if (mutableHome || rel.length === 0) {
+      throw new PhextVfsError("EISDIR", `Cannot rename a file over a directory: ${toPath}`);
+    }
+    const filename = rel[rel.length - 1];
+    const parent = this.ensureParent(library, rel.slice(0, -1));
+    const parentIndex = this.readIndex(parent.library, parent.address);
+    if (parent.foldSuffix !== undefined) {
+      const head = parentIndex.entries[parent.foldSuffix.split("/")[0]];
+      if (head !== undefined && !head.hashed && head.kind === "file") {
+        throw new PhextVfsError(
+          "ENOTDIR",
+          `Path component is not a directory: ${parent.foldSuffix.split("/")[0]}`,
+        );
+      }
+    }
+    const entryName = parent.foldSuffix === undefined
+      ? filename
+      : `${parent.foldSuffix}/${filename}`;
+    const sourceIndex = this.readIndex(node.library, node.parentAddress);
+    const sameIndex = node.library === parent.library
+      && node.parentAddress.length === parent.address.length
+      && node.parentAddress.every((value, i) => value === parent.address[i]);
+    const destIndex = sameIndex ? sourceIndex : parentIndex;
+    if (destIndex.entries[entryName] !== undefined) {
+      throw new PhextVfsError("EEXIST", `Destination already exists: ${toPath}`);
+    }
+    const sourceAddress = [...node.parentAddress, node.entry.slot];
+    const slot = allocateSlot(destIndex);
+    const destAddress = [...parent.address, slot];
+    for (let i = 1; i <= node.entry.chunks; i++) {
+      const text = this.lattice.readScroll(chunkCoordinate(node.library, sourceAddress, i));
+      if (text === undefined) {
+        throw new PhextVfsError(
+          "EINTEGRITY",
+          `Missing chunk ${i} of ${fromPath} at ` +
+            formatCoordinate(chunkCoordinate(node.library, sourceAddress, i)),
+        );
+      }
+      this.lattice.writeScroll(chunkCoordinate(library, destAddress, i), text);
+    }
+    destIndex.entries[entryName] = {
+      kind: "file",
+      slot,
+      ...(parent.foldSuffix === undefined ? {} : { hashed: true }),
+      format: node.entry.format,
+      size: node.entry.size,
+      chunks: node.entry.chunks,
+      sha256: node.entry.sha256,
+    } satisfies FileIndexEntry;
+    if (sameIndex) {
+      delete destIndex.entries[node.entryName];
+      this.writeIndex(parent.library, parent.address, destIndex);
+    } else {
+      this.writeIndex(parent.library, parent.address, destIndex);
+      delete sourceIndex.entries[node.entryName];
+      this.writeIndex(node.library, node.parentAddress, sourceIndex);
+    }
+    this.deleteChunks(node.library, sourceAddress, node.entry.chunks);
   }
 
   /** Stat a path; undefined when it does not exist. */
@@ -1176,6 +1296,28 @@ function assertTextPayload(bytes: Buffer, path: string): void {
       );
     }
   }
+}
+
+/**
+ * Encode caller-named slices as chunk texts: the slices must partition
+ * the file bytes exactly, and each slice is encoded with the standard
+ * text chunker (so an oversize slice sub-splits at codepoint
+ * boundaries, but a slice boundary is always a scroll boundary).
+ */
+function encodeSlices(
+  bytes: Buffer,
+  slices: readonly Buffer[],
+  format: PhextVfsFileFormat,
+  chunkSize: number,
+  path: string,
+): string[] {
+  if (format !== "text") {
+    throw new PhextVfsError("EINVAL", `Sliced writes are text-only: ${path}`);
+  }
+  if (!Buffer.concat(slices.map((slice) => Buffer.from(slice))).equals(bytes)) {
+    throw new PhextVfsError("EINVAL", `Slices do not partition the file bytes: ${path}`);
+  }
+  return slices.flatMap((slice) => encodeChunks(slice, "text", chunkSize));
 }
 
 function encodeChunks(
