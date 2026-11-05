@@ -104,10 +104,21 @@
  * is written atomically by the lattice (tmp + rename).
  *
  * Errors are {@link PhextVfsError} with a `code` in the fs tradition
- * (ENOENT, ENOTDIR, EISDIR, EEXIST, EINVAL, ECLOSED, EINTEGRITY).
+ * (ENOENT, ENOTDIR, EISDIR, EEXIST, EINVAL, ECLOSED, EINTEGRITY,
+ * ELOCKED).
  */
 import { createHash } from "node:crypto";
-import { copyFileSync, existsSync } from "node:fs";
+import {
+  closeSync,
+  copyFileSync,
+  existsSync,
+  openSync,
+  readFileSync,
+  unlinkSync,
+  writeSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve as resolvePath } from "node:path";
 import {
   formatCoordinate,
   type PhextCoordinate,
@@ -384,6 +395,12 @@ export class PhextVFS {
   private readonly filePath: string;
   private readonly chunkSize: number;
   private isClosed = false;
+  /**
+   * SHA-256 of the on-disk bytes this instance's base was loaded from
+   * (or last saved). flush() compares it against the live file to
+   * detect generations saved by another instance (Phase 4).
+   */
+  private diskFingerprint: string | undefined;
 
   private constructor(filePath: string, lattice: PhextLattice, chunkSize: number) {
     this.filePath = filePath;
@@ -408,6 +425,7 @@ export class PhextVFS {
 
   /** Open an existing VFS phext, verifying its L9 checksums by default. */
   static open(path: string, options: PhextVfsOptions = {}): PhextVFS {
+    const bytes = readFileSync(path);
     const lattice = PhextLattice.open(path);
     const manifest = readManifest(lattice);
     if (manifest === undefined) {
@@ -421,6 +439,7 @@ export class PhextVFS {
       lattice,
       options.chunkSize ?? manifest.chunkSize ?? DEFAULT_CHUNK_SIZE,
     );
+    vfs.diskFingerprint = sha256Hex(bytes);
     if (options.verify !== false) vfs.verifyIntegrity(manifest);
     return vfs;
   }
@@ -828,9 +847,47 @@ export class PhextVFS {
    * Persist: rewrite the L9 checksum series from the live state, refresh
    * the manifest, keep the previous on-disk generation at `<path>.bak`,
    * and save the phext atomically. A no-op when nothing changed.
+   *
+   * Multi-instance discipline (Phase 4): several PhextVFS instances may
+   * hold one file (the server lifecycle owns one; the knowledge worker
+   * owns another) provided each writes disjoint strata. The whole
+   * check-and-save section runs under a short cross-process mutex (a
+   * token file in the system temp directory, keyed by the phext's
+   * absolute path — nothing new appears beside the phext). Before
+   * saving, the on-disk fingerprint is compared with the generation
+   * this instance loaded: a mismatch means another instance saved
+   * meanwhile, so the lattice rebases onto the on-disk generation
+   * (foreign scrolls are adopted, this instance's overlay is replayed)
+   * and the checksums are computed over the merged state. A foreign
+   * file that is not a PhextVFS generation is refused, never adopted.
    */
   flush(): void {
     this.assertOpen();
+    const release = acquireFlushMutex(this.filePath);
+    try {
+      this.flushLocked();
+    } finally {
+      release();
+    }
+  }
+
+  private flushLocked(): void {
+    if (existsSync(this.filePath)) {
+      const diskBytes = readFileSync(this.filePath);
+      const diskHash = sha256Hex(diskBytes);
+      if (this.diskFingerprint !== undefined && diskHash !== this.diskFingerprint) {
+        const foreign = PhextLattice.fromBuffer(diskBytes);
+        if (readManifest(foreign) === undefined) {
+          throw new PhextVfsError(
+            "EINTEGRITY",
+            `Refusing to adopt the on-disk generation of ${this.filePath}: ` +
+              "it is not a PhextVFS file (no L9 manifest)",
+          );
+        }
+        this.lattice.rebaseFromBuffer(diskBytes);
+      }
+      this.diskFingerprint = diskHash;
+    }
     // The scrolls the checksum series must cover: everything populated
     // except the series itself (the manifest included).
     const covered = this.lattice
@@ -880,6 +937,13 @@ export class PhextVFS {
     if (!this.lattice.isDirty()) return;
     if (existsSync(this.filePath)) copyFileSync(this.filePath, `${this.filePath}.bak`);
     this.lattice.saveToFile(this.filePath);
+    try {
+      this.diskFingerprint = sha256Hex(readFileSync(this.filePath));
+    } catch {
+      // The save landed; a fingerprint that cannot be refreshed only
+      // costs a rebase check on the next flush, never correctness.
+      this.diskFingerprint = undefined;
+    }
   }
 
   /** Flush and close. Further operations throw ECLOSED. */
@@ -1357,4 +1421,72 @@ function mergeDirEntries(lists: PhextVfsDirEntry[][]): PhextVfsDirEntry[] {
     }
   }
   return [...out.values()].sort((a, b) => (a.name < b.name ? -1 : 1));
+}
+
+function pidAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === "EPERM";
+  }
+}
+
+/**
+ * The cross-process flush mutex: a token file in the system temp
+ * directory (the stage-C gates flock fallback's shape), keyed by the
+ * phext's absolute path, held only across flush's fingerprint-check +
+ * rebase + save section. The holder's pid is the token content; a dead
+ * holder's token is recovered by the next contender, so a crashed
+ * flusher cannot wedge the file. Synchronous, because flush() is.
+ */
+function acquireFlushMutex(filePath: string): () => void {
+  const key = createHash("sha256")
+    .update(resolvePath(filePath))
+    .digest("hex")
+    .slice(0, 32);
+  const lockPath = join(tmpdir(), `mutable-phext-flush-${key}.lock`);
+  const deadline = Date.now() + 30000;
+  const spin = new Int32Array(new SharedArrayBuffer(4));
+  for (;;) {
+    try {
+      const fd = openSync(lockPath, "wx", 0o600);
+      try {
+        writeSync(fd, `${process.pid}\n`);
+      } finally {
+        closeSync(fd);
+      }
+      let released = false;
+      return () => {
+        if (released) return;
+        released = true;
+        try {
+          if (parseInt(readFileSync(lockPath, "utf8"), 10) === process.pid) {
+            unlinkSync(lockPath);
+          }
+        } catch {
+          /* token already gone or replaced — leave the holder's alone */
+        }
+      };
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+    }
+    try {
+      const pid = parseInt(readFileSync(lockPath, "utf8"), 10);
+      if (Number.isInteger(pid) && pid > 0 && pid !== process.pid && !pidAlive(pid)) {
+        unlinkSync(lockPath);
+        continue;
+      }
+    } catch {
+      /* token vanished mid-check — retry the create */
+      continue;
+    }
+    if (Date.now() > deadline) {
+      throw new PhextVfsError(
+        "ELOCKED",
+        `Timed out waiting for the PhextVFS flush lock: ${filePath}`,
+      );
+    }
+    Atomics.wait(spin, 0, 0, 5);
+  }
 }
