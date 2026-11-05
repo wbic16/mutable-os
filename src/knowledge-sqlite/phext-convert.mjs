@@ -164,11 +164,21 @@ export function convertDiskKnowledgeToPhext({ mutableFile, auditFile, store }) {
     throw Error('Phext knowledge already established; conversion requires an unconverted Cavern');
   }
   const checkDb = new Database(mutableFile, { readonly: true, fileMustExist: true });
-  try { if (!verifyDatabase(checkDb, 'mutable').ok) throw Error('Source mutable.db failed verification; conversion refused'); }
+  try {
+    let verdict;
+    try { verdict = verifyDatabase(checkDb, 'mutable'); }
+    catch (error) { throw Error(`Source mutable.db could not be read (${error.message}); conversion refused`); }
+    if (!verdict.ok) throw Error('Source mutable.db failed verification; conversion refused');
+  }
   finally { checkDb.close(); }
   if (auditFile && fs.existsSync(auditFile)) {
     const checkAudit = new Database(auditFile, { readonly: true, fileMustExist: true });
-    try { if (!verifyDatabase(checkAudit, 'audit').ok) throw Error('Source audit.db failed verification; conversion refused'); }
+    try {
+      let verdict;
+      try { verdict = verifyDatabase(checkAudit, 'audit'); }
+      catch (error) { throw Error(`Source audit.db could not be read (${error.message}); conversion refused`); }
+      if (!verdict.ok) throw Error('Source audit.db failed verification; conversion refused');
+    }
     finally { checkAudit.close(); }
   }
   const dump = dumpDiskKnowledge({ mutableFile, auditFile });
