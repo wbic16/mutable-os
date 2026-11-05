@@ -479,6 +479,124 @@ Coverage and gates:
   worktree comparison: same failing tests, same timeout mode;
   academic passes 8/8 solo on both trees) — no Phase 4 delta.
 
+## PhextVFS Phase 5 (2026-11-05) — the exit ramps
+
+Migration tooling + Download/Open Cavern: a disk-mode Cavern can be
+converted to one phext, a phext-mode Cavern can be exported back to a
+complete disk tree, and the Cavern travels as a single file — raw
+(`cavern.phext`) or sealed (`cavern.phext.xz`). Everything is behind
+the `phextVfs` flag (default off); with the flag off the new routes
+refuse (409) and behavior is byte-identical. Stacked on Phase 4.
+
+- **New module `server/phext-cavern-transfer.mjs`** (plain `.mjs`,
+  loaded by URL like `phext-fs.mjs`; the PhextVFS class is injected):
+  - `migrateCavernToPhext({root, openVfs})` — verified-round-trip
+    migration for a CLOSED disk-mode Cavern. Walks the disk tree and
+    classifies every file: documents + pair journals + relocation
+    state via the Phase 3a phext-fs machinery (native documents
+    raw-sliced on block boundaries), `.memory` history + the
+    history/jobs/publications/assets gates stores via the Phase 2
+    copy discipline, knowledge via the Phase 4.6 converter. Writes go
+    to `cavern.phext.migrating-<uuid>`; verification reopens the
+    temporary phext fresh and checks every copied file's SHA-256
+    against the L9 index, smoke-reads a native document / history
+    record / pair journal, and compares the canonical knowledge dump
+    (tables + counts + audit + outbox) against the disk source. Only
+    then are the L7 records written (below) and the temporary phext
+    renamed to `cavern.phext`. The disk `.mutable` directory is
+    renamed to `.mutable-disk-fallback/` (the 4.6 converter's
+    precedent); the document tree stays in place, inactive. Any
+    failure before the rename aborts with the disk Cavern untouched
+    and the partial phext discarded. Refusals: already migrated, no
+    disk state, writer lock / open handles present, and a non-empty
+    SQLite `-wal`/`-journal` sidecar (uncheckpointed knowledge —
+    `-shm` and empty sidecars are stale readonly-open artifacts and
+    are skipped). Runtime residue (`writer.lock`, discovery cache,
+    `.lock`/anchor files) is never migrated; the knowledge lease
+    anchor is rebindable state and is recorded as skipped.
+  - **Honesty rule (Phase 3b pending):** the legacy document /
+    workspace stores and `uploads/` are NOT phext-backed yet. The
+    migration record lists them under `remainingOnDisk` and the
+    report says so — a migrated Cavern is never claimed to be
+    fully-one-phext while Phase 3b is outstanding. Their files stay
+    on disk, untouched, alongside the fallback.
+  - `exportPhextCavernToDisk({phextPath, openVfs, destination})` —
+    the reverse ramp: VFS file walk (control stratum excluded and
+    reported) + the Phase 4.6 L3→SQLite knowledge export into the
+    destination's `.mutable/`; refuses a non-empty destination.
+  - `sealPhext` / `verifySeal` / `unsealPhext` — the xz seal
+    (`xz -6 --check=sha256`, per the media ruling: an export-time
+    operation on the in-memory uncompressed phext; never the working
+    format, never per-save). Implemented with `spawn` + streamed
+    stdin — `execFile` with an `input` buffer deadlocks against xz
+    in this runtime. `xz -t` integrity verification always runs
+    BEFORE decompression; a corrupt seal is refused before anything
+    is written.
+  - `installPhextIntoFolder({bytes, filename, targetDir, openVfs})`
+    — Open Cavern: verify/unseal → write `cavern.phext` → sanity-open
+    the VFS (index builds, strata record reads, knowledge control
+    record present for a knowledge-bearing Cavern, vault identity
+    present). Refusals: non-phext content, missing knowledge control
+    record, non-empty target folder. On any refusal the written
+    phext is removed — the target is left as found.
+- **L7 Cavern state (proposal item 5):** `/.control/cavern-state.json`
+  in the Cavern's own phext now carries `migration` (timestamp,
+  source manifest hash, per-stratum source hashes, converter
+  version), `strata` (format/states, preserving the `onDisk` list of
+  strata still disk-backed), and `lastOpenedUtc` (best-effort write
+  on establish — an L7 write failure never fails an open).
+  `caverns.json` stays server installation state and is not moved.
+- **Lifecycle routes (`server/cavern-lifecycle.ts`, all flag-gated):**
+  `POST /api/cavern/migrate {root}` (serial with establish; refuses a
+  currently-open Cavern), `POST /api/cavern/export-phext
+  {root, destination}`, `GET /api/cavern/download?sealed=0|1` (the
+  open Cavern: flush, then raw bytes or the sealed stream; sidecar
+  facts as headers — `X-Cavern-Guid`, `X-Cavern-Phext-Sha256`,
+  `X-Cavern-Phext-Bytes`, `X-Cavern-Sealed-Bytes`), `POST
+  /api/cavern/open-phext` (multipart upload, 512 MiB cap; install +
+  establish in one step, returning the merged Cavern view).
+- **UI (`src/application/cavern-startup.tsx`):** the Cavern picker
+  gains an "Open a Cavern from a Phext" card beside Establish/Open,
+  and an open Cavern's CavernControl menu gains "Download Cavern
+  (.phext)" and "Download Sealed Cavern (.phext.xz)" — the exit
+  ramps ship on the same surface as Establish/Open, not on a hidden
+  page (discoverability rule).
+- **New suite:** `server/phext-exit-e2e.test.ts` (4 tests) — full
+  round trip (disk fixture with every stratum → migrate → read back
+  from the phext alone with the fallback renamed away → seal →
+  `xz -t` + unseal byte-identical → install into a fresh folder →
+  phext-mode state diff-equal → export to disk → canonical dumps
+  diff-equal again), the migration refusal matrix (already migrated /
+  no disk state / corrupted source DB aborts with the disk
+  untouched), the open refusal matrix (corrupt seal / non-phext /
+  missing knowledge control / non-empty target), and flag-off route
+  refusals.
+- **Operating instructions:** with `phextVfs` on — to migrate: close
+  the Cavern, POST `/api/cavern/migrate` (or wait for the picker
+  affordance), keep `.mutable-disk-fallback/` until satisfied, then
+  delete it and the in-place document tree copy at leisure; to move
+  a Cavern: Download (sealed for transport), then Open from Phext on
+  the receiving install; to return to disk mode: export-phext into a
+  fresh folder and open that folder as a disk Cavern.
+- Baselines: `test:sqlite` (node --test, serial) 131/131; the phext vitest set
+  68/68 serial (12 files, incl. the new exit E2E) and cavern-lifecycle
+  3/3; typecheck 0; build 0; boot smoke HTTP 200 with the flag off
+  and with it temporarily flipped on (reverted) — under the flag the
+  download route answers 409 "Choose a Cavern first." and migrate
+  400 on an out-of-root path, i.e. registered and refusing on domain
+  grounds. The full `npm test` on this loaded VM (24 min; a present
+  `dist/` makes vitest also collect the compiled copies) ended 3010
+  passed / 93 failed, every failure in a documented pre-existing
+  class: `dist/**` copies are not a test root (module-resolution
+  artifacts), the src `.test.mjs` files are node:test suites vitest
+  cannot collect (green under node --test), the missing
+  `data/raven.json` fixture, and the load-dependent
+  application-services/UI timeout class Phase 4 verified identical
+  on the pristine base — spot-re-verified here: legacy-codex-import
+  and compatible-document fail identically on base ea0c7e8. No
+  phext-family src suite failed in any run.
+
+
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,
@@ -554,6 +672,10 @@ Coverage and gates:
 - `deploy/deploy.sh`, `deploy/deploy.md`,
   `deploy/nginx-mutable.phext.io.conf`, `deploy/mutable-os.service` —
   hosting for mutable.phext.io.
+- `server/phext-cavern-transfer.mjs` — the Phase 5 transfer module
+  (migration, export, xz seal, open-from-phext); see the Phase 5
+  section above.
+- `server/phext-exit-e2e.test.ts` — the Phase 5 exit-ramp E2E.
 - `PATCHES.md`, `PHEXT.md` — this file and the phext design notes.
 
 ## Rebase flow
