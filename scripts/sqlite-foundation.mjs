@@ -52,6 +52,17 @@ try {
     // unlinked, exactly as in production. The open below re-creates
     // a fresh phext; normal init never repairs partial infrastructure.
   }
+  // Phext-only: this process must register the vault's Cavern phext
+  // with the phext-fs facade itself (in the server, the Cavern
+  // lifecycle does it). Without a registration the document stores
+  // the indexer drives refuse with ENOPHEXT. The knowledge worker
+  // opens its own instance on the same file; flush generations
+  // rebase between them, as in the server.
+  if (fs.existsSync(path.join(vault, 'cavern.phext')) || ['init','init-test','reset-test','restore'].includes(command)) {
+    const { PhextVFS } = await import('../dist/src/phext/vfs.js');
+    const { registerPhextFs } = await import('../dist/server/phext-fs.mjs');
+    registerPhextFs({ root: vault, vfs: PhextVFS.openOrCreate(path.join(vault, 'cavern.phext')) });
+  }
   client = await openSqliteFoundation({ vault, initialize: ['init','init-test','reset-test'].includes(command),
     readOnly: !!values['read-only'] || command === 'inspect', ...(command === 'restore' ? { restoreFrom: values.source } : {}) });
   let result;

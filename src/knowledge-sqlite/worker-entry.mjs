@@ -10,6 +10,7 @@ import { createEntityLookup } from './entity-lookup.mjs';
 let store, phextVfs;
 try {
   if (workerData.restoreFrom && workerData.readOnly) throw Error('Read-only mode cannot restore databases');
+  if (workerData.initialize && workerData.readOnly) throw Error('Read-only mode cannot initialize databases');
   // Phext-only (cutover): the worker owns its own PhextVFS instance
   // on the Cavern phext (the lifecycle's instance owns the document
   // strata; flush generations keep them coherent). No .mutable home
@@ -19,7 +20,13 @@ try {
     ? workerData.phextKnowledge
     : path.join(workerData.vault, 'cavern.phext');
   const home = path.dirname(phextPath);
-  phextVfs = workerData.readOnly ? PhextVFS.open(phextPath) : PhextVFS.openOrCreate(phextPath);
+  // Creation is explicit, mirroring the disk era's prepareHome: only
+  // an initializing open (or a restore, which establishes by
+  // conversion) may create the phext file. A plain open of an
+  // unestablished Cavern refuses without leaving a file behind.
+  phextVfs = workerData.readOnly || (!workerData.initialize && !workerData.restoreFrom)
+    ? PhextVFS.open(phextPath)
+    : PhextVFS.openOrCreate(phextPath);
   // Restoring a SQLite snapshot converts it into the phext (the
   // snapshot stays a transport format; the 4.6 converter does the
   // verified move). Refused when the phext already has knowledge.

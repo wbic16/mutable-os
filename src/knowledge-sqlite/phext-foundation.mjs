@@ -240,7 +240,14 @@ export function openPhextFoundation(options = {}, context = {}) {
     cacheFile() { active(); return replicaFile; },
     async backup(destination) {
       active();
-      return exportPhextKnowledge({ store, vaultGuid, destination });
+      // A snapshot inside the vault it snapshots would pollute the
+      // Cavern (and be swept into its own subject); the disk
+      // foundation refused this too.
+      if (typeof destination === 'string' && path.isAbsolute(destination)) {
+        const rel = path.relative(root, path.resolve(destination));
+        if (rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel))) throw Error('Backup destination must be outside the vault');
+      }
+      return exportPhextKnowledge({ store, vaultGuid, destination, auditAvailable });
     },
     close() {
       if (closed) return;

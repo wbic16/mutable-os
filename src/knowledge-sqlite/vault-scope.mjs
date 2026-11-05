@@ -9,19 +9,22 @@ const require=createRequire(import.meta.url);
 const exists=p=>{try{return fs.lstatSync(p);}catch(e){if(e.code==='ENOENT')return;throw e;}};
 export function inspectVaultScope(vault,{maxEntries=100000,maxDepth=128,maxMs=5000}={}) {
  if(typeof vault!=='string'||!path.isAbsolute(vault))throw Error('Supply an absolute Vault directory');
- const stat=fs.lstatSync(vault);if(!stat.isDirectory()||stat.isSymbolicLink())throw Error('Vault must be a real directory');
- const root=fs.realpathSync(vault),start=Date.now();let count=0;
- for(let dir=path.dirname(root);;dir=path.dirname(dir)){
+ // Ancestor overlap is decidable lexically and must win over a
+ // missing vault directory: a virtual subpath of a Cavern has no
+ // real directory of its own, but it is still inside an established
+ // persistence domain. The Cavern phext is establishment
+ // infrastructure, so it overlaps exactly like .mutable does.
+ for(let dir=path.dirname(path.resolve(vault));;dir=path.dirname(dir)){
   if(exists(path.join(dir,'.mutable')))throw Error(`Overlapping Vault: ancestor Mutable infrastructure at ${dir}`);
-  // Phext-only (cutover): the Cavern phext is establishment
-  // infrastructure, so it overlaps exactly like .mutable does.
   if(exists(path.join(dir,'cavern.phext')))throw Error(`Overlapping Vault: ancestor Mutable infrastructure at ${dir}`);
   if(dir===path.dirname(dir))break;
  }
+ const stat=fs.lstatSync(vault);if(!stat.isDirectory()||stat.isSymbolicLink())throw Error('Vault must be a real directory');
+ const root=fs.realpathSync(vault),start=Date.now();let count=0;
  const home=path.join(root,'.mutable'),own=exists(home);
  if(own&&(!own.isDirectory()||own.isSymbolicLink()))throw Error('Invalid Mutable system directory: expected a real directory, not a symlink');
  const phextFile=exists(path.join(root,'cavern.phext'));
- if(phextFile&&(!phextFile.isFile()||phextFile.isSymbolicLink()))throw Error('Invalid Mutable system file: expected a regular phext file, not a symlink');
+ if(phextFile&&(!phextFile.isFile()||phextFile.isSymbolicLink()||phextFile.nlink!==1))throw Error('Invalid Mutable system file: expected a private regular phext file, not a symlink or hard link');
  const walk=(dir,depth)=>{
   if(depth>maxDepth||Date.now()-start>maxMs)throw Error('Vault overlap inspection incomplete: scan budget exceeded');
   const handle=fs.opendirSync(dir);

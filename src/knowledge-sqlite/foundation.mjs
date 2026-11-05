@@ -92,7 +92,6 @@ export function restoreSnapshot(source, destination, scopeValidated = false, vfs
 
 function restoreIntoPhext(source, destination, vfs) {
   if (typeof source !== 'string' || !path.isAbsolute(source) || typeof destination !== 'string' || !path.isAbsolute(destination)) throw Error('Restore requires absolute source and destination directories');
-  if (!vfs) throw Error('Restoring a SQLite snapshot into a Cavern requires the destination\u2019s PhextVFS instance');
   const backup = directory(source), target = directory(destination);
   regularFile(path.join(backup, 'snapshot.json'));
   const manifest = JSON.parse(fs.readFileSync(path.join(backup, 'snapshot.json'), 'utf8'));
@@ -110,12 +109,17 @@ function restoreIntoPhext(source, destination, vfs) {
       const db = new Database(to, { fileMustExist: true });
       try {
         validateSchema(db, kind, manifest.vaultGuid); if (!verifyDatabase(db, kind).ok) throw Error('Invalid backup database');
-        // This snapshot contains no authoritative resource files at the new location.
-        if (kind === 'mutable') db.prepare("UPDATE Resource SET indexStatus='stale'").run();
+        // Note: no stale-marking of Resource rows — the converter
+        // carries canonical knowledge only; derived projections are
+        // repopulated from the destination Cavern's own documents
+        // by reconciliation, never from a database-only snapshot.
       }
       finally { db.close(); }
       syncFile(to);
     }
+    // The snapshot is fully validated and hash-verified above; only
+    // the conversion itself needs the destination's VFS.
+    if (!vfs) throw Error('Restoring a SQLite snapshot into a Cavern requires the destination\u2019s PhextVFS instance');
     const store = new PhextKnowledgeStore(vfs);
     convertDiskKnowledgeToPhext({
       mutableFile: path.join(staged, 'mutable.db'),

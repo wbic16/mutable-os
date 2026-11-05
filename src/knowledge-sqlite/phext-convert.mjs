@@ -96,7 +96,7 @@ export function dumpDiskKnowledge({ mutableFile, auditFile }) {
 }
 
 /** The same dump read back from L3 (post-conversion verification). */
-export function dumpPhextKnowledge(store) {
+export function dumpPhextKnowledge(store, { includeAudit = true } = {}) {
   const control = store.readControl();
   if (!control) throw Error('Phext knowledge is not established; nothing to dump');
   const tables = {};
@@ -109,10 +109,13 @@ export function dumpPhextKnowledge(store) {
   for (const entityGuid of store.aggregateIds()) propositions[entityGuid] = store.readAggregate(entityGuid);
   const outbox = store.listOutbox().map(r => ({ guid: r.operationId, timestampUtc: r.timestampUtc, payload: r.payload }))
     .sort(byGuid);
-  const audit = store.listAudit().map(e => ({
+  // includeAudit:false is the backup-with-unavailable-audit path: a
+  // corrupt audit stratum degrades audit surfaces, never canonical
+  // ones, so the dump must not parse the audit entries at all.
+  const audit = includeAudit ? store.listAudit().map(e => ({
     guid: e.guid, actorGuid: e.actorGuid ?? null, timestampUtc: e.timestampUtc, attributes: e.attributes,
     events: [...(e.events ?? [])].map(eventShape).sort(byGuid),
-  })).sort(byGuid);
+  })).sort(byGuid) : [];
   return { vaultGuid: control.vaultGuid, tables, propositions, outbox, audit };
 }
 
@@ -273,14 +276,14 @@ function buildDbFile(target, kind, vaultGuid, populate) {
  * `mutable-sqlite-backup` shape, so `restoreSnapshot` consumes the
  * export unchanged.
  */
-export function exportPhextKnowledge({ store, vaultGuid, destination }) {
+export function exportPhextKnowledge({ store, vaultGuid, destination, auditAvailable = true }) {
   if (typeof destination !== 'string' || !path.isAbsolute(destination)) {
     throw Error('Backup requires an absolute new directory');
   }
   const parent = directory(path.dirname(destination));
   const target = path.join(parent, path.basename(destination));
   fs.mkdirSync(target, { mode: 0o700 }); // Explicitly no replacement/merging.
-  const dump = dumpPhextKnowledge(store);
+  const dump = dumpPhextKnowledge(store, { includeAudit: auditAvailable });
   if (dump.vaultGuid !== vaultGuid) throw Error('Export vault identity mismatch');
   const insert = (db, table, record) => {
     const row = recordToRow(record);
@@ -303,7 +306,7 @@ export function exportPhextKnowledge({ store, vaultGuid, destination }) {
       for (const row of dump.outbox) pending.run(row.guid, row.timestampUtc, row.payload);
     }).immediate();
   });
-  buildDbFile(path.join(target, 'audit.db'), 'audit', vaultGuid, db => {
+  if (auditAvailable) buildDbFile(path.join(target, 'audit.db'), 'audit', vaultGuid, db => {
     db.transaction(() => {
       const mutation = db.prepare('INSERT INTO AuditMutation(guid,actorGuid,timestampUtc,attributes) VALUES(?,?,?,?)');
       const event = db.prepare('INSERT INTO AuditEvent(guid,mutationGuid,actorGuid,operation,recordType,recordGuid,timestampUtc,beforeJson,afterJson) VALUES(?,?,?,?,?,?,?,?,?)');
@@ -316,7 +319,7 @@ export function exportPhextKnowledge({ store, vaultGuid, destination }) {
     }).immediate();
   });
   const files = {};
-  for (const kind of ['mutable', 'audit']) {
+  for (const kind of auditAvailable ? ['mutable', 'audit'] : ['mutable']) {
     const file = path.join(target, `${kind}.db`);
     fs.chmodSync(file, 0o600); syncFile(file);
     const check = new Database(file, { readonly: true, fileMustExist: true });
@@ -329,7 +332,7 @@ export function exportPhextKnowledge({ store, vaultGuid, destination }) {
   const manifest = {
     format: 'mutable-sqlite-backup', version: 1, vaultGuid,
     createdUtc: new Date().toISOString(), files,
-    scope: 'database-only', atomicAcrossDatabases: false, auditAvailable: true,
+    scope: 'database-only', atomicAcrossDatabases: false, auditAvailable,
   };
   const marker = path.join(target, 'snapshot.json');
   fs.writeFileSync(marker, JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx', mode: 0o600 });

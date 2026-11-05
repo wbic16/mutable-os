@@ -31,8 +31,8 @@ export function testCavern(root, { create = true } = {}) {
     flush() { vfs.flush(); },
     close() {
       try { vfs.flush(); } catch { /* already closed */ }
-      unregisterPhextFs(root);
-      unregisterPhextKnowledge(root);
+      try { unregisterPhextFs(root); } catch { /* teardown raced the temp dir's removal */ }
+      try { unregisterPhextKnowledge(root); } catch { /* as above */ }
     },
   };
 }
