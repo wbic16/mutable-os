@@ -14,7 +14,8 @@ await build({entryPoints:[fileURLToPath(new URL('../server/native-document-store
 // by URL and with the copy inlined into the native store bundle.
 await build({entryPoints:[fileURLToPath(new URL('../server/phext-fs.mjs',import.meta.url))],outfile:fileURLToPath(new URL('../dist/server/phext-fs.mjs',import.meta.url)),bundle:true,platform:'node',format:'esm',target:'node22',sourcemap:true});
 
-await import('./build-relocation-helper.mjs');
+// The native relocation helper (build-relocation-helper.mjs) is
+// deleted with the phext-only cutover: vault moves are VFS renames.
 
 await import('./build-native-knowledge-worker.mjs');
 

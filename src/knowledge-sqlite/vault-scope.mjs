@@ -7,22 +7,20 @@ import { isMainThread } from 'node:worker_threads';
 import { flockExclusiveSync } from './advisory-lock.mjs';
 const require=createRequire(import.meta.url);
 const exists=p=>{try{return fs.lstatSync(p);}catch(e){if(e.code==='ENOENT')return;throw e;}};
-export function inspectVaultScope(vault,{maxEntries=100000,maxDepth=128,maxMs=5000,phextKnowledge=false}={}) {
+export function inspectVaultScope(vault,{maxEntries=100000,maxDepth=128,maxMs=5000}={}) {
  if(typeof vault!=='string'||!path.isAbsolute(vault))throw Error('Supply an absolute Vault directory');
  const stat=fs.lstatSync(vault);if(!stat.isDirectory()||stat.isSymbolicLink())throw Error('Vault must be a real directory');
  const root=fs.realpathSync(vault),start=Date.now();let count=0;
  for(let dir=path.dirname(root);;dir=path.dirname(dir)){
   if(exists(path.join(dir,'.mutable')))throw Error(`Overlapping Vault: ancestor Mutable infrastructure at ${dir}`);
-  // PhextVFS Phase 4: in phext knowledge mode the Cavern phext is
-  // establishment infrastructure too, so it overlaps exactly like
-  // .mutable does. Disk mode is untouched: a phext beside a disk
-  // Cavern (documents strata) is not a knowledge conflict.
-  if(phextKnowledge&&exists(path.join(dir,'cavern.phext')))throw Error(`Overlapping Vault: ancestor Mutable infrastructure at ${dir}`);
+  // Phext-only (cutover): the Cavern phext is establishment
+  // infrastructure, so it overlaps exactly like .mutable does.
+  if(exists(path.join(dir,'cavern.phext')))throw Error(`Overlapping Vault: ancestor Mutable infrastructure at ${dir}`);
   if(dir===path.dirname(dir))break;
  }
  const home=path.join(root,'.mutable'),own=exists(home);
  if(own&&(!own.isDirectory()||own.isSymbolicLink()))throw Error('Invalid Mutable system directory: expected a real directory, not a symlink');
- const phextFile=phextKnowledge?exists(path.join(root,'cavern.phext')):undefined;
+ const phextFile=exists(path.join(root,'cavern.phext'));
  if(phextFile&&(!phextFile.isFile()||phextFile.isSymbolicLink()))throw Error('Invalid Mutable system file: expected a regular phext file, not a symlink');
  const walk=(dir,depth)=>{
   if(depth>maxDepth||Date.now()-start>maxMs)throw Error('Vault overlap inspection incomplete: scan budget exceeded');
@@ -31,17 +29,18 @@ export function inspectVaultScope(vault,{maxEntries=100000,maxDepth=128,maxMs=50
    if(++count>maxEntries||Date.now()-start>maxMs)throw Error('Vault overlap inspection incomplete: scan budget exceeded');
    const p=path.join(dir,e.name);
    if(e.name==='.mutable'){if(dir!==root)throw Error(`Overlapping Vault: descendant Mutable infrastructure at ${dir}`);continue;}
-   if(phextKnowledge&&e.name==='cavern.phext'){if(dir!==root)throw Error(`Overlapping Vault: descendant Mutable infrastructure at ${dir}`);continue;}
+   if(e.name==='cavern.phext'){if(dir!==root)throw Error(`Overlapping Vault: descendant Mutable infrastructure at ${dir}`);continue;}
    if(e.isSymbolicLink())throw Error(`Vault overlap inspection incomplete: symlink at ${p}`);
    if(e.isDirectory())walk(p,depth+1);
   }}finally{handle.closeSync();}
  };
  walk(root,0);
- // Never repair a partial existing home by manufacturing a new canonical database.
- // Phext mode tolerates exactly one relaxation: a .mutable documents home
- // with no mutable.db (the knowledge lives in the phext). A mutable.db
- // that IS present must still be a private regular file in both modes.
- if(own){const database=exists(path.join(home,'mutable.db'));if((database&&(!database.isFile()||database.isSymbolicLink()))||(!database&&!phextKnowledge))throw Error('Existing Mutable infrastructure has missing or invalid current database; expected a private regular file, restore current knowledge explicitly');}
+ // Never repair a partial existing home by manufacturing a new canonical store.
+ // A .mutable home with no mutable.db is normal in the phext era (the
+ // knowledge lives in the phext); a mutable.db that IS present must
+ // still be a private regular file — and the foundation refuses to
+ // open beside it until the Cavern has been converted.
+ if(own){const database=exists(path.join(home,'mutable.db'));if(database&&(!database.isFile()||database.isSymbolicLink()))throw Error('Existing Mutable infrastructure has an invalid current database; expected a private regular file, restore current knowledge explicitly');}
  return {root,home,existing:!!(own||phextFile),entries:count};
 }
 export function lockVaultEstablishment(){
