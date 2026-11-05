@@ -1,3 +1,4 @@
+import {createTextualPresentationFeature} from './textual-presentation-contributions';
 import {createCardexFeature} from './cardex';
 import {createAutocompleteFeature} from '../features/autocomplete';
 import { createDesktopPlaceholderFeature } from './desktop-applications';
@@ -22,6 +23,7 @@ import { createTimerFeature } from "../features/timer";
 import { blockFeatureCapabilities } from "./feature-capabilities";
 
 export function registerApplicationViews(editor: ReactiveEditor): void {
+  if(editor.features.applicationPresentations)editor.featureHost.activate(createTextualPresentationFeature(editor));
   // Temporary legacy assembly: unmigrated views/commands retain their existing path.
   registerCoreViews(editor, editor.features.documentFormats ? FormattedDocumentView : undefined);
   // Retain readability of saved placeholder windows even when shortcuts are off.

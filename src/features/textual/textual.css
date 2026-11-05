@@ -144,7 +144,7 @@
 .textual-workspace .tw-instrument hr { height:var(--tw-line-height); background:linear-gradient(var(--tw-menu),var(--tw-menu)) center / 100% 1px no-repeat; }
 .textual-workspace .tw-instrument footer { padding-bottom:var(--tw-line-height); gap:var(--tw-line-height) calc(2 * var(--tw-cell-width)); }
 .textual-workspace .tw-instrument footer > button { box-shadow:var(--tw-cell-width) var(--tw-line-height) 0 var(--tw-shadow); }
-.textual-workspace .tw-instrument footer > button:active { transform:translate(var(--tw-cell-width),var(--tw-line-height)); box-shadow:none; }
+.textual-workspace .tw-instrument footer > button:active { box-shadow:none; }
 .textual-workspace .tw-instrument article { margin-bottom:var(--tw-line-height); overflow-wrap:anywhere; }
 .textual-workspace .tw-instrument textarea { box-sizing:border-box; max-width:100%; font:inherit; line-height:var(--tw-line-height); border:0; border-radius:0; padding:0 var(--tw-cell-width); }
 .textual-workspace .tw-instrument label { max-width:100%; }

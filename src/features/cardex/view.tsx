@@ -1,3 +1,5 @@
+import {RegisteredApplicationView,originPresentationHost} from '../../application/application-presentations';
+import {cardexApplication} from '../../application/application-presentation-keys';
 import {cardexPresentationPorts} from '../../application/cardex-presentation-ports';
 import {CardexSearch} from './search';
 import {CardexDetailPane,detailTabs} from './details';
@@ -66,9 +68,10 @@ export function EntityCardInstrument(props:{host:ReactiveEditor;windowKey?:strin
  const querySubmit=()=>{if(!discard())return;setDraft(undefined);setDirty(false);setPending(undefined);void search();};
  const [navigation,setNavigation]=createSignal<{applicationKey?:string}>();
  const [searchSlot,setSearchSlot]=createSignal<HTMLElement>(),[identitySlot,setIdentitySlot]=createSignal<HTMLElement>(),[detailsSlot,setDetailsSlot]=createSignal<HTMLElement>(),[legacySlot,setLegacySlot]=createSignal<HTMLElement>();
- if(props.host.features.textualWorkspace)onMount(()=>onCleanup(cardexPresentationPorts(props.host).register({key:crypto.randomUUID(),windowKey:props.windowKey,vault,ready,notice,dirty,busy,pending,draft,saved,activeTab,selectTab:setActiveTab,navigation,canPresent:()=>!busy()&&!bulkBusy()&&!graphWriting(),add,back,save,deletion,search:searchSlot,identity:identitySlot,details:detailsSlot,legacy:legacySlot})));
+ const presentationPort={key:crypto.randomUUID(),windowKey:props.windowKey,vault,ready,notice,dirty,busy,pending,draft,saved,activeTab,selectTab:setActiveTab,navigation,canPresent:()=>!busy()&&!bulkBusy()&&!graphWriting(),add,back,save,deletion,search:searchSlot,identity:identitySlot,details:detailsSlot,legacy:legacySlot,desktop:()=> <Desktop/>};
+ if(props.host.features.textualWorkspace||props.host.features.applicationPresentations)onMount(()=>onCleanup(cardexPresentationPorts(props.host).register(presentationPort)));
 
- return <section class="cardex-instrument" aria-label="Entity Card" onKeyDown={e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'&&!e.isComposing){e.preventDefault();e.stopPropagation();void save();}}}>
+ const Desktop=()=> <section class="cardex-instrument" aria-label="Entity Card" onKeyDown={e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'&&!e.isComposing){e.preventDefault();e.stopPropagation();void save();}}}>
   <Show when={!draft()}><header class="cardex-toolbar"><strong>Entities</strong><Show when={ready()}><Show when={!increment2}><form onSubmit={e=>{e.preventDefault();querySubmit();}}><input aria-label="Search Entity names and aliases" placeholder="Name or alias…" value={query()} onInput={e=>setQuery(e.currentTarget.value)}/><button type="submit" disabled={busy()}>Search</button></form></Show><button type="button" onClick={add} disabled={busy()}>Add</button></Show></header></Show>
   <div class="cardex-vault">{vault()}<Show when={dirty()}> · Unsaved changes</Show></div>
   <Show when={notice()}><p role="status" class="cardex-error">{notice()}</p></Show><Show when={imageBusy()}><button onClick={()=>upload?.abort()}>Cancel image import</button></Show><Show when={loading()}><p role="status">Loading…</p></Show>
@@ -93,6 +96,7 @@ export function EntityCardInstrument(props:{host:ReactiveEditor;windowKey?:strin
    <Show when={impact()}>{value=><div class="cardex-delete" role="status"><p>{value().blocked?'Deletion blocked by references.':'This Entity has no saved SQL dependencies.'}</p><For each={value().dependencies}>{d=><p>{d.kind}: {d.count}</p>}</For><p>{value().notice}</p><button disabled={value().blocked||busy()} onClick={confirmDelete}>Confirm deletion</button></div>}</Show>
   </>}</Show>
  </section>;
+ return <Show when={props.host.features.applicationPresentations} fallback={<Desktop/>}><RegisteredApplicationView editor={props.host} application={cardexApplication} instance={presentationPort} workspace="desktop" host={originPresentationHost}/></Show>;
 }
 export function CardexShell(props:{host:ReactiveEditor;windowKey?:string;openIndependent?:(id:string,vault:string)=>void;dirtyChanged?:(dirty:boolean)=>void}){
  const [active,setActive]=createSignal('Entities'),[dirty,setDirty]=createSignal(false),instance=crypto.randomUUID(),categories=['Entities','Claims','Relationships','Facts'];

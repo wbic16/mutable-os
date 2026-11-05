@@ -7,6 +7,8 @@ import type { SavePrompt } from './document-save';
 /** Runtime presentation ports, not new application instances or canonical state. */
 export interface DocumentApplicationPort {
   key: string;
+  applicationId?:string;
+  desktop?:()=>import("solid-js").JSX.Element;
   application: DocumentApplicationInstance;
   windowId(): string | undefined;
   tabs(): readonly { key: string; title: string; documentId?: string; dirty: boolean }[];

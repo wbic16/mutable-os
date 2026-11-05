@@ -8,7 +8,7 @@ import "./compact-shell.css";
 
 export function createFlintFeature(capabilities: (scope: FeatureScope) => DocumentApplicationCapabilities, materialChrome = true, probe = true, spatialGraph = true, logo = true, compactShell = true): CodexFeature {
   return { id: "flint", activate(scope) {
-    capabilities(scope).register({ type: "flint-application-block", view: props => <FlintView {...props} materialChrome={materialChrome} probe={probe} spatialGraph={spatialGraph} logo={logo} compactShell={compactShell} />,
+    capabilities(scope).register({ applicationId: "flint", type: "flint-application-block", view: props => <FlintView {...props} materialChrome={materialChrome} probe={probe} spatialGraph={spatialGraph} logo={logo} compactShell={compactShell} />,
       create: createFlintDocumentTabs,
     });
   } };

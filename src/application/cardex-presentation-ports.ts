@@ -3,6 +3,7 @@ import type {ReactiveEditor} from '../reactive-editor/editor';
 import type {EntityCardRecord} from '../features/cardex/service';
 /** A view over the already-mounted Instrument, including its original field DOM. */
 export interface CardexPresentationPort {
+ desktop?:()=>import("solid-js").JSX.Element;
  key:string;windowKey?:string;vault:Accessor<string>;ready:Accessor<boolean>;notice:Accessor<string>;dirty:Accessor<boolean>;busy:Accessor<boolean>;pending:Accessor<unknown>;
  draft:Accessor<EntityCardRecord|undefined>;saved:Accessor<EntityCardRecord|undefined>;activeTab:Accessor<string>;selectTab(tab:string):void;
  navigation:Accessor<{applicationKey?:string}|undefined>;canPresent():boolean;add():void;back():void;save():Promise<void>;deletion():Promise<void>;

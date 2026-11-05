@@ -1,3 +1,4 @@
+import {applicationPresentations} from './application-presentations';
 import {canPresentCardex} from './cardex-presentation-ports';
 import { documentApplicationPorts } from "./document-application-ports";
 import { createSpatialActions, supportsSpatial } from "./spatial-actions";
@@ -139,7 +140,7 @@ export class WorkspaceSession {
         (typeof document !== "undefined" && document.querySelector('[role="dialog"]')) ||
         Object.values(this.projection.state.nodes).some(node => editor.mounts.get(node.key) &&
           !editor.registry.hasCapability(node.viewType, "spatial-document-compatible") && node.viewType !== "youtube-video-block" &&
-          !canPresentCardex(editor,node.key,this.presentation.active(),name) &&
+          !(editor.features.applicationPresentations?applicationPresentations(editor).allowsNode(node.key,this.presentation.active(),name):canPresentCardex(editor,node.key,this.presentation.active(),name)) &&
           (editor.mounts.get(node.key)?.inputPolicy === "opaque-widget" || editor.registry.hasCapability(node.viewType, "opaque-widget")))) {
       this.noticeSignal[1]("Finish or close the open panel, draft or embedded application before switching presentations."); return false;
     }
@@ -156,7 +157,8 @@ export class WorkspaceSession {
       const candidate = createDesktop ? deriveDesktop(editor.repository.snapshot(), this.presentation.read()!, this.resolveObjects(),
         typeof window === "undefined" ? undefined : { width: window.innerWidth, height: window.innerHeight }) : undefined;
       const retainedPresentation = name === "textual" || this.presentation.active() === "textual";
-      if(retainedPresentation)for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session){this.documentSessions?.presentations.check(session);this.documentSessions?.presentations.remember(session);}}
+      if(retainedPresentation&&editor.features.applicationPresentations){applicationPresentations(editor).checkTransition(this.presentation.active(),name);applicationPresentations(editor).remember();}
+      if(retainedPresentation&&!editor.features.applicationPresentations)for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session){this.documentSessions?.presentations.check(session);this.documentSessions?.presentations.remember(session);}}
       batch(() => {
         if (name === "textual" && this.presentation.read()?.presentations.textual === undefined) this.presentation.initializeTextual();
         if (name === "spatial" && this.presentation.read()?.presentations.spatial === undefined) this.spatial?.create();
@@ -189,7 +191,8 @@ export class WorkspaceSession {
       });
       queueMicrotask(() => {
         if (this.disposed || name === "textual") return;
-        if(retainedPresentation)for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)this.documentSessions?.presentations.restorePosition(session);}
+        if(retainedPresentation&&editor.features.applicationPresentations){applicationPresentations(editor).checkTransition(this.presentation.active(),name);applicationPresentations(editor).remember();}
+      if(retainedPresentation&&!editor.features.applicationPresentations)for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)this.documentSessions?.presentations.restorePosition(session);}
         if(!key)return;
         // Existing occurrences (including minimized ones) keep their bookmark.
         // A reparented occurrence has a new route: match its retained ancestor

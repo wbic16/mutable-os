@@ -122,6 +122,7 @@ export type FeatureFlags = Readonly<{
    * other editor hosts opt in explicitly. */
   canvasWorkspace: boolean;
   /** Dedicated measured character-cell Workspace presentation. */
+  applicationPresentations: boolean;
   textualWorkspace: boolean;
   /** Experimental study presentation; explicitly opt in at application assembly. */
   spatialWorkspace: boolean;
@@ -221,6 +222,7 @@ export const featureFlags: FeatureFlags = Object.freeze({
   threeDObjects: true,
   anchorRelationships: true,
   canvasWorkspace: false,
+  applicationPresentations: true,
   textualWorkspace: true,
   spatialWorkspace: false,
   spatialDeskObjects: true,

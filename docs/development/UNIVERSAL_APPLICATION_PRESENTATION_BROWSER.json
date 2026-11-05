@@ -1,0 +1,148 @@
+{
+  "flint_registry": {
+    "applicationPresentations": true,
+    "geometry": {
+      "font": "ui-monospace, \"Cascadia Mono\", Consolas, monospace",
+      "fontSize": "16px",
+      "cellWidth": 9.640625,
+      "lineHeight": 20,
+      "width": 848.375,
+      "columns": 88,
+      "x": 2,
+      "advances": [
+        9.640625,
+        9.640625,
+        9.640625,
+        9.640625
+      ],
+      "rows": [
+        4,
+        6,
+        8,
+        10,
+        17,
+        19,
+        21,
+        23
+      ],
+      "selection": {
+        "anchor": 20,
+        "head": 25
+      },
+      "status": "letter.ink"
+    },
+    "zoom": {
+      "selection": {
+        "anchor": 306,
+        "head": 306
+      },
+      "font": "ui-monospace, \"Cascadia Mono\", Consolas, monospace",
+      "fontSize": "17.6px",
+      "columns": "120"
+    },
+    "typing": {
+      "snapshots": 0,
+      "creates": 0,
+      "projectionRebuilds": 0,
+      "referenceRebuilds": 0
+    },
+    "trustedEditing": true,
+    "compositionSmoke": true,
+    "selectionPreservingFormatting": true,
+    "undoRedo": true,
+    "manualSave": true,
+    "newDocumentCancellation": true,
+    "saveAsAndCancel": true,
+    "serviceDialogVisible": true,
+    "slashPopupVisible": true,
+    "applicationSwitching": true,
+    "sharedOccurrenceSelection": true,
+    "scrollRetention": true,
+    "representativeListsTablesTabs": true,
+    "sameEditorCellAndTextNode": true,
+    "documentSwitching": true,
+    "desktopRoundTrip": true,
+    "snapshotsOutsideSave": 0
+  },
+  "flint_legacy": {
+    "applicationPresentations": false,
+    "geometry": {
+      "font": "ui-monospace, \"Cascadia Mono\", Consolas, monospace",
+      "fontSize": "16px",
+      "cellWidth": 9.640625,
+      "lineHeight": 20,
+      "width": 848.375,
+      "columns": 88,
+      "x": 2,
+      "advances": [
+        9.640625,
+        9.640625,
+        9.640625,
+        9.640625
+      ],
+      "rows": [
+        4,
+        6,
+        8,
+        10,
+        17,
+        19,
+        21,
+        23
+      ],
+      "selection": {
+        "anchor": 20,
+        "head": 25
+      },
+      "status": "letter.ink"
+    },
+    "zoom": {
+      "selection": {
+        "anchor": 306,
+        "head": 306
+      },
+      "font": "ui-monospace, \"Cascadia Mono\", Consolas, monospace",
+      "fontSize": "17.6px",
+      "columns": "120"
+    },
+    "typing": {
+      "snapshots": 0,
+      "creates": 0,
+      "projectionRebuilds": 0,
+      "referenceRebuilds": 0
+    },
+    "trustedEditing": true,
+    "compositionSmoke": true,
+    "selectionPreservingFormatting": true,
+    "undoRedo": true,
+    "manualSave": true,
+    "newDocumentCancellation": true,
+    "saveAsAndCancel": true,
+    "serviceDialogVisible": true,
+    "slashPopupVisible": true,
+    "applicationSwitching": true,
+    "sharedOccurrenceSelection": true,
+    "scrollRetention": true,
+    "representativeListsTablesTabs": true,
+    "sameEditorCellAndTextNode": true,
+    "documentSwitching": true,
+    "desktopRoundTrip": true,
+    "snapshotsOutsideSave": 0
+  },
+  "cardex_registry": {
+    "cardexSearchEditSave": true,
+    "cardexDirtyDesktopRoundTrip": true,
+    "retainedFlintIdentity": true,
+    "cardexDocumentNavigation": true,
+    "cardexTypingWorkspaceSnapshots": 0,
+    "cardexTypingWorkspaceChanges": 0,
+    "cardexRequests": [
+      "context",
+      "search",
+      "get",
+      "claims",
+      "save",
+      "documents"
+    ]
+  }
+}

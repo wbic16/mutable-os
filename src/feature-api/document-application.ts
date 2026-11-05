@@ -54,6 +54,7 @@ export interface DocumentApplicationInstance {
 }
 export interface DocumentApplicationCapabilities {
   register(definition: {
+    applicationId?: string;
     type: string;
     create(documents: readonly ApplicationDocument[]): ExistingBlockDto;
     view: Component<{ application: DocumentApplicationInstance; initialView?: "document" | "graph" }>;

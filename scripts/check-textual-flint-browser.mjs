@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {createServer} from 'vite';
+const registryEnabled=process.env.MUTABLE_PRESENTATIONS!=='off';
 const fixture=await readFile('vaults/imported/documents/michelangelo-letters/1507-02-13-[a7a41cd3].ink');
 let saved;
 const profile=await mkdtemp(path.join(tmpdir(),'textual-shell-'));
@@ -19,7 +20,7 @@ try {
    import {WorkspacePresentations} from '/src/demo/workspace-presentations.tsx';
    import {materializeLocalWorkspace} from '/src/reactive-editor/workspace-manifest.ts';
    import '/src/index.css';import '/src/demo/workspace-demo.css';
-   const session=new WorkspaceSession(materializeLocalWorkspace({type:'workspace-block',children:[]}),{features:{nativeDocumentPersistence:true,nativeKnowledge:false,sqliteKnowledge:false,flintProbe:false}});
+   const session=new WorkspaceSession(materializeLocalWorkspace({type:'workspace-block',children:[]}),{features:{applicationPresentations:${registryEnabled},nativeDocumentPersistence:true,nativeKnowledge:false,sqliteKnowledge:false,flintProbe:false}});
    const editor=session.editor;
    const bank=editor.commands.insert({type:'workspace-object-bank-block',children:[]},{kind:'at',parentKey:session.projection.state.rootKey,index:0});
    const {admitNative}=await import('/src/persistence/native-resource.ts');
@@ -116,7 +117,7 @@ try {
  assert.equal(await evaluate('proof.creates-proof.baseCreates'),1);assert.equal(await evaluate('proof.snapshots'),0);
  // Use native scrolling in a short viewport, then switch Documents and retain its position.
  await send('Emulation.setDeviceMetricsOverride',{width:1280,height:360,deviceScaleFactor:1,mobile:false},sessionId);
- await wait('document.querySelector(".tw-flint-editor").clientHeight < 240');
+ await wait('(()=>{const root=document.querySelector(".textual-workspace"),height=document.querySelector(".tw-flint-editor").clientHeight;return height<300&&height===(Number(root.dataset.rows)-4)*parseFloat(getComputedStyle(root).getPropertyValue("--tw-line-height"));})()');
  const wheelPoint=await evaluate(`(()=>{const r=document.querySelector('.tw-flint-editor').getBoundingClientRect();return {x:r.left+100,y:r.top+50};})()`);
  await send('Input.dispatchMouseEvent',{type:'mouseWheel',deltaY:120,deltaX:0,...wheelPoint},sessionId);await wait('document.querySelector(".tw-flint-editor").scrollTop>=100');
  const scrollTop=await evaluate('document.querySelector(".tw-flint-editor").scrollTop');
@@ -141,6 +142,6 @@ try {
  assert(await evaluate('proof.flow.isConnected && proof.retained.element.parentElement===proof.originalParent && proof.retained.host.port===proof.source && getComputedStyle(proof.flow).fontFamily+" "+getComputedStyle(proof.flow).fontSize===proof.font'));
  await evaluate('proof.mount.focus()');await send('Input.insertText',{text:'Q'},sessionId);await wait('proof.text().includes("Q")');
  assert.equal(await evaluate('proof.snapshots'),0);
- const result={geometry,zoom,typing,trustedEditing:true,compositionSmoke:true,selectionPreservingFormatting:true,undoRedo:true,manualSave:true,newDocumentCancellation:true,saveAsAndCancel:true,serviceDialogVisible:true,slashPopupVisible:true,applicationSwitching:true,sharedOccurrenceSelection:true,scrollRetention:true,representativeListsTablesTabs:true,sameEditorCellAndTextNode:true,documentSwitching:true,desktopRoundTrip:true,snapshotsOutsideSave:0};
- await writeFile('/tmp/textual-flint-browser.json',JSON.stringify(result,null,2)+'\n');await send('Page.captureScreenshot',{format:'png'},sessionId).then(r=>writeFile('/tmp/textual-flint-desktop.png',Buffer.from(r.data,'base64')));console.log(JSON.stringify(result,null,2));
+ const result={applicationPresentations:registryEnabled,geometry,zoom,typing,trustedEditing:true,compositionSmoke:true,selectionPreservingFormatting:true,undoRedo:true,manualSave:true,newDocumentCancellation:true,saveAsAndCancel:true,serviceDialogVisible:true,slashPopupVisible:true,applicationSwitching:true,sharedOccurrenceSelection:true,scrollRetention:true,representativeListsTablesTabs:true,sameEditorCellAndTextNode:true,documentSwitching:true,desktopRoundTrip:true,snapshotsOutsideSave:0};
+ await writeFile(`/tmp/textual-flint-browser${registryEnabled?'':'-legacy'}.json`,JSON.stringify(result,null,2)+'\n');await send('Page.captureScreenshot',{format:'png'},sessionId).then(r=>writeFile('/tmp/textual-flint-desktop.png',Buffer.from(r.data,'base64')));console.log(JSON.stringify(result,null,2));
 } catch(error) { console.error(error);process.exitCode=1; } finally {socket?.close();browser?.kill();server?.httpServer?.closeAllConnections();await Promise.race([server?.close(),new Promise(resolve=>setTimeout(resolve,1500))]);await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}

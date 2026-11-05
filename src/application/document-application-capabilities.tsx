@@ -1,3 +1,5 @@
+import {registerDocumentPresentations} from './document-presentation-registration';
+import {RegisteredApplicationView,originPresentationHost} from './application-presentations';
 import { documentApplicationPorts } from './document-application-ports';
 import { tabOrientation } from '../block-tree/tab-orientation';
 import { tabOrientationMenu } from '../runtime/tab-orientation';
@@ -57,6 +59,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
   };
   return { register(definition) {
     requireActive();
+    const presentationKey=editor.features.applicationPresentations?registerDocumentPresentations(editor,scope,definition.applicationId??definition.type):undefined;
     // One launch may request an existing presentation. Never persist that UI mode.
     const launchViews = new Map<string, "graph">();
     const recents = definition.type === 'flint-application-block' && editor.features.flintRecentDocuments ? createRecentDocuments() : undefined;
@@ -563,18 +566,18 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
           },
           closeActiveTab() { const key = activeTab(); if (key) closeTab(key); },
         };
-      if(editor.features.textualWorkspace && retainedSessions) {
-        onMount(()=>onCleanup(documentApplicationPorts(editor).register({
-          key:props.nodeKey,application,windowId:()=>editor.windowManager?.ownerForNode(props.nodeKey),
+      const presentationPort = {
+          key:props.nodeKey,applicationId:definition.applicationId??definition.type,application,windowId:()=>editor.windowManager?.ownerForNode(props.nodeKey),
+          desktop:()=> <Dynamic component={definition.view} initialView={initialView} application={application}/>,
           tabs:()=>tabKeys().map(key=>({key,documentId:tabId(key),title:resolve(tabId(key)??'')?.title??'Unavailable Document',dirty:!!native?.isDirty(tabId(key)??'')})),
           activeTab,selectTab:chooseTab,presented:setExternalPresentation,
-          session:()=>{retainedSessions.transfers.observe();return retainedSessions.sessions().find(s=>s.host.ownerKey===props.nodeKey&&s.host.slotKey===activeTab());},
+          session:()=>{retainedSessions?.transfers.observe();return retainedSessions?.sessions().find(s=>s.host.ownerKey===props.nodeKey&&s.host.slotKey===activeTab());},
           prompt:()=>documentSaver?.prompt(),
           saveAs:documentSaver?()=>documentSaver.save(requireId(),undefined,true):undefined,
-        })));
-      }
+      };
+      if(presentationKey || (editor.features.textualWorkspace && retainedSessions))onMount(()=>onCleanup(documentApplicationPorts(editor).register(presentationPort)));
       return <>{documentSaver && <documentSaver.Dialogs/>}<Show when={publication()}>{p=><PublicationDialog editor={editor} initial={p().initial} close={()=>setPublication(undefined)}/>}</Show><Show when={collectionMode()}>{mode=><CollectionDialog editor={editor} vault={selectedVault()?.root??'.'} current={()=>mounted&&scope.active()} mode={mode()} close={()=>setCollectionMode(undefined)}/>}</Show><Show when={choosingVault()}><DocumentBrowser mode="directory" initialLocation={{folder:selectedVault()?.root??'.',filename:''}} busy={chooserBusy()} error={chooserError()} onClose={()=>setChoosingVault(false)} onChoose={async location=>{setChooserBusy(true);setChooserError('');try{await vault!.open(location.folder);if(mounted)setChoosingVault(false);return true;}catch(e){if(mounted)setChooserError(String(e));return false;}finally{if(mounted)setChooserBusy(false);}}}/></Show><div ref={root} tabIndex={-1} data-block-type={definition.type} data-runtime-key={props.nodeKey}>
-        <Dynamic component={definition.view} initialView={initialView} application={application} />
+        <Show when={presentationKey} fallback={<Dynamic component={definition.view} initialView={initialView} application={application} />}>{key=><RegisteredApplicationView editor={editor} application={key()} instance={presentationPort} workspace="desktop" host={originPresentationHost}/>}</Show>
       </div></>;
     };
     scope.own(editor.registry.register({ type: definition.type, capabilities: ["container"], view: props => <Show when={scope.active()}><Instance nodeKey={props.nodeKey} /></Show> }, scope.owner));

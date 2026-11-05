@@ -1,3 +1,4 @@
+import {registerCardexPresentations} from './cardex-presentation-registration';
 import {Show,createSignal,onMount,onCleanup} from 'solid-js';
 import type {CodexFeature} from '../feature-api';
 import type {ReactiveEditor} from '../reactive-editor/editor';
@@ -5,6 +6,7 @@ import {CardexShell,EntityCardInstrument} from '../features/cardex/view';
 /** A normal Window hosts either the navigation shell or the reusable Entity Instrument. */
 export function createCardexFeature(editor:ReactiveEditor):CodexFeature{
  return {id:'cardex',activate(scope){
+  if(editor.features.applicationPresentations)registerCardexPresentations(editor,scope);
   const open=(independent=false,id?:string,vault?:string)=>{
    const state=editor.repository.readState(),root=state.rootPlacementKey,host=state.contents[state.placements[root].contentKey];
    if(host.viewType!=='workspace-block')throw Error('Open Cardex from the Mutable workspace.');

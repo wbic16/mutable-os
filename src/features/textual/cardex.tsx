@@ -8,8 +8,12 @@ export function RetainedInstrumentSlot(props:{element:HTMLElement|undefined}) {
  onMount(()=>createEffect(()=>{const element=props.element;if(!element)return;const parent=element.parentNode,next=element.nextSibling;if(!parent)return;slot.append(element);onCleanup(()=>{if(element.parentNode===slot&&parent.isConnected&&props.element===element)parent.insertBefore(element,next?.parentNode===parent?next:null);else if(element.parentNode===slot)element.remove();});}));
  return <div ref={slot} class="tw-retained-instrument"/>;
 }
+const presented=new WeakSet<CardexPresentationPort>();
 export function TextualCardex(props:{editor:ReactiveEditor;port:CardexPresentationPort;choose(key:string):void;close(navigation?:string|true):void}) {
- const p=props.port,registry=cardexPresentationPorts(props.editor);
+ const p=props.port;
+ if(presented.has(p))throw Error('Cardex Instrument already has an interactive presentation');
+ presented.add(p);onCleanup(()=>presented.delete(p));
+ const registry=cardexPresentationPorts(props.editor);
  const navigation=p.navigation();
  createEffect(()=>{const next=p.navigation();if(next&&next!==navigation)props.close(next.applicationKey??true);});
  return <><div class="tw-cardex-caption">Cardex · Entities</div><section class="tw-instrument tw-cardex" aria-label="Textual Cardex" data-mwm-window={p.windowKey?props.editor.windowManager?.ownerForNode(p.windowKey):undefined} onKeyDown={e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'&&!e.isComposing){e.preventDefault();e.stopPropagation();void p.save();}}}>

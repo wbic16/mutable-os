@@ -1,3 +1,5 @@
+import {TextualApplications} from '../features/textual/applications';
+import {applicationPresentations} from './application-presentations';
 import {InstrumentPresentationContext} from '../rendering/instrument-presentations';
 import {TextualLer,TextualCompletion} from '../features/textual/entity-tools';
 import {TextualGloss} from '../features/textual/gloss';
@@ -25,7 +27,7 @@ const SpatialView = lazy(() => import("../features/spatial/view"));
 /** One provider and one overlay set survive switches; only active roots mount. */
 export function WorkspacePresentationView(props: { session: WorkspaceSession; desktopActions?: DesktopActions; desktopAvailable?: () => boolean }) {
   const { editor, projection, presentation } = props.session;
-  const TextualApplication = (p:{grid:import("../features/textual/grid").TextualGrid}) => <TextualFlint session={props.session} grid={p.grid}/>;
+  const TextualApplication = (p:{grid:import("../features/textual/grid").TextualGrid}) => editor.features.applicationPresentations?<TextualApplications session={props.session} grid={p.grid}/>:<TextualFlint session={props.session} grid={p.grid}/>;
   createEffect(()=>props.session.windowManager?.layout.setEnabled(presentation.active()==="desktop"));
   const canvas = createMemo(() => presentation.read()?.presentations.canvas);
   const roots = createMemo(() => presentation.active() === "canvas" ? props.session.canvasRoots() : []);
@@ -89,6 +91,6 @@ export function WorkspacePresentationView(props: { session: WorkspaceSession; de
     </Show>
     <Show when={props.session.documentSessions?.detachment}>{controller=><DetachedDocumentWindows controller={controller()}/>}</Show>
     <ReactiveViewLayers editor={editor} projection={projection} />
-    <Show when={presentation.active() === "textual"}><TextualWorkspace ownSurface={element=>props.session.windowManager?ownApplicationPresentationSurface(props.session.windowManager,element):()=>{}} application={TextualApplication} beforeZoom={()=>{for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);}}} returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
+    <Show when={presentation.active() === "textual"}><TextualWorkspace ownSurface={element=>props.session.windowManager?ownApplicationPresentationSurface(props.session.windowManager,element):()=>{}} application={TextualApplication} beforeZoom={()=>{if(editor.features.applicationPresentations){applicationPresentations(editor).remember();return;}for(const port of documentApplicationPorts(editor).ports()){const session=port.session();if(session)editor.documentSessions?.presentations.remember(session);}}} returnDesktop={() => props.session.selectPresentation("desktop")} notice={props.session.notice()} /></Show>
   </ReactiveViewProvider></WindowManagerPlane></InstrumentPresentationContext.Provider>;
 }
