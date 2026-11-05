@@ -218,6 +218,14 @@ export class SqliteKnowledgeHost {
     if(typeof body.vault!=='string' || !(archive || ['search','get','authority-lookup'].includes(body.request?.op)))throw Error('Invalid Entity lookup');
     signal?.throwIfAborted();
     const root=await this.store.resolve(body.vault);
+    // Phext mode: derived rows (document Blocks/StandoffProperties) are
+    // ephemeral — they live only in the open Vault worker's replica,
+    // rebuilt by reconciliation, and are never canonical store records.
+    // A read-only reader replica therefore cannot see saved mentions at
+    // all. When the Vault is open, its live worker is the only correct
+    // lookup target; the reader path below serves unopened Vaults
+    // (canonical names/aliases/get — mentions report as unindexed).
+    if(!archive){const live=this.entries.get(root);if(live?.client)return await live.client.entityLookup(body.request,signal);}
     const file=path.join(root,'cavern.phext');
     const stamp=await stat(file),identity=`${stamp.dev}:${stamp.ino}`;
     let reader=this.readers.get(root);

@@ -3,8 +3,12 @@ import { canonicalEntities } from './entities.mjs';
 const fold = value => value.normalize('NFKC').toLowerCase();
 const savedNotice = 'Uses saved indexed mentions; unsaved or unindexed changes are not included.';
 
-/** A bounded, vault-owned read cache. data_version changes on commits by ANY
- * other connection, including imports, renames and index updates. No file reads. */
+/** A bounded, vault-owned read cache. The revision pairs data_version
+ * (commits by OTHER connections) with total_changes() (commits by THIS
+ * connection): the phext replica is single-connection — the worker's
+ * own index updates and mutations are same-connection writes, which
+ * data_version alone never reports. Same formula as reconcile.mjs's
+ * sqlRevision. No file reads. */
 export function createEntityLookup() {
   const cache = new Map();
   let version, bytes = 0, configured = false;
@@ -13,7 +17,7 @@ export function createEntityLookup() {
     if (!request || !['search', 'get', 'authority-lookup'].includes(request.op)) throw Error('Unsupported Entity lookup');
     if (!configured) { db.function('entity_fold', {deterministic:true}, value => fold(value ?? '')); configured = true; }
     return db.transaction(() => {
-      const revision = db.pragma('data_version', {simple:true});
+      const revision = [db.pragma('data_version', {simple:true}), db.prepare('SELECT total_changes() AS n').get().n].join(':');
       if (revision !== version) { cache.clear(); bytes = 0; version = revision; }
       if (request.op === 'get' || request.op === 'authority-lookup') return canonicalEntities(db, request, check);
       const {query, stream, match, resourceId} = request;
