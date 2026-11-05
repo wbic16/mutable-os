@@ -4,7 +4,8 @@ import { Router, type RequestHandler } from 'express';
 import { promises as fs, constants } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
+import multer from 'multer';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -106,10 +107,18 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
         phextFs.registerPhextFs({ root, vfs });
         const knowledge = await import(pathToFileURL(path.resolve('src/knowledge-sqlite/phext-registry.mjs')).href);
         knowledge.registerPhextKnowledge({ root, phextPath: path.join(root, 'cavern.phext'), vfs });
+        // Phase 5: a migrated Cavern's strata record carries its
+        // remaining-on-disk list (Phase 3b honesty); preserve it
+        // across opens instead of overwriting it with an empty list.
+        let preservedOnDisk: unknown[] = [];
+        try {
+          const previous = JSON.parse(vfs.readTextFile('/.control/phext-strata.json'));
+          if (Array.isArray(previous?.onDisk)) preservedOnDisk = previous.onDisk;
+        } catch { /* a phext-born Cavern has no prior record */ }
         vfs.writeFile('/.control/phext-strata.json', JSON.stringify({
           v: 1,
           phextBacked: { documents: 1, pairJournals: 2, knowledge: 3, history: 4, services: 5, assets: 6, control: 7 },
-          onDisk: [],
+          onDisk: preservedOnDisk,
         }));
         vfs.flush();
       })();
@@ -153,7 +162,7 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
       indexWork = read().finally(() => { indexWork = undefined; });
       return indexWork;
     };
-    return { api, sql, phextReady,
+    return { api, sql, phextReady, phextVfs,
       async activateAssets(cavern: Cavern) {
         if(featureFlags.applicationServices)services=createApplicationServiceHost({root,cavernId:cavern.cavernGuid,nativeEnabled:featureFlags.nativeDocumentPersistence,publicationEnabled:featureFlags.webPublishing,academicEnabled:featureFlags.academicResourceLoaders,iiifEnabled:featureFlags.iiifResourceLoaders,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,everydayEnabled:featureFlags.everydayWebResources,academic:(request,signal)=>sql.academic(request,signal),assets:()=>assets?.store,knowledge:(request,signal)=>sql.entityLookup({vault:'.',request},signal,true)});
         if (featureFlags.managedAssetClipboard) { assets = createManagedAssetService({ root, cavernId: cavern.cavernGuid, session: cavern.session,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,inspectOriginal:(bytes,mediaType,signal)=>{if(!services)throw Error('Application services unavailable');return services.executor.run(['application/xml','application/epub+zip','application/x-bibtex','application/x-research-info-systems'].includes(mediaType)?{kind:'academic-original-inspect',bytes,mediaType}:mediaType==='application/pdf'?{kind:'pdf-inspect',bytes}:{kind:'json-inspect',bytes},signal);} }); return assets.recover(); } },
@@ -194,6 +203,21 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
       ].slice(0, 8) });
       await runtime?.close();
       runtime = next; next = undefined; current = selected; recovery = undefined;
+      // Phase 5: Cavern-scoped state lives in the Cavern's own L7
+      // record — last-opened for THIS Cavern travels with it.
+      // `caverns.json` stays server installation state. Best-effort:
+      // a state record must never fail an open.
+      if (runtime.phextVfs) {
+        try {
+          const vfs = runtime.phextVfs;
+          let state: Record<string, unknown> = { v: 1 };
+          try { state = { ...JSON.parse(vfs.readTextFile('/.control/cavern-state.json')) }; } catch { /* first open */ }
+          vfs.writeFile('/.control/cavern-state.json', JSON.stringify({
+            ...state, v: 1, cavernGuid: selected.cavernGuid, lastOpenedUtc: new Date().toISOString(),
+          }));
+          vfs.flush();
+        } catch (error) { console.warn('Cavern state record was not updated:', error); }
+      }
       return { current, alreadyCavern: target.state === 'cavern' };
     } finally { await next?.close(); switching = false; }
   };
@@ -236,6 +260,81 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
     if (!current) fail('Choose a Cavern first.');
     await run(process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'explorer.exe' : 'xdg-open', [current.path]);
     return { revealed: true };
+  });
+  // ---- PhextVFS Phase 5: the exit ramps (migration, export,
+  // download, open-from-phext). All behind the phextVfs flag; the
+  // work itself lives in server/phext-cavern-transfer.mjs, loaded by
+  // URL like the other phext modules.
+  const transferModule = () => import(pathToFileURL(path.resolve('server/phext-cavern-transfer.mjs')).href);
+  const requirePhextVfs = () => { if (!featureFlags.phextVfs) fail('This Cavern operation requires the phextVfs feature flag.'); };
+  route('post', '/migrate', req => serial(async () => {
+    requirePhextVfs();
+    const target = resolve(req.body.path);
+    if (current?.path === target) fail('Close the Cavern before migrating it.');
+    const inspected = await inspect(target);
+    if (inspected.state !== 'cavern') fail('Only an established disk-mode Cavern can be migrated.');
+    const transfer = await transferModule();
+    return transfer.migrateCavernToPhext({ root: target, openVfs: PhextVFS });
+  }));
+  route('post', '/export-phext', req => serial(async () => {
+    requirePhextVfs();
+    const source = resolve(req.body.path);
+    const destination = resolve(req.body.destination);
+    const transfer = await transferModule();
+    return transfer.exportPhextCavernToDisk({ phextPath: path.join(source, 'cavern.phext'), openVfs: PhextVFS, destination });
+  }));
+  router.get('/download', async (req, res) => {
+    try {
+      requirePhextVfs();
+      if (!current || !runtime) fail('Choose a Cavern first.');
+      await runtime.phextReady;
+      const vfs = runtime.phextVfs;
+      if (!vfs) fail('The current Cavern is not phext-backed.');
+      // Download serves the CURRENT state: flush first, then read
+      // the phext from disk. The seal is produced from those
+      // uncompressed bytes, at export time only (safe model).
+      vfs.flush();
+      const bytes = await fs.readFile(path.join(current.path, 'cavern.phext'));
+      const format = req.query.format === 'xz' ? 'xz' : 'phext';
+      let body: Buffer = bytes;
+      let filename = `${current.name}.phext`;
+      if (format === 'xz') {
+        const transfer = await transferModule();
+        body = await transfer.sealPhext(bytes);
+        filename = `${current.name}.phext.xz`;
+      }
+      res.set({
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${filename.replace(/"/g, '')}"`,
+        'X-Cavern-Guid': current.cavernGuid,
+        'X-Cavern-Format': format,
+        'X-Cavern-Phext-Bytes': String(bytes.length),
+        'X-Cavern-Phext-Sha256': createHash('sha256').update(bytes).digest('hex'),
+        ...(format === 'xz' ? { 'X-Cavern-Sealed-Bytes': String(body.length) } : {}),
+      });
+      res.send(body);
+    } catch (error) {
+      res.status((error as any).status || 409).json({ Success: false, Error: (error as Error).message });
+    }
+  });
+  const phextUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 512 * 1024 * 1024, files: 1 } }).single('phext');
+  router.post('/open-phext', (req, res) => {
+    if (!featureFlags.phextVfs) { res.status(409).json({ Success: false, Error: 'Opening a Cavern from a phext requires the phextVfs feature flag.' }); return; }
+    phextUpload(req, res, error => {
+      if (error) { res.status(409).json({ Success: false, Error: error.message }); return; }
+      void serial(async () => {
+        const file = (req as any).file as { buffer: Buffer; originalname: string } | undefined;
+        if (!file) fail('Choose a .phext or .phext.xz file to open.', 400);
+        const target = resolve((req.body as any)?.target);
+        const transfer = await transferModule();
+        const installed = await transfer.installPhextIntoFolder({
+          bytes: file.buffer, filename: file.originalname, targetDir: target, openVfs: PhextVFS,
+        });
+        const opened = await establish(target, 'open');
+        return { ...opened, ...(await view()), vaultGuid: installed.vaultGuid, sealed: installed.sealed };
+      }).then(data => res.json({ Success: true, Data: data }))
+        .catch(e => res.status((e as any).status || 409).json({ Success: false, Error: (e as Error).message }));
+    });
   });
   const middleware: RequestHandler = (req, res, next) => {
     if (!runtime || !current || switching) { res.status(409).json({ Success: false, Error: 'Establish a Cavern before entering Mutable OS.' }); return; }
