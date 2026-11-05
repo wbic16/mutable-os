@@ -106,3 +106,7 @@ The separately approved contract now supplies an optional registry-backed path f
 | `rendering/font-layout.ts`, `standoff-editor-view.tsx`, `features/gloss/presentation.tsx` | Presentation-scoped notification refreshes existing geometry owners when inherited fonts change without resizing Blocks. Actual same-width font switching exposed stale range heights. A global synthetic resize or a new geometry subsystem would invalidate unrelated content or duplicate the engine. | No Textual branches in graphical views. Only elements contained by the notification scope refresh; subscriptions clean up with their owners. Scope/disposal unit test, 26 existing renderer tests, browser same-advance geometry check and zero-snapshot/rebuild checks pass. |
 
 Font preferences, UI and CSS remain under Textual. Font changes preserve canonical authored styles, selection bookmarks, editor identity and manual persistence.
+
+## Menu refinement boundaries — 2026-11-05
+
+No shared non-Textual code changes. Dedicated Textual menu rendering consumes existing action models, lazy children and input callbacks. Content-derived grid geometry replaces the fixed popup wrapper; Workspace and Flint reuse the same renderer. Scoped CSS leaves graphical menus untouched. Focused renderer tests and a trusted browser flow cover dispatch, selection/typing/Undo, font/zoom geometry, retained identity, Desktop restoration and zero snapshots/projection rebuilds. See [qualification](TEXTUAL_MENU_REFINEMENT_QUALIFICATION.md).

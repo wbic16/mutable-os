@@ -1,0 +1,39 @@
+{
+  "initial": {
+    "height": 160,
+    "width": 192.1875,
+    "rows": 8,
+    "columns": 20,
+    "shadow": "rgb(0, 0, 0) 9.60938px 20px 0px 0px",
+    "selected": "Annotations►",
+    "background": "rgb(0, 0, 0)"
+  },
+  "resized": {
+    "height": 176,
+    "width": 240,
+    "rows": 8,
+    "columns": 20,
+    "shadow": "rgb(0, 0, 0) 12px 22px 0px 0px",
+    "selected": "Annotations►",
+    "background": "rgb(0, 0, 0)"
+  },
+  "zoomed": {
+    "height": 193.5,
+    "width": 264.0625,
+    "rows": 8,
+    "columns": 20,
+    "shadow": "rgb(0, 0, 0) 13.2031px 24.1875px 0px 0px",
+    "selected": "Annotations►",
+    "background": "rgb(0, 0, 0)"
+  },
+  "keyboardSubmenuEscape": true,
+  "typingUndo": true,
+  "retainedIdentity": true,
+  "desktopRestoration": true,
+  "work": {
+    "snapshots": 0,
+    "projections": 0,
+    "rebuilds": 0,
+    "referenceRebuilds": 0
+  }
+}

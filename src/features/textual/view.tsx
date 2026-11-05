@@ -1,3 +1,4 @@
+import {TextualCommandMenu} from './command-menu';
 import {notifyFontLayoutChange} from '../../rendering/font-layout';
 import {TextualFontSettingsPanel} from './font-settings';
 import {legacyTextualFont,resolveTextualFont,textualFontPixels} from './fonts';
@@ -9,7 +10,7 @@ import './textual.css';
 
 /** Dedicated presentation; no editor/repository dependencies or global input bindings. */
 export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:boolean; notice?: string; application?: import("solid-js").Component<{grid:TextualGrid}>; beforeZoom?():void; ownSurface?(element:HTMLElement):()=>void }) {
-  let root!: HTMLDivElement, probe!: HTMLSpanElement;
+  let root!: HTMLDivElement, probe!: HTMLSpanElement, menuAnchor!:HTMLButtonElement;
   const [preferences, setPreferences] = createSignal(loadPreferences());
   const [grid, setGrid] = createSignal<TextualGrid>();
   const [menu, setMenu] = createSignal(false);
@@ -100,7 +101,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:b
     <span ref={probe} class="tw-font-probe" aria-hidden="true">{Array.from({length:256},()=> <span>M</span>)}</span>
     <Show when={grid() && columns() >= 20 && rows() >= 8} fallback={<div class="tw-small"><p>{error() || 'Enlarge the window or reduce font zoom to show the grid.'}</p><button onClick={() => zoom(-.1)}>Zoom out</button><button onClick={props.returnDesktop}>Return to Desktop</button></div>}>
       <nav class="tw-cell tw-menu-bar" aria-label="Workspace menu" style={rect({col:0,row:0,widthCells:columns(),heightCells:1})}>
-        <button style={{width: `${11*(grid()?.cellWidthPx??0)}px`}} aria-haspopup="true" aria-expanded={menu()} onClick={() => setMenu(!menu())}>Workspace</button>
+        <button ref={menuAnchor} style={{width: `${11*(grid()?.cellWidthPx??0)}px`}} aria-haspopup="true" aria-expanded={menu()} onClick={() => setMenu(!menu())}>Workspace</button>
       </nav>
       <Show when={props.application} fallback={<>
       <div class="tw-cell tw-title" style={rect({col:1,row:2,widthCells:columns()-2,heightCells:1})}>Textual Desktop</div>
@@ -111,9 +112,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:b
       <footer class="tw-cell tw-status" style={rect({col:0,row:rows()-1,widthCells:columns(),heightCells:1})}>
         <button aria-label="Zoom out" onClick={() => zoom(-.1)}>−</button><span>{Math.round(preferences().zoom*100)}%</span><button aria-label="Zoom in" onClick={() => zoom(.1)}>+</button><span>{columns()} × {rows()}</span><span ref={setStatusSlot} class="tw-app-status"/><Show when={props.notice}><span role="status">{props.notice}</span></Show>
       </footer>
-      <Show when={menu()}><div class="tw-cell tw-popup" aria-label="Workspace actions" style={rect({col:0,row:1,widthCells:Math.min(28,columns()),heightCells:Math.min(9,rows()-2)})}>
-        <For each={actions()}>{action => <button onClick={() => { action.run(); closeMenu(); }}>{action.label}</button>}</For>
-      </div></Show>
+      <Show when={menu()}><TextualCommandMenu items={actions()} grid={grid()!} anchor={menuAnchor} label="Workspace actions" close={closeMenu} execute={action=>{closeMenu();action();}}/></Show>
     </Show>
     <Show when={settings()}><TextualFontSettingsPanel value={preferences().font} change={font=>preference({font})} close={closeSettings} notice={font().notice} loading={loading()} effective={font().label}/></Show>
   </div></Portal></TextualWorkspaceContext.Provider>;

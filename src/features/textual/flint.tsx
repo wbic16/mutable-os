@@ -10,6 +10,7 @@ import {textualFileActions} from './file-actions';
 import {TextualNewDocument} from './new-document';
 import { documentStylePorts } from '../../runtime/document-style-ports';
 import { blockMenuItems, type BlockMenuItem } from '../../runtime/block-menu-actions';
+import type {TextualMenuItem} from './menu-layout';
 import { TextualCommandMenu } from './command-menu';
 import { ownSelectionToolbar } from '../../input/selection-target';
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show, untrack } from 'solid-js';
@@ -39,7 +40,8 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
   const [mounted,setMounted]=createSignal(false),[error,setError]=createSignal(''),[busy,setBusy]=createSignal(false),[menu,setMenu]=createSignal<'file'|'edit'|'format'|'block'|'tools'>();
   const document=createMemo(()=>port.session());
   const styles=()=>{const s=document();return s?documentStylePorts(editor).get(s.rootKey):undefined;};
-  const [items,setItems]=createSignal<BlockMenuItem[]>([]);
+  const [items,setItems]=createSignal<TextualMenuItem[]>([]);
+  const [menuAnchor,setMenuAnchor]=createSignal<HTMLElement>();
   const [creating,setCreating]=createSignal(false),[references,setReferences]=createSignal(false),[fullSize,setFullSize]=createSignal(false);
   const gloss=()=>{const s=document();return s&&glossPresentationControls(s);};
   const secondaryOpen=()=>references()||!!(gloss()?.active()&&gloss()?.references());
@@ -55,7 +57,7 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
     onCleanup(()=>{islands.dispose();delete (s.element as any).textualIslands;});
   });
   const target=()=>[editor.focus.state.focusedKey,editor.focus.state.lastFocusedKey].find(key=>key&&document()?.projection.node(key))??document()?.rootKey;
-  const openCommands=(kind:'format'|'block'|'file'|'tools')=>{remember();styles()?.capture();try{
+  const openCommands=(kind:'format'|'block'|'file'|'tools',anchor:HTMLElement)=>{if(menu()===kind){closeMenu();return;}setMenuAnchor(anchor);remember();styles()?.capture();try{
     if(kind==='tools')setItems([
       {label:'Scry / Link Entity',disabled:!editor.features.autocompleteWorkstation,run:()=>{const key=target();if(key)editor.commandRegistry.execute('autocomplete.open',{targetKey:key,args:undefined});}},
       {label:'New Gloss',disabled:!editor.features.glossMode,run:()=>{const key=target();if(key)editor.commandRegistry.execute('gloss.create',{targetKey:key,args:undefined});}},
@@ -64,9 +66,9 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
       {label:'References & Search',run:()=>{const controls=gloss();if(controls?.active()&&controls.references())controls.toggleReferences();setReferences(true);}},
       {label:'Cardex',disabled:!editor.features.cardex,run:props.openCardex}
     ]);
-    else if(kind==='file')setItems(textualFileActions(port,save,()=>setCreating(true)));
+    else if(kind==='file')setItems(textualFileActions(port,save,()=>setCreating(true)).map(item=>({...item,shortcut:item.label==='Save Document'?'Ctrl/Cmd+S':undefined,separatorBefore:['Save Document','Vault','Import','Storage'].includes(item.label)})));
     else if(kind==='block'){const key=target();setItems(key?blockMenuItems(editor,key):[]);}
-    else {const tools=styles()?.tools()??[];setItems([...new Set(tools.map(t=>t.toolset))].map<BlockMenuItem>(group=>({label:group,children:tools.filter(t=>t.toolset===group&&t.run).map(t=>({label:t.label,disabled:t.disabled?.(),run:t.run}))})).concat([{label:'Colours',children:[{label:'Text colour',input:{label:'CSS colour',value:'#ff0000',submit:value=>styles()?.annotate('text/colour',value)}},{label:'Background colour',input:{label:'CSS colour',value:'#ffff00',submit:value=>styles()?.annotate('text/background-colour',value)}}]}] as BlockMenuItem[]));}
+    else {const tools=styles()?.tools()??[];setItems([...new Set(tools.map(t=>t.toolset))].map<BlockMenuItem>(group=>({label:group,children:tools.filter(t=>t.toolset===group&&t.run).map(t=>({label:t.label,disabled:t.disabled?.(),run:t.run}))})).concat([{label:'Colours',separatorBefore:true,children:[{label:'Text colour',input:{label:'CSS colour',value:'#ff0000',submit:value=>styles()?.annotate('text/colour',value)}},{label:'Background colour',input:{label:'CSS colour',value:'#ffff00',submit:value=>styles()?.annotate('text/background-colour',value)}}]}] as TextualMenuItem[]));}
     setMenu(kind);
   }catch(e){setError(String(e));}};
   const run=async(action:()=>unknown)=>{try{setError('');await action();}catch(e){setError(String(e));}};
@@ -97,8 +99,8 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
   const closeMenu=()=>{setMenu(undefined);focus();};
   return <div ref={root} class="tw-flint" inert={props.covered} data-cardex-covered={props.covered||undefined} data-secondary-fullscreen={panes().fullscreen||undefined} data-mwm-window={port.windowId()} onKeyDown={e=>{if(e.key==='Escape'&&menu()){e.preventDefault();closeMenu();}}}>
     <nav data-cross-text-controls data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))} class="tw-cell tw-flint-menu" aria-label="Flint menu" style={rect(12,0,props.grid.columns-12,1)}>
-      <button aria-expanded={menu()==='file'} onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('file')}>File</button>
-      <button aria-expanded={menu()==='edit'} onPointerDown={e=>e.preventDefault()} onClick={()=>{remember();setMenu(menu()==='edit'?undefined:'edit');}}>Edit</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('format')}>Format</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('block')}>Block</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>openCommands('tools')}>Tools</button><fieldset class="tw-flint-applications" disabled={busy()}>{props.applications}</fieldset>
+      <button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='file'} onClick={e=>openCommands('file',e.currentTarget)}>File</button>
+      <button aria-expanded={menu()==='edit'} onPointerDown={e=>e.preventDefault()} onClick={e=>{if(menu()==='edit'){closeMenu();return;}setMenuAnchor(e.currentTarget);remember();setItems([{label:'Undo',shortcut:'Ctrl/Cmd+Z',run:()=>history('undo')},{label:'Redo',shortcut:'Ctrl/Cmd+Shift+Z',run:()=>history('redo')},{label:'Find',separatorBefore:true,run:()=>{const key=target();if(key)editor.find.open(key);}}]);setMenu('edit');}}>Edit</button><button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='format'} onClick={e=>openCommands('format',e.currentTarget)}>Format</button><button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='block'} onClick={e=>openCommands('block',e.currentTarget)}>Block</button><button onPointerDown={e=>e.preventDefault()} aria-expanded={menu()==='tools'} onClick={e=>openCommands('tools',e.currentTarget)}>Tools</button><fieldset class="tw-flint-applications" disabled={busy()}>{props.applications}</fieldset>
     </nav>
     <nav class="tw-cell tw-flint-tabs" aria-label="Documents" style={rect(1,1,props.grid.columns-2,1)}><strong class="tw-app-identity">Flint</strong>
       <For each={port.tabs()}>{tab=><button disabled={busy()} aria-current={tab.key===port.activeTab()?'page':undefined} onPointerDown={e=>e.preventDefault()} onClick={()=>choose(tab.key)} title={tab.title}>{tab.title}{tab.dirty?' *':''}</button>}</For>
@@ -113,10 +115,7 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
       <div ref={glossSurface} class="tw-secondary-slot" hidden={references()}/><div class="tw-secondary-slot" hidden={!references()}><Show when={references()}><div data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))}><TextualReferences docked clearFocus={()=>showFullDocument(editor)} knowledge={port.application.knowledge} entities={port.application.entities} restore={focus} close={restore=>{if(restore===false&&!panes().fullscreen)return;setReferences(false);if(restore!==false)focus();}}/></div></Show></div>
     </div>
     <Show when={workspace?.status()} keyed>{status=><Portal mount={status}><div class="tw-flint-status" role="status" hidden={props.covered}>{error()||styles()?.notice()|| (busy()?'Saving…':port.application.properties()?.unsaved?'Modified · Ctrl/Cmd+S to save':port.application.properties()?.location?.filename??'Ready')}</div></Portal>}</Show>
-    <Show when={menu()}><div data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))} class="tw-cell tw-popup tw-flint-popup" style={{...rect(12,1,Math.min(42,props.grid.columns-12),Math.min(menu()==='edit'?6:24,props.grid.rows-3)),height:'auto','max-height':`${Math.min(menu()==='edit'?6:24,props.grid.rows-3)*props.grid.cellHeightPx}px`}}>
-      <Show when={menu()!=='edit'&&items()} keyed>{list=><TextualCommandMenu items={list} close={closeMenu} execute={action=>{setMenu(undefined);focus();void run(action);}}/>}</Show>
-      <Show when={menu()==='edit'}><button onPointerDown={e=>e.preventDefault()} onClick={()=>history('undo')}>Undo</button><button onPointerDown={e=>e.preventDefault()} onClick={()=>history('redo')}>Redo</button><button onClick={()=>{closeMenu();const key=target();if(key)editor.find.open(key);}}>Find</button><button onClick={closeMenu}>Close menu</button></Show>
-    </div></Show>
+    <Show when={menu()&&items()} keyed>{list=><div data-selection-toolbar ref={el=>onCleanup(ownSelectionToolbar(el,editor.mounts))}><TextualCommandMenu items={list} grid={props.grid} anchor={menuAnchor()!} label={`${menu()} menu`} close={closeMenu} execute={action=>{setMenu(undefined);focus();void run(action);}}/></div>}</Show>
     <Show when={creating()&&port.application.vault}>{vault=><TextualNewDocument vault={vault()} grid={props.grid} close={()=>{setCreating(false);focus();}}/>}</Show>
     <div ref={surfaces} class="tw-flint-surfaces"/>
     <Show when={port.prompt()} keyed>{prompt=><TextualSavePrompt prompt={prompt} grid={props.grid}/>}</Show>
