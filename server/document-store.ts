@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { createHistoryService } from "./history-router.js";
-import { promises as fs } from "node:fs";
+import { promises as fs } from "./phext-fs.mjs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 

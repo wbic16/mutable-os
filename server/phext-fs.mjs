@@ -30,8 +30,19 @@
  * opens of the root, whose sync() is the VFS flush). Below the root:
  *
  * - `.mutable/**` stays on real disk in this phase: the knowledge
- *   SQLite home, its establishment files, the recognized-document
- *   journal and the listing cache are Phase 4 / establishment-owned.
+ *   SQLite home, its establishment files and the listing cache are
+ *   Phase 4 / establishment-owned. (Phase 3b carves out exactly two
+ *   exceptions, below.)
+ * - Phase 3b: `.mutable/document-saves/**` — the recognized-document
+ *   journal, a legacy JSON store — is virtual, as is `.mutable`
+ *   itself (the VFS home directory that merges strata 3/5/6), so the
+ *   store's resolve() lstat-walk can enter it. The journal lands in
+ *   the `.mutable` stratum at its natural path (the VFS dispatches
+ *   by path; stratum 3's root *is* `.mutable`). No other `.mutable`
+ *   path crosses: knowledge is phext-native since Phase 4 and never
+ *   travels through this facade, and the discovery cache is retired
+ *   in phext mode (vault-listing-cache.mjs), so its file is neither
+ *   read nor written here.
  * - `cavern.phext`, `cavern.phext.bak` and `cavern.phext.anchor-*`
  *   are real files by construction.
  * - Everything else is virtual: the document tree (stratum 1),
@@ -357,8 +368,16 @@ class PhextFsBackend {
   vfsPathFor(absPath) {
     const rel = path.relative(this.root, path.resolve(absPath));
     if (rel === '' || rel.startsWith('..') || path.isAbsolute(rel)) return undefined;
-    const first = rel.split(path.sep)[0];
-    if (first === '.mutable') return undefined;
+    const parts = rel.split(path.sep);
+    const first = parts[0];
+    if (first === '.mutable') {
+      // Phase 3b: only the .mutable home itself (a directory in the
+      // VFS) and the recognized-document journal beneath it cross
+      // into the phext. Every other .mutable path stays on disk —
+      // knowledge is phext-native (Phase 4), never fs-backed.
+      if (parts.length === 1 || parts[1] === 'document-saves') return '/' + parts.join('/');
+      return undefined;
+    }
     if (first.startsWith('cavern.phext')) return undefined;
     return '/' + rel.split(path.sep).join('/');
   }
@@ -449,7 +468,21 @@ class PhextFsBackend {
   statFor(vfsPath, options) {
     const stat = this.vfs.stat(vfsPath);
     if (!stat) throw coded('ENOENT', `ENOENT: no such file or directory, lstat '${vfsPath}'`);
-    const node = this.nodeFor(vfsPath);
+    // The `.mutable` home is a synthetic merged directory (strata
+    // 3/5/6 roots): it gets a deterministic identity derived from
+    // the phext path, never a registry assignment. Assigning here
+    // would dirty the node registry on a pure read, and the next
+    // flush would rewrite the phext inside a discovery fence —
+    // operations() stats this directory from inside fence windows.
+    let node;
+    if (vfsPath === '/.mutable') {
+      node = this.loadNodes().get(vfsPath) ?? {
+        token: sha256Hex(Buffer.from(`phext-fs-mutable-home:${this.vfs.path}`)),
+        version: 1,
+      };
+    } else {
+      node = this.nodeFor(vfsPath);
+    }
     const contentKey = stat.type === 'file'
       ? stat.sha256
       : sha256Hex(Buffer.from(JSON.stringify(this.vfs.listDir(vfsPath).map(e => [e.name, e.type]))));
@@ -728,6 +761,9 @@ class PhextFileHandle {
 }
 
 // --------------------------------------------------------------- facade
+
+/** node:fs constants, re-exported for facade consumers (Phase 3b). */
+export { constants };
 
 function dispatch(absPath) {
   const backend = phextFsBackendFor(absPath);
