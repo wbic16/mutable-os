@@ -1,8 +1,37 @@
 import { Worker } from 'node:worker_threads';
 import { inspectVaultScope, lockVaultEstablishment } from './vault-scope.mjs';
 import { writerLock } from './paths.mjs';
+import { flockExclusiveSync } from './advisory-lock.mjs';
+import { phextKnowledgeFor } from './phext-registry.mjs';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
+import fs from 'node:fs';
 import path from 'node:path';
+
+/**
+ * PhextVFS Phase 4 writer lease: a flock on the writer lock's anchor
+ * file beside the phext — the same anchor the gates backend computes
+ * for the VFS path '/.mutable/writer.lock' (see
+ * scripts/stage-c-gates/phext-backend.mjs), so the knowledge writer
+ * lock is the same logical lock across layers. Held for the worker's
+ * lifetime, exactly like paths.writerLock on disk.
+ */
+function phextWriterLease(phextPath) {
+  const anchor = path.join(path.dirname(phextPath),
+    `${path.basename(phextPath)}.anchor-${createHash('sha256').update('/.mutable/writer.lock').digest('hex').slice(0, 16)}`);
+  let fd, releaseLock;
+  try {
+    fd = fs.openSync(anchor, fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_NOFOLLOW, 0o600);
+    const stat = fs.fstatSync(fd);
+    if (!stat.isFile() || (process.getuid && stat.uid !== process.getuid())) throw Error('Writer lease anchor is not a private regular file');
+    releaseLock = flockExclusiveSync(fd, `${anchor}.holder`);
+  } catch (e) {
+    if (fd !== undefined) try { fs.closeSync(fd); } catch { /* already closed */ }
+    throw Error(`SQLite writer unavailable: ${e.message}`);
+  }
+  let released = false;
+  return () => { if (released) return; released = true; try { releaseLock(); } finally { fs.closeSync(fd); } };
+}
 
 /** One vault-owned worker, independent of editor occurrences. No raw SQL transport. */
 export async function openSqliteFoundation(options) {
@@ -11,10 +40,20 @@ export async function openSqliteFoundation(options) {
   // Selector readers open an existing DB only. They neither establish a Vault
   // nor acquire a writer/indexing lease, so they must not scan its documents.
   if(configuration.entityReader && (!configuration.readOnly || configuration.initialize))throw Error('Entity readers must be read-only');
+  // PhextVFS Phase 4: resolve phext knowledge mode before scope
+  // inspection. A registered lifecycle instance wins; an explicit
+  // path (or `true` for the default cavern.phext) is honored; the
+  // resolved absolute path rides workerData into the worker.
+  const phextPath = typeof configuration.phextKnowledge === 'string' ? configuration.phextKnowledge
+    : configuration.phextKnowledge === true ? (configuration.vault ? path.join(configuration.vault, 'cavern.phext') : undefined)
+    : (configuration.vault ? phextKnowledgeFor(configuration.vault)?.phextPath : undefined);
+  if (phextPath) configuration.phextKnowledge = phextPath;
+  else if (configuration.phextKnowledge) throw Error('Phext knowledge mode requires a vault phext path');
+  if (configuration.restoreFrom && phextPath) throw Error('Phext knowledge mode does not restore SQLite snapshots; export from the source Cavern instead');
   let releaseScope;
   if(!configuration.entityReader){
    for(let attempt=0;;attempt++){try{releaseScope=lockVaultEstablishment();break;}catch(e){if(!['EAGAIN','EWOULDBLOCK'].includes(e.code)||attempt>=100)throw e;await new Promise(resolve=>setTimeout(resolve,20));}}
-   try{inspectVaultScope(configuration.vault);}catch(e){releaseScope();throw e;}
+   try{inspectVaultScope(configuration.vault, phextPath ? {phextKnowledge:true} : undefined);}catch(e){releaseScope();throw e;}
   }
   let worker;try{worker = new Worker(path.join(path.dirname(fileURLToPath(import.meta.url)), 'worker.mjs'), { workerData: {...configuration,scopeValidated:true} });}catch(e){releaseScope?.();throw e;}
   const pending = new Map(); let next = 0, pendingBytes = 0, dead = false, closing = false, startup, unlock;
@@ -32,7 +71,7 @@ export async function openSqliteFoundation(options) {
   worker.on('message', message => {
     if (message.leaseRequest) {
       if (dead) return;
-      try { if (unlock) throw Error('Duplicate writer lease request'); unlock = writerLock(message.home); worker.postMessage({ leaseGranted: true }); }
+      try { if (unlock) throw Error('Duplicate writer lease request'); unlock = message.phextKnowledge ? phextWriterLease(message.phextKnowledge) : writerLock(message.home); worker.postMessage({ leaseGranted: true }); }
       catch (e) { worker.postMessage({ leaseError: e.message }); }
       return;
     }
@@ -84,6 +123,7 @@ export async function openSqliteFoundation(options) {
     indexIssue:(path,reason)=>request('index-issue',undefined,{path,reason}),
     finishReconciliation:()=>request('finish-reconciliation'),
     inspect: () => request('inspect'), verify: () => request('verify'),
+    knowledgeCacheFile: () => request('knowledge-cache-file'),
     rebuildFts: () => request('rebuild-fts'), clearDerived: () => request('clear-derived'),
     backup: directory => request('backup', directory), terminate,
     async close() { if (dead) { await exited; return; } if (closing) { await exited; return; } const done = request('close'); closing = true; try { await done; } finally { await exited; } },
