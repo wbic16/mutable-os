@@ -221,7 +221,11 @@ function decompressToTempFile(bytes, maxBytes) {
       if (error) reject(error); else resolve(value);
     };
     const fail = error => { child.kill('SIGKILL'); finish(error); };
+    // A write queued just before the cap kill can complete against
+    // the destroyed stream; surface it here instead of uncaught.
+    out.on('error', error => fail(error));
     child.stdout.on('data', chunk => {
+      if (settled) return;
       seen += chunk.length;
       if (seen > maxBytes) {
         fail(Error(`the sealed phext decompresses to more than the ${maxBytes}-byte limit and was refused`));
