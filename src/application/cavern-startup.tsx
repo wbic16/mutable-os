@@ -18,15 +18,29 @@ type CavernContext = {
 const Context = createContext<CavernContext>();
 export const useCurrentCavern = () => useContext(Context);
 
+// SSO identity (sso-design §4.2 M5). The server gate is env-gated:
+// when it is off, /api/auth/session answers 404 and ssoIdentity
+// stays undefined — no identity bar, no CSRF header, no 401
+// redirect; this client behaves exactly as it did before SSO.
+type SsoIdentity = { signed_in: boolean; who?: string; handle?: string; name?: string; editor?: boolean; csrf?: string };
+let ssoIdentity: SsoIdentity | undefined;
+const ssoLoginUrl = () => '/api/auth/login?return=' + encodeURIComponent(window.location.pathname);
+
 async function request(action: string, body?: unknown) {
   const unavailable = 'Mutable cannot reach its local server. Start or restart Mutable, then try again.';
   const invalid = 'Mutable received an invalid response from its local server. Restart Mutable, then try again.';
   let response: Response;
   try {
     response = await fetch(`/api/cavern/${action}`, body === undefined ? undefined : {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(ssoIdentity?.csrf ? { 'x-csrf-token': ssoIdentity.csrf } : {}) },
+      body: JSON.stringify(body),
     });
   } catch { throw new Error(unavailable); }
+  // The SSO gate's 401: the Mutable session is gone (expired
+  // mid-flight). Restart sign-in at the current page (§3.1); the
+  // error below still surfaces if the navigation is somehow held.
+  if (response.status === 401 && ssoIdentity) window.location.assign(ssoLoginUrl());
   let result: any;
   try { result = await response.json(); }
   // The development proxy returns an empty 500 when the local server is stopped.
@@ -53,19 +67,66 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
   const [phextOpen, setPhextOpen] = createSignal(false), [phextTarget, setPhextTarget] = createSignal('');
   let phextFile: File | undefined;
   const [target, setTarget] = createSignal<Target>(), [index, setIndex] = createSignal<any>();
+  // SSO identity for the chrome (M5): undefined until the session
+  // call answers with a real payload — and forever when the
+  // server's gate is unconfigured, which is the point.
+  const [identity, setIdentity] = createSignal<SsoIdentity>();
   let alive = true, polling = false, generation: string | undefined;
   // Every managed request is bound to the active server context, fencing stale tabs.
   const originalFetch = window.fetch;
   const boundFetch: typeof window.fetch = (input, init) => {
     const address = new URL(input instanceof Request ? input.url : String(input), window.location.href);
-    if (address.origin === window.location.origin && ((address.pathname.startsWith('/api/') && !address.pathname.startsWith('/api/cavern/')) || address.pathname === '/upload')) {
-      const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
-      if (generation && !headers.has('X-Mutable-Cavern')) headers.set('X-Mutable-Cavern', generation);
-      return originalFetch.call(window, input, { ...init, headers });
-    }
-    return originalFetch.call(window, input, init);
+    const gated = address.origin === window.location.origin && (address.pathname.startsWith('/api/') || address.pathname === '/upload');
+    if (!gated) return originalFetch.call(window, input, init);
+    const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
+    const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
+    // The Cavern fence, unchanged: the session header rides on the
+    // fenced /api surface and /upload, never on /api/cavern itself.
+    if (!address.pathname.startsWith('/api/cavern/') && generation && !headers.has('X-Mutable-Cavern')) headers.set('X-Mutable-Cavern', generation);
+    // The SSO gate's CSRF rule covers every non-GET API/upload
+    // call once a Mutable session exists (design §2 decision 6).
+    if (ssoIdentity?.csrf && method !== 'GET' && method !== 'HEAD' && !headers.has('x-csrf-token')) headers.set('x-csrf-token', ssoIdentity.csrf);
+    const pending = originalFetch.call(window, input, { ...init, headers });
+    // A 401 from the gate restarts sign-in at the current page.
+    if (ssoIdentity) void pending.then(response => {
+      if (response.status === 401 && alive) window.location.assign(ssoLoginUrl());
+    }, () => {});
+    return pending;
   };
   window.fetch = boundFetch;
+  // Ask the server who is signed in (design §3.4). Any failure —
+  // a 404 from an unconfigured gate, a stopped server, a non-JSON
+  // proxy error — leaves the identity unset and the chrome bare.
+  const loadIdentity = async () => {
+    try {
+      const response = await originalFetch('/api/auth/session');
+      const data = await response.json().catch(() => undefined);
+      if (!alive || !data || typeof data.signed_in !== 'boolean') return;
+      ssoIdentity = data as SsoIdentity;
+      setIdentity(ssoIdentity);
+    } catch { /* SSO unconfigured or unreachable: no identity UI. */ }
+  };
+  // Mutable logout is local (design §3.5): it clears the Mutable
+  // session and lands on the gate's signed-out page; the edit
+  // session is ended at edit, not from here.
+  const signOut = async () => {
+    try {
+      await originalFetch('/api/auth/logout', {
+        method: 'POST', headers: ssoIdentity?.csrf ? { 'x-csrf-token': ssoIdentity.csrf } : {},
+      });
+    } catch { /* The navigation is the outcome either way. */ }
+    window.location.assign('/');
+  };
+  const identityBar = () => <Show when={identity()}><div class="cavern-identity">
+    <Show when={identity()!.signed_in} fallback={<span>Not signed in to Mutable OS</span>}>
+      <span>Signed in as <strong>{identity()!.handle || identity()!.who}</strong></span>
+      <Show when={identity()!.editor}><em class="cavern-mode-badge">editor</em></Show>
+    </Show>
+    <a href="https://edit.phext.io/">phext edit ↗</a>
+    <Show when={identity()!.signed_in} fallback={<a href={ssoLoginUrl()}>Sign in</a>}>
+      <button type="button" onClick={() => void signOut()}>Sign out</button>
+    </Show>
+  </div></Show>;
   const apply = (value: any) => {
     if (!alive) return;
     if (value.recentCaverns) setRecent(value.recentCaverns);
@@ -93,7 +154,10 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
       const form = new FormData();
       form.append('phext', phextFile);
       form.append('target', phextTarget());
-      const response = await originalFetch('/api/cavern/open-phext', { method: 'POST', body: form });
+      const response = await originalFetch('/api/cavern/open-phext', {
+        method: 'POST', body: form,
+        headers: ssoIdentity?.csrf ? { 'x-csrf-token': ssoIdentity.csrf } : undefined,
+      });
       const result = await response.json().catch(() => undefined);
       if (!response.ok || result?.Success === false || !result?.Data) {
         throw new Error(typeof result?.Error === 'string' && result.Error ? result.Error : 'Mutable could not open a Cavern from that phext.');
@@ -186,6 +250,7 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     },
   };
   onMount(() => {
+    void loadIdentity();
     void startup();
     const timer = setInterval(() => {
       const selected = untrack(current); if (!selected || polling || untrack(busy)) return;
@@ -245,6 +310,7 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     <Show when={error()}><p class="cavern-error" role="alert">{error()}</p><Show when={!current() && !choosing()}><button disabled={busy()} onClick={() => void startup()}>Retry startup</button></Show></Show>
   </section>;
   return <Context.Provider value={context}>
+    {identityBar()}
     <Show when={current()} keyed fallback={<main class="cavern-startup">{chooser()}</main>}>{selected => <>
       <div inert={choosing()}>{props.children(selected)}</div>
       <Show when={choosing()}><div class="cavern-overlay" ref={el => queueMicrotask(() => el.querySelector<HTMLInputElement>('input')?.focus())} onKeyDown={e => {
