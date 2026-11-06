@@ -15,7 +15,7 @@ async function start(root,hold=''){
  return {held,kill:async()=>{proc.kill('SIGKILL');await once(proc,'exit');},call:async(action,body)=>{const response=await fetch(`http://127.0.0.1:${port}/api/native/${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return {status:response.status,...await response.json()};}};
 }
 async function fixture(hold){
- const root=await fs.mkdtemp(path.join(os.tmpdir(),'flint-c1a-restart-'));cleanup.push(()=>fs.rm(root,{recursive:true,force:true}));await fs.mkdir(path.join(root,'notes'));await fs.mkdir(path.join(root,'other'));
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'flint-c1a-restart-'));cleanup.push(()=>fs.rm(root,{recursive:true,force:true}));
  const native=await fs.readFile('artifacts/flint-b1.2/rich.mutable.json','utf8'),resource=decodeNative(new TextEncoder().encode(native)),projection=exportMarkdown(resource);
  const g={resourceId:resource.resourceId,generation:crypto.randomUUID(),native,markdown:projection.text,profile:projection.profile,targets:[]};
  const host=await start(root,hold),location={folder:'notes',filename:'paper.mutable.json'};
@@ -34,15 +34,27 @@ it.each(['relocation-intent','relocation-after-0','relocation-after-1','relocati
 it('recovers nonempty directory movement after server death and refuses external interference on recovery',async()=>{
  const f=await fixture('relocation-after-0');f.q.kind='directory';f.q.source='notes';f.q.destination='moved';
  const request=f.host.call('vault/relocate',f.q).catch(()=>undefined);await f.host.held;await f.host.kill();await request;
- await fs.writeFile(path.join(f.root,'moved/paper.md'),'external after crash');const resumed=await start(f.root);
- const conflict=await resumed.call('vault/recover',{operationId:f.q.operationId});expect(conflict.Data.phase).toBe('relocation-pending');expect(await fs.readFile(path.join(f.root,'moved/paper.md'),'utf8')).toBe('external after crash');
+ // External interference: a write into the phext by another
+ // opener while the server is dead (the disk era wrote a real
+ // file into the moved folder).
+ const {PhextVFS}=await import('../src/phext/vfs');const xvfs=PhextVFS.open(path.join(f.root,'cavern.phext'));xvfs.writeFile('/moved/paper.md','external after crash');xvfs.flush();xvfs.close();
+ const resumed=await start(f.root);
+ const conflict=await resumed.call('vault/recover',{operationId:f.q.operationId});expect(conflict.Data.phase).toBe('relocation-pending');
+ {const {PhextVFS:P2}=await import('../src/phext/vfs');const rvfs=P2.open(path.join(f.root,'cavern.phext'));expect(rvfs.readFile('/moved/paper.md').toString('utf8')).toBe('external after crash');rvfs.close();}
  expect((await resumed.call('open',{location:{folder:'moved',filename:'paper.mutable.json'}})).status).toBe(409);
 },15000);
 it('serializes a concurrent Save against a pending relocation across server processes',async()=>{
  const f=await fixture('relocation-after-0'),other=await start(f.root);const request=f.host.call('vault/relocate',f.q).catch(()=>undefined);await f.host.held;
  expect((await other.call('save',{location:f.location,generation:f.g,baseline:f.q.baselines[0].baseline})).status).toBe(409);
- await f.host.kill();await request;expect((await other.call('save',{location:f.location,generation:f.g,baseline:f.q.baselines[0].baseline})).status).toBe(409);
- expect((await other.call('vault/recover',{operationId:f.q.operationId})).Data.phase).toBe('relocated');
+ await f.host.kill();await request;
+ // Recovery completes once both processes are gone and a fresh
+ // server instance opens the Cavern: two live VFS instances on
+ // one phext cohere by sequential handoff (flush-rebase), not by
+ // concurrent service — a second process that keeps serving after
+ // the first dies is outside the one-server-per-Cavern contract.
+ await other.kill();
+ const resumed=await start(f.root);
+ expect((await resumed.call('vault/recover',{operationId:f.q.operationId})).Data.phase).toBe('relocated');
 },15000);
 it('finishes a directory move after actual server death and reopens its unchanged native identity',async()=>{
  const f=await fixture('relocation-after-0');f.q.kind='directory';f.q.source='notes';f.q.destination='moved';

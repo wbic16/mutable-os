@@ -1,70 +1,79 @@
-import { constants } from 'node:fs';
-import { open, lstat } from 'node:fs/promises';
-import { fork } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-import { join } from 'node:path';
-import fsExt from 'fs-ext';
+/**
+ * Stage-C gates filesystem — PHEXT-ONLY (cutover, 2026-11-05).
+ *
+ * This module is the single seam the four gates consumers (history
+ * store, job storage, publication storage, managed assets) call:
+ * pinDirectory, atDirectory, createDirectory, lockFile. Until the
+ * cutover it dispatched between a disk backend (a forked worker
+ * pinning real directories) and the phext backend in
+ * ./phext-backend.mjs. The disk backend is DELETED — code, worker
+ * and all. Every call now routes to the phext backend registered
+ * for the Cavern root containing the path (cavern-lifecycle
+ * registers one per open Cavern), and a path no Cavern covers
+ * fails explicitly: gates trees live inside a Cavern's phext or
+ * nowhere.
+ *
+ * The backend serves every path under its Cavern root through the
+ * VFS — the gates-owned trees (`.mutable`, `.memory`) and the
+ * document folders history descends through alike — with the disk
+ * backend's exact identity, locking and error contracts (see
+ * phext-backend.mjs for the identity and anchor-flock discipline).
+ */
+import { resolve, sep } from 'node:path';
+import { createPhextBackend } from './phext-backend.mjs';
 
 export const fileIdentity = stat => ({ dev: String(stat.dev), ino: String(stat.ino) });
-const same = (a, b) => a.dev === b.dev && a.ino === b.ino;
-const worker = fileURLToPath(new URL('./filesystem-worker.mjs', import.meta.url));
-const sessions = new Map();
-function sessionFor(lockFd) {
-  if (sessions.has(lockFd)) return sessions.get(lockFd);
-  const child = fork(worker, [], { serialization: 'advanced', execArgv: [],
-    stdio: ['ignore', 'ignore', 'pipe', 'ipc', ...(lockFd === undefined ? [] : [lockFd])] });
-  const pending = new Map(); let sequence = 0, stderr = '', stopped = false;
-  child.stderr.on('data', bytes => { if (stderr.length < 4096) stderr += bytes; });
-  const fail = error => { stopped = true; for (const p of pending.values()) p.reject(error); pending.clear(); sessions.delete(lockFd); };
-  child.once('error', fail);
-  const exited = new Promise(resolve => child.once('exit', () => { fail(new Error(`filesystem worker exited: ${stderr}`)); resolve(); }));
-  child.on('message', message => {
-    const p = pending.get(message.id); if (!p) return;
-    pending.delete(message.id);
-    if (message.error) p.reject(Object.assign(new Error(message.error.message), { code: message.error.code }));
-    else p.resolve(message.result);
-  });
-  const session = {
-    request(value) {
-      if (stopped) return Promise.reject(new Error('filesystem worker stopped'));
-      if (pending.size >= 128) return Promise.reject(new Error('filesystem worker queue capacity'));
-      return new Promise((resolve, reject) => {
-        const id = ++sequence; pending.set(id, { resolve, reject });
-        child.send({ ...value, id }, error => { if (error) { pending.delete(id); reject(error); } });
-      });
-    },
-    async close() {
-      if (!stopped) { stopped = true; child.send({ shutdown: true }); }
-      await exited;
-    },
-  };
-  sessions.set(lockFd, session); return session;
+
+const phextBackends = new Map();
+export function registerPhextBackend({ root, vfs }) {
+  const backend = createPhextBackend({ root, vfs });
+  if (phextBackends.has(backend.root)) throw new Error(`PhextVFS backend already registered for ${backend.root}`);
+  phextBackends.set(backend.root, backend);
+  return backend;
 }
-export async function closeFilesystemWorkers() { await Promise.all([...sessions.values()].map(session => session.close())); }
-export async function pinDirectory(path) {
-  const fd = await open(path, constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW);
-  try { return { path, identity: fileIdentity(await fd.stat()) }; } finally { await fd.close(); }
+export async function unregisterPhextBackend(root) {
+  const backend = phextBackends.get(resolve(root));
+  if (!backend) return;
+  phextBackends.delete(backend.root);
+  backend.flush();
+}
+function phextBackendFor(path) {
+  const resolved = resolve(path);
+  let best;
+  for (const backend of phextBackends.values()) {
+    if (resolved === backend.root || resolved.startsWith(backend.root + sep)) {
+      if (!best || backend.root.length > best.root.length) best = backend;
+    }
+  }
+  return best;
+}
+function requireBackend(path) {
+  const backend = phextBackendFor(path);
+  if (!backend) {
+    throw Object.assign(
+      new Error(`No Cavern phext is registered for ${path}; gates storage only operates inside a Cavern phext`),
+      { code: 'ENOPHEXT' },
+    );
+  }
+  return backend;
 }
 
-/** Only single-component operations are exposed. Holding the writer's lock FD
- * in the child also keeps OS exclusion alive if its parent process dies mid-write. */
+export async function closeFilesystemWorkers() { for (const backend of phextBackends.values()) backend.flush(); }
+
+export async function pinDirectory(path) {
+  return requireBackend(path).pinDirectory(path);
+}
+
 export async function atDirectory(directory, operation, lockFd, hooks = {}) {
-  if ((await lstat(directory.path)).isSymbolicLink()) throw new Error('symlink rejected');
+  const backend = requireBackend(directory.path);
   await hooks.beforeSpawn?.();
-  return sessionFor(lockFd).request({ directory: directory.path, identity: directory.identity, operation });
+  return backend.atDirectory(directory, operation);
 }
 
 export async function createDirectory(parent, name, lockFd) {
-  const result = await atDirectory(parent, { kind: 'mkdir', name }, lockFd);
-  return { path: join(parent.path, name), identity: result.identity };
+  return requireBackend(parent.path).createDirectory(parent, name);
 }
 
 export async function lockFile(directory, name, expectedIdentity, shared = false) {
-  // The lock inode is created by the pinned worker, never by an unconfined open.
-  const fd = await open(join(directory.path, name), constants.O_RDWR | constants.O_NOFOLLOW);
-  try {
-    if (!same(fileIdentity(await fd.stat()), expectedIdentity)) throw new Error('lock identity changed');
-    await new Promise((resolve, reject) => fsExt.flock(fd.fd, shared ? 'shnb' : 'exnb', e => e ? reject(e) : resolve()));
-    return { fd: fd.fd, close: async () => { await sessions.get(fd.fd)?.close(); await fd.close(); } };
-  } catch (error) { await fd.close(); throw error; }
+  return requireBackend(directory.path).lockFile(directory, name, expectedIdentity, shared);
 }

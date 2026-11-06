@@ -8,6 +8,8 @@ import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { build } from 'esbuild';
 import { createHistoryService } from './history-router';
+import { promises as vfs } from './phext-fs.mjs';
+import { testCavern } from '../src/knowledge-sqlite/phext-test-cavern.mjs';
 import { PersistentHistoryReader } from '../src/history/persistent-reader';
 import { queryDurableSubtree } from '../src/history/durable-core';
 import { createDocumentStoreRouter } from './document-store';
@@ -21,10 +23,10 @@ const cleanups: (() => Promise<unknown>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); const fs = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href); await fs.closeFilesystemWorkers(); });
 describe('persistent history HTTP enrollment/read/save seams', () => {
   it('verifies append, exact retry and older save; restarts with the same bounded history and immutable enrollment', async () => {
-    const root = await mkdtemp(path.join(tmpdir(), 'history-service-')); cleanups.push(() => rm(root, { recursive: true, force: true }));
+    const root = await mkdtemp(path.join(tmpdir(), 'history-service-')); cleanups.push(() => rm(root, { recursive: true, force: true })); const cavern = testCavern(root); cleanups.push(() => cavern.close());
     const workerFile = path.join(root, 'validation-worker.mjs'); await build({ entryPoints: ['server/history-validation-worker.ts'], outfile: workerFile, bundle: true, platform: 'node', format: 'esm', target: 'node22' });
     const derivedFile = path.join(root, 'derived-worker.mjs'); await build({ entryPoints: ['server/history-derived-worker.ts'], outfile: derivedFile, bundle: true, platform: 'node', format: 'esm', target: 'node22' });
-    const raw = { id: 'doc', type: 'document-block', children: [{ id: 'p', type: 'standoff-editor-block', text: 'hello' }] }; await writeFile(path.join(root, 'doc.json'), JSON.stringify(raw));
+    const raw = { id: 'doc', type: 'document-block', children: [{ id: 'p', type: 'standoff-editor-block', text: 'hello' }] }; await vfs.writeFile(path.join(root, 'doc.json'), JSON.stringify(raw));
     const state = decodeDocument(raw).state, repository = new CanonicalRepository(state, { enforceBlockIdentity: true }), commands = new TreeCommands(repository, key => key);
     const baseline = projectWholeDocument(state, 'doc'), capture = new WholeDocumentCapture(baseline, state.revision), events: ResourceTransition[] = [];
     repository.subscribeHistoryChanges(changes => events.push(capture.capture(changes) as ResourceTransition), error => { throw error; });
@@ -50,14 +52,14 @@ describe('persistent history HTTP enrollment/read/save seams', () => {
     const ordinaryResponse = await saveFile(ordinary, 'ordinary.json');
     expect(ordinaryResponse.Success).toBe(true); expect(ordinaryResponse.Warning).toContain('History association is unavailable');
     expect(ordinaryResponse.Data?.receipt).toBeUndefined();
-    const ordinaryBytes = JSON.parse(await readFile(path.join(root, 'ordinary.json'), 'utf8'));
+    const ordinaryBytes = JSON.parse(await vfs.readFile(path.join(root, 'ordinary.json'), 'utf8'));
     expect(ordinaryBytes).toEqual(ordinary); expect(ordinaryBytes.saved).toBeUndefined();
     await expect(access(path.join(root, '.memory'))).rejects.toThrow();
     const loaded = await (await fetch(`http://127.0.0.1:${port}/documents/loadDocumentJson?folder=.&filename=ordinary.json`)).json() as any;
     expect(loaded.Success).toBe(true); expect(loaded.Data.document).toEqual(ordinary);
     const inventedReceipt = await saveFile({ ...ordinary, saved: { segmentId: 'invented', revisionId: 'unverified' } }, 'ordinary.json');
     expect(inventedReceipt.Success).toBe(false); expect(inventedReceipt.Error).toContain('requires its verified proof');
-    expect(JSON.parse(await readFile(path.join(root, 'ordinary.json'), 'utf8'))).toEqual(ordinary);
+    expect(JSON.parse(await vfs.readFile(path.join(root, 'ordinary.json'), 'utf8'))).toEqual(ordinary);
     expect((await call('open', { ownerId: 'reader', writable: false })).available).toBe(false);
     await expect(access(path.join(root, '.memory'))).rejects.toThrow();
     const opened = await call('open', { ownerId: 'browser-a', writable: true }); location.memoirId = opened.memoirId; let epoch = opened.epoch;
@@ -103,7 +105,7 @@ describe('persistent history HTTP enrollment/read/save seams', () => {
     const verifiedSave = await saveFile(saved, 'doc.json', proof); expect(verifiedSave.Success).toBe(true);
     const receipt = verifiedSave.Data.receipt; expect(receipt.sequence).toBe(1);
     expect((await call('describe')).receipt.hash).toBe((receipt as any).hash);
-    await writeFile(path.join(root, 'copied.json'), JSON.stringify(saved));
+    await vfs.writeFile(path.join(root, 'copied.json'), JSON.stringify(saved));
     await call('open', { location: { ...location, filename: 'copied.json', memoirId: undefined }, ownerId: 'copy', writable: true }, false);
     await service.dispose(); service = createHistoryService({ root, validatorWorkerUrl: pathToFileURL(workerFile), derivedWorkerUrl: pathToFileURL(derivedFile) });
     expect((await selection(13, events[12].commitId)).timing?.route).toBe('full');
@@ -128,11 +130,11 @@ describe('persistent history HTTP enrollment/read/save seams', () => {
     await expect(service.saveDocument(location, { location, epoch, segmentId: 'segment', revisionId: events[12].commitId, sequence: 13 }, savedAfterRestart, async () => {
       throw new Error('Injected Document publication failure');
     })).rejects.toThrow('Injected Document publication failure');
-    await mkdir(receiptPath);
+    await vfs.mkdir(receiptPath, { recursive: true });
     const incomplete = await saveFile(savedAfterRestart, 'doc.json', { location, epoch, segmentId: 'segment', revisionId: events[12].commitId, sequence: 13 });
     expect(incomplete.Success).toBe(true); expect(incomplete.Warning).toContain('history association could not be finalized');
     expect(incomplete.Data?.receipt).toBeUndefined();
-    expect(JSON.parse(await readFile(path.join(root, 'doc.json'), 'utf8'))).toEqual(savedAfterRestart);
+    expect(JSON.parse(await vfs.readFile(path.join(root, 'doc.json'), 'utf8'))).toEqual(savedAfterRestart);
     expect((await call('describe')).receipt).toBeNull();
     await call('release', { epoch }); await call('heartbeat', { epoch }, false);
     await service.dispose(); service = createHistoryService({ root, validatorWorkerUrl: pathToFileURL(workerFile), derivedWorkerUrl: pathToFileURL(path.join(root, 'missing-derived-worker.mjs')) });

@@ -2,12 +2,12 @@ import { afterEach, describe, expect, it } from "vitest";
 import express from "express";
 import type { Server } from "node:http";
 import { Surreal } from "surrealdb";
-import { surrealdbNodeEngines } from "@surrealdb/node";
+import { createNodeEngines } from "@surrealdb/node";
 import { createEntitySearchRouter } from "./entity-search";
 const cleanup: (() => Promise<unknown>)[] = [];
 afterEach(async () => { for (const fn of cleanup.splice(0).reverse()) await fn(); });
 async function setup(available = true, readOnly = false) {
-  const db = new Surreal({ engines: surrealdbNodeEngines() });
+  const db = new Surreal({ engines: createNodeEngines() });
   await db.connect("mem://"); await db.use({ namespace: "test", database: "entities" });
   cleanup.push(() => db.close());
   const app = express(); app.use(express.json()); app.use("/api", createEntitySearchRouter(() => available ? db : undefined, { readOnly }));
