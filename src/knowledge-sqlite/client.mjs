@@ -67,6 +67,14 @@ export async function openSqliteFoundation(options) {
     try { nativeRecorded = JSON.parse(fs.readFileSync(path.join(vault, '.mutable', 'cavern-state.json'), 'utf8'))?.mode === 'native'; } catch { /* no marker */ }
     const hasPhext = fs.existsSync(path.join(vault, 'cavern.phext'));
     const hasDiskKnowledge = fs.existsSync(path.join(vault, '.mutable', 'mutable.db'));
+    // A `.mutable` home that exists but holds nothing at all is a
+    // documents home, not knowledge infrastructure: the folder is
+    // an app Cavern whose knowledge was never on disk. (A home
+    // carrying ANY content is the opposite case — a partial disk
+    // home — and the disk derivation below stands for it, so the
+    // scope inspection refuses it fail-closed.)
+    let emptyDocumentsHome = false;
+    try { const homeStat = fs.lstatSync(path.join(vault, '.mutable')); emptyDocumentsHome = homeStat.isDirectory() && !homeStat.isSymbolicLink() && fs.readdirSync(path.join(vault, '.mutable')).length === 0; } catch { /* no documents home */ }
     // The recorded mode governs (§2.4/§4.3): a phext-side record
     // of phext mode decides even when a native record also
     // exists — the upgrade leaves the native era's marker beside
@@ -74,12 +82,19 @@ export async function openSqliteFoundation(options) {
     // write the frozen snapshot DB. Reading the record takes a
     // brief read-only VFS open; an unreadable phext records
     // nothing and the layout rules below decide.
-    let phextRecorded = false;
+    let phextRecorded = false, phextEstablished = false;
     if (hasPhext) {
       try {
         const { PhextVFS } = await import(new URL('../../dist/src/phext/vfs.js', import.meta.url));
         const vfs = PhextVFS.open(path.join(vault, 'cavern.phext'));
-        try { phextRecorded = JSON.parse(vfs.readTextFile('/.control/cavern-state.json'))?.mode === 'phext'; }
+        try {
+          try { phextRecorded = JSON.parse(vfs.readTextFile('/.control/cavern-state.json'))?.mode === 'phext'; } catch { /* no phext-side mode record */ }
+          // The phext's knowledge control record is its own
+          // establishment record (the foundation's test: control
+          // present ⇔ knowledge established) — distinct from the
+          // lifecycle's mode marker read above.
+          try { phextEstablished = typeof JSON.parse(vfs.readTextFile('/.mutable/knowledge.json'))?.vaultGuid === 'string'; } catch { /* no established phext knowledge */ }
+        }
         finally { vfs.close(); }
       } catch { /* no readable phext record */ }
     }
@@ -100,6 +115,15 @@ export async function openSqliteFoundation(options) {
     // unconditionally, minting a `.mutable` home for a phext-born
     // snapshot — the regression phext-worker.test.mjs caught.)
     if (phextRecorded) phextPath = path.join(vault, 'cavern.phext');
+    else if (!nativeRecorded && hasPhext && hasDiskKnowledge && phextEstablished) {
+      // The phext's knowledge is established (its control record
+      // is present) and no marker governs, so the disk database
+      // beside it is unconverted knowledge, not a frozen snapshot:
+      // refuse it explicitly — conversion is the way in. (A
+      // recorded phext mode, handled above, makes the same
+      // coexistence the normal post-upgrade state instead.)
+      throw Error('This vault holds an established phext knowledge store and an unconverted disk knowledge home (.mutable/mutable.db); the phext store is canonical — convert the disk home explicitly or remove it, do not open beside it');
+    }
     else if (!nativeRecorded && hasPhext && hasDiskKnowledge) {
       throw Error('This vault holds both a phext store and a disk knowledge home (.mutable/mutable.db), and no recorded mode says the disk copy is current; open the Cavern through the server so the recorded mode governs');
     }
@@ -110,13 +134,25 @@ export async function openSqliteFoundation(options) {
       catch { /* provenance unreadable; the worker's restore validation refuses a malformed snapshot itself */ }
       if (sourceMode !== 'native') phextPath = path.join(vault, 'cavern.phext');
     }
+    else if (configuration.initialize && !nativeRecorded && !hasPhext && !hasDiskKnowledge && emptyDocumentsHome) {
+      // §2.4's "neither" row for an app Cavern folder: a documents
+      // home is present but no knowledge store exists in either
+      // mode, so this Cavern's knowledge is unestablished and an
+      // initializing open is a setup — it follows the new-Cavern
+      // default (§2.3, phext). A bare folder with no home at all
+      // keeps the disk fall-through (upstream vault semantics),
+      // and a home carrying any content is a partial disk home:
+      // the disk derivation stands and the scope inspection
+      // refuses it fail-closed.
+      phextPath = path.join(vault, 'cavern.phext');
+    }
   }
   if (phextPath) configuration.phextKnowledge = phextPath;
   else delete configuration.phextKnowledge;
   let releaseScope;
   if(!configuration.entityReader){
    for(let attempt=0;;attempt++){try{releaseScope=lockVaultEstablishment();break;}catch(e){if(!['EAGAIN','EWOULDBLOCK'].includes(e.code)||attempt>=100)throw e;await new Promise(resolve=>setTimeout(resolve,20));}}
-   try{inspectVaultScope(configuration.vault);}catch(e){releaseScope();throw e;}
+   try{inspectVaultScope(configuration.vault, phextPath ? {phextKnowledge:true} : undefined);}catch(e){releaseScope();throw e;}
   }
   let worker;try{worker = new Worker(path.join(path.dirname(fileURLToPath(import.meta.url)), 'worker.mjs'), { workerData: {...configuration,scopeValidated:true} });}catch(e){releaseScope?.();throw e;}
   const pending = new Map(); let next = 0, pendingBytes = 0, dead = false, closing = false, startup, unlock;

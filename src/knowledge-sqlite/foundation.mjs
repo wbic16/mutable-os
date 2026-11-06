@@ -82,7 +82,7 @@ export function openFoundation(options = {}, context = {}) {
     }
     const release = lockVaultEstablishment();
     try {
-      inspectVaultScope(options.vault);
+      inspectVaultScope(options.vault, {phextKnowledge:true});
       return openPhextFoundation(options, { ...context, phext });
     } finally { release(); }
   }
@@ -238,6 +238,24 @@ function configure(db, readOnly) {
  * refusal). Restore only into a knowledge-free Cavern, never over
  * live knowledge. No file-resource restore claim.
  */
+/**
+ * Whether the destination sits inside an established phext domain:
+ * walking up from its parent, the first persistence boundary met
+ * decides — a `cavern.phext` means the enclosing Cavern is a phext
+ * domain (its phext is establishment infrastructure for everything
+ * beneath it); a disk knowledge home means a disk domain. Restore
+ * scope inspection is keyed on the destination's domain, exactly as
+ * the open paths key theirs on the opened Cavern's mode.
+ */
+function enclosingPhextDomain(destination) {
+  if (typeof destination !== 'string') return false;
+  for (let dir = path.dirname(path.resolve(destination)); ; dir = path.dirname(dir)) {
+    if (fs.existsSync(path.join(dir, 'cavern.phext'))) return true;
+    if (fs.existsSync(path.join(dir, '.mutable', 'mutable.db'))) return false;
+    if (dir === path.dirname(dir)) return false;
+  }
+}
+
 export function restoreSnapshot(source, destination, scopeValidated = false, vfs = undefined) {
   if (!isMainThread) {
     if (!scopeValidated) throw Error('Vault restore scope was not verified');
@@ -245,7 +263,7 @@ export function restoreSnapshot(source, destination, scopeValidated = false, vfs
   }
   const release = lockVaultEstablishment();
   try {
-    inspectVaultScope(destination);
+    inspectVaultScope(destination, (vfs || enclosingPhextDomain(destination)) ? {phextKnowledge:true} : undefined);
     return vfs ? restoreIntoPhext(source, destination, vfs) : restoreValidatedSnapshot(source, destination);
   } finally { release(); }
 }
