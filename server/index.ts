@@ -15,6 +15,7 @@ import { createWorkspaceStoreRouter } from "./workspace-store.js";
 import { SqliteKnowledgeHost } from "./sqlite-knowledge-host.js";
 import { featureFlags } from "../src/configuration.js";
 import { createCavernLifecycle } from "./cavern-lifecycle.js";
+import { createSsoAuth } from "./sso-auth.js";
 //import { BlockType } from "./types";
 let db: Surreal | undefined;
 
@@ -232,6 +233,18 @@ if (!featureFlags.cavernStartup && process.env.SPEEDY_DISABLE_DATABASE !== "1") 
 }
 
 const app = express();
+// SSO gate (sso-design §4.2 M4): identity via edit.phext.io,
+// env-gated — with MUTABLE_SSO_SECRET / MUTABLE_SESSION_SECRET
+// unset, the middleware passes everything through and the auth
+// routes answer 404, so local and test instances behave exactly
+// as before. Mounted ahead of statics and the Cavern router: a
+// request must be an authenticated user before Cavern state is
+// consulted. The user session is distinct from the Cavern
+// session (X-Mutable-Cavern) fenced further below.
+const sso = createSsoAuth();
+app.use('/api/auth', sso.router);
+app.use(sso.middleware);
+console.log(sso.enabled ? 'SSO: enabled (edit.phext.io)' : 'SSO: disabled (no secrets configured)');
 const cavern = featureFlags.cavernStartup ? createCavernLifecycle() : undefined;
 // Must precede general body parsing, static routes and Cavern routing.
 if (featureFlags.dialecticProviders) app.use("/api/dialectic", createDialecticBroker({currentCavern:()=>cavern?.current(),attachmentsEnabled:featureFlags.dialecticAttachments,artifactsEnabled:featureFlags.dialecticArtifacts,imageGenerationEnabled:featureFlags.dialecticImageGeneration,attachmentContext:session=>cavern?.attachments(session),continuity:featureFlags.dialecticProviderContinuity,testLogging:featureFlags.dcpTestPhaseLogging}).router);
