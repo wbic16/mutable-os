@@ -16,9 +16,10 @@
 //                              explorerWidth,inspectorWidth,density}
 //   /.control/settings/domains/annotation-bar/policy
 //   /.control/settings/domains/editor-interactions/crossBlockSelection
+//   /.control/settings/domains/textual-fonts/{source,family,size,lineHeight}
 //
 // Capture is explicit (a user action in the Cavern menu): the client
-// sends the four domains' current values; this module validates ALL
+// sends the five domains' current values; this module validates ALL
 // of them before writing anything, then rewrites the tree in one
 // flush. Opening a Cavern NEVER imports or overwrites live settings
 // — there is deliberately no import path in this module; the bundle
@@ -41,16 +42,25 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const SETTINGS_ROOT = '/.control/settings';
-export const SETTINGS_SCHEMA_VERSION = '1';
+// Schema 1 carried exactly the original four domains; schema 2 adds
+// the textual-fonts domain (step 4). The version is recorded so a
+// future importer can tell a complete bundle from a pre-fonts one
+// instead of guessing (audit §2.6).
+export const SETTINGS_SCHEMA_VERSION = '2';
 export const BINDINGS_FORMAT_VERSION = 2;
 
 const MODIFIERS = ['Ctrl', 'Meta', 'Alt', 'Shift'];
 const CUSTOM_INPUTS = ['inspect-annotation', 'save-document', 'toggle-bindings'];
 const ANNOTATION_POLICIES = ['auto', 'expanded', 'compact', 'hidden'];
 const FLINT_DENSITIES = ['compact', 'reading'];
-const DOMAINS = ['keybindings', 'flint-layout', 'annotation-bar', 'editor-interactions'];
+const FONT_SOURCES = ['bundled', 'system'];
+// Mirror of bundledTextualFonts in src/features/textual/fonts.ts —
+// the families the bundled source may name. Keep the two in step.
+const BUNDLED_FONT_FAMILIES = ['IBM Plex Mono'];
+const DOMAINS = ['keybindings', 'flint-layout', 'annotation-bar', 'editor-interactions', 'textual-fonts'];
 
 const fail = message => { throw Error(`Settings capture refused: ${message}`); };
+const failRead = message => { throw Error(`Settings bundle refused: ${message}`); };
 const isRecord = value => !!value && typeof value === 'object' && !Array.isArray(value);
 
 // --- validation (mirrors src/input/bindings.ts validateTrigger) ---
@@ -121,18 +131,44 @@ function validateEditorInteractions(input) {
   return { crossBlockSelection: input.crossBlockSelection };
 }
 
+// The font domain's live shape is TextualFontSettings
+// (src/features/textual/fonts.ts): its normaliser guarantees an
+// integer size in 12..32 and an integer line height inside
+// ceil(size*1.1)..floor(size*2.5), a family of at most 100 chars
+// with no control characters, and — for the bundled source — one
+// of the bundled families. Validation here enforces the same
+// invariants but refuses instead of repairing: a payload outside
+// them did not come through the client's normaliser. The family
+// is a font NAME (a plain scalar); a path-shaped one is refused
+// under the portability screen like any other bundle field.
+function validateTextualFonts(input, refuse = fail) {
+  if (!isRecord(input)) refuse('textual-fonts: domain must be an object');
+  const { source, family, size, lineHeight } = input;
+  if (!FONT_SOURCES.includes(source)) refuse(`textual-fonts: source must be one of ${FONT_SOURCES.join(', ')}`);
+  if (typeof family !== 'string' || family.length === 0 || family.length > 100 || /[\x00-\x1f\x7f/\\]/.test(family)) {
+    refuse('textual-fonts: family must be a font name of 1-100 characters, with no control characters or path separators');
+  }
+  if (source === 'bundled' && !BUNDLED_FONT_FAMILIES.includes(family)) refuse(`textual-fonts: bundled family must be one of ${BUNDLED_FONT_FAMILIES.join(', ')}`);
+  if (!Number.isInteger(size) || size < 12 || size > 32) refuse('textual-fonts: size must be an integer between 12 and 32');
+  const minLineHeight = Math.ceil(size * 1.1), maxLineHeight = Math.floor(size * 2.5);
+  if (!Number.isInteger(lineHeight) || lineHeight < minLineHeight || lineHeight > maxLineHeight) {
+    refuse(`textual-fonts: lineHeight must be an integer between ${minLineHeight} and ${maxLineHeight} for size ${size}`);
+  }
+  return { source, family, size, lineHeight };
+}
+
 /**
  * Validate a client capture payload in full. Returns the normalized
  * bundle {keybindings, flintLayout, annotationBar,
- * editorInteractions, label?} or throws naming the first problem —
- * nothing is written when this throws.
+ * editorInteractions, textualFonts, label?} or throws naming the
+ * first problem — nothing is written when this throws.
  */
 export function validateSettingsCapture(input) {
-  if (!isRecord(input)) fail('payload must be an object with the four settings domains');
+  if (!isRecord(input)) fail('payload must be an object with the five settings domains');
   for (const key of Object.keys(input)) {
     if (![...DOMAINS, 'label'].includes(key)) fail(`unknown settings domain "${key}" — the bundle carries exactly: ${DOMAINS.join(', ')}`);
   }
-  for (const domain of DOMAINS) if (!(domain in input)) fail(`missing settings domain "${domain}" — capture sends all four domains`);
+  for (const domain of DOMAINS) if (!(domain in input)) fail(`missing settings domain "${domain}" — capture sends all five domains`);
   let label;
   if (input.label !== undefined) {
     if (typeof input.label !== 'string' || input.label.length > 120 || /[/\0]/.test(input.label)) fail('label must be a short plain-text name');
@@ -143,6 +179,7 @@ export function validateSettingsCapture(input) {
     flintLayout: validateFlintLayout(input['flint-layout']),
     annotationBar: validateAnnotationBar(input['annotation-bar']),
     editorInteractions: validateEditorInteractions(input['editor-interactions']),
+    textualFonts: validateTextualFonts(input['textual-fonts']),
     ...(label !== undefined ? { label } : {}),
   };
 }
@@ -234,6 +271,12 @@ export function writeSettingsBundle(vfs, bundle, now = new Date()) {
   const interactions = `${domains}/editor-interactions`;
   vfs.mkdir(interactions);
   put(`${interactions}/crossBlockSelection`, bundle.editorInteractions.crossBlockSelection);
+  const fonts = `${domains}/textual-fonts`;
+  vfs.mkdir(fonts);
+  put(`${fonts}/source`, bundle.textualFonts.source);
+  put(`${fonts}/family`, bundle.textualFonts.family);
+  put(`${fonts}/size`, bundle.textualFonts.size);
+  put(`${fonts}/lineHeight`, bundle.textualFonts.lineHeight);
 
   vfs.flush();
   return { written, createdUtc, updatedUtc: stamp };
@@ -285,23 +328,39 @@ export function readSettingsBundle(vfs) {
     overrides[actionId] = triggers;
   }
   const bool = value => value === 'true';
+  const domainsOut = {
+    keybindings: { version: Number(readText(vfs, `${kb}/formatVersion`) ?? BINDINGS_FORMAT_VERSION), overrides },
+    'flint-layout': {
+      library: bool(readText(vfs, `${domains}/flint-layout/library`)),
+      context: bool(readText(vfs, `${domains}/flint-layout/context`)),
+      explorerWidth: Number(readText(vfs, `${domains}/flint-layout/explorerWidth`)),
+      inspectorWidth: Number(readText(vfs, `${domains}/flint-layout/inspectorWidth`)),
+      density: readText(vfs, `${domains}/flint-layout/density`),
+    },
+    'annotation-bar': { policy: readText(vfs, `${domains}/annotation-bar/policy`) },
+    'editor-interactions': { crossBlockSelection: bool(readText(vfs, `${domains}/editor-interactions/crossBlockSelection`)) },
+  };
+  // The font domain is validated on read-back: a stored bundle is
+  // data that arrived from elsewhere, and a malformed font domain
+  // is refused whole rather than handed on as if usable. A bundle
+  // written before the domain existed (schema 1) simply has no
+  // font subtree; it reads back without one — absence is recorded
+  // by the missing key, never filled with a fabricated default.
+  const fonts = `${domains}/textual-fonts`;
+  if (readText(vfs, `${fonts}/source`) !== undefined) {
+    domainsOut['textual-fonts'] = validateTextualFonts({
+      source: readText(vfs, `${fonts}/source`),
+      family: readText(vfs, `${fonts}/family`),
+      size: Number(readText(vfs, `${fonts}/size`)),
+      lineHeight: Number(readText(vfs, `${fonts}/lineHeight`)),
+    }, failRead);
+  }
   return {
     schemaVersion,
     createdUtc: readText(vfs, `${SETTINGS_ROOT}/bundle/createdUtc`),
     updatedUtc: readText(vfs, `${SETTINGS_ROOT}/bundle/updatedUtc`),
     sourceAppVersion: readText(vfs, `${SETTINGS_ROOT}/bundle/sourceAppVersion`),
     label: readText(vfs, `${SETTINGS_ROOT}/bundle/label`),
-    domains: {
-      keybindings: { version: Number(readText(vfs, `${kb}/formatVersion`) ?? BINDINGS_FORMAT_VERSION), overrides },
-      'flint-layout': {
-        library: bool(readText(vfs, `${domains}/flint-layout/library`)),
-        context: bool(readText(vfs, `${domains}/flint-layout/context`)),
-        explorerWidth: Number(readText(vfs, `${domains}/flint-layout/explorerWidth`)),
-        inspectorWidth: Number(readText(vfs, `${domains}/flint-layout/inspectorWidth`)),
-        density: readText(vfs, `${domains}/flint-layout/density`),
-      },
-      'annotation-bar': { policy: readText(vfs, `${domains}/annotation-bar/policy`) },
-      'editor-interactions': { crossBlockSelection: bool(readText(vfs, `${domains}/editor-interactions/crossBlockSelection`)) },
-    },
+    domains: domainsOut,
   };
 }
