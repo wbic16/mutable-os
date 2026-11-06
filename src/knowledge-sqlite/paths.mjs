@@ -1,9 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { isMainThread } from 'node:worker_threads';
-const require = createRequire(import.meta.url);
+import { flockExclusiveSync } from './advisory-lock.mjs';
 
+/**
+ * Filesystem shape guards for the knowledge layer, plus the disk
+ * foundation's home preparation and writer lease (restored with
+ * per-Cavern mode selection, 2026-11-06): a native-mode Cavern keeps
+ * its canonical databases at `.mutable/mutable.db` / `audit.db`, so
+ * `prepareHome` and `writerLock` live again beside the validators
+ * the restore and converter paths use. In phext mode neither is
+ * called — the writer lease there is a flock on the phext's anchor
+ * file (client.mjs's phextWriterLease).
+ */
 export function regularFile(file, optional = false) {
   let stat;
   try { stat = fs.lstatSync(file); } catch (e) { if (optional && e.code === 'ENOENT') return false; throw e; }
@@ -30,9 +39,13 @@ export function writerLock(home, name = 'writer.lock') {
   directory(home);
   const file = path.join(home, name); regularFile(file, true);
   const fd = fs.openSync(file, fs.constants.O_CREAT | fs.constants.O_RDWR | fs.constants.O_NOFOLLOW, 0o600);
-  try { require('fs-ext').flockSync(fd, 'exnb'); }
+  // flockExclusiveSync prefers the native binding and falls back to a portable
+  // token lock (<name>.holder) when fs-ext is unavailable; the rendezvous
+  // inode itself is still never unlinked.
+  let releaseLock;
+  try { releaseLock = flockExclusiveSync(fd, `${file}.holder`); }
   catch (e) { fs.closeSync(fd); throw Error(`SQLite writer unavailable: ${e.message}`); }
   // Never unlink the lock inode: that would allow a second writer to lock a different inode.
   let closed = false;
-  return () => { if (!closed) { closed = true; fs.closeSync(fd); } };
+  return () => { if (!closed) { closed = true; try { releaseLock(); } finally { fs.closeSync(fd); } } };
 }

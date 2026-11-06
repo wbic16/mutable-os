@@ -1053,6 +1053,234 @@ Results (2026-11-05, scratch clone on this VM — Node v24.22.1 / npm 10.9.4; th
 - **Environment note:** qualification ran through intermittent VM write-freeze episodes (writes failing with EPERM for minutes at a time) and contention on the per-user Vault establishment lock from a leftover server process. Every contaminated run was discarded and re-earned in a clean window; all results above are from clean runs, and the previously failing knowledge suites (host, phext-worker, vault-scope) pass 6/6, 1/1 and 5/5 respectively on the rebased tree — and pass identically on the pre-rebase tree, confirming no rebase regression.
 
 
+## Mode selection (2026-11-06) — per-Cavern Native/Phext choice restored
+
+The phext-only cutover is superseded by a **per-Cavern storage mode**,
+per the ratified design (`mode-selection-design.md` in the fork's
+working papers): the user chooses **Native** or **Phext** at Cavern
+create/open; there is **no global flag** (the design addresses the
+repo's feature-flag convention directly: the per-Cavern marker *is*
+the switch, and the deleted `phextVfs` flag is not restored). The mode
+is recorded in the Cavern's own state record — L7
+`/.control/cavern-state.json` (`mode: "phext"`) on the phext side,
+`.mutable/cavern-state.json` on the native side — and `caverns.json`
+caches it for recents badging only. One resolver
+(`resolveMode` in `server/cavern-lifecycle.ts`) interprets records and
+layout: marker governs; absent a marker, phext-only layout → phext,
+disk-only → native, neither → not a Cavern, **both layouts with no
+marker → refuse and ask**. New Caverns default to Phext pre-selected.
+The restoration re-widens the six dual-dispatch modules the cutover
+narrowed, recovering their disk branches from the pre-cutover history
+(commit `01f03de`); in every subsystem the mode signal is
+**registration**: the lifecycle registers the phext backends only for
+a phext-mode Cavern, and absence of registration is the disk signal.
+The native → phext **upgrade is non-destructive**: the verified
+migration generates `cavern.phext` and records the mode inside it as
+the commit point; the native tree stays byte-for-byte in place as a
+frozen snapshot (no rename-aside, no fallback directory). Phext →
+Native remains the export, which now writes the native marker into
+the exported folder. Standalone SurrealDB mounts are native by
+definition (no Cavern, no mode). Saves stay manual in both modes.
+
+### Files — implementation
+
+- `server/cavern-lifecycle.ts` (modified) — the integration point.
+  `resolveMode` (records + layout, §2.4); `stores(root, mode)` opens
+  the PhextVFS and registers the gates backend, the phext-fs facade
+  and the knowledge registry **only in phext mode** (native mode
+  leaves `phextReady` undefined, which every existing await already
+  tolerates); `establish` honors a requested mode only where a choice
+  exists (setup, and as the answer to the ambiguous layout), records
+  an explicit answer in the marker *before* the open (the answer is
+  the user's act, and the knowledge layer's own derivation must see
+  it during the open), writes a derived/recorded marker after a
+  successful open (a failed open leaves the folder byte-identical),
+  and generates a phext only when phext is the resolved/chosen mode
+  for a content folder that has none. `convertIfDiskBorn` is deleted
+  — opening never converts. Download and settings routes gate on the
+  runtime's mode with the §3.2 refusal ("This Cavern is in Native
+  mode; upgrade it to Phext to use this."). New `POST /api/cavern/
+  close` route: the close primitive the Cavern menu's upgrade
+  composition (close → migrate → establish) requires. Recents entries
+  carry `mode` as a display cache.
+- `server/phext-cavern-transfer.mjs` (modified) — the migration is
+  the non-destructive upgrade: the `.mutable` rename-aside and its
+  rollback are deleted, the fallback-exists precondition is dropped,
+  the migration record carries `fallback: null` and `onDisk` = the
+  **entire native manifest**, and the L7 cavern-state written into
+  the published phext gains `mode: 'phext'`. The single phext rename
+  remains the only publish step. Export writes
+  `.mutable/cavern-state.json` (`mode: 'native'`, the exported
+  Cavern's guid) into the destination folder (§4.5).
+- `src/knowledge-sqlite/foundation.mjs` (modified) — the dual
+  foundation restored: signal resolution (injected worker context →
+  lifecycle registry → explicit request, failing closed when phext
+  is requested without an instance), else the disk branch
+  (`openValidatedFoundation` + `configure`/`initialize`/`checkFiles`,
+  recovered from `01f03de`). `restoreSnapshot` dispatches on the vfs
+  argument. The cutover's disk-knowledge refusal changed sides: it
+  now guards only the disk branch (`refuseAmbiguousDiskOpen` —
+  both stores present and no native record → refuse), because on the
+  phext branch a snapshot `.mutable/mutable.db` beside the phext is
+  the normal post-upgrade state.
+- `src/knowledge-sqlite/client.mjs` (modified) — host-side mode
+  resolution mirroring §2.4: explicit string > registry > recorded
+  mode > layout. The phext-side record is read through a brief
+  read-only VFS open and **governs even beside a stale native
+  record** (the only supported flow leaving both records is the
+  upgrade, whose commit point is the phext record — §4.3: a direct
+  client open must never write the frozen snapshot DB). Both stores
+  present with no governing record throws. The writer-lease grant
+  follows the resolved mode (`phextWriterLease` vs the restored
+  disk `writerLock`). A snapshot restore follows the destination's
+  resolved mode — it converts into a registered/recorded phext
+  destination and restores to disk at a native-recorded one. At an
+  unestablished destination (no marker, neither layout) the
+  snapshot's recorded provenance decides: every backup stamps its
+  manifest with the producing foundation's mode (`sourceMode`,
+  stamped by the disk `backup()` in `foundation.mjs` and by
+  `exportPhextKnowledge` in `phext-convert.mjs`), a phext-born
+  snapshot converts, a disk-born one restores to disk, and an
+  unstamped (pre-mode-selection) snapshot converts — the phext-only
+  era's backups are phext-born, and phext is the new-Cavern
+  default. (Regression fix, 2026-11-06: the original step-3
+  fall-through sent this case to disk unconditionally, minting a
+  `.mutable` home for a phext-born snapshot; see the correction
+  note under Qualification below.)
+- `src/knowledge-sqlite/worker-entry.mjs` (modified) — the worker
+  takes its mode from `workerData`: a host-resolved phext path means
+  phext (own PhextVFS, current creation discipline, phext lease and
+  restore-convert); no path means native (`prepareHome` disk home,
+  disk lease request, disk restore). Read-only guards unchanged and
+  first.
+- `src/knowledge-sqlite/paths.mjs` (modified) — `prepareHome` and
+  `writerLock` restored from `01f03de`: the disk foundation's home
+  preparation and cross-process writer lock.
+- `scripts/stage-c-gates/filesystem.mjs` (modified) — merged
+  dispatch keyed on registration: a registered root is served by the
+  phext backend for the whole tree; an unregistered root by the disk
+  backend through worker sessions. (The `01f03de` tree-start
+  crossover dispatch was *not* restored: the cutover widened the
+  phext backend to serve documents too, so the crossover would route
+  a phext Cavern's document pins to disk. Registration is the
+  design's §3.1 signal.) One adaptation from `01f03de`: the worker
+  path is resolved lazily at first disk use — this module is
+  statically imported by vitest suites (via the test-Cavern helper),
+  where `import.meta.url` is not a file URL, and the phext backend
+  must stay loadable there; disk sessions run under native loads.
+- `server/sqlite-knowledge-host.ts` (modified) — the cutover's
+  phext-only existence probe widened to the mode model:
+  `knowledgeProbe` accepts either knowledge store (the Cavern phext
+  or `.mutable/mutable.db`) as proof of an established Vault, and
+  the read-only reader's identity stamp tracks whichever store file
+  the Vault actually has. Without this, every knowledge mutation
+  route refused in native mode with an ENOENT on the absent phext.
+- `scripts/stage-c-gates/filesystem-worker.mjs` (added) — restored
+  verbatim from `01f03de`: the disk backend's worker (directory
+  pins, iteration, file locks).
+- `server/phext-fs.mjs` (modified) — the dispatch tail reverted: no
+  registered backend → the facade falls through to real fs;
+  the `ENOPHEXT` refusal is deleted. Registered roots are unchanged,
+  including the cutover's no-carve-out rule for `.mutable` (design
+  §1.2: not restored).
+- `server/vault-listing-cache.mjs` (modified) — the persisted
+  discovery cache restored **native-only** (gated on registration
+  absence); phext mode keeps the in-memory/rebuild behavior, since
+  a cache file inside the VFS would be stored state the cutover
+  deliberately removed.
+- `server/index.ts` (modified) — uploads follow the current
+  Cavern's mode per request: a delegating multer storage chooses
+  the phext engine or a restored `multer.diskStorage` (the Cavern's
+  real `uploads/`, created on demand; standalone mounts use the
+  relative folder) behind one shared `X-Mutable-Cavern` session
+  fence; H3's limits stay on the single multer instance. `/uploads`
+  dispatches to the phext static handler or `express.static` by
+  mode, and refuses with 409 when no Cavern is current.
+- `src/application/cavern-startup.tsx` (modified) — the choice in
+  the main UI flow (discoverability): a Native/Phext control with
+  one-line descriptions in the create form and the folder-setup
+  screen, **Phext pre-selected**; a derived mode is shown as a fact
+  screen once ("This is a Native/Phext Cavern"); an ambiguous
+  layout asks "Which copy should Mutable use?" with the two answers
+  as primary actions; recents rows badge the cached mode; the
+  Cavern menu names the current mode, keeps Download / Update
+  Shipped Settings visible in native mode but disabled with the
+  §3.2 reason, and offers **Upgrade to Phext…** with the terms
+  stated up front (phext generated and verified; existing files
+  stay in place unchanged as a snapshot Mutable will no longer
+  update; the Cavern reopens in Phext mode).
+- `src/application/cavern-startup.css` (modified) — mode badge,
+  mode-choice fieldset, and menu mode-line styles.
+
+### Files — tests
+
+- `server/cavern-lifecycle.test.ts` (modified) — new mode suite:
+  the inspect matrix (every §2.4 row, marker and derived), the
+  ambiguity refusal and both answers becoming the marker, a native
+  create (no phext written, marker + recents cache), the exact
+  §3.2 refusal on download/settings/capture in native mode, and a
+  recorded phext mode governing beside a snapshot knowledge home.
+- `server/phext-cutover-e2e.test.ts` (modified) — (a) disk-silence
+  now also asserts the phext default and its L7 record; (b)
+  rewritten: a disk-born Cavern **derives native** and opens
+  natively (no conversion, disk knowledge live, marker recorded);
+  (c) new: the explicit upgrade — native tree hash-identical across
+  migrate, `fallback: null`, onDisk naming the whole tree, phext
+  marker governing the reopen, post-flip writes landing in the
+  phext while snapshot hashes never move; (b2) a corrupt fixture
+  is refused with originals byte-identical and no phext created.
+- `server/phext-exit-e2e.test.ts` (modified) — migration assertions
+  moved to the non-destructive record (onDisk = whole manifest,
+  `fallback: null`, `.mutable` in place byte-for-byte, mode in the
+  L7 state); the phext-alone readback deletes the snapshot instead
+  of renaming a fallback away; export asserts the §4.5 native
+  marker. Refusal shapes otherwise unchanged.
+- `server/phext-fs.test.mjs` (modified) — the cutover `ENOPHEXT`
+  test rewritten as the dual contract: `.mutable` stays virtual
+  under a registered root; unregistered roots fall through to real
+  disk again.
+- `src/knowledge-sqlite/foundation.test.mjs` (modified) — the two
+  snapshot-restore tests register the destination Cavern first:
+  restore follows the destination's signal, and a plain folder
+  restores to disk (the disk suite's branch). Assertions unchanged.
+- `src/knowledge-sqlite/foundation-disk.test.mjs` (added) — the
+  `01f03de` disk-foundation suite restored beside the phext suite.
+- `scripts/stage-c-gates/storage-disk.test.mjs` (added) — the
+  `01f03de` disk-backend suite restored. One reconciliation: the
+  read-only-journal test obstructs the journal with a directory
+  instead of `chmod 0o444` (these suites run as root, where mode
+  bits do not refuse writes) and accepts the writer's
+  "not a regular file" refusal — the same device the phext suite
+  already uses.
+- `scripts/stage-c-gates/flock-disk.test.mjs` (added) — the
+  `01f03de` flock suite restored verbatim.
+
+### Qualification (2026-11-06)
+
+Results (2026-11-06, this VM — Node v24.22.1; the project pins Node 22.12.0 in .nvmrc). Every tally below is from a clean run; two contaminated runs (a mid-edit `test:sqlite` and the first vitest pass, which caught two real defects — the knowledge host's phext-only probe and a vitest-SSR module-load failure in the restored gates dispatch) were discarded, the defects fixed, and the sets re-run in full.
+
+- **`npm run typecheck`: PASS (exit 0)** — both `tsconfig.reactive.json` and `tsconfig.server.json`.
+- **`npm run build`: PASS** — Vite client build, `tsc` server project, history-worker and sqlite-foundation staging; the built server is what the boot smoke below runs.
+- **Serial phext vitest set: PASS — 108/108 tests across 19 files** (`npx vitest run --maxWorkers=1`: the five `src/phext` suites, eleven `server/phext-*` suites, `server/cavern-lifecycle.test.ts`, `server/vault-listing-cache.test.mjs`, `src/application/cavern-startup.test.tsx`). The set includes the new mode tests: lifecycle mode suite 6/6, cutover E2E 4/4 (native derivation, explicit upgrade, corrupt refusal), exit E2E 4/4 on the non-destructive record.
+- **Knowledge-host consumer suites: 60/63 across 8 files** (serial vitest: `sqlite-knowledge-host`, `entity-lookup`, `entity-mutate`, `entity-search`, `native-knowledge`, `thesis`, `sqlite-semantic-services`, `sqlite-saved-scope`) — run because this step widened the host's probe. The 3 failures (two SurrealDB-backed `entity-search` creations that cannot confirm against a SurrealDB connection in this environment, one `native-knowledge` timeout test) **reproduce identically on the base commit `dc81ad68`** — pre-existing environmental failures, not step-3 regressions; everything touching the widened probe (host, lookup, mutate, thesis, semantic services, saved scope) passes.
+- **`npm run test:sqlite`: PASS — 168/168 across the 15 `src/knowledge-sqlite/*.test.mjs` files**, including the restored disk-foundation suite (24 tests) beside the phext suite (19). (The step-2 tally of 125/125 across 14 files was recorded on the same tree minus the disk suite; `node --test` counts subtests, and the two tallies' bases were not itemized against each other — what is comparable is that every file passes in full, both branches included.)
+- **Gates node suites: PASS — 52/52** (`node --test --test-concurrency=1` over the phext `storage.test.mjs`/`flock.test.mjs` and the restored `storage-disk.test.mjs` 23/23 + `flock-disk.test.mjs` 3/3).
+- **Phext settings node tests: PASS — 4/4** (`node --test server/phext-settings.test.mjs`).
+- **Boot smoke: PASS — 14/14 checks.** The built server, against a fresh temporary config home: a COPY of a native-layout fixture Cavern opens in native mode (marker recorded, no phext appears); a phext Cavern created by the built server defaults to phext; a COPY of it opens in phext mode; after a restart, startup auto-restores the phext copy in phext mode.
+
+**Correction (2026-11-06, regression-fix commit).** Independent verification found the `test:sqlite` tally above does not reproduce, and one regression the wedged run had masked: `phext-worker.test.mjs` failed at its restore assertion (a phext-born snapshot restored into a fresh vault minted a `.mutable` disk home) and then hung, so the serial run never completed. Cause: the client's restore derivation fell through to native whenever the destination had no record or layout of its own. Fix: backups record their provenance (`sourceMode` in `snapshot.json`, stamped by both foundations), and a restore into an unestablished destination derives from it — phext-born converts, disk-born restores to disk, unstamped converts (see the `client.mjs` entry above). No test was changed. Verified tallies after the fix (fresh `npm run build` first — the knowledge worker runs from `dist/`): `phext-worker.test.mjs` 1/1 in ~1 s; `foundation-disk.test.mjs` 24/24; the phext vitest set 108/108 across 19 files; typecheck exit 0; gates suites 52/52; phext-settings 4/4; knowledge-host consumer suites 61/63 (the 2 failures are the SurrealDB-backed `entity-search` creations, environmental, same class as recorded above). **`npm run test:sqlite` true tally: 142/149 across the 15 files** — authority-identities 1/1, cardex-regex 1/1, cardex 13/13, entities 2/2, foreground 12/12, foundation-disk 24/24, foundation 18/19, host 5/6, indexer 23/23, package-data 8/8, phext-worker 1/1, propositions 8/8, schema 17/17, semantics 7/9, vault-scope 2/5. The 7 failures (foundation ×1, host ×1, semantics ×2, vault-scope ×3) reproduce identically on the unmodified step-3 commit with a fresh build: they are cutover-era suites whose assertions encode the phext-only default for a no-signal open, which step 3 deliberately retired (design §1.5) without reconciling those suites. They are pre-existing step-3 defects, not effects of this fix, and are recorded here rather than silently absorbed; the boot smoke was not re-run (it has no scripted form in the repo).
+
+**Reconciliation (2026-11-06, test-only commit).** Six of the 7 failures above are reconciled to the ratified design — tests only; no production code and no design default changed, no assertion weakened, nothing skipped or deleted. Per test (form (a): the test means to exercise phext behaviour, so its opens gain the explicit phext signal and the phext assertions stay; form (b): the test means to exercise the no-signal default, so the `01f03de` disk-side assertions are restored):
+
+- `src/knowledge-sqlite/vault-scope.test.mjs` 'same root reopens with same identity…' and 'cross-process concurrent parent/child establishment…' — **form (b)**. Both tests drive bare `openSqliteFoundation` opens to measure persistence-domain identity and overlap enforcement; their store-existence assertions name the disk store again, exactly as at `01f03de` (`.mutable/audit.db` after init and no `.mutable` in a rejected child; exactly one `.mutable/mutable.db` across the concurrent parent/child race). Every other assertion is unchanged.
+- `src/knowledge-sqlite/host.test.mjs` 'read-only missing/existing database never initializes or reconciles and cannot claim coverage' — **form (b)**, restored to its `01f03de` body including the name: the writer init is a no-signal open, so the existing store is `.mutable/mutable.db`, and the read-only host must leave those bytes identical (the cutover form read back `cavern.phext`). Phext-mode read-only behaviour stays covered by `foundation.test.mjs`'s registered-Cavern suite. The fixture keeps this branch's `cavern: false` option so nothing pre-registers a phext for the root.
+- `src/knowledge-sqlite/semantics.test.mjs` 'bounded batches are atomic…' and 'corrupt audit keeps canonical reads…' — **form (a)**. Both tests end by operating on the phext itself (audit-stratum readback through `PhextKnowledgeStore`; a corrupted audit stratum entry degrading the foundation to audit-unavailable), so their opens now carry the explicit phext signal — `phextKnowledge: true`, the shorthand `client.mjs` documents for the vault's `cavern.phext` (`phext-worker.test.mjs` uses the explicit-path form) — on the fixture open and, for 'corrupt audit', on the reopen. Assertions unchanged.
+- `src/knowledge-sqlite/foundation.test.mjs` 'online backup restores canonical knowledge…' — **form (a)**. The final assertion (a second restore over live knowledge throws /already established/) is now read through a fresh `PhextVFS` instance opened on the destination phext. Step 3 moved the destination's test-Cavern registration before the restore (the restore derives its mode from the destination's signal — see the entry above), but that instance's in-memory view predates the restore and still shows the unconverted store, so the converter's already-established check read stale state and the second restore went through. At `dc81ad6` the test Cavern was created after the restore, producing the fresh view by construction; the fresh instance restores exactly that view. The assertion and its expected error are unchanged.
+
+**Open conflict — `src/knowledge-sqlite/vault-scope.test.mjs` 'incomplete, symlink, unconverted and conflicting existing topology fail closed' (1 of 149), left failing.** This test's partial-infrastructure segment cannot be reconciled test-only. At `01f03de`, `inspectVaultScope` took the `phextKnowledge` signal and, on the disk branch, refused a `.mutable` home with no current database ('Existing Mutable infrastructure has missing or invalid current database; … restore current knowledge explicitly') — the fail-closed rule its surviving comment still states ('Never repair a partial existing home by manufacturing a new canonical store'). The cutover deleted the signal and that check (in the phext-only world an empty `.mutable` is a normal documents home), and step 3 — which re-widened the six dispatches of design §1 — did not re-widen `vault-scope.mjs` (untouched by both step-3 commits; `client.mjs`/`foundation.mjs` call it with no mode argument, and its `cavern.phext` overlap checks are unconditional where `01f03de` keyed them on the signal). The result: a no-signal initialize silently manufactures a canonical database inside a partial home. Asserting that success would bless the silent repair and invert the test's intent; asserting the `01f03de` refusal fails against current production code. Resolution requires the production change the archaeology implies — restore the mode signal to `inspectVaultScope` and pass it from its callers — which is outside this reconciliation's tests-only mandate, so the test is left exactly as it stands and the conflict stays visible in every run. Verified tallies after this reconciliation (fresh `npm run build` first): **`npm run test:sqlite` 148/149 across the 15 files** — authority-identities 1/1, cardex-regex 1/1, cardex 13/13, entities 2/2, foreground 12/12, foundation-disk 24/24, foundation 19/19, host 6/6, indexer 23/23, package-data 8/8, phext-worker 1/1, propositions 8/8, schema 17/17, semantics 9/9, vault-scope 4/5 (the open conflict above); serial phext vitest set 108/108 across 19 files; `npm run typecheck` exit 0.
+
+**Resolution (2026-11-06, vault-scope signal restoration) — the open conflict above is closed; the test passes unedited.** The production change the archaeology implied, in four parts. (1) `src/knowledge-sqlite/vault-scope.mjs`: `inspectVaultScope` regains the `phextKnowledge` signal in its `01f03de` form — the root `cavern.phext` validation (keeping the cutover's stricter private-regular-file check, hard links included) and the descendant `cavern.phext` walk check are keyed on it, and the fail-closed block again refuses a `.mutable` home with no current database on the disk branch, with the `01f03de` message ('Existing Mutable infrastructure has missing or invalid current database; … restore current knowledge explicitly'); phext mode keeps exactly the cutover's one relaxation (a documents home with no `mutable.db` is tolerated; a present database must still be a private regular file in both modes). One deliberate deviation from the `01f03de` form: the ANCESTOR `cavern.phext` check stays unconditional, as the cutover left it — ancestor overlap is keyed on the enclosing domain, not the opener's mode (a `cavern.phext` in an ancestor makes that folder a phext Cavern, and nesting any domain inside it overlaps), and a standing suite pins it: `host.test.mjs` 'confines roots…' expects a bare open of a not-yet-existing nested path inside a phext domain to refuse as overlap rather than fail on the missing directory. (2) Threading, in the forms the callers already use: `client.mjs` passes `phextPath ? {phextKnowledge:true} : undefined` with its resolved path (the exact `01f03de` call form); `foundation.mjs`'s phext branch passes `{phextKnowledge:true}` and its disk branch passes nothing, as at `01f03de`; `restoreSnapshot` keys its destination inspection on the restore's own mode — the passed PhextVFS instance, or, for the direct disk form, whether the destination sits inside an established phext domain (`enclosingPhextDomain`, a layout probe in the idiom of `refuseAmbiguousDiskOpen`). (3) Two derivation reconciliations in `client.mjs` that the standing test's segments pin: the derivation now also reads the phext's knowledge control record (its own establishment record — control present ⇔ knowledge established) beside the mode marker, and an established phext with no governing marker beside a disk database refuses that database as UNCONVERTED knowledge (the cutover client guard's heir — 'convert the disk home explicitly or remove it'); marker-governed coexistence (the post-upgrade frozen snapshot) is untouched, and a phext with no established knowledge beside a disk database keeps the both-present ask refusal. And an initializing open of a Cavern folder whose `.mutable` documents home exists but is completely empty follows §2.4's 'neither' row as a setup — the new-Cavern default, phext (§2.3) — while a bare folder with no home keeps the disk fall-through and a home carrying any content is a partial disk home the restored scope check refuses. No test file was changed. Verified tallies (fresh `npm run build` first; every run watched to completion): `vault-scope.test.mjs` solo 5/5; **`npm run test:sqlite` 149/149 across the 15 files** (per-file full counts as in the reconciliation tally, with vault-scope now 5/5; `host.test.mjs` additionally verified solo at 6/6 after the ancestor-keying call above); serial phext vitest set 108/108 across 19 files; phext-settings node tests 4/4; `npm run typecheck` exit 0.
+
 ## Appendix — complete per-file accounting (final state)
 
 Every file the one-commit landing changes relative to its upstream

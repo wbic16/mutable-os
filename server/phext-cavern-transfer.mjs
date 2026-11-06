@@ -4,16 +4,20 @@
  * The one-phext coverage (Phases 1–4) is only real if a Cavern can get
  * IN and OUT of the phext without a cliff:
  *
- * - `migrateCavernToPhext` converts a closed disk-mode Cavern in
- *   place: walk the disk tree → write the VFS strata → verify every
- *   copied file's SHA-256 against the L9 index (a fresh VFS open,
- *   which also verifies the L9 checksum series) → store-level smoke
- *   reads → write the migration record into L7 → publish the phext
- *   and rename the old `.mutable` home to `.mutable-disk-fallback/`
- *   (the 4.6 converter's precedent: the operator keeps the renamed
- *   home as the fallback). The original document tree is preserved
- *   in place but inactive. Any failure before publish discards the
- *   partial phext and leaves the disk Cavern untouched.
+ * - `migrateCavernToPhext` generates a phext from a closed
+ *   disk-mode Cavern, NON-DESTRUCTIVELY (mode selection,
+ *   2026-11-06; before that it converted in place and renamed the
+ *   knowledge home aside): walk the disk tree → write the VFS
+ *   strata → verify every copied file's SHA-256 against the L9
+ *   index (a fresh VFS open, which also verifies the L9 checksum
+ *   series) → store-level smoke reads → write the migration record
+ *   into L7 → publish by the single rename of the verified phext
+ *   into place. Every native file stays exactly where it is,
+ *   byte-for-byte, as a frozen snapshot the phext mode never reads
+ *   or writes; the mode marker flip (the generated phext's L7
+ *   cavern-state gains `mode: "phext"`) is the commit point. Any
+ *   failure before publish discards the partial phext and leaves
+ *   the disk Cavern untouched.
  * - `exportPhextCavernToDisk` is the reverse ramp: a phext-mode
  *   Cavern written back out to a complete disk-mode tree, verified
  *   by the same hash discipline (files) and the 4.6 knowledge dumps
@@ -37,11 +41,10 @@
  * recognized-document journal under `.mutable/document-saves`, and
  * the uploads endpoint are phext-backed at runtime now, so
  * migration copies their files into the phext like every other
- * stratum and the migration/strata records list nothing for them —
- * `onDisk` names only what a given Cavern actually left behind
- * (symlinks, an unrecognized `.mutable` remnant), never a standing
- * remainder. `caverns.json` is server installation state and is
- * never touched.
+ * stratum. Since the non-destructive turn, the records' `onDisk`
+ * list names the ENTIRE native tree — all of it remains on disk as
+ * the frozen snapshot — never a standing remainder. `caverns.json`
+ * is server installation state and is never touched.
  *
  * The PhextVFS class is passed in as `openVfs` (its statics: open /
  * create / openOrCreate) because this module is plain .mjs loaded by
@@ -139,13 +142,6 @@ export const PHEXT_BACKED_STRATA = Object.freeze({
   // paths with stratum 6's binary encoding (media ruling).
   legacyDocumentStores: 1, documentSavesJournal: 3, uploads: 1,
 });
-
-/**
- * The standing remainder: empty since Phase 3b. Per-Cavern
- * remainders (symlinks, unrecognized `.mutable` remnants) are
- * still computed from the manifest by remainingSummary().
- */
-export const REMAINING_ON_DISK = Object.freeze([]);
 
 const BREAK_BYTES = new Set([0x01, 0x17, 0x18, 0x19, 0x1a, 0x1c, 0x1d, 0x1e, 0x1f]);
 
@@ -313,35 +309,28 @@ function walkDiskTree(root) {
   return out;
 }
 
-const remainingSummary = manifest => {
-  const notes = [...REMAINING_ON_DISK];
-  const specific = new Set();
-  for (const entry of manifest) {
-    if (entry.action !== 'remaining') continue;
-    specific.add(entry.path);
-  }
-  return [...notes, ...specific];
-};
 
 // --------------------------------------------------------------- migration
 
 /**
- * Convert a CLOSED disk-mode Cavern at `root` to phext mode.
- * `openVfs` is the PhextVFS class. Returns the verification report
- * (also written into the phext at the migration record path).
- * Refusals: a phext already exists (already migrated / phext-born),
- * no disk knowledge state, a leftover fallback, live WAL sidecars.
- * On any failure the partial phext is discarded and the disk Cavern
- * is left exactly as found.
+ * Generate a phext from a CLOSED disk-mode Cavern at `root`,
+ * non-destructively: the native tree is left byte-for-byte intact
+ * as a frozen snapshot, and the generated phext's L7 cavern-state
+ * records `mode: "phext"` — the marker flip is the commit point,
+ * ordered last, after verification. `openVfs` is the PhextVFS
+ * class. Returns the verification report (also written into the
+ * phext at the migration record path).
+ * Refusals: a phext already exists (already upgraded / phext-born),
+ * no disk knowledge state. On any failure the partial phext is
+ * discarded and the disk Cavern is left exactly as found.
  *
- * Cutover addition: `allowNoKnowledge` (used only by the lifecycle's
- * upgrade-on-encounter, where the folder is already confirmed a
- * Cavern) converts a legacy layout whose home never gained a
- * knowledge database — the tree is copied and verified the same
- * way, the knowledge steps are skipped, and the vault identity is
- * minted by the establishment that follows the conversion. The
- * explicit /migrate route keeps the strict contract (a disk
- * knowledge state is required).
+ * `allowNoKnowledge` (used only by the lifecycle, when a folder
+ * being set up as a phext Cavern is already confirmed) generates
+ * from a legacy layout whose home never gained a knowledge
+ * database — the tree is copied and verified the same way, the
+ * knowledge steps are skipped, and the vault identity is minted by
+ * the establishment that follows. The explicit /migrate route keeps
+ * the strict contract (a disk knowledge state is required).
  */
 export async function migrateCavernToPhext({ root, openVfs, now = () => new Date().toISOString(), allowNoKnowledge = false }) {
   const cavernRoot = path.resolve(root);
@@ -349,13 +338,9 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
   const mutableHome = path.join(cavernRoot, '.mutable');
   const mutableFile = path.join(mutableHome, 'mutable.db');
   const auditFile = path.join(mutableHome, 'audit.db');
-  const fallbackPath = path.join(cavernRoot, FALLBACK_DIRNAME);
 
   if (fs.existsSync(phextPath)) {
     throw Error('This Cavern already has a cavern.phext; migration refused (already migrated or phext-born)');
-  }
-  if (fs.existsSync(fallbackPath)) {
-    throw Error(`A previous migration fallback (${FALLBACK_DIRNAME}) already exists; migration refused`);
   }
   const hasKnowledge = fs.existsSync(mutableFile);
   if (!hasKnowledge && !allowNoKnowledge) {
@@ -462,7 +447,9 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
 
     // ---- record provenance + state in L7, then publish
     const migratedUtc = now();
-    const onDisk = remainingSummary(manifest);
+    // Non-destructive: the ENTIRE native tree remains on disk as
+    // the frozen snapshot, so onDisk enumerates all of it.
+    const onDisk = manifest.map(e => e.path);
     const migrationRecord = {
       v: 1,
       format: 'phext-cavern-migration',
@@ -481,7 +468,7 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       bytesCopied: copied.reduce((sum, e) => sum + e.size, 0),
       smoke: smokeReport,
       converterVersions: { phextVfs: 1, knowledge: 'phext-knowledge-v1', migration: 'phase5+3b' },
-      fallback: FALLBACK_DIRNAME,
+      fallback: null,
       onDisk,
     };
     vfs = openVfs.open(temporaryPath);
@@ -489,26 +476,19 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       vfs.writeFile(STRATA_RECORD_PATH, JSON.stringify({ v: 1, phextBacked: { ...PHEXT_BACKED_STRATA }, onDisk, migrated: true }));
       vfs.writeFile(MIGRATION_RECORD_PATH, JSON.stringify(migrationRecord));
       vfs.writeFile(CAVERN_STATE_PATH, JSON.stringify({
-        v: 1, ...(knowledgeReport ? { cavernGuid: knowledgeReport.vaultGuid } : {}), migratedUtc, lastOpenedUtc: null,
+        v: 1, mode: 'phext', ...(knowledgeReport ? { cavernGuid: knowledgeReport.vaultGuid } : {}), migratedUtc, lastOpenedUtc: null,
       }));
       vfs.flush();
     } finally { vfs.close(); }
 
-    // Publish: the phext first, then the knowledge home aside. If
-    // the rename aside fails, the phext rename is rolled back so the
-    // Cavern is never half-migrated.
+    // Publish: the single rename of the verified phext into place.
+    // There is no second rename and nothing to roll back — the
+    // native tree is never moved. The L7 mode record written above
+    // is the commit point: until this rename lands, the folder is
+    // still a native Cavern with an inert temp file beside it.
     fs.renameSync(temporaryPath, phextPath);
     try { fs.unlinkSync(`${temporaryPath}.bak`); } catch { /* no prior generation */ }
-    if (fs.existsSync(mutableHome)) {
-      try {
-        fs.renameSync(mutableHome, fallbackPath);
-      } catch (error) {
-        try { fs.renameSync(phextPath, temporaryPath); } catch { /* report the original failure */ }
-        discardTemporary();
-        throw Error(`Migration could not move .mutable aside as the fallback; aborted with the disk Cavern untouched: ${error.message}`);
-      }
-    }
-    return { ...migrationRecord, phextPath, fallbackPath, verified: true };
+    return { ...migrationRecord, phextPath, fallbackPath: null, verified: true };
   } catch (error) {
     discardTemporary();
     throw error;
@@ -593,6 +573,12 @@ export async function exportPhextCavernToDisk({ phextPath, openVfs, destination 
     if (canonText(phextDump) !== canonText(diskDump)) {
       throw Error('Export verification failed: exported knowledge dump differs from the phext dump');
     }
+    // The exported tree is a native Cavern: record its mode in its
+    // own state record (design §4.5), so its first open is governed
+    // by the marker, not by derivation.
+    fs.writeFileSync(path.join(destination, '.mutable', 'cavern-state.json'), JSON.stringify({
+      v: 1, mode: 'native', cavernGuid: control.vaultGuid, lastOpenedUtc: null,
+    }));
     return {
       verified: true, destination, vaultGuid: control.vaultGuid,
       files, fileCount: files.length, skippedInternal, knowledgeFiles,
