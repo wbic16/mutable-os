@@ -1377,6 +1377,160 @@ Fresh `npm run build` first (the knowledge worker runs from
 - **`npm run typecheck`: PASS (exit 0)** — both
   `tsconfig.reactive.json` and `tsconfig.server.json`.
 
+## SSO against edit.phext.io (2026-11-06) — identity gate for Mutable
+
+Task reference coordinate 27.6.8/7.5.9/6.5.8; design of record:
+`files/sso-design.md` in the goal workspace (handshake §3, change
+list §4.2 M1–M7). Mutable gains a user identity where it had none:
+edit.phext.io is the identity provider, and Mutable's gate — only
+when configured — bounces logged-out document requests to edit's
+SSO endpoint, receives the returning browser at
+`/api/auth/callback` with a short-lived signed assertion
+(120 s, single-use `jti`, audience `mutable`), and seals its own
+session cookie under a Mutable-only secret. The shared assertion
+secret is dedicated (`PHEXT_SSO_SECRET` on edit =
+`MUTABLE_SSO_SECRET` here); edit's session secret is never shared,
+and the assertion format is edit's existing seal format
+(base64url JSON + HMAC-SHA256), so no new dependency appears on
+either side.
+
+**Admission.** Any signed-in edit account may use Mutable (§2
+decision 2): the assertion's `editor` boolean is carried in the
+session for display, not required. The check is one isolated
+predicate (`admitsUser` in `server/sso-auth.ts`); making Mutable
+editor-only is `return identity.editor;` there and nothing else.
+
+**Activation is the env gate** (§2 decision 5), which is this
+feature's flag: with `MUTABLE_SSO_SECRET` and
+`MUTABLE_SESSION_SECRET` unset (or placeholder/short), the
+middleware passes every request through and the auth routes
+answer 404 — local and test instances behave byte-for-byte as
+before. The deployed unit gains four values (§5 of the design):
+the two secrets plus optional `MUTABLE_SSO_EDIT_URL` /
+`MUTABLE_PUBLIC_URL` overrides. Deploy order matters (edit first,
+then Mutable) and is Will's step.
+
+**CSRF and logout.** The session body carries a `csrf` token
+(edit's `Gate::admit` parity): non-GET calls under `/api/` and
+`/upload` must present it as `x-csrf-token` once a session exists,
+enforced by the gate and sent by the client's fetch wrappers.
+Logout is local only — it clears the Mutable cookie and sets a
+5-minute `mutable_logged_out` suppression cookie so the gate
+serves a signed-out page instead of bouncing the browser straight
+back through edit's still-live session; `/api/auth/login` clears
+the suppression. Federated logout is out of scope by design.
+
+**The Cavern session is untouched.** `mutable_session` (who is at
+the keyboard) and `X-Mutable-Cavern` (which Cavern is open) are
+separate concepts; the gate mounts ahead of the Cavern router and
+fence and neither replaces the other.
+
+### Files
+
+- `server/sso-auth.ts` (new) — the whole gate in one module:
+  env config (enabled iff both secrets are ≥ 32 chars and not
+  placeholders); `seal`/`open` over node:crypto HMAC-SHA256 +
+  base64url with `timingSafeEqual`; assertion verification
+  (signature, `aud`, `exp`, in-memory jti replay cache swept per
+  verify); `safePath` return validation mirroring edit's
+  `safe_next`; the router (`GET /api/auth/login` — clears the
+  suppression cookie, 302 to edit's SSO endpoint;
+  `GET /api/auth/callback` — verify, seal `mutable_session`
+  (HttpOnly, Secure, SameSite=Lax, host-only, 14 days), 302 to the
+  return path, any failure restarts at login;
+  `GET /api/auth/session` — the §3.4 identity JSON, never gated;
+  `POST /api/auth/logout` — session + CSRF required, clears the
+  session and sets the suppression) and the gate middleware
+  (pass-through when disabled; `/api/auth/*` exempt; valid session
+  passes with the CSRF rule on non-GET API/upload calls; no
+  session → document GETs 302 to edit, or the signed-out page when
+  suppressed; API/upload calls → 401 JSON). No new npm
+  dependencies. [sso]
+- `server/index.ts` (modified) — one import plus four lines
+  immediately after `const app = express();`, before the
+  `/assets` static mount: create the gate, mount its router at
+  `/api/auth`, mount its middleware, log the one startup line
+  (`SSO: enabled (edit.phext.io)` / `SSO: disabled (no secrets
+  configured)`). Everything else — statics, `/api/cavern`, the
+  Cavern fence, uploads, standalone routers — sits behind the
+  gate with no further edits. [sso]
+- `src/application/cavern-startup.tsx` (modified) — the client
+  half (M5). A module-level identity slot stays unset unless
+  `GET /api/auth/session` answers with a real payload (a 404 from
+  an unconfigured gate, or any failure, leaves it unset and every
+  addition below inert). On mount the component loads the
+  identity; the root return renders a slim identity bar ahead of
+  the chooser/workspace `<Show>` — handle (or "Not signed in"),
+  an editor badge when the assertion carried one, the
+  `phext edit ↗` cross-link to https://edit.phext.io/, and Sign
+  out (POST `/api/auth/logout` with the CSRF header, then
+  navigate to `/`, where the gate serves the signed-out page) or
+  Sign in when the session has lapsed. `request()` and
+  `boundFetch` add `x-csrf-token` on non-GET calls when a token
+  is known and restart sign-in at the current page on a 401;
+  `boundFetch`'s Cavern-fence behaviour is unchanged (the session
+  header still never rides on `/api/cavern/`), and the
+  `openFromPhext` upload — which bypasses `boundFetch` via
+  `originalFetch` — carries the CSRF header explicitly so the
+  phext-open flow survives an enabled gate. [sso]
+- `src/application/cavern-startup.css` (modified) — the
+  `.cavern-identity` bar, in the file's existing palette and
+  conventions. [sso]
+- `server/sso-auth.test.ts` (new) — the design §6 Mutable-side
+  suite on the cavern-lifecycle in-process pattern, fixed test
+  secrets, assertions minted locally in edit's format: callback
+  happy path (302 to the return path, the §3.4 cookie attributes,
+  session endpoint reports identity + csrf); refusals (expired,
+  mis-signed, wrong audience, replayed jti — no cookie, restart
+  at login) and the §3.3 landing rule (a hostile return inside an
+  otherwise authentic assertion is clamped to `/`, never
+  followed); gate behaviour (document 302 to
+  edit with the encoded return, API 401 JSON, session passes,
+  CSRF 403 without/with wrong token and passes with it); login
+  clearing the suppression and clamping a hostile return; logout
+  requiring CSRF, clearing the session, setting the 300 s
+  suppression, and the suppressed document request serving the
+  signed-out page; and the disabled gate passing everything
+  through with the auth routes at 404. [test]
+
+### Qualification (2026-11-06)
+
+Fresh `npm run build` first (the knowledge worker runs from
+`dist/`); every run watched to completion. One transient
+environment incident during qualification: a system-wide exec
+write block briefly truncated the gitignored `dist/` outputs;
+the block cleared on its own, the build was re-run clean, and
+every tally below is from the post-recovery runs.
+
+- **`npm run build`: PASS** — Vite client build (2,098 modules),
+  `tsc` server project, history-worker and sqlite-foundation
+  staging.
+- **`npm run typecheck`: PASS (exit 0)** — both
+  `tsconfig.reactive.json` and `tsconfig.server.json`.
+- **SSO suite: PASS — 7/7** (`server/sso-auth.test.ts`, the
+  design §6 Mutable-side list). First run was 6/7 with the
+  hostile-`ret` case asserted as an outright refusal; §3.3
+  specifies re-validate-and-clamp on landing, the implementation
+  already did exactly that (302 to `/`, no open redirect), and
+  the test was corrected to the design before this tally.
+- **Serial phext vitest set: PASS — 108/108 across 19 files**
+  (the recorded set — five `src/phext` suites, eleven
+  `server/phext-*` suites, `server/cavern-lifecycle.test.ts`,
+  `server/vault-listing-cache.test.mjs`,
+  `src/application/cavern-startup.test.tsx` — run serially with
+  file parallelism off; cavern-lifecycle 10/10, cavern-startup
+  6/6). `server/phext-settings.test.mjs` is a `node --test` file
+  swept in by the glob and passes **5/5** under its own runner,
+  as in step 4's qualification.
+- **Serial sqlite node tests: PASS — 149/149** (the `test:sqlite`
+  command, `node --test --test-concurrency=1
+  src/knowledge-sqlite/*.test.mjs`).
+
+Not verified here, by design: the live handshake against
+edit.phext.io (the phext-lattice half, L1–L7, is a separate
+branch) and the deployed service — §5's deploy checklist is
+Will's sequence.
+
 ## Appendix — complete per-file accounting (final state)
 
 Every file the one-commit landing changes relative to its upstream
