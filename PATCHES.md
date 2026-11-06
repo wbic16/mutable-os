@@ -1281,6 +1281,102 @@ Results (2026-11-06, this VM — Node v24.22.1; the project pins Node 22.12.0 in
 
 **Resolution (2026-11-06, vault-scope signal restoration) — the open conflict above is closed; the test passes unedited.** The production change the archaeology implied, in four parts. (1) `src/knowledge-sqlite/vault-scope.mjs`: `inspectVaultScope` regains the `phextKnowledge` signal in its `01f03de` form — the root `cavern.phext` validation (keeping the cutover's stricter private-regular-file check, hard links included) and the descendant `cavern.phext` walk check are keyed on it, and the fail-closed block again refuses a `.mutable` home with no current database on the disk branch, with the `01f03de` message ('Existing Mutable infrastructure has missing or invalid current database; … restore current knowledge explicitly'); phext mode keeps exactly the cutover's one relaxation (a documents home with no `mutable.db` is tolerated; a present database must still be a private regular file in both modes). One deliberate deviation from the `01f03de` form: the ANCESTOR `cavern.phext` check stays unconditional, as the cutover left it — ancestor overlap is keyed on the enclosing domain, not the opener's mode (a `cavern.phext` in an ancestor makes that folder a phext Cavern, and nesting any domain inside it overlaps), and a standing suite pins it: `host.test.mjs` 'confines roots…' expects a bare open of a not-yet-existing nested path inside a phext domain to refuse as overlap rather than fail on the missing directory. (2) Threading, in the forms the callers already use: `client.mjs` passes `phextPath ? {phextKnowledge:true} : undefined` with its resolved path (the exact `01f03de` call form); `foundation.mjs`'s phext branch passes `{phextKnowledge:true}` and its disk branch passes nothing, as at `01f03de`; `restoreSnapshot` keys its destination inspection on the restore's own mode — the passed PhextVFS instance, or, for the direct disk form, whether the destination sits inside an established phext domain (`enclosingPhextDomain`, a layout probe in the idiom of `refuseAmbiguousDiskOpen`). (3) Two derivation reconciliations in `client.mjs` that the standing test's segments pin: the derivation now also reads the phext's knowledge control record (its own establishment record — control present ⇔ knowledge established) beside the mode marker, and an established phext with no governing marker beside a disk database refuses that database as UNCONVERTED knowledge (the cutover client guard's heir — 'convert the disk home explicitly or remove it'); marker-governed coexistence (the post-upgrade frozen snapshot) is untouched, and a phext with no established knowledge beside a disk database keeps the both-present ask refusal. And an initializing open of a Cavern folder whose `.mutable` documents home exists but is completely empty follows §2.4's 'neither' row as a setup — the new-Cavern default, phext (§2.3) — while a bare folder with no home keeps the disk fall-through and a home carrying any content is a partial disk home the restored scope check refuses. No test file was changed. Verified tallies (fresh `npm run build` first; every run watched to completion): `vault-scope.test.mjs` solo 5/5; **`npm run test:sqlite` 149/149 across the 15 files** (per-file full counts as in the reconciliation tally, with vault-scope now 5/5; `host.test.mjs` additionally verified solo at 6/6 after the ancestor-keying call above); serial phext vitest set 108/108 across 19 files; phext-settings node tests 4/4; `npm run typecheck` exit 0.
 
+## Step 4 (2026-11-06) — font settings as the fifth settings-bundle domain
+
+Upstream's Textual programme (commit `23ae138`, landed in this fork
+by the rebase) introduced a user font-settings domain the L7
+settings bundle did not capture — recorded there as a named
+follow-up; this step closes it. The bundle now carries five
+domains: the original four plus **`textual-fonts`**.
+
+**Where the settings live.** The live domain is
+`TextualFontSettings` (`src/features/textual/fonts.ts`):
+`{source: 'bundled'|'system', family, size, lineHeight}`, held as
+the `font` field of the Textual preferences persisted at
+localStorage key `mutable.textual.preferences.v1`
+(`src/features/textual/grid.ts`) and edited by the Textual
+Presentation Settings panel. Only the font object is the domain —
+the sibling preference fields (`zoom`, `palette`, `readingWidth`)
+are grid presentation state, not font settings, and stay out of
+the bundle. A font family is a plain scalar (a name); the
+portability screen (audit §2.4) is satisfied as-is, and a
+path-shaped family is refused at validation.
+
+**Mechanism.** Same snapshot discipline as the four existing
+domains: explicit capture only, whole-payload validation before
+anything is written, per-field scrolls under
+`/.control/settings/domains/textual-fonts/{source,family,size,lineHeight}`,
+no import path (opening a Cavern still never touches live
+settings), and the existing phext-mode gating on the settings
+routes unchanged — a native Cavern refuses capture/read by the
+same §3.2 path as before. The validator enforces the live
+domain's own invariants (the ones `normaliseTextualFont`
+guarantees: integer size 12–32; integer line height inside
+ceil(size·1.1)..floor(size·2.5); family ≤ 100 chars, no control
+characters; the bundled source names only a bundled family) but
+refuses rather than repairing — a payload outside them did not
+come through the client's normaliser. Read-back validates the
+font domain too: a stored bundle is data from elsewhere, so a
+malformed stored font domain is refused whole (`Settings bundle
+refused: …`) rather than handed on as if usable. **Bundle schema
+version 1 → 2**: version 1 carried exactly the four original
+domains; a pre-fonts bundle has no font subtree and reads back
+with the `textual-fonts` key absent — absence is recorded, never
+filled with a fabricated default — so a future importer can tell
+a complete bundle from a pre-fonts one (audit §2.6).
+
+### Files
+
+- `server/phext-settings.mjs` (modified) — the fifth domain end to
+  end: `textual-fonts` joins the domain list; `validateTextualFonts`
+  (capture- and read-back-flavoured refusals); capture requires all
+  five domains and rejects unknown ones as before; the writer adds
+  the four font leaves; read-back reassembles and validates the
+  domain when its subtree is present and omits the key when it is
+  not. Schema version constant 1 → 2. [phext-settings]
+- `src/application/settings-snapshot.ts` (modified) — the client
+  capture payload gains `textual-fonts`, read through the Textual
+  preferences reader (`loadPreferences().font`, which normalises
+  on load — the same state a restart restores). An empty system
+  family is captured as Courier New, the domain's own default for
+  an unspecified system family. [phext-settings]
+- `server/phext-settings.test.mjs` (modified) — the round-trip,
+  rewrite, and refusal suites extended to the font domain
+  (per-field leaves, deep-equal read-back, second-capture rewrite,
+  missing-domain refusal, eight malformed-font refusals), plus a
+  new read-back test: a stored font domain corrupted out of bounds
+  is refused on read, and a font subtree removed (the pre-fonts
+  shape) reads back with the key absent and the other domains
+  intact. [test]
+- `server/cavern-lifecycle.ts`, `src/application/cavern-startup.tsx`
+  (modified) — comment-only: "four domains" → "five domains" where
+  the settings routes and the Cavern menu describe the capture.
+  No UI change: the shipped-settings UI never enumerated domains
+  (one "Update Shipped Settings" action), so there is no domain
+  list to extend. [phext-settings]
+
+### Qualification (2026-11-06)
+
+Fresh `npm run build` first (the knowledge worker runs from
+`dist/`); every run watched to completion.
+
+- **`npm run build`: PASS** — Vite client build, `tsc` server
+  project, history-worker and sqlite-foundation staging.
+- **Phext settings node tests: PASS — 5/5** (`node --test
+  server/phext-settings.test.mjs`; the pre-step-4 suite was 4/4 —
+  the fifth test is the read-back refusal/absence test, and the
+  four standing tests carry the font domain through their
+  round-trip, rewrite, and refusal assertions).
+- **Serial phext vitest set: PASS — 108/108 across 19 files**
+  (the recorded set: five `src/phext` suites, eleven
+  `server/phext-*` suites, `server/cavern-lifecycle.test.ts`,
+  `server/vault-listing-cache.test.mjs`,
+  `src/application/cavern-startup.test.tsx`).
+- **`npm run test:sqlite`: PASS — 149/149 across the 15
+  `src/knowledge-sqlite/*.test.mjs` files.**
+- **`npm run typecheck`: PASS (exit 0)** — both
+  `tsconfig.reactive.json` and `tsconfig.server.json`.
+
 ## Appendix — complete per-file accounting (final state)
 
 Every file the one-commit landing changes relative to its upstream

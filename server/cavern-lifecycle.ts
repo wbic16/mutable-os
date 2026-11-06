@@ -491,7 +491,7 @@ export function createCavernLifecycle(options: { stateFile?: string; drainTimeou
     }
   });
   // Settings bundle (audit Part 2): capture is an explicit user
-  // action — the client sends the four domains' current values,
+  // action — the client sends the five domains' current values,
   // the whole payload is validated before anything is written,
   // and the L7 /.control/settings tree is rewritten in the open
   // Cavern's phext. The read route returns the shipped copy for
