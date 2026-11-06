@@ -314,8 +314,11 @@ const storage = phextUploads.createPhextUploadStorage({
   },
 });
 
+// H3: requests are capped at the boundary; the phext engine
+// enforces the per-file cap again (see server/phext-uploads.mjs).
 const upload = multer({
   storage: storage,
+  limits: { fileSize: phextUploads.MAX_UPLOAD_FILE_BYTES, files: phextUploads.MAX_UPLOAD_FILES },
   fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
     if (
       file.mimetype == 'image/png' ||
@@ -324,7 +327,6 @@ const upload = multer({
     ) {
       cb(null, true);
     } else {
-      cb(null, false);
       return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
     }
   },
@@ -335,7 +337,7 @@ const uploadImages = upload.array('image');
 app.post('/upload', function(req: Request, res: Response) {
   uploadImages(req, res, function (err: any) {
     if (err) {
-      return res.status(400).send({ message: err.message });
+      return res.status(400).json({ Success: false, Error: err.message });
     }
     const files = (req as MulterRequest).files;
     res.json(files);
