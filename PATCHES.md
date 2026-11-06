@@ -1,14 +1,17 @@
 # Patches on upstream
-## Landing state (2026-11-05)
+## Landing state (2026-11-06)
 
 This file is the complete record of the fork's phext-support work. As of
-2026-11-05 the work lands as **one commit** on upstream
-`be4e520f3aaa716f569fd92808522c67605aed0b` — see "Rebase onto upstream
-be4e520 (2026-11-05)" and the accounting appendix at the end of this
-file. The sections between here and there are the development provenance:
-per-phase notes written as the work happened, describing intermediate
-states (including the dual-mode build the final state deletes). Read
-them as history; read the appendix as the final state.
+2026-11-06 the work lands as **three commits** on upstream
+`db3ed30064f07ba99784a1d395ba127787274501` — the squashed phext commit,
+step 3 (mode selection) squashed to one commit, and step 4 (font
+settings domain) — see "Rebase onto upstream db3ed30 (2026-11-06)" and
+the accounting appendix at the end of this file. (The previous landing,
+one commit on `be4e520`, is recorded in "Rebase onto upstream be4e520
+(2026-11-05)".) The sections between here and there are the development
+provenance: per-phase notes written as the work happened, describing
+intermediate states (including the dual-mode build the final state
+deletes). Read them as history; read the appendix as the final state.
 
 
 The fork's `emise/*` branches carry wbic16's changes on top of
@@ -1376,6 +1379,92 @@ Fresh `npm run build` first (the knowledge worker runs from
   `src/knowledge-sqlite/*.test.mjs` files.**
 - **`npm run typecheck`: PASS (exit 0)** — both
   `tsconfig.reactive.json` and `tsconfig.server.json`.
+
+## Rebase onto upstream db3ed30 (2026-11-06)
+
+The fork's divergence — by then the be4e520 landing's one commit plus
+step 3 (mode selection, merged at `f86cda1`) and step 4 (font settings
+domain, merged at `ec1dce1`) — was replayed onto upstream HEAD
+`db3ed30064f07ba99784a1d395ba127787274501` ("MD highlighting and MD
+Input Transformation", 2026-11-06 18:42:39 +1000). The landed series
+is three commits: the squashed phext commit, step 3 squashed to one
+commit (its four branch commits are named in its message), and step 4.
+The pre-rebase main is preserved as branch `emise/pre-rebase-2026-11-06b`
+at `ec1dce1`.
+
+**What upstream did in its 1 commit since be4e520** — Markdown:
+Lezer-based highlighting for Markdown and a Markdown Input
+Transformation (new `src/runtime/markdown-input.ts`,
+`src/interchange/markdown-native.ts`, the
+`markdownInputTransformation` feature flag, gateway / clipboard /
+rendering wiring, qualification docs, and one dependency:
+`+@lezer/markdown ^1.7.2`). Nothing in `server/`, the knowledge layer,
+or build config.
+
+**Prior updates made during the rebase:**
+
+- `package.json` — auto-merged. The landed file is the fork's
+  refreshed dependency set with exactly one line added: upstream's
+  `@lezer/markdown ^1.7.2`. Scripts are identical to the fork's.
+- `package-lock.json` — the one content conflict of the rebase;
+  **regenerated** with `npm install --legacy-peer-deps
+  --ignore-scripts` from the merged `package.json`; never hand-merged.
+- `src/configuration.ts` — auto-merged: the landed file carries
+  upstream's `markdownInputTransformation` flag (declaration and
+  default) beside the fork's `phextDocuments`.
+- Steps 3 and 4 applied with no conflicts at all.
+- **Tree check:** the landed tree differs from the pre-rebase main
+  (`ec1dce1`) in exactly the 27 files of upstream's `db3ed30` commit,
+  +711 / −70 (the lockfile regeneration accounts for the one-line
+  delta against upstream's own +711 / −71).
+
+### Rebase compatibility fixes
+
+None required — no source changes beyond the resolutions above.
+
+### Qualification (2026-11-06, on the rebased tree)
+
+Results (this VM — Node v24.22.1 / npm 10.9.4; the repo's deploy route
+uses `npm ci --legacy-peer-deps` under npm 10.9.9 on the host):
+
+- **Install:** `npm install --legacy-peer-deps --ignore-scripts` —
+  clean (595 packages; `tslib` present as locked). Note: aletheia-core's
+  npm 11.19.1 installs this same lockfile with 592 packages and drops
+  `tslib`, which fails the client build at `@antv/x6`; that is an npm-11
+  install artifact, not a property of the tree — the identical tree
+  builds and passes under npm 10. Verification therefore ran here.
+- **`npm run build`: PASS** — Vite client build, `tsc` server project,
+  history-worker and sqlite-foundation staging; `dist/server/index.js`
+  and `dist/index.html` produced.
+- **`npm run typecheck`: PASS (exit 0)** — both `tsconfig.reactive.json`
+  and `tsconfig.server.json`, run on the built tree (the repo's known
+  build-order property applies: test files import built `dist/`
+  modules).
+- **Step suites: PASS** — `server/phext-settings.test.mjs`
+  (`node --test`): **5/5**. `server/cavern-lifecycle.test.ts` (vitest):
+  **10/10**. These are the suites that verified steps 4 and 3
+  respectively; both match their pre-rebase numbers.
+- **Serial phext vitest set: PASS — 82/82 across 17 files** (codec,
+  lattice, VFS, documents, gates backend, phext-fs, knowledge / legacy /
+  exit / docs end-to-end, transfer, uploads, history, menu). One
+  first-pass failure (`phext-cavern-transfer` H2) was this VM's
+  intermittent spawned-process write EPERM; the file passes 1/1 on
+  isolated re-run.
+- **Stage-C gates node tests: PASS — 52/52** (flock, flock-disk,
+  storage, storage-disk).
+- **`npm run test:sqlite`: PASS — 149/149** — identical to the
+  pre-rebase main's verified tally.
+- **Upstream's `db3ed30` suites: PASS — 113/113** across
+  `src/rendering/markdown-input.test.tsx`,
+  `src/interchange/markdown-native.test.ts`, and
+  `src/rendering/mutable-clipboard.test.tsx`, run on aletheia-core
+  (16 cores). On this loaded VM the markdown-input file's editor tests
+  hit vitest's 5000 ms timeout (8 tests, durations 6–33 s); the same
+  tree passes them unloaded, so this is a host-load artifact, not a
+  rebase effect.
+- **Boot smoke: PASS** — the built server, started against a fresh
+  temporary config home, answers `POST /api/cavern/startup` with
+  HTTP 200 `{"Success":true,...}`.
 
 ## Appendix — complete per-file accounting (final state)
 
