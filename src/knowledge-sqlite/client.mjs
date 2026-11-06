@@ -83,16 +83,33 @@ export async function openSqliteFoundation(options) {
         finally { vfs.close(); }
       } catch { /* no readable phext record */ }
     }
-    // No restore special case: a restore destination takes the
-    // mode its own record/layout resolves to — a registered or
-    // phext-recorded destination converts into the phext; a plain
-    // destination restores to disk, the 01f03de behavior the
-    // design restores.
+    // A restore destination takes the mode its own record/layout
+    // resolves to — a registered or phext-recorded destination
+    // converts into the phext, a native-recorded one restores to
+    // disk (the rollback round trip), and an ambiguous layout
+    // refuses. The one case with nothing of its own to derive
+    // from is a restore into an UNESTABLISHED destination (no
+    // marker, neither layout): that restore is a setup, not an
+    // open, so the snapshot's recorded provenance decides — a
+    // phext-born snapshot converts into the phext (the cutover's
+    // restore contract, and the §2.3 default for a new Cavern);
+    // a disk-born snapshot restores to disk. A snapshot with no
+    // recorded provenance predates mode selection; the backups
+    // of the phext-only era are phext-born, so it converts too.
+    // (The earlier step-3 fall-through sent this case to disk
+    // unconditionally, minting a `.mutable` home for a phext-born
+    // snapshot — the regression phext-worker.test.mjs caught.)
     if (phextRecorded) phextPath = path.join(vault, 'cavern.phext');
     else if (!nativeRecorded && hasPhext && hasDiskKnowledge) {
       throw Error('This vault holds both a phext store and a disk knowledge home (.mutable/mutable.db), and no recorded mode says the disk copy is current; open the Cavern through the server so the recorded mode governs');
     }
     else if (!nativeRecorded && hasPhext && !hasDiskKnowledge) phextPath = path.join(vault, 'cavern.phext');
+    else if (configuration.restoreFrom && !nativeRecorded && !hasPhext && !hasDiskKnowledge) {
+      let sourceMode;
+      try { sourceMode = JSON.parse(fs.readFileSync(path.join(configuration.restoreFrom, 'snapshot.json'), 'utf8'))?.sourceMode; }
+      catch { /* provenance unreadable; the worker's restore validation refuses a malformed snapshot itself */ }
+      if (sourceMode !== 'native') phextPath = path.join(vault, 'cavern.phext');
+    }
   }
   if (phextPath) configuration.phextKnowledge = phextPath;
   else delete configuration.phextKnowledge;

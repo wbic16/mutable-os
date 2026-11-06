@@ -202,6 +202,11 @@ function openValidatedFoundation({ vault, readOnly = false, initialize: create =
         const manifest = {
           format: 'mutable-sqlite-backup', version: 1, vaultGuid: identity.vaultGuid, createdUtc: new Date().toISOString(), files,
           scope: 'database-only', atomicAcrossDatabases: false, auditAvailable: !!audit,
+          // Provenance: the mode of the foundation that produced
+          // this snapshot. A restore into an unestablished
+          // destination derives its mode from it (client.mjs);
+          // established destinations never consult it.
+          sourceMode: 'native',
         };
         const marker = path.join(target, 'snapshot.json'); fs.writeFileSync(marker, JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx', mode: 0o600 }); syncFile(marker); syncDirectory(target);
         return { directory: target, ...manifest };

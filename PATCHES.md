@@ -1134,7 +1134,19 @@ definition (no Cavern, no mode). Saves stay manual in both modes.
   follows the resolved mode (`phextWriterLease` vs the restored
   disk `writerLock`). A snapshot restore follows the destination's
   resolved mode — it converts into a registered/recorded phext
-  destination and restores to disk at a plain one.
+  destination and restores to disk at a native-recorded one. At an
+  unestablished destination (no marker, neither layout) the
+  snapshot's recorded provenance decides: every backup stamps its
+  manifest with the producing foundation's mode (`sourceMode`,
+  stamped by the disk `backup()` in `foundation.mjs` and by
+  `exportPhextKnowledge` in `phext-convert.mjs`), a phext-born
+  snapshot converts, a disk-born one restores to disk, and an
+  unstamped (pre-mode-selection) snapshot converts — the phext-only
+  era's backups are phext-born, and phext is the new-Cavern
+  default. (Regression fix, 2026-11-06: the original step-3
+  fall-through sent this case to disk unconditionally, minting a
+  `.mutable` home for a phext-born snapshot; see the correction
+  note under Qualification below.)
 - `src/knowledge-sqlite/worker-entry.mjs` (modified) — the worker
   takes its mode from `workerData`: a host-resolved phext path means
   phext (own PhextVFS, current creation discipline, phext lease and
@@ -1255,6 +1267,8 @@ Results (2026-11-06, this VM — Node v24.22.1; the project pins Node 22.12.0 in
 - **Gates node suites: PASS — 52/52** (`node --test --test-concurrency=1` over the phext `storage.test.mjs`/`flock.test.mjs` and the restored `storage-disk.test.mjs` 23/23 + `flock-disk.test.mjs` 3/3).
 - **Phext settings node tests: PASS — 4/4** (`node --test server/phext-settings.test.mjs`).
 - **Boot smoke: PASS — 14/14 checks.** The built server, against a fresh temporary config home: a COPY of a native-layout fixture Cavern opens in native mode (marker recorded, no phext appears); a phext Cavern created by the built server defaults to phext; a COPY of it opens in phext mode; after a restart, startup auto-restores the phext copy in phext mode.
+
+**Correction (2026-11-06, regression-fix commit).** Independent verification found the `test:sqlite` tally above does not reproduce, and one regression the wedged run had masked: `phext-worker.test.mjs` failed at its restore assertion (a phext-born snapshot restored into a fresh vault minted a `.mutable` disk home) and then hung, so the serial run never completed. Cause: the client's restore derivation fell through to native whenever the destination had no record or layout of its own. Fix: backups record their provenance (`sourceMode` in `snapshot.json`, stamped by both foundations), and a restore into an unestablished destination derives from it — phext-born converts, disk-born restores to disk, unstamped converts (see the `client.mjs` entry above). No test was changed. Verified tallies after the fix (fresh `npm run build` first — the knowledge worker runs from `dist/`): `phext-worker.test.mjs` 1/1 in ~1 s; `foundation-disk.test.mjs` 24/24; the phext vitest set 108/108 across 19 files; typecheck exit 0; gates suites 52/52; phext-settings 4/4; knowledge-host consumer suites 61/63 (the 2 failures are the SurrealDB-backed `entity-search` creations, environmental, same class as recorded above). **`npm run test:sqlite` true tally: 142/149 across the 15 files** — authority-identities 1/1, cardex-regex 1/1, cardex 13/13, entities 2/2, foreground 12/12, foundation-disk 24/24, foundation 18/19, host 5/6, indexer 23/23, package-data 8/8, phext-worker 1/1, propositions 8/8, schema 17/17, semantics 7/9, vault-scope 2/5. The 7 failures (foundation ×1, host ×1, semantics ×2, vault-scope ×3) reproduce identically on the unmodified step-3 commit with a fresh build: they are cutover-era suites whose assertions encode the phext-only default for a no-signal open, which step 3 deliberately retired (design §1.5) without reconciling those suites. They are pre-existing step-3 defects, not effects of this fix, and are recorded here rather than silently absorbed; the boot smoke was not re-run (it has no scripted form in the repo).
 
 ## Appendix — complete per-file accounting (final state)
 
