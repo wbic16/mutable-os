@@ -29,10 +29,13 @@ export class SqliteKnowledgeHost {
     const work=this.control.then(action);this.control=work.then(()=>{},()=>{});return work;
   }
   /** Existence probe for the vault's knowledge store (never establishes
-   * anything): the Cavern phext is the knowledge store (phext-only). */
+   * anything): the store is the Cavern phext in phext mode and the
+   * disk home (.mutable/mutable.db) in native mode — either proves
+   * an established Vault. */
   private async knowledgeProbe(vaultPath:string){
     const root=await this.store.resolve(vaultPath);
-    await stat(path.join(root,'cavern.phext'));
+    try{ await stat(path.join(root,'cavern.phext')); return; }catch{ /* not the phext store */ }
+    await stat(path.join(root,'.mutable','mutable.db'));
   }
   async acquire(vault:string,policy=normalizePolicy()) {
     return this.acquireContext(vault,policy);
@@ -226,7 +229,10 @@ export class SqliteKnowledgeHost {
     // lookup target; the reader path below serves unopened Vaults
     // (canonical names/aliases/get — mentions report as unindexed).
     if(!archive){const live=this.entries.get(root);if(live?.client)return await live.client.entityLookup(body.request,signal);}
-    const file=path.join(root,'cavern.phext');
+    // Reader identity tracks the vault's knowledge store file —
+    // the phext in phext mode, the disk database in native mode.
+    let file=path.join(root,'cavern.phext');
+    try{ await stat(file); }catch{ file=path.join(root,'.mutable','mutable.db'); }
     const stamp=await stat(file),identity=`${stamp.dev}:${stamp.ino}`;
     let reader=this.readers.get(root);
     if(reader && reader.identity!==identity){

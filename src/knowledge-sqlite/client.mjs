@@ -1,6 +1,7 @@
 import { Worker } from 'node:worker_threads';
 import { inspectVaultScope, lockVaultEstablishment } from './vault-scope.mjs';
 import { flockExclusiveSync } from './advisory-lock.mjs';
+import { writerLock } from './paths.mjs';
 import { phextKnowledgeFor } from './phext-registry.mjs';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -13,8 +14,9 @@ import path from 'node:path';
  * for the VFS path '/.mutable/writer.lock' (see
  * scripts/stage-c-gates/phext-backend.mjs), so the knowledge writer
  * lock is the same logical lock across layers. Held for the worker's
- * lifetime; the disk writer lock it mirrors is deleted with the
- * phext-only cutover.
+ * lifetime, exactly like paths.writerLock on disk (the native-mode
+ * lease, granted by the same message when the worker's lease request
+ * carries no phext path).
  */
 function phextWriterLease(phextPath) {
   const anchor = path.join(path.dirname(phextPath),
@@ -40,23 +42,60 @@ export async function openSqliteFoundation(options) {
   // Selector readers open an existing DB only. They neither establish a Vault
   // nor acquire a writer/indexing lease, so they must not scan its documents.
   if(configuration.entityReader && (!configuration.readOnly || configuration.initialize))throw Error('Entity readers must be read-only');
-  // Phext-only (cutover): knowledge always lives in the vault's
-  // cavern.phext. A registered lifecycle path wins; an explicit
-  // path (or `true`) is honored; otherwise the default
-  // <vault>/cavern.phext is used. The resolved absolute path rides
-  // workerData into the worker.
-  const phextPath = typeof configuration.phextKnowledge === 'string' ? configuration.phextKnowledge
-    : (configuration.vault ? (phextKnowledgeFor(configuration.vault)?.phextPath ?? path.join(configuration.vault, 'cavern.phext')) : undefined);
-  if (phextPath) configuration.phextKnowledge = phextPath;
-  else throw Error('Phext knowledge mode requires a vault phext path');
-  // Upgrade-on-encounter belongs to the Cavern lifecycle (it
-  // converts the whole tree, not just knowledge). A vault that
-  // still holds a disk knowledge home has not been converted;
-  // refuse here rather than mint fresh phext knowledge beside it
-  // and silently orphan the disk state.
-  if (configuration.vault && fs.existsSync(path.join(configuration.vault, '.mutable', 'mutable.db'))) {
-    throw Error('This vault still holds disk knowledge (.mutable/mutable.db); open the Cavern through the server once to convert it to phext');
+  // Mode selection: resolve the Cavern's knowledge mode before
+  // scope inspection. A registered lifecycle instance wins (the
+  // lifecycle registers phext-mode Caverns only); an explicit path
+  // (or `true` for the default cavern.phext) is honored. With no
+  // phext signal at all, the Cavern's own records decide — the
+  // same derivation the lifecycle applies (design §2.4): a
+  // phext-side record of phext mode governs (even beside a stale
+  // native record left by an upgrade — §4.3's frozen snapshot
+  // must never be written by a direct open); a recorded native
+  // marker, or a plain disk layout, opens the disk foundation; a
+  // phext-only layout opens the phext; both stores present with
+  // no governing record refuses, because the disk copy may be a
+  // frozen post-upgrade snapshot. The resolved absolute
+  // path rides workerData into the worker; no path rides for a
+  // native-mode Cavern, and the worker opens the disk foundation.
+  const registered = configuration.vault ? phextKnowledgeFor(configuration.vault) : undefined;
+  let phextPath = typeof configuration.phextKnowledge === 'string' ? configuration.phextKnowledge
+    : registered?.phextPath ?? (configuration.phextKnowledge === true ? (configuration.vault ? path.join(configuration.vault, 'cavern.phext') : undefined) : undefined);
+  if (configuration.phextKnowledge && !phextPath) throw Error('Phext knowledge mode requires a vault phext path');
+  if (!phextPath && configuration.vault) {
+    const vault = configuration.vault;
+    let nativeRecorded = false;
+    try { nativeRecorded = JSON.parse(fs.readFileSync(path.join(vault, '.mutable', 'cavern-state.json'), 'utf8'))?.mode === 'native'; } catch { /* no marker */ }
+    const hasPhext = fs.existsSync(path.join(vault, 'cavern.phext'));
+    const hasDiskKnowledge = fs.existsSync(path.join(vault, '.mutable', 'mutable.db'));
+    // The recorded mode governs (§2.4/§4.3): a phext-side record
+    // of phext mode decides even when a native record also
+    // exists — the upgrade leaves the native era's marker beside
+    // its own commit-point record, and a direct open must never
+    // write the frozen snapshot DB. Reading the record takes a
+    // brief read-only VFS open; an unreadable phext records
+    // nothing and the layout rules below decide.
+    let phextRecorded = false;
+    if (hasPhext) {
+      try {
+        const { PhextVFS } = await import(new URL('../../dist/src/phext/vfs.js', import.meta.url));
+        const vfs = PhextVFS.open(path.join(vault, 'cavern.phext'));
+        try { phextRecorded = JSON.parse(vfs.readTextFile('/.control/cavern-state.json'))?.mode === 'phext'; }
+        finally { vfs.close(); }
+      } catch { /* no readable phext record */ }
+    }
+    // No restore special case: a restore destination takes the
+    // mode its own record/layout resolves to — a registered or
+    // phext-recorded destination converts into the phext; a plain
+    // destination restores to disk, the 01f03de behavior the
+    // design restores.
+    if (phextRecorded) phextPath = path.join(vault, 'cavern.phext');
+    else if (!nativeRecorded && hasPhext && hasDiskKnowledge) {
+      throw Error('This vault holds both a phext store and a disk knowledge home (.mutable/mutable.db), and no recorded mode says the disk copy is current; open the Cavern through the server so the recorded mode governs');
+    }
+    else if (!nativeRecorded && hasPhext && !hasDiskKnowledge) phextPath = path.join(vault, 'cavern.phext');
   }
+  if (phextPath) configuration.phextKnowledge = phextPath;
+  else delete configuration.phextKnowledge;
   let releaseScope;
   if(!configuration.entityReader){
    for(let attempt=0;;attempt++){try{releaseScope=lockVaultEstablishment();break;}catch(e){if(!['EAGAIN','EWOULDBLOCK'].includes(e.code)||attempt>=100)throw e;await new Promise(resolve=>setTimeout(resolve,20));}}
@@ -78,7 +117,7 @@ export async function openSqliteFoundation(options) {
   worker.on('message', message => {
     if (message.leaseRequest) {
       if (dead) return;
-      try { if (unlock) throw Error('Duplicate writer lease request'); unlock = phextWriterLease(message.phextKnowledge); worker.postMessage({ leaseGranted: true }); }
+      try { if (unlock) throw Error('Duplicate writer lease request'); unlock = message.phextKnowledge ? phextWriterLease(message.phextKnowledge) : writerLock(message.home); worker.postMessage({ leaseGranted: true }); }
       catch (e) { worker.postMessage({ leaseError: e.message }); }
       return;
     }

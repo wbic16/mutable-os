@@ -188,6 +188,11 @@ test('online backup restores canonical knowledge and independent audit; derived 
     await assert.rejects(client.backup(path.join(f.vault,'nested')),/outside|inside/);
   } finally {await client.close();}
   const target=path.join(f.root,'restore'); fs.mkdirSync(target);
+  // Mode selection: a snapshot restore follows the destination's
+  // signal — restoring into a registered phext Cavern converts
+  // into the phext (this suite's branch); a plain folder restores
+  // to disk (foundation-disk.test.mjs covers that branch).
+  const targetCavern=testCavern(target); t.after(()=>targetCavern.close());
   const restored=await openSqliteFoundation({vault:target,restoreFrom:snapshot});
   try {
     const info=await restored.inspect(); assert.equal(info.mutable.vaultGuid,original.mutable.vaultGuid);
@@ -203,7 +208,6 @@ test('online backup restores canonical knowledge and independent audit; derived 
   } finally {await restored.close();}
   assert.equal(f.cavern.readFile('poe.mutable.json'),'authoritative placeholder');
   assert.equal(fs.existsSync(path.join(target,'poe.mutable.json')),false);
-  const targetCavern=testCavern(target); t.after(()=>targetCavern.close());
   assert.throws(()=>restoreSnapshot(snapshot,target,false,targetCavern.vfs),/already established/);
 });
 
@@ -222,6 +226,7 @@ test('backup remains available with an unavailable audit and restore carries can
   const damaged=await openSqliteFoundation({vault:f.vault}); const snapshot=path.join(f.root,'backup');
   try { assert.equal((await damaged.inspect()).audit.available,false); const backup=await damaged.backup(snapshot); assert.equal(backup.files.audit,undefined); } finally { await damaged.close(); }
   const target=path.join(f.root,'restore'); fs.mkdirSync(target);
+  const targetCavern=testCavern(target); t.after(()=>targetCavern.close());
   const restored=await openSqliteFoundation({vault:target,restoreFrom:snapshot});
   try {const info=await restored.inspect(); assert.equal(info.mutable.counts.Entity,2); assert.equal((await restored.entities({op:'get',id:ids.e})).entity.name,'Edgar Allan Poe');} finally {await restored.close();}
 });
