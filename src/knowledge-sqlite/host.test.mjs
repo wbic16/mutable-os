@@ -36,10 +36,10 @@ test('storage still works after SQL worker failure; no automatic transaction rep
  assert.equal((await f.host.status(l.lease)).coverage.state,'unknown');
  assert.equal(await f.host.foreground(async()=>{f.cavern.writeFile('saved.txt','authoritative');return 'saved';}),'saved');await f.host.flush();assert.equal((await f.host.status(l.lease)).coverage.complete,false);
 });
-test('read-only missing/existing phext never initializes or reconciles and cannot claim coverage',async t=>{
- const f=await fixture(t,{readOnly:true,cavern:false});await assert.rejects(f.host.acquire('.'),/ENOENT|missing|unavailable|No Cavern phext/i);await assert.rejects(fs.stat(path.join(f.root,'.mutable')));await f.host.close();
- const writer=await openSqliteFoundation({vault:f.root,initialize:true});await writer.close();const phext=path.join(f.root,'cavern.phext'),before=await fs.readFile(phext);
- const cavern=testCavern(f.root);const reader=new SqliteKnowledgeHost({root:f.root,readOnly:true});try{const l=await reader.acquire('.');assert.equal(l.coverage.state,'unknown');await reader.flush();assert.equal((await reader.status(l.lease)).coverage.complete,false);}finally{await reader.close();}assert.deepEqual(await fs.readFile(phext),before);cavern.close();
+test('read-only missing/existing database never initializes or reconciles and cannot claim coverage',async t=>{
+ const f=await fixture(t,{readOnly:true,cavern:false});await assert.rejects(f.host.acquire('.'),/ENOENT|missing|unavailable/i);await assert.rejects(fs.stat(path.join(f.root,'.mutable')));await f.host.close();
+ const writer=await openSqliteFoundation({vault:f.root,initialize:true});await writer.close();const db=path.join(f.root,'.mutable/mutable.db'),before=await fs.readFile(db);
+ const reader=new SqliteKnowledgeHost({root:f.root,readOnly:true});try{const l=await reader.acquire('.');assert.equal(l.coverage.state,'unknown');await reader.flush();assert.equal((await reader.status(l.lease)).coverage.complete,false);}finally{await reader.close();}assert.deepEqual(await fs.readFile(db),before);
 });
 test('confines roots, rejects overlaps and conflicting policy, and expires abandoned leases',async t=>{
  const f=await fixture(t,{leaseMs:50});f.cavern.vfs.mkdir('/nested');const l=await f.host.acquire('.');await assert.rejects(f.host.acquire('nested'),/Overlapping/);await assert.rejects(f.host.acquire('../'),/Invalid/);

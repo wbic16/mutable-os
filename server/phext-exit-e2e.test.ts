@@ -7,23 +7,25 @@
  * a history record, jobs + publications, a binary managed asset,
  * knowledge: entity + proposition + delivered/pending audit) is:
  *
- *   migrated → verification all-green, .mutable renamed aside as
- *   the fallback, and (since Phase 3b) every legacy store phext-
- *   backed: the records list no remaining-on-disk stratum;
- *   → the fallback is renamed AWAY and the Cavern is read back
+ *   migrated → verification all-green, and (since mode selection)
+ *   NON-destructively: the native tree stays in place byte-for-byte
+ *   as the frozen snapshot, the migration record's onDisk names the
+ *   whole tree, and the L7 record carries mode: "phext";
+ *   → the snapshot .mutable is deleted and the Cavern is read back
  *     from the phext alone (documents, asset, knowledge dump);
  *   → downloaded raw + sealed (xz -t verifies; sidecar hash is
  *     the uncompressed phext's SHA-256);
  *   → the sealed file is opened into a fresh folder, established
  *     phext-mode, and the full state compares diff-equal;
- *   → exported back to a disk tree, diff-equal again.
+ *   → exported back to a disk tree, diff-equal again, carrying the
+ *     native mode record (§4.5).
  *
  * Refusals: already-migrated, no disk state, a corrupted source
  * database (abort leaves the disk Cavern untouched), a corrupt
  * seal, non-phext content, a knowledge-bearing phext missing its
  * control record, a non-empty target folder. And the lifecycle
- * transfer routes serve the phext-only world (the phextVfs flag is
- * deleted; there is no flag-off behaviour). Fixture note: the
+ * transfer routes serve the per-Cavern mode world (the deleted
+ * global flag stays deleted). Fixture note: the
  * disk-born knowledge pair is produced by seeding a phext Cavern
  * and exporting a snapshot, then laying the pair down as real
  * .mutable files — the disk format the migration consumes.
@@ -126,16 +128,22 @@ describe('Phase 5 exit ramps', () => {
     expect(report.knowledge.tables.Entity).toBeGreaterThanOrEqual(2);
     expect(report.knowledge.propositions).toBe(1);
     expect(report.smoke.knowledge.vaultGuid).toBe(f.vaultGuid);
-    // Phase 3b: the legacy stores and uploads migrated too — the
-    // records name no remaining-on-disk stratum for them.
-    expect(report.onDisk).toEqual([]);
+    // Phase 3b: the legacy stores and uploads migrated too.
+    // Mode selection: the migration is non-destructive — the
+    // records name the ENTIRE native tree as remaining on disk
+    // (the frozen snapshot), and no fallback is recorded.
+    expect(report.fallback).toBe(null);
+    expect(report.onDisk).toEqual(report.manifest.map((e: any) => e.path));
     expect(report.manifest.find((e: any) => e.path === 'uploads/up.bin')?.action).toBe('copy');
     expect(report.manifest.find((e: any) => e.path === '.mutable/document-saves/rec/record.json')?.action).toBe('copy');
     expect(report.smoke.documentSaves).toBe('.mutable/document-saves/rec/record.json');
     expect(report.smoke.upload).toBe('uploads/up.bin');
-    // Fallback discipline: .mutable renamed aside, phext published.
-    expect(fs.existsSync(path.join(f.vault, '.mutable'))).toBe(false);
-    expect(fs.existsSync(path.join(f.vault, '.mutable-disk-fallback', 'mutable.db'))).toBe(true);
+    // Snapshot discipline: .mutable stays in place byte-for-byte,
+    // no fallback directory exists, the phext is published.
+    expect(fs.existsSync(path.join(f.vault, '.mutable', 'mutable.db'))).toBe(true);
+    expect(fs.readFileSync(path.join(f.vault, '.mutable', 'assets', 'blob.bin')).equals(ASSET_BYTES)).toBe(true);
+    expect(fs.readFileSync(path.join(f.vault, 'notes', 'paper.mutable.json')).equals(f.native)).toBe(true);
+    expect(fs.existsSync(path.join(f.vault, '.mutable-disk-fallback'))).toBe(false);
     const phextPath = path.join(f.vault, 'cavern.phext');
     expect(fs.existsSync(phextPath)).toBe(true);
 
@@ -145,17 +153,20 @@ describe('Phase 5 exit ramps', () => {
       const record = JSON.parse(vfs.readTextFile('/.control/phext-migration.json'));
       expect(record.format).toBe('phext-cavern-migration');
       expect(record.sourceTreeSha256).toBe(report.sourceTreeSha256);
-      expect(record.onDisk).toEqual([]);
+      expect(record.fallback).toBe(null);
+      expect(record.onDisk).toEqual(report.onDisk);
       const strata = JSON.parse(vfs.readTextFile('/.control/phext-strata.json'));
       expect(strata.phextBacked.knowledge).toBe(3);
       expect(strata.phextBacked.legacyDocumentStores).toBe(1);
       expect(strata.phextBacked.uploads).toBe(1);
-      expect(strata.onDisk).toEqual([]);
+      expect(strata.onDisk).toEqual(report.onDisk);
+      const state = JSON.parse(vfs.readTextFile('/.control/cavern-state.json'));
+      expect(state.mode).toBe('phext');
       vfs.close();
     }
 
-    // Rename the fallback AWAY: the Cavern now stands on the phext alone.
-    fs.renameSync(path.join(f.vault, '.mutable-disk-fallback'), path.join(f.dir, 'fallback-away'));
+    // Delete the snapshot .mutable: the Cavern now stands on the phext alone.
+    fs.rmSync(path.join(f.vault, '.mutable'), { recursive: true, force: true });
     {
       const vfs = PhextVFS.open(phextPath);
       expect(vfs.readFile('/notes/paper.mutable.json').equals(f.native)).toBe(true);
@@ -210,6 +221,11 @@ describe('Phase 5 exit ramps', () => {
       auditFile: path.join(destination, '.mutable', 'audit.db'),
     });
     expect(canon(exportedDump)).toEqual(canon(f.dump));
+    // §4.5: the exported folder is a native Cavern by record, so
+    // its first open needs no derivation.
+    const exportedState = JSON.parse(fs.readFileSync(path.join(destination, '.mutable', 'cavern-state.json'), 'utf8'));
+    expect(exportedState.mode).toBe('native');
+    expect(exportedState.cavernGuid).toBe(f.vaultGuid);
   });
 
   it('migration refusals: already migrated, no disk state, corrupted source leaves disk untouched', { timeout: 120000 }, async () => {
@@ -270,7 +286,7 @@ describe('Phase 5 exit ramps', () => {
     expect(fs.readFileSync(path.join(occupied, 'keep.txt'), 'utf8')).toBe('mine');
   });
 
-  it('lifecycle transfer routes serve the phext-only world (no flag remains)', { timeout: 120000 }, async () => {
+  it('lifecycle transfer routes serve the per-Cavern mode world (no global flag)', { timeout: 120000 }, async () => {
     const f = await diskCavern();
     const root = f.dir;
     const lifecycle = createCavernLifecycle({ stateFile: path.join(root, 'preferences.json') });
@@ -283,8 +299,9 @@ describe('Phase 5 exit ramps', () => {
     cleanups.push(() => { server.close(); });
     const port = (server.address() as { port: number }).port;
 
-    // The migrate route converts the disk-born Cavern — the flag
-    // that used to gate it is deleted, so the route simply works.
+    // The migrate route upgrades the disk-born Cavern — the
+    // global flag that used to gate it is deleted, and mode is a
+    // per-Cavern record now, so the route simply works.
     const migrate = await fetch(`http://127.0.0.1:${port}/api/cavern/migrate`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: f.vault }),
     });

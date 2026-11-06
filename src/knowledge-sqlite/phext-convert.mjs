@@ -343,6 +343,11 @@ export function exportPhextKnowledge({ store, vaultGuid, destination, auditAvail
     format: 'mutable-sqlite-backup', version: 1, vaultGuid,
     createdUtc: new Date().toISOString(), files,
     scope: 'database-only', atomicAcrossDatabases: false, auditAvailable,
+    // Provenance: this snapshot was materialized from a phext-mode
+    // foundation. A restore into an unestablished destination
+    // derives its mode from it (client.mjs); established
+    // destinations never consult it.
+    sourceMode: 'phext',
   };
   const marker = path.join(target, 'snapshot.json');
   fs.writeFileSync(marker, JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx', mode: 0o600 });

@@ -222,20 +222,23 @@ it('stamps are stable, change on any rewrite, and identity survives rename', asy
   await expect(fs.lstat(file)).rejects.toMatchObject({ code: 'ENOENT' });
 });
 
-it('no fallthrough (cutover): .mutable paths are virtual, unregistered roots refuse with ENOPHEXT', async () => {
+it('dispatch by registration: .mutable under a registered root stays virtual; unregistered roots fall through to real disk', async () => {
   const { root, vfs } = await fixture();
-  // The .mutable carve-out is gone: the path resolves inside the
-  // phext like everything else in the Cavern, and no real .mutable
-  // directory appears on disk.
+  // Mode selection keeps the cutover's no-carve-out rule (design
+  // §1.2): under a registered (phext-mode) root the .mutable path
+  // resolves inside the phext like everything else in the Cavern,
+  // and no real .mutable directory appears on disk.
   await fs.writeFile(path.join(root, '.mutable', 'cache.json'), '{"on":"phext"}', { flag: 'wx', mode: 0o600 });
   expect(vfs.readFile('/.mutable/cache.json').toString('utf8')).toBe('{"on":"phext"}');
   await expect(realFs.stat(path.join(root, '.mutable'))).rejects.toMatchObject({ code: 'ENOENT' });
-  // A path no registered Cavern covers is an explicit refusal —
-  // never a silent write to real disk.
+  // A path no registered Cavern covers — a native Cavern, a
+  // standalone mount — is served by the real filesystem again:
+  // absence of registration is the disk signal (design §3.1).
   const outside = await realFs.mkdtemp(path.join(os.tmpdir(), 'phext-fs-outside-'));
   cleanup.push(() => realFs.rm(outside, { recursive: true, force: true }));
-  await expect(fs.writeFile(path.join(outside, 'plain.txt'), 'real')).rejects.toMatchObject({ code: 'ENOPHEXT' });
-  await expect(realFs.stat(path.join(outside, 'plain.txt'))).rejects.toMatchObject({ code: 'ENOENT' });
+  await fs.writeFile(path.join(outside, 'plain.txt'), 'real');
+  expect(await realFs.readFile(path.join(outside, 'plain.txt'), 'utf8')).toBe('real');
+  expect((await fs.readFile(path.join(outside, 'plain.txt'))).toString()).toBe('real');
 });
 
 it('a paired save through ManagedPair lands entirely in the phext', async () => {
