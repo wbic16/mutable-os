@@ -51,6 +51,7 @@
 import { spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { isNativeDocumentName } from '../src/persistence/document-file-names.mjs';
 import { sliceNativeEnvelope } from './phext-fs.mjs';
@@ -62,19 +63,59 @@ import {
 const sha256Hex = data => createHash('sha256').update(data).digest('hex');
 
 /**
+ * H2 (bug hunt, 2026-11-05): every filter child is time-bounded —
+ * a stuck xz must not wedge its caller (the unseal path runs
+ * inside the lifecycle's serial queue). Generous on purpose: the
+ * byte caps are the bomb defence; this only kills a child that
+ * will never finish. Sealing a 512 MiB phext at xz -6, the slowest
+ * legitimate run, takes well under this on the deploy host class.
+ */
+export const FILTER_TIMEOUT_MS = 300_000;
+
+/**
+ * H2: the decompressed-phext ceiling enforced by unsealPhext. The
+ * open-phext upload cap (512 MiB, in cavern-lifecycle) bounds the
+ * SEALED bytes only; xz expands crafted input thousands-to-one,
+ * so the decompressed size carries its own cap, at least as strict.
+ */
+export const MAX_UNSEALED_PHEXT_BYTES = 512 * 1024 * 1024;
+
+/**
  * Run a filter process over an in-memory buffer. Deliberately NOT
  * execFile-with-input: that deadlocks against xz in this runtime
  * (the child never sees stdin EOF while its stdout is piped).
  * spawn + stdin.end(input) streams with real backpressure.
+ * Bounded (H2): the child is killed on timeout, and on exceeding
+ * `maxOutputBytes` when the caller sets one. Callers whose output
+ * is the COMPRESSED form (sealPhext) or empty (verifySeal) set no
+ * output cap — compression output is smaller than its input by
+ * construction; decompression goes through decompressToTempFile.
  */
-function runFilter(command, args, input) {
+function runFilter(command, args, input, { timeoutMs = FILTER_TIMEOUT_MS, maxOutputBytes = Infinity } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { stdio: ['pipe', 'pipe', 'pipe'] });
     const out = [], err = [];
-    child.stdout.on('data', chunk => out.push(chunk));
+    let outBytes = 0, settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return; settled = true;
+      child.kill('SIGKILL');
+      reject(Error(`${command} timed out after ${timeoutMs} ms`));
+    }, timeoutMs);
+    const fail = error => {
+      if (settled) return; settled = true;
+      clearTimeout(timer);
+      child.kill('SIGKILL');
+      reject(error);
+    };
+    child.stdout.on('data', chunk => {
+      outBytes += chunk.length;
+      if (outBytes > maxOutputBytes) { fail(Error(`${command} output exceeded the ${maxOutputBytes}-byte limit`)); return; }
+      out.push(chunk);
+    });
     child.stderr.on('data', chunk => err.push(chunk));
-    child.on('error', reject);
+    child.on('error', fail);
     child.on('close', code => {
+      if (settled) return; settled = true; clearTimeout(timer);
       if (code === 0) resolve(Buffer.concat(out));
       else reject(Error(`${command} exited with code ${code}: ${Buffer.concat(err).toString('utf8').trim()}`));
     });
@@ -153,11 +194,69 @@ export async function verifySeal(sealedBytes) {
   return true;
 }
 
-/** Unlock a sealed phext: integrity is verified BEFORE decompression. */
-export async function unsealPhext(sealedBytes) {
+/**
+ * Stream a decompression into a temp file, counting the bytes as
+ * they land (H2). Memory stays O(chunk) whatever the expansion
+ * ratio: past `maxBytes` the child is killed and the seal refused,
+ * instead of a buffer growing until the process dies; the child is
+ * time-bounded by the same FILTER_TIMEOUT_MS as runFilter. Only a
+ * complete, in-cap result is read back for the caller, and the
+ * temp file never survives the call.
+ */
+function decompressToTempFile(bytes, maxBytes) {
+  return new Promise((resolve, reject) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mutable-unseal-'));
+    const file = path.join(dir, 'cavern.phext');
+    const child = spawn('xz', ['-d', '-c'], { stdio: ['pipe', 'pipe', 'pipe'] });
+    const out = fs.createWriteStream(file);
+    const err = [];
+    let seen = 0, settled = false;
+    const timer = setTimeout(
+      () => fail(Error(`xz decompression timed out after ${FILTER_TIMEOUT_MS} ms`)), FILTER_TIMEOUT_MS);
+    const finish = (error, value) => {
+      if (settled) return; settled = true;
+      clearTimeout(timer);
+      out.destroy();
+      try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ }
+      if (error) reject(error); else resolve(value);
+    };
+    const fail = error => { child.kill('SIGKILL'); finish(error); };
+    child.stdout.on('data', chunk => {
+      seen += chunk.length;
+      if (seen > maxBytes) {
+        fail(Error(`the sealed phext decompresses to more than the ${maxBytes}-byte limit and was refused`));
+        return;
+      }
+      if (!out.write(chunk)) { child.stdout.pause(); out.once('drain', () => child.stdout.resume()); }
+    });
+    child.stderr.on('data', chunk => err.push(chunk));
+    child.on('error', fail);
+    child.on('close', code => {
+      if (settled) return;
+      if (code !== 0) {
+        finish(Error(`xz exited with code ${code}: ${Buffer.concat(err).toString('utf8').trim()}`));
+        return;
+      }
+      out.end(() => {
+        let data;
+        try { data = fs.readFileSync(file); } catch (error) { finish(error); return; }
+        finish(null, data);
+      });
+    });
+    child.stdin.on('error', () => { /* EPIPE: the close handler reports the child's own error */ });
+    child.stdin.end(bytes);
+  });
+}
+
+/**
+ * Unlock a sealed phext: integrity is verified BEFORE
+ * decompression, and decompression streams through the capped
+ * temp-file path (H2) rather than buffering its output.
+ */
+export async function unsealPhext(sealedBytes, { maxBytes = MAX_UNSEALED_PHEXT_BYTES } = {}) {
   const bytes = Buffer.isBuffer(sealedBytes) ? sealedBytes : Buffer.from(sealedBytes);
   await verifySeal(bytes);
-  return runFilter('xz', ['-d', '-c'], bytes)
+  return decompressToTempFile(bytes, maxBytes)
     .catch(error => { throw Error(`Unlocking the sealed phext failed: ${error.message}`); });
 }
 
