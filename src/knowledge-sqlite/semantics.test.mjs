@@ -79,7 +79,11 @@ test('bounded batches are atomic and sequential expected revisions audit each ch
  await assert.rejects(c.semantics({op:'batch',operationId:uuid(),commands:[{recordType:'Relationship',op:'create',id:uuid(),name:'Wrong record kind'}]}),/record type/);
  const op=uuid();await c.semantics({op:'batch',operationId:op,commands:[{recordType:'DataSet',op:'create',guid:set},{recordType:'DataPoint',op:'create',guid:pointId,value:'1'},{recordType:'DataSetMembership',op:'add',guid:uuid(),dataSetGuid:set,dataPointGuid:pointId,expectedDataSetRevision:0}]});assert.equal((await c.auditStatus()).pending,1);
  assert.equal((await c.operationOutcome(op)).status,'committed');await c.deliverAudit();assert.equal((await c.operationOutcome(op)).delivery,'delivered');
- const audit=new Database(path.join(f.vault,'.mutable/audit.db'),{readonly:true});try{const rows=audit.prepare('SELECT recordType,beforeJson,afterJson FROM AuditEvent WHERE mutationGuid=?').all(op);assert.deepEqual(new Set(rows.map(r=>r.recordType)),new Set(['DataSet','DataPoint','DataSetMembership']));assert.equal(JSON.parse(rows.find(r=>r.recordType==='DataSet').afterJson).revision,1);}finally{audit.close();}
+ // Delivered audit lives in the phext's audit stratum; read the
+ // entry back through the knowledge store on a fresh VFS instance.
+ const {PhextKnowledgeStore}=await import('./phext-store.mjs');const {PhextVFS}=await import('../../dist/src/phext/vfs.js');
+ const rows=new PhextKnowledgeStore(PhextVFS.open(path.join(f.vault,'cavern.phext'))).readAudit(op).events;
+ assert.deepEqual(new Set(rows.map(r=>r.recordType)),new Set(['DataSet','DataPoint','DataSetMembership']));assert.equal(JSON.parse(rows.find(r=>r.recordType==='DataSet').afterJson).revision,1);
 });
 test('delivery crash/retry, durable conflict outcomes and compatibility with old request receipts',()=>{
  const db=new Database(':memory:'),audit=new Database(':memory:');try{
@@ -125,9 +129,15 @@ test('canonical callback interruption and event/byte budgets rollback all writes
   db.prepare('INSERT INTO PendingAuditMutation VALUES(?,?,?)').run(uuid(),'now',JSON.stringify('x'.repeat(16*1024*1024)));assert.throws(()=>canonicalSemantics(db,ledger,request),/outbox full/);assert.equal(db.prepare('SELECT count(*) n FROM DataSet').get().n,0);
  }finally{audit.close();db.close();}
 });
-test('missing audit keeps canonical reads and pending retries, while refusing unknown writes through the worker',async t=>{
- const f=await fixture(t),request=command('DataSet','create',{guid:uuid(),name:'Retained pending result'});await f.client.semantics(request);
- await f.client.close();await fs.rename(path.join(f.vault,'.mutable/audit.db'),path.join(f.dir,'held-audit.db'));
+test('corrupt audit keeps canonical reads and pending retries, while refusing unknown writes through the worker',async t=>{
+ const f=await fixture(t),first=command('DataSet','create',{guid:uuid(),name:'Delivered'});await f.client.semantics(first);await f.client.deliverAudit();
+ const request=command('DataSet','create',{guid:uuid(),name:'Retained pending result'});await f.client.semantics(request);
+ await f.client.close();
+ // The disk era renamed audit.db away; the phext analog is a
+ // corrupted audit stratum entry, which the foundation degrades to
+ // the same audit-unavailable posture (never a silent reset).
+ const {PhextVFS}=await import('../../dist/src/phext/vfs.js');const vfs=PhextVFS.open(path.join(f.vault,'cavern.phext'));
+ vfs.writeFile(`/.mutable/audit/${first.operationId}.json`,'not json');vfs.flush();
  const c=await f.reopen();assert.equal((await c.auditStatus()).auditAvailable,false);
  assert.equal((await c.semantics({op:'get',recordType:'DataSet',guid:request.guid})).record.name,request.name);
  assert.equal((await c.semantics(request)).record.name,request.name);assert.equal((await c.operationOutcome(request.operationId)).status,'committed');

@@ -2,6 +2,7 @@
 import { afterEach, it, expect, vi } from 'vitest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import { testCavern } from '../../src/knowledge-sqlite/phext-test-cavern.mjs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import Database from 'better-sqlite3';
@@ -23,6 +24,7 @@ async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), 'academic-e-')),
     cavernId = randomUUID();
   cleanup.push(() => rm(root, { recursive: true, force: true }));
+  const cavern = testCavern(root); cleanup.push(() => cavern.close());
   const db = new Database(':memory:'),
     audit = new Database(':memory:');
   migrate(db, 'mutable', { fresh: true, vaultGuid: cavernId });

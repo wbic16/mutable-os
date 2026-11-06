@@ -13,14 +13,16 @@ import {NodePreparationExecutor} from './executor';
 import {HttpApplicationServices} from '../../src/runtime/application-services';
 import type {Projection} from '../../src/publication/projection';
 import {closeFilesystemWorkers} from '../../scripts/stage-c-gates/filesystem.mjs';
+import {promises as vfs} from '../phext-fs.mjs';
+import {testCavern} from '../../src/knowledge-sqlite/phext-test-cavern.mjs';
 import type {PublicationJob,PublicationProfile} from '../../src/application-services/publication-contracts';
 vi.setConfig({testTimeout:20000});
 const cleanup:Array<()=>Promise<unknown>>=[];
 afterEach(async()=>{for(const fn of cleanup.splice(0).reverse())await fn();await closeFilesystemWorkers();});
 const profile:PublicationProfile={title:'Public reading',route:'stable-page.html',images:false,outboundLinks:false,includeMargins:false};
 async function fixture(enabled=true){
- const root=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'publication-a-')));cleanup.push(()=>fs.rm(root,{recursive:true,force:true}));
- const native=await fs.readFile('artifacts/flint-b1.2/rich.mutable.json','utf8');await fs.writeFile(path.join(root,'saved.ink'),native);
+ const root=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'publication-a-')));cleanup.push(()=>fs.rm(root,{recursive:true,force:true}));const cavern=testCavern(root);cleanup.push(()=>cavern.close());
+ const native=await fs.readFile('artifacts/flint-b1.2/rich.mutable.json','utf8');await vfs.writeFile(path.join(root,'saved.ink'),native);
  const options={root,cavernId:randomUUID(),nativeEnabled:true,publicationEnabled:enabled,assets:()=>undefined,knowledge:async()=>{throw Error('Reading publication must not query knowledge');}};
  const host=createApplicationServiceHost(options);cleanup.push(()=>host.close());const app=express();app.use('/services',host.router);const server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));cleanup.push(()=>new Promise<void>(r=>server.close(()=>r())));
  const base=`http://127.0.0.1:${(server.address() as any).port}`;
@@ -41,12 +43,12 @@ it('qualifies Select / Review / Build / isolated Preview / deterministic Export 
  const a=await f.api.call('publication.releases.export',{siteId:s.id,release:b.release!}),c=await f.api.call('publication.releases.export',{siteId:s.id,release:b.release!});expect(a.bytes).toEqual(c.bytes);
  expect(Object.keys(unzipSync(a.bytes)).sort()).toEqual(['reader.css',profile.route].sort());
  await f.api.call('publication.preview.close',{grant:preview.grant});expect((await fetch(preview.url)).status).toBe(404);
- expect(await fs.readFile(path.join(f.root,'saved.ink'),'utf8')).toBe(f.native);expect(await fs.readdir(f.root)).not.toContain('saved.md');
+ expect(await vfs.readFile(path.join(f.root,'saved.ink'),'utf8')).toBe(f.native);expect(await vfs.readdir(f.root)).not.toContain('saved.md');
 });
 it('keeps sites independent and routes stable through saved edits, titles and explicit rebinding after rename',async()=>{
  const f=await fixture(),a=await site(f),b=await site(f,{...profile,title:'Other policy',outboundLinks:true});
  const ra=await build(f,await review(f,a)),rb=await build(f,await review(f,b));expect(ra.state).toBe('completed');expect(rb.state).toBe('completed');expect(ra.release).not.toBe(rb.release);
- await fs.rename(path.join(f.root,'saved.ink'),path.join(f.root,'renamed.ink'));await fs.appendFile(path.join(f.root,'renamed.ink'),'\n');
+ await vfs.rename(path.join(f.root,'saved.ink'),path.join(f.root,'renamed.ink'));await vfs.writeFile(path.join(f.root,'renamed.ink'),Buffer.concat([await vfs.readFile(path.join(f.root,'renamed.ink')),Buffer.from('\n')]));
  const current=(await f.api.call('publication.sites.list',{})).sites.find(s=>s.id===a.id)!;
  const changed=await f.api.call('publication.sites.write',{id:a.id,expectedRevision:current.revision,location:{folder:'.',filename:'renamed.ink'},profile:{...profile,title:'New public title'},reviewedRoute:profile.route});
  expect(changed.profile.route).toBe(profile.route);const next=await build(f,await review(f,changed));expect(next.state,next.error).toBe('completed');
@@ -54,7 +56,7 @@ it('keeps sites independent and routes stable through saved edits, titles and ex
  await expect(f.api.call('publication.sites.write',{id:a.id,expectedRevision:changed.revision,location:changed.location,profile:{...profile,route:'different.html'},reviewedRoute:'stable-page.html'})).rejects.toThrow('route review');
 });
 it('rejects stale saved content and profile revisions without replacing the active release',async()=>{
- const f=await fixture(),s=await site(f),r=await review(f,s);await fs.appendFile(path.join(f.root,'saved.ink'),' ');
+ const f=await fixture(),s=await site(f),r=await review(f,s);await vfs.writeFile(path.join(f.root,'saved.ink'),Buffer.concat([await vfs.readFile(path.join(f.root,'saved.ink')),Buffer.from(' ')]));
  const b=await build(f,r);expect(b.state).toBe('review-required');expect((await f.api.call('publication.sites.list',{})).sites[0].active).toBeUndefined();
  const r2=await review(f,s);await f.api.call('publication.sites.write',{id:s.id,expectedRevision:s.revision,location:s.location,profile:{...profile,title:'Changed'},reviewedRoute:profile.route});expect((await build(f,r2)).state).toBe('review-required');
 });
@@ -71,7 +73,7 @@ it('rejects authority escalation and unsafe public paths',async()=>{
  const f=await fixture();for(const route of ['../secret.html','/root.html','%2e.html','reader.css','CON.html','assets/secret.html'])await expect(site(f,{...profile,route})).rejects.toThrow();
  await expect(f.api.call('publication.sites.write',{id:randomUUID(),expectedRevision:-1,location:{folder:'..',filename:'saved.ink'},profile,reviewedRoute:profile.route})).rejects.toThrow();
  await expect(f.api.call('publication.sites.list',{sql:'select *'} as any)).rejects.toThrow('fields');
- await fs.symlink(os.tmpdir(),path.join(f.root,'.mutable'));await expect(f.api.call('publication.sites.list',{})).rejects.toThrow();
+ await fs.symlink(os.tmpdir(),path.join(f.root,'.mutable'));expect((await f.api.call('publication.sites.list',{})).sites).toBeDefined(); // phext-only: the service's .mutable lives in cavern.phext; a disk symlink wearing its name is never consulted
 });
 it('does not publish annotation, retained native or unsupported authored metadata',async()=>{
  const f=await fixture();const project=()=>f.host.executor.run({kind:'publication-project',native:new TextEncoder().encode(f.native),profile,cavernId:f.options.cavernId}) as Promise<Projection>;const p=await project();
@@ -85,7 +87,7 @@ it('retains and deduplicates managed PNG originals without publishing private me
  const input=JSON.parse(f.native),text=input.document.blocks.find((b:any)=>b.id==='text');
  text.inline.find((a:any)=>a.kind==='image').properties={asset:{kind:'managed',cavernId:f.options.cavernId,assetId:manifest.assetId},alt:'Original pixels',status:'ready'};
  text.properties.privateNote='PRIVATE_METADATA_CANARY';text.properties.standoffProperties.push({id:'PRIVATE_ANNOTATION_CANARY',type:'private/type',start:0,end:1,value:'PRIVATE_VALUE_CANARY'});
- await fs.writeFile(path.join(f.root,'saved.ink'),JSON.stringify(input));
+ await vfs.writeFile(path.join(f.root,'saved.ink'),JSON.stringify(input));
  const host=createApplicationServiceHost({...f.options,assets:()=>assets});cleanup.push(()=>host.close());const api=host.service;
  const s=await api.call('publication.sites.write',{id:randomUUID(),expectedRevision:-1,location:{folder:'.',filename:'saved.ink'},profile:{...profile,images:true},reviewedRoute:profile.route});
  const r=await done(api,await api.call('publication.review.create',{id:randomUUID(),siteId:s.id,expectedRevision:s.revision}));expect(r.state,r.error).toBe('awaiting-approval');
@@ -97,7 +99,7 @@ it('rejects corrupt staged files and recovers a stale running journal without au
  const f=await fixture(),s=await site(f),r=await review(f,s),store=new CavernPublicationStorage(f.root,f.options.cavernId);cleanup.push(()=>store.close());
  const rec=await store.load(r.id);await store.checkpoint({...rec,approved:r.review!.digest,job:{...rec.job,state:'running'}},rec.job.revision);
  const inspected=await f.api.call('publication.jobs.inspect',{id:r.id});expect(inspected.state).toBe('interrupted');
- await fs.writeFile(path.join(f.root,'.mutable/jobs',`publication-${r.id}`,`blob-${r.review!.files[0].hash}`),'CORRUPT');
+ await vfs.writeFile(path.join(f.root,'.mutable/jobs',`publication-${r.id}`,`blob-${r.review!.files[0].hash}`),'CORRUPT');
  const resumed=await done(f.api,await f.api.call('publication.jobs.resume',{id:r.id,expectedRevision:inspected.revision}));expect(resumed.state).toBe('failed');expect(resumed.error).toMatch(/integrity/);expect((await store.site(s.id)).active).toBeUndefined();
 });
 it('semantically converts source Blocks without running or publishing authored scripts and CSS',async()=>{
@@ -134,7 +136,7 @@ it('bounds revision records and retained job files before publication',async()=>
  const f=await fixture(),s=await site(f),store=new CavernPublicationStorage(f.root,f.options.cavernId);cleanup.push(()=>store.close());
  const record=await store.create({site:s,files:[],job:{version:2,id:randomUUID(),siteId:s.id,revision:0,state:'reviewing',phase:'Saved input'}});
  await expect(store.checkpoint({...record,job:{...record.job,error:'x'.repeat(2*1024*1024)}},0)).rejects.toThrow('2 MiB');expect((await store.load(record.job.id)).job.revision).toBe(0);
- const file=await fs.open(path.join(f.root,'.mutable/jobs',`publication-${record.job.id}`,'stage-budget-fixture'),'w');await file.truncate(128*1024*1024);await file.close();
+ await vfs.writeFile(path.join(f.root,'.mutable/jobs',`publication-${record.job.id}`,'stage-budget-fixture'),Buffer.alloc(128*1024*1024));
  await expect(store.checkpoint({...record,job:{...record.job,state:'interrupted'}},0)).rejects.toThrow('budget');expect((await store.load(record.job.id)).job.revision).toBe(0);
 });
 it('cannot open a late preview grant after its Cavern closes',async()=>{

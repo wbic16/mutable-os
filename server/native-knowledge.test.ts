@@ -1,5 +1,7 @@
 // @vitest-environment node
 import {afterEach,expect,it} from 'vitest';
+import {promises as vfs} from './phext-fs.mjs';
+import {testCavern} from '../src/knowledge-sqlite/phext-test-cavern.mjs';
 import {promises as fs} from 'node:fs';
 import os from 'node:os';import path from 'node:path';
 import express from 'express';
@@ -16,8 +18,8 @@ import {exportMarkdown} from '../src/persistence/markdown';
 const cleanup:Array<()=>unknown>=[];afterEach(async()=>{for(const f of cleanup.splice(0).reverse())await f();});
 const bytes=(s=fixtureText(0,3))=>new TextEncoder().encode(s);
 function jobs(options={}){const j=new NativeKnowledgeJobs(options),run=j.run.bind(j);j.run=(kind,input,options={})=>run(kind,input,{policy:{version:1,opaqueTypes:[]},...options});cleanup.push(()=>j.close());return j;}
-async function temp(){const dir=await fs.mkdtemp(path.join(os.tmpdir(),'native-p2-'));cleanup.push(()=>fs.rm(dir,{recursive:true,force:true}));return dir;}
-async function store(options={}){const root=await temp();await fs.mkdir(path.join(root,'vault'));const data=bytes();await fs.writeFile(path.join(root,'vault/a.mutable.json'),data);return {root,data,store:new NativeVaultStore({root,...options})};}
+async function temp(){const dir=await fs.mkdtemp(path.join(os.tmpdir(),'native-p2-'));const cavern=testCavern(dir);cleanup.push(()=>cavern.close());cleanup.push(()=>fs.rm(dir,{recursive:true,force:true}));return dir;}
+async function store(options={}){const root=await temp();await vfs.mkdir(path.join(root,'vault'));const data=bytes();await vfs.writeFile(path.join(root,'vault/a.mutable.json'),data);return {root,data,store:new NativeVaultStore({root,...options})};}
 const request=(data:Uint8Array)=>({vault:'vault',location:{folder:'vault',filename:'a.mutable.json'},resourceId:'resource-0',byteHash:hash(data),policy:{version:1,opaqueTypes:[]}});
 async function oracle(input:Uint8Array,policy?:any){const {location,generation,...facts}=await extract(decode(input),'unused','unused',undefined,undefined,policy);return facts;}
 it('matches full decoder oracle for all facts and real producer resources without detaching caller bytes',async()=>{
@@ -62,52 +64,52 @@ it.each(['crash','timeout','stale','incomplete'])('%s never produces ready evide
  expect((await j.run('inspect',bytes())).inspection.resourceId).toBe('resource-0');
 });
 it('worker and legacy discovery agree on complete hierarchy, duplicates, projections and malformed files',async()=>{
- const f=await store();await fs.mkdir(path.join(f.root,'vault/empty'));await fs.writeFile(path.join(f.root,'vault/loose.md'),'source');
+ const f=await store();await vfs.mkdir(path.join(f.root,'vault/empty'));await vfs.writeFile(path.join(f.root,'vault/loose.md'),'source');
  const legacy=new NativeVaultStore({root:f.root,nativeDiscoveryWorker:false});expect(await f.store.discover('vault')).toEqual(await legacy.discover('vault'));
- await fs.writeFile(path.join(f.root,'vault/copy.mutable.json'),f.data);await fs.writeFile(path.join(f.root,'vault/bad.mutable.json'),'{}');
+ await vfs.writeFile(path.join(f.root,'vault/copy.mutable.json'),f.data);await vfs.writeFile(path.join(f.root,'vault/bad.mutable.json'),'{}');
  const a=await f.store.discover('vault'),b=await legacy.discover('vault');expect(a.documents).toEqual(b.documents);expect(a.complete).toBe(false);expect(a.uninspected).toEqual(['vault/bad.mutable.json']);expect(a.diagnostics.map(d=>d.path??d.resourceId)).toEqual(b.diagnostics.map(d=>d.path??d.resourceId));
 });
 it.each(['failure','incomplete','stale'])('discovery %s remains unresolved, never clears duplicate uncertainty or authorizes relocation',async mode=>{
- const j=jobs(),f=await store();await fs.writeFile(path.join(f.root,'vault/copy.mutable.json'),f.data);
+ const j=jobs(),f=await store();await vfs.writeFile(path.join(f.root,'vault/copy.mutable.json'),f.data);
  let n=0;f.store.inspect=async(data,signal)=>{if(++n%2){if(mode==='failure')throw Error('worker unavailable');if(mode==='incomplete')return {};return {...await j.run('inspect',data,{signal}),byteHash:'0'.repeat(64)};}return j.run('inspect',data,{signal});};
  const scan=await f.store.discover('vault');expect(scan.complete).toBe(false);expect(scan.uninspected).toHaveLength(1);expect(scan.documents).toHaveLength(1);
  await expect(readSavedFacts(f.store,request(f.data),{jobs:j})).rejects.toThrow('incomplete');
  await expect(f.store.relocate({operationId:crypto.randomUUID(),vault:'vault',kind:'pair',source:'vault/a.mutable.json',destination:'vault/moved.mutable.json',baselines:[]})).rejects.toThrow('incomplete');
- expect(await fs.readFile(path.join(f.root,'vault/a.mutable.json'))).toEqual(Buffer.from(f.data));
+ expect(await vfs.readFile(path.join(f.root,'vault/a.mutable.json'))).toEqual(Buffer.from(f.data));
 });
 it('discovery cancelled mid-inspection rejects rather than returning an empty/complete snapshot',async()=>{const c=new AbortController(),f=await store({inspect:async()=>{c.abort();throw Error('cancelled');}});await expect(f.store.discover('vault',{signal:c.signal})).rejects.toThrow();});
 it.each(['changed','replaced','removed'])('discovery rejects %s file after inspection',async kind=>{
- const j=jobs(),f=await store();f.store.inspect=async data=>{const r=await j.run('inspect',data),file=path.join(f.root,'vault/a.mutable.json');if(kind==='changed')await fs.writeFile(file,fixtureText(1,3));else {await fs.unlink(file);if(kind==='replaced')await fs.writeFile(file,data);}return r;};
+ const j=jobs(),f=await store();f.store.inspect=async data=>{const r=await j.run('inspect',data),file=path.join(f.root,'vault/a.mutable.json');if(kind==='changed')await vfs.writeFile(file,fixtureText(1,3));else {await vfs.unlink(file);if(kind==='replaced')await vfs.writeFile(file,data);}return r;};
  const scan=await f.store.discover('vault');expect(scan.complete).toBe(false);expect(scan.uninspected).toEqual(['vault/a.mutable.json']);expect(scan.documents).toEqual([]);
 });
 it('read-only actual HTTP route transports facts and rejects stale evidence without changing any file',async()=>{
  const f=await store({readOnly:true}),app=express();
  const v=JSON.parse(new TextDecoder().decode(f.data)),p=v.document.blocks.find(b=>b.id==='resource-0-p0');
  p.properties=encodeAuthoredValue({...p.properties,standoffProperties:[{id:'wire',type:'future/rich',start:0,end:2,value:{u:undefined,z:-0,n:NaN,inf:Infinity,tag:{$codexHistoryValue:['undefined']}}}]});
- f.data=bytes(JSON.stringify(v));await fs.writeFile(path.join(f.root,'vault/a.mutable.json'),f.data);
+ f.data=bytes(JSON.stringify(v));await vfs.writeFile(path.join(f.root,'vault/a.mutable.json'),f.data);
  app.use('/api/native',createNativeDocumentStoreRouter({root:f.root,readOnly:true}));
  const server:any=await new Promise(resolve=>{const s=app.listen(0,'127.0.0.1',()=>resolve(s));});cleanup.push(()=>new Promise<void>(resolve=>server.close(()=>resolve())));
  const call=async body=>{const r=await fetch(`http://127.0.0.1:${server.address().port}/api/native/vault/facts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return {status:r.status,...await r.json()};};
  const a=await call(request(f.data));expect(a.Success).toBe(true);expect(decodeFacts(a.Data.wire)).toEqual(await oracle(f.data));
- expect((await call({...request(f.data),byteHash:'0'.repeat(64)})).status).toBe(409);expect(await fs.readdir(path.join(f.root,'vault'))).toEqual(['a.mutable.json']);expect(await fs.readFile(path.join(f.root,'vault/a.mutable.json'))).toEqual(Buffer.from(f.data));
+ expect((await call({...request(f.data),byteHash:'0'.repeat(64)})).status).toBe(409);expect(await vfs.readdir(path.join(f.root,'vault'))).toEqual(['a.mutable.json']);expect(await vfs.readFile(path.join(f.root,'vault/a.mutable.json'))).toEqual(Buffer.from(f.data));
 });
 it.each(['duplicate','relocation','change','symlink'])('saved route rejects %s introduced while extraction is running',async kind=>{
  const f=await store(),j=jobs(),proxy={run:async(...args:any[])=>{const r=await (j.run as any)(...args),file=path.join(f.root,'vault/a.mutable.json');
-  if(kind==='duplicate')await fs.writeFile(path.join(f.root,'vault/copy.mutable.json'),f.data);
-  if(kind==='relocation')await fs.rename(file,path.join(f.root,'vault/moved.mutable.json'));
-  if(kind==='change')await fs.writeFile(file,fixtureText(1,3));
-  if(kind==='symlink'){await fs.rename(file,path.join(f.root,'outside.mutable.json'));await fs.symlink('../outside.mutable.json',file);}return r;}};
+  if(kind==='duplicate')await vfs.writeFile(path.join(f.root,'vault/copy.mutable.json'),f.data);
+  if(kind==='relocation')await vfs.rename(file,path.join(f.root,'vault/moved.mutable.json'));
+  if(kind==='change')await vfs.writeFile(file,fixtureText(1,3));
+  if(kind==='symlink'){await vfs.rename(file,path.join(f.root,'outside.mutable.json'));}return r;}}; // phext: the vault entry is gone; a disk symlink cannot replace it
  await expect(readSavedFacts(f.store,request(f.data),{jobs:proxy})).rejects.toThrow();
 });
 it.each(['after-native','before-receipt'])('changed and pending paired resources at %s are ineligible and reads never update pair evidence',async stageToFail=>{
  const f=await store(),r=decode(f.data),md=exportMarkdown(r),pair=new ManagedPair({root:path.join(f.root,'vault'),resourceId:r.resourceId,nativeName:'a.mutable.json',markdownName:'a.md'});
- await fs.unlink(path.join(f.root,'vault/a.mutable.json'));
+ await vfs.unlink(path.join(f.root,'vault/a.mutable.json')); // phext: the native side of the pair is removed through the Cavern
  const generation={resourceId:r.resourceId,generation:crypto.randomUUID(),native:new TextDecoder().decode(f.data),markdown:md.text,profile:md.profile,targets:[]};
  expect((await pair.save(generation)).phase).toBe('saved');
  expect((await f.store.discover('vault')).documents[0].state).toBe('paired');
  const receipt=JSON.stringify(await pair.receipt());await readSavedFacts(f.store,request(f.data));expect(JSON.stringify(await pair.receipt())).toBe(receipt);
- await fs.writeFile(path.join(f.root,'vault/a.md'),'outside');await expect(readSavedFacts(f.store,request(f.data))).rejects.toThrow('state');
- await fs.writeFile(path.join(f.root,'vault/a.md'),md.text);const baseline=(await f.store.discover('vault')).documents[0].baseline;
+ await vfs.writeFile(path.join(f.root,'vault/a.md'),'outside');await expect(readSavedFacts(f.store,request(f.data))).rejects.toThrow('state');
+ await vfs.writeFile(path.join(f.root,'vault/a.md'),md.text);const baseline=(await f.store.discover('vault')).documents[0].baseline;
  const next=bytes(fixtureText(0,3).replace('observations','new observations')),projection=exportMarkdown(decode(next));
  pair.fault=async stage=>{if(stage===stageToFail)throw Error('hold');};
  expect((await pair.save({...generation,generation:crypto.randomUUID(),native:new TextDecoder().decode(next),markdown:projection.text},undefined,baseline)).phase).toBe(stageToFail==='after-native'?'canonical-saved-markdown-pending':'confirmation-pending');
@@ -115,11 +117,11 @@ it.each(['after-native','before-receipt'])('changed and pending paired resources
 });
 it('requires explicit host extraction capabilities rather than guessing a widget registry',async()=>{const j=new NativeKnowledgeJobs();cleanup.push(()=>j.close());await expect(j.run('facts',bytes())).rejects.toThrow('Explicit');const f=await store();const {policy,...q}=request(f.data);await expect(readSavedFacts(f.store,q)).rejects.toThrow('Explicit');});
 it.each(['prior-native','prior-pair','new-duplicate'])('late %s changes invalidate an already inspected part of discovery',async kind=>{
- const j=jobs(),f=await store();await fs.writeFile(path.join(f.root,'vault/z.mutable.json'),fixtureText(1,3));let seen=0;
+ const j=jobs(),f=await store();await vfs.writeFile(path.join(f.root,'vault/z.mutable.json'),fixtureText(1,3));let seen=0;
  f.store.inspect=async(data,signal)=>{const r=await j.run('inspect',data,{signal});if(++seen===2){
-  if(kind==='prior-native')await fs.writeFile(path.join(f.root,'vault/a.mutable.json'),fixtureText(2,3));
-  if(kind==='prior-pair')await fs.writeFile(path.join(f.root,'vault/a.md'),'external');
-  if(kind==='new-duplicate')await fs.writeFile(path.join(f.root,'vault/late.mutable.json'),f.data);
+  if(kind==='prior-native')await vfs.writeFile(path.join(f.root,'vault/a.mutable.json'),fixtureText(2,3));
+  if(kind==='prior-pair')await vfs.writeFile(path.join(f.root,'vault/a.md'),'external');
+  if(kind==='new-duplicate')await vfs.writeFile(path.join(f.root,'vault/late.mutable.json'),f.data);
  }return r;};
  const scan=await f.store.discover('vault');expect(scan.complete).toBe(false);expect(scan.diagnostics.some(d=>/changed/.test(d.message))).toBe(true);
 });
@@ -142,7 +144,7 @@ it('shares discovery across browser/indexer stores and invalidates it after exte
  expect(a).toEqual(b);expect(scans).toBe(1);
  a.documents.length=0;
  expect((await other.discoverShared('vault')).documents).toHaveLength(1);
- await fs.writeFile(path.join(f.root,'vault/external.json'),'{}');
+ await vfs.writeFile(path.join(f.root,'vault/external.json'),'{}');
  expect((await other.discoverShared('vault')).other).toContain('vault/external.json');
  expect(scans).toBe(2);
 });
