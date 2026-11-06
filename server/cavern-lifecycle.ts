@@ -30,8 +30,21 @@ const appHome = () => process.platform === 'darwin' ? path.join(os.homedir(), 'L
   : process.platform === 'win32' ? path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'Mutable')
   : path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'mutable');
 
-export function createCavernLifecycle(options: { stateFile?: string } = {}) {
+/**
+ * H1 (bug hunt, 2026-11-05): the bound on lifecycle waits that have
+ * no rejection path of their own. A Cavern switch waits for the
+ * in-flight API requests to drain; one request that never finishes
+ * (a dead client, a half-open socket — no finish, no close) must
+ * not wedge the server permanently. After this long the switch
+ * proceeds anyway and logs it; the session fence then rejects the
+ * stragglers. close() bounds its wait on the serial queue the
+ * same way.
+ */
+const DRAIN_TIMEOUT_MS = 15_000;
+
+export function createCavernLifecycle(options: { stateFile?: string; drainTimeoutMs?: number } = {}) {
   const stateFile = options.stateFile || path.join(appHome(), 'caverns.json');
+  const drainTimeoutMs = options.drainTimeoutMs ?? DRAIN_TIMEOUT_MS;
   const router = Router();
   let preferences: Preferences = { recentCaverns: [] }, loaded = false, recovery: { path: string; error: string } | undefined;
   let current: Cavern | undefined, runtime: ReturnType<typeof stores> | undefined, switching = false;
@@ -39,6 +52,19 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
   const serial = <T>(action: () => Promise<T>): Promise<T> => {
     const work = tail.then(action); tail = work.then(() => {}, () => {}); return work;
   };
+  // The drain wait behind a Cavern switch, bounded by H1's timeout:
+  // resolves when the middleware's request counter reaches zero
+  // (the middleware invokes `drain`), or when the timeout fires —
+  // whichever comes first. `drain` is cleared on timeout so a late
+  // finish cannot resolve a later switch's wait early by mistake.
+  const waitForDrain = () => new Promise<void>(resolve => {
+    const timer = setTimeout(() => {
+      drain = undefined;
+      console.warn(`Cavern switch: ${requests} API request(s) still in flight after ${drainTimeoutMs} ms; proceeding without them.`);
+      resolve();
+    }, drainTimeoutMs);
+    drain = () => { clearTimeout(timer); resolve(); };
+  });
   const load = async () => {
     if (loaded) return;
     try {
@@ -216,7 +242,7 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
     switching = true;
     let next: ReturnType<typeof stores> | undefined;
     try {
-      if (requests) await new Promise<void>(done => { drain = done; });
+      if (requests) await waitForDrain();
       // Establish/open with the existing SQLite foundation; no replacement metadata.
       next = stores(target.path);
       await next.phextReady;
@@ -392,5 +418,15 @@ export function createCavernLifecycle(options: { stateFile?: string } = {}) {
     res.once('finish', finish); res.once('close', finish);
     runtime.api(req, res, next);
   };
-  return { router, middleware, current: () => current, async close() { await tail; await runtime?.close(); } };
+  return { router, middleware, current: () => current, async close() {
+    // Bounded the same way as the drain wait (H1): a serial action
+    // that never settles must not hang shutdown forever either.
+    let settled = false;
+    await Promise.race([
+      tail.then(() => { settled = true; }),
+      new Promise<void>(resolve => setTimeout(resolve, drainTimeoutMs)),
+    ]);
+    if (!settled) console.warn(`Cavern lifecycle close: the serial queue was still busy after ${drainTimeoutMs} ms; closing anyway.`);
+    await runtime?.close();
+  } };
 }

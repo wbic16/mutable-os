@@ -797,6 +797,61 @@ reader still serves unopened Vaults (canonical names/aliases/get;
 mentions there report as unindexed, per the lookup's own diagnostics).
 
 
+## High-severity fixes (2026-11-05) — drain wedge, xz bomb, upload limits
+
+Three findings from the 2026-11-05 bug hunt (H1–H3), each a
+single-request wedge or kill inside the accepted public-writable
+posture; each fix lands with its regression test.
+
+**H1 — the Cavern-switch drain wait is bounded.**
+`server/cavern-lifecycle.ts`: `establish()` waited for the
+in-flight API request counter to drain on a promise with no
+timeout and no rejection path; one request that never finishes
+(a dead client, a half-open socket) wedged every lifecycle
+operation until restart. The wait now races `DRAIN_TIMEOUT_MS`
+(15 s; injectable via `createCavernLifecycle` options for tests):
+on timeout the switch proceeds, logs a warning, and the session
+fence rejects the stragglers. `close()` bounds its wait on the
+serial queue the same way. Normal switches — requests that
+finish promptly — never see the timeout.
+(`server/cavern-lifecycle.test.ts`: a request held in flight
+through the counting middleware; the switch completes.)
+
+**H2 — unseal decompression is capped and streamed; filter
+children are time-bounded.** `server/phext-cavern-transfer.mjs`:
+the 512 MiB open-phext cap bounds the *sealed* bytes, but
+`unsealPhext` decompressed through a buffer-everything filter —
+a crafted seal expands thousands-to-one until the process dies.
+Decompression now streams to a temp file under a hard output cap
+(`MAX_UNSEALED_PHEXT_BYTES` = 512 MiB, matching the upload cap):
+past the cap the child is killed and the seal refused with a
+clear error; `xz -t` verification still runs before anything
+decompresses. `runFilter` (seal/verify) gains a child timeout
+(`FILTER_TIMEOUT_MS` = 300 s); the seal path takes no output
+cap, because compression output is smaller than its input by
+construction — legitimate sealing of a ≤512 MiB phext is
+unaffected. (`server/phext-cavern-transfer.test.ts`: a small
+seal of zeros refused at a test-lowered cap; the same seal
+unlocks byte-identical under the real cap.)
+
+**H3 — `/upload` is capped at the boundary and inside the
+engine.** `server/index.ts` + `server/phext-uploads.mjs`: the
+route had no limits at all and the engine buffered every file
+whole. The ceilings are exported from the engine module
+(`MAX_UPLOAD_FILE_BYTES` = 20 MiB — the native-document scale;
+`MAX_UPLOAD_FILES` = 8 — the client's one call site,
+universe-block's `saveImageToServer`, posts a single image per
+request) and applied as multer `limits`; the engine enforces
+the per-file cap itself as defence in depth, dropping bytes
+past the cap and refusing the file whole. Limit refusals now
+surface as the app's JSON envelope (`{ Success: false, Error }`)
+instead of the ad-hoc `{ message }` body. Ride-along (bug hunt
+L2): the file filter's double callback on non-images is reduced
+to the single error callback the envelope path depends on.
+(`server/phext-uploads.test.ts`: engine refusal with nothing
+written, HTTP oversize/over-count refusals in the envelope, a
+normal upload landing byte-identical.)
+
 ## New files (no rebase risk beyond additions)
 
 - `src/phext/coordinate.ts`, `src/phext/codec.ts`, `src/phext/document.ts`,

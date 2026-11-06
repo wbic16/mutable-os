@@ -20,6 +20,13 @@
  *   filename, path, size — matches the disk engine's. Since the
  *   cutover there is no disk branch: a destination no Cavern phext
  *   covers is an explicit error, never a silent disk write.
+ * - Upload size is capped in two places (H3): multer's `limits`
+ *   in server/index.ts refuse oversize requests at the boundary,
+ *   and this engine enforces MAX_UPLOAD_FILE_BYTES itself, since
+ *   it is also reachable directly (tests, other callers). Past
+ *   the cap the engine drops bytes instead of buffering them and
+ *   refuses the file whole at end of stream — never a truncated
+ *   write into the phext.
  * - `createPhextUploadsStatic({ currentRoot })` serves GET/HEAD
  *   /uploads/* from the registered Cavern's VFS and falls through
  *   to the next handler (which 404s) whenever anything is not a
@@ -39,6 +46,17 @@ const CONTENT_TYPES = {
   '.txt': 'text/plain; charset=utf-8', '.md': 'text/markdown; charset=utf-8',
 };
 
+/**
+ * H3 (bug hunt, 2026-11-05): the upload ceilings. The per-file cap
+ * matches the native-document scale (20 MiB). The client's one
+ * /upload call site posts a single image per request
+ * (universe-block's saveImageToServer), so the files cap carries
+ * generous headroom over real behaviour while a single request's
+ * worst case stays small.
+ */
+export const MAX_UPLOAD_FILE_BYTES = 20 * 1024 * 1024;
+export const MAX_UPLOAD_FILES = 8;
+
 /** The backend covering a destination, when it is phext-resident. */
 function backendFor(destination) {
   if (!destination?.root) return undefined;
@@ -55,9 +73,21 @@ export function createPhextUploadStorage({ destinationFor } = {}) {
       try { destination = destinationFor(req); } catch (error) { cb(error); return; }
       const filename = Date.now() + path.extname(file.originalname ?? '');
       const chunks = [];
-      file.stream.on('data', chunk => chunks.push(chunk));
-      file.stream.on('error', cb);
+      let size = 0, overflow = false, settled = false;
+      const done = (error, info) => { if (settled) return; settled = true; cb(error, info); };
+      file.stream.on('data', chunk => {
+        size += chunk.length;
+        // H3, defence in depth: past the cap, drop the bytes (the
+        // stream still drains) and refuse the file whole at 'end'.
+        if (size > MAX_UPLOAD_FILE_BYTES) { overflow = true; chunks.length = 0; return; }
+        chunks.push(chunk);
+      });
+      file.stream.on('error', error => done(error));
       file.stream.on('end', () => {
+        if (overflow) {
+          done(new Error(`Upload exceeds the ${MAX_UPLOAD_FILE_BYTES}-byte (20 MiB) per-file limit.`));
+          return;
+        }
         const bytes = Buffer.concat(chunks);
         const backend = backendFor(destination);
         const info = {
@@ -67,14 +97,14 @@ export function createPhextUploadStorage({ destinationFor } = {}) {
           size: bytes.length,
         };
         if (!backend) {
-          cb(new Error('Uploads are stored in the current Cavern\u2019s phext; no Cavern phext covers this destination.'));
+          done(new Error('Uploads are stored in the current Cavern\u2019s phext; no Cavern phext covers this destination.'));
           return;
         }
         try {
           backend.vfs.writeFile(`/uploads/${filename}`, bytes, { format: 'binary' });
           backend.flush(); // the upload is durable before it is reported
-          cb(null, info);
-        } catch (error) { cb(error); }
+          done(null, info);
+        } catch (error) { done(error); }
       });
     },
     _removeFile(req, file, cb) {
