@@ -1,21 +1,43 @@
 import { extractPackageData } from './package-data.mjs';
 import { parentPort, workerData } from 'node:worker_threads';
 import { openFoundation, restoreSnapshot } from './foundation.mjs';
-import { prepareHome } from './paths.mjs';
+import { PhextVFS } from '../phext/vfs.ts';
+import path from 'node:path';
 import { projectSaved } from './saved-projection.ts';
 import { sqlKnowledgeRead } from './query-services.ts';
 import { randomUUID } from 'node:crypto';
 import { createEntityLookup } from './entity-lookup.mjs';
-let store;
+let store, phextVfs;
 try {
   if (workerData.restoreFrom && workerData.readOnly) throw Error('Read-only mode cannot restore databases');
-  const restored = workerData.restoreFrom ? restoreSnapshot(workerData.restoreFrom, workerData.vault, workerData.scopeValidated) : undefined;
-  const { home } = prepareHome(workerData);
+  if (workerData.initialize && workerData.readOnly) throw Error('Read-only mode cannot initialize databases');
+  // Phext-only (cutover): the worker owns its own PhextVFS instance
+  // on the Cavern phext (the lifecycle's instance owns the document
+  // strata; flush generations keep them coherent). No .mutable home
+  // is prepared: the knowledge lives in the phext and in the
+  // ephemeral replica the foundation builds in temp.
+  const phextPath = typeof workerData.phextKnowledge === 'string'
+    ? workerData.phextKnowledge
+    : path.join(workerData.vault, 'cavern.phext');
+  const home = path.dirname(phextPath);
+  // Creation is explicit, mirroring the disk era's prepareHome: only
+  // an initializing open (or a restore, which establishes by
+  // conversion) may create the phext file. A plain open of an
+  // unestablished Cavern refuses without leaving a file behind.
+  phextVfs = workerData.readOnly || (!workerData.initialize && !workerData.restoreFrom)
+    ? PhextVFS.open(phextPath)
+    : PhextVFS.openOrCreate(phextPath);
+  // Restoring a SQLite snapshot converts it into the phext (the
+  // snapshot stays a transport format; the 4.6 converter does the
+  // verified move). Refused when the phext already has knowledge.
+  const restored = workerData.restoreFrom
+    ? restoreSnapshot(workerData.restoreFrom, workerData.vault, workerData.scopeValidated, phextVfs)
+    : undefined;
   if (!workerData.readOnly) await new Promise((resolve, reject) => {
     parentPort.once('message', message => message.leaseGranted ? resolve() : reject(Error(message.leaseError || 'Writer lease unavailable')));
-    parentPort.postMessage({ leaseRequest: true, home });
+    parentPort.postMessage({ leaseRequest: true, home, phextKnowledge: phextPath });
   });
-  store = openFoundation(workerData, { hostLeaseHeld: !workerData.readOnly, scopeValidated:workerData.scopeValidated });
+  store = openFoundation(workerData, { hostLeaseHeld: !workerData.readOnly, scopeValidated:workerData.scopeValidated, phextVfs, phextPath });
   parentPort.postMessage({ ready: true, restored });
 } catch (e) { parentPort.postMessage({ startupError: e.message }); parentPort.close(); }
 if (store) {
@@ -60,6 +82,7 @@ if (store) {
             value=e.excerpt!==null&&e.excerpt!==excerpt?{status:'unresolved',diagnostics:['Evidence excerpt differs from source span']}:{status:'resolved',excerpt,diagnostics:[]};break;
           }
           case 'knowledge-revision': value=store.knowledgeRevision();break;
+          case 'knowledge-cache-file': value=store.cacheFile?store.cacheFile():null;break;
           case 'knowledge-read': value=await store.readKnowledge(db=>sqlKnowledgeRead(db,payload,check));break;
           case 'finish-reconciliation': value=store.finishReconciliation();break;
           case 'inventory': value=store.inventory(); break;
@@ -86,7 +109,7 @@ if (store) {
           case 'rebuild-fts': value = store.rebuildFts(); break;
           case 'clear-derived': value = store.clearDerived(); break;
           case 'backup': value = await store.backup(directory); break;
-          case 'close': store.close(); parentPort.postMessage({ id, value: { closed: true } }); parentPort.close(); return;
+          case 'close': store.close(); phextVfs?.close(); parentPort.postMessage({ id, value: { closed: true } }); parentPort.close(); return;
           default: throw Error('Unsupported SQLite foundation operation');
         }
         parentPort.postMessage({ id, value });

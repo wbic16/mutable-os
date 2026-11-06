@@ -57,7 +57,7 @@ export class NativeKnowledgeJobs {
      }
      this.finish(reply);this.pump();
     });
-    w.on('error',e=>{if(this.worker===w){this.finish(undefined,e);this.retire();}});
+    w.on('error',e=>{if(this.worker===w){this.finish(undefined,e instanceof Error?e:Error(String(e)));this.retire();}});
     w.on('exit',()=>{if(this.worker===w){this.finish(undefined,new Error('Native inspection worker exited'));this.retire();}});
    }catch(error){const j=this.queue.shift()!;this.bytes-=j.bytes.byteLength;j.cleanup();j.reject(error as Error);this.pump();return;}
   }

@@ -1,6 +1,7 @@
 /** Verified source identity within an established Mutable Vault; no suffix-derived identity. */
 import path from 'node:path';
-import { promises as fs, constants as C } from 'node:fs';
+import { constants as C } from 'node:fs';
+import { promises as fs } from './phext-fs.mjs';
 import { hash } from '../src/persistence/managed-pair.mjs';
 import { documentIdentities, recognizeCompatibleDocument } from '../src/persistence/compatible-document';
 /** Reject media/prose by the whole-file JSON prefix, never by filename. A possible

@@ -36,7 +36,7 @@ export class NodePreparationExecutor implements Executor {
   try{
    const worker=item.worker=new Worker(this.workerPath,{execArgv:[],resourceLimits:{maxOldGenerationSizeMb:384,maxYoungGenerationSizeMb:32}});
    worker.once('message',message=>void this.finish(item,message.error?Error(message.error):undefined,message.value));
-   worker.once('error',error=>void this.finish(item,error));
+   worker.once('error',error=>void this.finish(item,error instanceof Error?error:Error(String(error))));
    worker.once('exit',()=>{if(!item.finished)void this.finish(item,Error('Preparation worker exited'));});
    worker.postMessage(item.task);
   }catch(error){void this.finish(item,error as Error);}

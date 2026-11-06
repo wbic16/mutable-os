@@ -112,8 +112,22 @@ export function entityService(editor:ReactiveEditor,owner:string):EntityService 
   if(result.entity?.attributes!==undefined)result.entity.attributes=decodeAuthoredValue(result.entity.attributes);
   return result.entity;
  };
+ // Usage history is scoped by the Cavern's own identity (its
+ // knowledge vaultGuid), never by its absolute path on disk: a
+ // Cavern that moves keeps its history, and two Caverns at the
+ // same path over time never share it. (Audit item P3.)
+ let scopeGuid:string|undefined,scopeRoot:string|undefined;
  return {
-  historyScope:()=>lookupRoot(),
+  historyScope:async()=>{
+   const root=await lookupRoot();
+   if(scopeGuid&&scopeRoot===root)return scopeGuid;
+   const opened=await request('open',{vault:root,policy:policy()});
+   try{
+    const guid=opened.vaultGuid as string|undefined;
+    if(!guid)throw Error('Entity history scope unavailable: the Vault did not report its identity');
+    scopeRoot=root;scopeGuid=guid;return guid;
+   }finally{await request('release',{lease:opened.lease}).catch(()=>{});}
+  },
   async authorityLookup(record,signal){const vault=await lookupRoot(signal),result=await request('entity-lookup',{vault,request:{op:'authority-lookup',record}},signal);lookupCurrent();if(result.entity?.attributes!==undefined)result.entity.attributes=decodeAuthoredValue(result.entity.attributes);return result.entity;},
   async acquireIdentity(input){return mutate({op:'authority-import',...input});},
   names:async(ids,signal)=>(await listingCall({op:'names',ids},signal)).rows,

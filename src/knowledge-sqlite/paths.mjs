@@ -1,9 +1,15 @@
 import fs from 'node:fs';
-import path from 'node:path';
-import { createRequire } from 'node:module';
-import { isMainThread } from 'node:worker_threads';
-const require = createRequire(import.meta.url);
 
+/**
+ * Filesystem shape guards for the knowledge layer. The disk-era
+ * exports that prepared a `.mutable` database home and took its
+ * writer lease (prepareHome, writerLock) are deleted with the
+ * phext-only cutover: canonical knowledge lives in the Cavern
+ * phext, the writer lease is a flock on the phext's anchor file
+ * (client.mjs's phextWriterLease), and no `.mutable` home is ever
+ * prepared. What remains is the pair of validators the restore and
+ * converter paths still use.
+ */
 export function regularFile(file, optional = false) {
   let stat;
   try { stat = fs.lstatSync(file); } catch (e) { if (optional && e.code === 'ENOENT') return false; throw e; }
@@ -14,24 +20,4 @@ export function directory(dir) {
   const stat = fs.lstatSync(dir);
   if (!stat.isDirectory() || stat.isSymbolicLink()) throw Error(`Expected a real directory: ${dir}`);
   return fs.realpathSync(dir);
-}
-export function prepareHome({ vault, readOnly = false, initialize = false } = {}) {
-  if (typeof vault !== 'string' || !path.isAbsolute(vault)) throw Error('Supply an absolute vault directory');
-  if (readOnly && initialize) throw Error('Read-only mode cannot initialize databases');
-  const root = directory(vault), home = path.join(root, '.mutable');
-  if (!fs.existsSync(home) && initialize) fs.mkdirSync(home, { mode: 0o700 });
-  directory(home);
-  return { root, home };
-}
-export function writerLock(home) {
-  // fs-ext 2.1.1 uses process-global native state and is not safe across worker isolates.
-  if (!isMainThread) throw Error('The host thread must own the SQLite writer lease');
-  directory(home);
-  const file = path.join(home, 'writer.lock'); regularFile(file, true);
-  const fd = fs.openSync(file, fs.constants.O_CREAT | fs.constants.O_RDWR | fs.constants.O_NOFOLLOW, 0o600);
-  try { require('fs-ext').flockSync(fd, 'exnb'); }
-  catch (e) { fs.closeSync(fd); throw Error(`SQLite writer unavailable: ${e.message}`); }
-  // Never unlink the lock inode: that would allow a second writer to lock a different inode.
-  let closed = false;
-  return () => { if (!closed) { closed = true; fs.closeSync(fd); } };
 }

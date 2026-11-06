@@ -7,10 +7,12 @@ const defaults: FlintLayout = { library: true, context: false, explorerWidth: 23
 export const paneBounds = { library: { min: 150, max: 450 }, context: { min: 190, max: 450 } };
 export function clampPane(value: number, pane: keyof typeof paneBounds) { return Math.round(Math.max(paneBounds[pane].min, Math.min(paneBounds[pane].max, value))); }
 
-/** Local presentation preferences only; never a document edit or history entry. */
-export function createFlintLayout(persistent: boolean) {
-  const initial = { ...defaults, context: !persistent };
-  if (persistent) try {
+/** The persisted compact layout (the same parse createFlintLayout
+ *  starts from). The settings-bundle capture reads through this so
+ *  the shipped copy is exactly what a restart would restore. */
+export function readPersistedFlintLayout(): FlintLayout {
+  const initial = { ...defaults };
+  try {
     const saved = JSON.parse(localStorage.getItem(FLINT_LAYOUT_KEY) ?? '{}');
     for (const key of ['library', 'context'] as const) if (typeof saved?.[key] === 'boolean') initial[key] = saved[key];
     for (const [key, pane] of [['explorerWidth', 'library'], ['inspectorWidth', 'context']] as const) {
@@ -18,6 +20,12 @@ export function createFlintLayout(persistent: boolean) {
     }
     if (saved?.density === 'reading') initial.density = 'reading';
   } catch { /* Storage restrictions do not prevent local presentation changes. */ }
+  return initial;
+}
+
+/** Local presentation preferences only; never a document edit or history entry. */
+export function createFlintLayout(persistent: boolean) {
+  const initial = persistent ? readPersistedFlintLayout() : { ...defaults, context: true };
   const [layout, setLayout] = createStore(initial);
   const persist = () => { if (persistent) try { localStorage.setItem(FLINT_LAYOUT_KEY, JSON.stringify(layout)); } catch { /* Session-local preferences still work. */ } };
   function set<K extends keyof FlintLayout>(key: K, value: FlintLayout[K], save = true) {
