@@ -73,7 +73,7 @@ test('observations retain authored values and identity across many-to-many membe
  await assert.rejects(c.semantics({op:'query',recordType:'DataSet',participants:[{entityGuid:place}]}),/Unsupported/);
 });
 test('bounded batches are atomic and sequential expected revisions audit each changed record',async t=>{
- const f=await fixture(t),c=f.client,set=uuid(),pointId=uuid();
+ const f=await fixture(t,{phextKnowledge:true}),c=f.client,set=uuid(),pointId=uuid();
  const bad={op:'batch',operationId:uuid(),commands:[{recordType:'DataSet',op:'create',guid:set,name:'Synthetic'},{recordType:'DataPoint',op:'create',guid:pointId,value:'1'},{recordType:'DataSetMembership',op:'add',guid:uuid(),dataSetGuid:set,dataPointGuid:uuid(),expectedDataSetRevision:0}]};
  await assert.rejects(c.semantics(bad),/missing/);assert.equal((await c.semantics({op:'get',recordType:'DataSet',guid:set})).record,undefined);assert.equal((await c.auditStatus()).pending,0);
  await assert.rejects(c.semantics({op:'batch',operationId:uuid(),commands:[{recordType:'Relationship',op:'create',id:uuid(),name:'Wrong record kind'}]}),/record type/);
@@ -130,7 +130,7 @@ test('canonical callback interruption and event/byte budgets rollback all writes
  }finally{audit.close();db.close();}
 });
 test('corrupt audit keeps canonical reads and pending retries, while refusing unknown writes through the worker',async t=>{
- const f=await fixture(t),first=command('DataSet','create',{guid:uuid(),name:'Delivered'});await f.client.semantics(first);await f.client.deliverAudit();
+ const f=await fixture(t,{phextKnowledge:true}),first=command('DataSet','create',{guid:uuid(),name:'Delivered'});await f.client.semantics(first);await f.client.deliverAudit();
  const request=command('DataSet','create',{guid:uuid(),name:'Retained pending result'});await f.client.semantics(request);
  await f.client.close();
  // The disk era renamed audit.db away; the phext analog is a
@@ -138,7 +138,7 @@ test('corrupt audit keeps canonical reads and pending retries, while refusing un
  // the same audit-unavailable posture (never a silent reset).
  const {PhextVFS}=await import('../../dist/src/phext/vfs.js');const vfs=PhextVFS.open(path.join(f.vault,'cavern.phext'));
  vfs.writeFile(`/.mutable/audit/${first.operationId}.json`,'not json');vfs.flush();
- const c=await f.reopen();assert.equal((await c.auditStatus()).auditAvailable,false);
+ const c=await f.reopen({phextKnowledge:true});assert.equal((await c.auditStatus()).auditAvailable,false);
  assert.equal((await c.semantics({op:'get',recordType:'DataSet',guid:request.guid})).record.name,request.name);
  assert.equal((await c.semantics(request)).record.name,request.name);assert.equal((await c.operationOutcome(request.operationId)).status,'committed');
  const unknown=command('DataSet','create',{guid:uuid()});await assert.rejects(c.semantics(unknown),/Audit unavailable/);assert.equal((await c.operationOutcome(unknown.operationId)).status,'unavailable');

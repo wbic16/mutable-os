@@ -249,11 +249,12 @@ app.use('/image-backgrounds', express.static(path.join(__dirname, baseBackground
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb'}));
 
-// Phext-only (Phase 3b + cutover): the upload endpoint and the
-// /uploads static route live in the Cavern phext
-// (server/phext-uploads.mjs, loaded by URL like the other phext
-// modules). There is no disk upload engine and no disk static
-// serving for Cavern uploads any more.
+// Mode selection (2026-11-06): the upload endpoint and the
+// /uploads static route follow the current Cavern's mode — the
+// phext engine (server/phext-uploads.mjs, loaded by URL like the
+// other phext modules) for a phext Cavern, the disk engine for a
+// native one; with no Cavern lifecycle (standalone mounts, native
+// by definition) uploads are disk, relative to the working folder.
 const phextUploads = await import(pathToFileURL(path.resolve('server/phext-uploads.mjs')).href);
 
 const cavern = featureFlags.cavernStartup ? createCavernLifecycle() : undefined;
@@ -261,7 +262,13 @@ if (cavern) {
   app.use('/api/cavern', cavern.router);
   app.use('/api', cavern.middleware, (_req, res) => { res.status(404).json({ Success: false, Error: 'This service is unavailable in the current Cavern.' }); });
   app.use('/upload', cavern.middleware);
-  app.use('/uploads', phextUploads.createPhextUploadsStatic({ currentRoot: () => cavern.current()?.path }));
+  const phextUploadsStatic = phextUploads.createPhextUploadsStatic({ currentRoot: () => cavern.current()?.path });
+  app.use('/uploads', (req, res, next) => {
+    const selected = cavern.current();
+    if (!selected) { res.sendStatus(409); return; }
+    if (selected.mode === 'phext') { phextUploadsStatic(req, res, next); return; }
+    express.static(path.join(selected.path, 'uploads'))(req, res, next);
+  });
 }
 const sqliteKnowledge = !cavern && (featureFlags.sqliteKnowledge || featureFlags.sqliteEntities) ? new SqliteKnowledgeHost({root: process.env.SPEEDY_DOCUMENT_ROOT || path.join(__dirname, baseDocumentPath),  entitiesEnabled: featureFlags.sqliteEntities, cardexEnabled: featureFlags.cardex}) : undefined;
 const coordinateStorage = sqliteKnowledge ? <T>(action: () => Promise<T>) => sqliteKnowledge.foreground(action) : undefined;
@@ -299,20 +306,45 @@ app.use("/api", createWorkspaceStoreRouter({
 }
 
 
-// Multer stores through the phext engine (same destination/session
-// contract as ever). A destination no Cavern phext covers — e.g.
-// the pre-Cavern standalone mode — is refused explicitly by the
-// engine; nothing writes uploads to disk.
-const storage = phextUploads.createPhextUploadStorage({
+// Multer stores through the engine matching the current Cavern's
+// mode, selected per request. The session fence
+// (X-Mutable-Cavern) is common to both branches and written once:
+// a Cavern upload must name the current Cavern's session. The
+// phext engine refuses a destination no Cavern phext covers; the
+// disk engine writes the Cavern's real uploads/ directory (created
+// on demand); standalone mode uses the relative uploads/ folder.
+const fencedCavern = (req: Request) => {
+  const selected = cavern?.current();
+  if (!selected || req.header('X-Mutable-Cavern') !== selected.session) throw new Error('Choose the current Cavern before uploading.');
+  return selected;
+};
+const phextStorage = phextUploads.createPhextUploadStorage({
   destinationFor: (req: Request) => {
-    if (cavern) {
-      const selected = cavern.current();
-      if (!selected || req.header('X-Mutable-Cavern') !== selected.session) throw new Error('Choose the current Cavern before uploading.');
-      return { root: selected.path, directory: path.join(selected.path, 'uploads') };
-    }
-    return { directory: 'uploads' };
+    const selected = fencedCavern(req);
+    return { root: selected.path, directory: path.join(selected.path, 'uploads') };
   },
 });
+const diskStorage = multer.diskStorage({
+  destination: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
+    if (!cavern) { cb(null, 'uploads'); return; }
+    let directory: string;
+    try { directory = path.join(fencedCavern(req).path, 'uploads'); }
+    catch (error) { cb(error as Error, ''); return; }
+    fs.promises.mkdir(directory, { recursive: true }).then(() => cb(null, directory), error => cb(error, ''));
+  },
+  filename: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const engineFor = (req: Request) => (cavern && cavern.current()?.mode === 'phext' ? phextStorage : diskStorage) as any;
+const storage = {
+  _handleFile(req: Request, file: Express.Multer.File, cb: (error: Error | null, info?: Partial<Express.Multer.File>) => void) {
+    engineFor(req)._handleFile(req, file, cb);
+  },
+  _removeFile(req: Request, file: Express.Multer.File, cb: (error: Error | null) => void) {
+    engineFor(req)._removeFile(req, file, cb);
+  },
+};
 
 // H3: requests are capped at the boundary; the phext engine
 // enforces the per-file cap again (see server/phext-uploads.mjs).

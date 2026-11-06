@@ -11,8 +11,8 @@ const fixture=t=>{const root=fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir(
 const init=async vault=>{const c=await openSqliteFoundation({vault,initialize:true});try{return (await c.inspect()).mutable.vaultGuid;}finally{await c.close();}};
 test('same root reopens with same identity and persistent overlap rejection outlives all leases',async t=>{
  const root=fixture(t),child=path.join(root,'research');fs.mkdirSync(child);
- const id=await init(root);assert.equal(await init(root),id);assert.ok(fs.existsSync(path.join(root,'cavern.phext')));
- await assert.rejects(init(child),/ancestor/);assert.equal(fs.existsSync(path.join(child,'cavern.phext')),false);
+ const id=await init(root);assert.equal(await init(root),id);assert.ok(fs.existsSync(path.join(root,'.mutable/audit.db')));
+ await assert.rejects(init(child),/ancestor/);assert.equal(fs.existsSync(path.join(child,'.mutable')),false);
  assert.throws(()=>openFoundation({vault:child,initialize:true}),/ancestor/);
 });
 test('dormant child forbids parent and sibling vaults retain independent knowledge identities',async t=>{
@@ -42,7 +42,7 @@ test('cross-process concurrent parent/child establishment creates at most one pe
  const runner=path.join(root,'establish.mjs');fs.writeFileSync(runner,script);
  const run=vault=>new Promise((resolve,reject)=>{const p=spawn(process.execPath,[runner,vault],{stdio:['ignore','ignore','pipe']});let errors='';p.stderr.on('data',b=>errors+=b);p.once('error',reject);p.once('exit',code=>resolve({code,errors}));});
  const results=await Promise.all([run(root),run(child)]);assert.equal(results.filter(r=>r.code===0).length,1,JSON.stringify(results));
- assert.equal([root,child].filter(r=>fs.existsSync(path.join(r,'cavern.phext'))).length,1);
+ assert.equal([root,child].filter(r=>fs.existsSync(path.join(r,'.mutable/mutable.db'))).length,1);
 });
 
 test('ordinary paired-save archive volume can exceed 10,000 entries without hiding descendants',t=>{
