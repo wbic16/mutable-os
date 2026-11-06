@@ -62,6 +62,7 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
   const target=()=>[editor.focus.state.focusedKey,editor.focus.state.lastFocusedKey].find(key=>key&&document()?.projection.node(key))??document()?.rootKey;
   const openCommands=(kind:'format'|'block'|'file'|'tools',anchor:HTMLElement)=>{if(menu()===kind){closeMenu();return;}setMenuAnchor(anchor);remember();styles()?.capture();try{
     if(kind==='tools')setItems([
+      {label:`Markdown Input Transformation: ${editor.markdownInput.enabled()?'On':'Off'}`,run:()=>{const key=target();if(key)editor.commandRegistry.execute('markdown.toggleInput',{targetKey:key,args:undefined});}},
       {label:'Scry / Link Entity',disabled:!editor.features.autocompleteWorkstation,run:()=>{const key=target();if(key)editor.commandRegistry.execute('autocomplete.open',{targetKey:key,args:undefined});}},
       {label:'New Gloss',disabled:!editor.features.glossMode,run:()=>{const key=target();if(key)editor.commandRegistry.execute('gloss.create',{targetKey:key,args:undefined});}},
       {label:'Gloss Mode',disabled:!editor.features.glossPresentation,run:()=>{const s=document();if(s)glossPresentationControls(s)?.toggle();}},

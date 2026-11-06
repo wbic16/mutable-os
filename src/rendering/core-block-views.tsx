@@ -57,6 +57,17 @@ function data(nodeKey: NodeKey, node: () => any) {
   };
 }
 
+export function HorizontalLineView(props: BlockViewProps) {
+  const { projection } = useReactiveView();
+  const node = () => projection.state.nodes[props.nodeKey];
+  let root!: HTMLDivElement;
+  useContainerMount(props.nodeKey, () => root);
+  return <div ref={root} class="abstract-block reactive-horizontal-line" tabIndex={-1} {...data(props.nodeKey, node)}>
+    <hr style={{ border: '0', 'border-top': '1px solid currentColor', margin: '0.5em 0' }} />
+    <RelationBlocks parentKey={props.nodeKey} /><ChildBlocks parentKey={props.nodeKey} />
+  </div>;
+}
+
 export function GenericContainerView(props: BlockViewProps) {
   const { editor, projection } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];

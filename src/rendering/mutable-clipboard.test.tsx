@@ -32,7 +32,14 @@ function setup(enabled = true, externalHtml = true, directDomCharacterCells = tr
     const values = { ...initial }; const event = new Event(type, { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { types: Object.keys(values), getData: (type: string) => values[type] ?? '', setData: (type: string, value: string) => { if (fail) throw Error('Clipboard write failed'); values[type] = value; } } }); target.dispatchEvent(event); return { values, event };
   };
-  return { editor, projection, host, node, select, dispatch, texts: () => editor.encodeDocument().children!.map(c => c.text) };
+  // Resource dispatcher coverage is independent of the retired Shift-V resource
+  // binding. The process-at-caret group above qualifies the retained public chord.
+  const resource = (source: string) => {
+    const service = editor.clipboard as any;
+    const bookmark = service.textBookmark(undefined, false, node('b').key);
+    return service.processResource(bookmark, source, undefined, false);
+  };
+  return { editor, projection, host, node, select, dispatch, resource, texts: () => editor.encodeDocument().children!.map(c => c.text) };
 }
 
 describe('process resource URI at the caret', () => {
@@ -128,8 +135,7 @@ describe('Mutable clipboard UI routing and lifecycle', () => {
   ])('creates a resource Block with %s, preserves surrounding text and restores exact Undo', async (modifier,url,type,host) => {
     const s=setup(true,true,true,true,false,false,true,true,type!=='iframe-block'),target=s.select('b',3),before=nativeEnvelope(captureNative(s.editor.repository.readState(),'doc'));
     const commit=vi.spyOn(s.editor.repository,'commit'),fetch=vi.spyOn(globalThis,'fetch');
-    target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',[modifier]:true,shiftKey:true,bubbles:true,cancelable:true}));
-    s.dispatch('paste',target,{'text/plain':url,'text/html':'<b>ignored rich representation</b>'});
+    s.resource(url);
     await vi.waitFor(()=>expect(s.host.querySelector(`[data-block-type="${type}"] iframe`)).not.toBeNull());
     const block=Object.values(s.editor.repository.readState().contents).find(c=>c.viewType===type)!;
     expect(block.payload.sourceUrl).toBe(url);expect(commit).toHaveBeenCalledTimes(1);expect(fetch).not.toHaveBeenCalled();
@@ -146,7 +152,7 @@ describe('Mutable clipboard UI routing and lifecycle', () => {
   it('retains ordinary and disabled-feature URL paste as text, with no acquisition', () => {
     for(const enabled of [true,false]){
       const s=setup(true,true,true,true,true,false,enabled),target=s.select('b',0,6),begin=vi.spyOn(s.editor.assets,'begin');
-      if(!enabled)target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',metaKey:true,shiftKey:true,bubbles:true}));
+
       s.dispatch('paste',target,{'text/plain':'https://example.org/photo.png'});
       expect(s.texts()[1]).toBe('https://example.org/photo.png');expect(begin).not.toHaveBeenCalled();
     }
@@ -158,8 +164,7 @@ describe('Mutable clipboard UI routing and lifecycle', () => {
     const action=vi.spyOn(assets,'action').mockResolvedValue({});let finish!:()=>void;
     const remote=vi.spyOn(assets,'remote').mockImplementation(async()=>{await new Promise<void>(r=>{finish=r});if(outcome==='failure')throw Error('Invalid image');return manifest;});
     const target=s.select('b',0,6),before=nativeEnvelope(captureNative(s.editor.repository.readState(),'doc'));
-    target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',ctrlKey:true,shiftKey:true,bubbles:true}));
-    s.dispatch('paste',target,{'text/plain':url});await vi.waitFor(()=>expect(remote).toHaveBeenCalledTimes(1));
+    s.resource(url);await vi.waitFor(()=>expect(remote).toHaveBeenCalledTimes(1));
     expect(s.editor.clipboard.imagePrompt()).toBeUndefined();
     if(outcome==='stale')s.editor.commands.replaceInlineRange(s.node('b').key,0,0,'!');
     if(outcome==='cancel')s.editor.clipboard.cancel();finish();
@@ -178,7 +183,7 @@ describe('Mutable clipboard UI routing and lifecycle', () => {
     const key = s.node('b').key;
     s.editor.overlays.open({ ownerKey: key, viewType: 'context-menu', anchor: { x: 0, y: 0 } });
     await tick();
-    blockMenuItems(s.editor, key).find(i => i.label === 'Paste as Markdown')!.run!();
+    blockMenuItems(s.editor, key).find(i => i.label === 'Paste as Markdown (Ctrl/Cmd+Shift+V)')!.run!();
     await vi.waitFor(() => expect(s.texts()).toEqual(['Rome abc', 'bold']));
     const inserted = s.editor.encodeDocument().children![1];
     expect(commits).toHaveBeenCalledTimes(1); expect(inserted.standoffProperties).toMatchObject([{ type: 'style/bold' }]);
@@ -187,27 +192,28 @@ describe('Mutable clipboard UI routing and lifecycle', () => {
     s.editor.repository.undo(); expect(s.texts()).toEqual(['Rome abc', 'target']);
     s.editor.repository.redo(); expect(s.texts()).toEqual(['Rome abc', 'bold']);
   });
-  it('uses supplied Markdown MIME via preparation and never guesses ordinary plain text', async () => {
+  it('keeps Markdown-only and plain MIME literal on ordinary paste', async () => {
     const s = setup(); s.dispatch('paste', s.select('b', 0, 6), { 'text/markdown': '**typed**' });
-    await vi.waitFor(() => expect(s.texts()[1]).toBe('typed'));
-    expect(s.editor.encodeDocument().children![1].standoffProperties).toMatchObject([{ type: 'style/bold' }]);
+    expect(s.texts()[1]).toBe('**typed**');
+    expect(s.node('b').payload.standoffProperties).toEqual([]);
     s.editor.repository.undo(); s.dispatch('paste', s.select('b', 0, 6), { 'text/plain': '**literal**' });
     expect(s.texts()[1]).toBe('**literal**'); expect(s.node('b').payload.standoffProperties).toEqual([]);
   });
   it('keeps Markdown behind both the shared flag and its importer preference', () => {
     for (const s of [setup(false), setup(true, true, true, false)]) {
-      expect(blockMenuItems(s.editor, s.node('b').key).some(i => i.label === 'Paste as Markdown')).toBe(false);
+      expect(blockMenuItems(s.editor, s.node('b').key).some(i => i.label === 'Paste as Markdown (Ctrl/Cmd+Shift+V)')).toBe(false);
       const commit = vi.spyOn(s.editor.repository, 'commit'); s.editor.clipboard.pasteMarkdown(s.node('b').key);
       expect(commit).not.toHaveBeenCalled();
     }
     const s = setup(true, true, true, false); s.dispatch('paste', s.select('b', 0, 6), { 'text/markdown': '**literal**' });
     expect(s.texts()[1]).toBe('**literal**');
   });
-  it('offers a one-shot native-event fallback when asynchronous clipboard reading is denied', async () => {
+  it('requests the explicit chord after clipboard read denial, leaving ordinary paste literal', async () => {
     clipboardRead(async () => { throw Error('denied'); });
     const s = setup(), target = s.select('b', 0, 6); s.editor.clipboard.pasteMarkdown(s.node('b').key);
-    await vi.waitFor(() => expect(s.editor.clipboard.message()).toContain('Press Command/Control-V'));
+    await vi.waitFor(() => expect(s.editor.clipboard.message()).toContain('Press Command/Control-Shift-V'));
     expect(s.texts()[1]).toBe('target');
+    target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',ctrlKey:true,shiftKey:true,bubbles:true}));
     s.dispatch('paste', target, { 'text/plain': '**bold**' });
     await vi.waitFor(() => expect(s.texts()[1]).toBe('bold'));
     s.editor.repository.undo(); s.dispatch('paste', s.select('b', 0, 6), { 'text/plain': '**literal**' });
@@ -281,12 +287,12 @@ describe('Mutable clipboard UI routing and lifecycle', () => {
     }else if(outcome==='failure')expect(image?.payload.status).toBe('failed');
     else {expect(image).toBeUndefined();expect(s.texts()[1]).toBe(outcome==='stale'?'!target':'target');}
   });
-  it('does not acquire images for plain-text paste or ordinary URL text', () => {
+  it('does not acquire HTML images for explicit Markdown or ordinary URL text', async () => {
     const s=setup(true,true,true,true,true,true),begin=vi.spyOn(s.editor.assets,'begin');
     const target=s.select('b',0,6);
     target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',metaKey:true,shiftKey:true,bubbles:true}));
     s.dispatch('paste',target,{'text/html':'<img src="https://example.com/image.png">','text/plain':'caption'});
-    expect(s.texts()[1]).toBe('caption');expect(begin).not.toHaveBeenCalled();
+    await vi.waitFor(()=>expect(s.texts()[1]).toBe('caption'));expect(begin).not.toHaveBeenCalled();
     s.dispatch('paste',s.select('b',0,7),{'text/plain':'https://example.com/image.png'});
     expect(begin).not.toHaveBeenCalled();expect(s.editor.clipboard.imagePrompt()).toBeUndefined();
   });
@@ -434,10 +440,10 @@ describe('Mutable clipboard UI routing and lifecycle', () => {
     for (const data of [{ 'text/plain': '' }, { 'image/png': 'blob' }, { [NATIVE_MIME]: '{bad' }] as Record<string, string>[]) s.dispatch('paste', target, data);
     expect(s.texts()).toEqual(before); expect(s.editor.repository.canUndo()).toBe(false);
   });
-  it('uses Shift-V as one-use plain intent without suppressing native paste', () => {
+  it('uses Shift-V as one-use Markdown intent without suppressing the paste event', async () => {
     const s = setup(), data = s.dispatch('copy', s.select('a', 0, 4)).values, target = s.select('b', 0);
     const key = new KeyboardEvent('keydown', { key: 'v', ctrlKey: true, shiftKey: true, bubbles: true, cancelable: true }); target.dispatchEvent(key); expect(key.defaultPrevented).toBe(false);
-    s.dispatch('paste', target, data); expect(s.node('b').payload.standoffProperties).toEqual([]);
+    s.dispatch('paste', target, data); await vi.waitFor(()=>expect(s.texts()[1]).toBe('Rometarget')); expect(s.node('b').payload.standoffProperties).toEqual([]);
   });
   it('uses system-event Blocks and fresh IDs even after cut; true move behavior is untouched', async () => {
     const s = setup(); s.editor.blockSelection.replaceKeys([s.node('a').key]);
@@ -533,7 +539,7 @@ describe('Academic citation paste',()=>{
  it.each(['metaKey','ctrlKey'])('inserts once with %s and restores Undo/Redo without requests',async modifier=>{
   const c=citation(),request=vi.fn(async()=>new Response(JSON.stringify({Success:true,Data:{citation:c,jobId:crypto.randomUUID()}}),{headers:{'Content-Type':'application/json'}}));vi.stubGlobal('fetch',request);
   const s=setup(),target=s.select('b',3),before=nativeEnvelope(captureNative(s.editor.repository.readState(),'doc'));
-  target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',[modifier]:true,shiftKey:true,bubbles:true}));s.dispatch('paste',target.firstElementChild??target,{'text/plain':'https://doi.org/10.1234/ABC?utm=x'});
+  s.resource('https://doi.org/10.1234/ABC?utm=x');
   await vi.waitFor(()=>expect(s.host.querySelector('.mutable-citation-block')).not.toBeNull());
   expect(request).toHaveBeenCalledTimes(1);const block=Object.values(s.editor.repository.readState().contents).find(b=>b.viewType==='mutable/citation-block')!.payload;
   expect(block.sourceUrl).toBe('https://doi.org/10.1234/ABC?utm=x');expect((block.blockProperties as any[])[0].value).toBe(c.entityId);
@@ -544,11 +550,11 @@ describe('Academic citation paste',()=>{
  });
  it('leaves plain paste and disabled academic paste network-free',()=>{
   const request=vi.fn();vi.stubGlobal('fetch',request);
-  for(const enabled of [true,false]){const s=setup(true,true,true,true,false,false,true,enabled),target=s.select('b',0);if(!enabled)target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',ctrlKey:true,shiftKey:true,bubbles:true}));s.dispatch('paste',target,{'text/plain':'10.1234/abc'});expect(s.host.querySelector('.mutable-citation-block')).toBeNull();}expect(request).not.toHaveBeenCalled();
+  for(const enabled of [true,false]){const s=setup(true,true,true,true,false,false,true,enabled),target=s.select('b',0);s.dispatch('paste',target,{'text/plain':'10.1234/abc'});expect(s.host.querySelector('.mutable-citation-block')).toBeNull();}expect(request).not.toHaveBeenCalled();
  });
  it.each(['stale','cancel','typing'])('does not insert after %s while acquisition is pending',async action=>{
   let complete!:(value:Response)=>void;const request=vi.fn(()=>new Promise<Response>(resolve=>complete=resolve));vi.stubGlobal('fetch',request);const s=setup(),target=s.select('b',3);
-  target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',metaKey:true,shiftKey:true,bubbles:true}));s.dispatch('paste',target,{'text/plain':'10.1234/abc'});
+  s.resource('10.1234/abc');
   await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(1));if(action==='cancel')s.editor.clipboard.cancel();else if(action==='typing')s.editor.commands.replaceInlineRange(s.node('b').key,3,3,'!');else s.select('a',0);
   complete(new Response(JSON.stringify({Success:true,Data:{citation:citation(),jobId:crypto.randomUUID()}}),{headers:{'Content-Type':'application/json'}}));
   await vi.waitFor(()=>expect(s.editor.clipboard.message()).not.toBe('Resolving DOI…'));expect(s.host.querySelector('.mutable-citation-block')).toBeNull();
@@ -558,10 +564,10 @@ describe('Academic citation paste',()=>{
 describe('Wikipedia resource paste',()=>{
  const capture=()=>({snapshot:{version:1,kind:'article',entityId:crypto.randomUUID(),subjectId:crypto.randomUUID(),snapshotId:crypto.randomUUID(),resourceId:crypto.randomUUID(),identityId:crypto.randomUUID(),revision:123,site:'en.wikipedia.org',title:'Captured article',qid:'Q42',assets:[{kind:'managed',cavernId:'cavern',assetId:'sha256:'+'a'.repeat(64)}]},projection:{title:'Captured article',html:'<p>Readable text.</p>',links:[],diagnostics:[],permalink:'https://en.wikipedia.org/w/index.php?oldid=123'}});
  it('inserts one independent native article with provenance and exact Undo/Redo',async()=>{
-  const value=capture(),request=vi.fn(async()=>new Response(JSON.stringify({Success:true,Data:value}),{headers:{'Content-Type':'application/json'}}));vi.stubGlobal('fetch',request);const s=setup(),target=s.select('b',3),before=s.editor.encodeDocument();target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',metaKey:true,shiftKey:true,bubbles:true}));s.dispatch('paste',target.firstElementChild??target,{'text/plain':'https://en.wikipedia.org/wiki/A?history=1'});await vi.waitFor(()=>expect(s.host.querySelector('.mutable-web-article')).toBeTruthy());const b=Object.values(s.editor.repository.readState().contents).find(b=>b.viewType==='mutable/web-article-block')!.payload;expect(b.sourceUrl).toBe('https://en.wikipedia.org/wiki/A?history=1');expect(b.blockProperties).toHaveLength(2);s.editor.repository.undo();expect(s.editor.encodeDocument()).toEqual(before);s.editor.repository.redo();expect(request).toHaveBeenCalledTimes(1);
+  const value=capture(),request=vi.fn(async()=>new Response(JSON.stringify({Success:true,Data:value}),{headers:{'Content-Type':'application/json'}}));vi.stubGlobal('fetch',request);const s=setup(),target=s.select('b',3),before=s.editor.encodeDocument();s.resource('https://en.wikipedia.org/wiki/A?history=1');await vi.waitFor(()=>expect(s.host.querySelector('.mutable-web-article')).toBeTruthy());const b=Object.values(s.editor.repository.readState().contents).find(b=>b.viewType==='mutable/web-article-block')!.payload;expect(b.sourceUrl).toBe('https://en.wikipedia.org/wiki/A?history=1');expect(b.blockProperties).toHaveLength(2);s.editor.repository.undo();expect(s.editor.encodeDocument()).toEqual(before);s.editor.repository.redo();expect(request).toHaveBeenCalledTimes(1);
  });
  it.each(['cancel','typing'])('prevents late article insertion after %s',async action=>{
-  let resolve!:(r:Response)=>void;vi.stubGlobal('fetch',vi.fn(()=>new Promise(r=>resolve=r)));const s=setup(),target=s.select('b',0);target.dispatchEvent(new KeyboardEvent('keydown',{key:'v',ctrlKey:true,shiftKey:true,bubbles:true}));s.dispatch('paste',target,{'text/plain':'https://en.wikipedia.org/wiki/A'});await tick();if(action==='cancel')s.editor.clipboard.cancel();else s.editor.commands.replaceInlineRange(s.node('b').key,0,0,'!');resolve(new Response(JSON.stringify({Success:true,Data:capture()}),{headers:{'Content-Type':'application/json'}}));await vi.waitFor(()=>expect(s.editor.clipboard.message()).not.toBe('Capturing Wikipedia revision…'));expect(s.host.querySelector('.mutable-web-article')).toBeNull();
+  let resolve!:(r:Response)=>void;vi.stubGlobal('fetch',vi.fn(()=>new Promise(r=>resolve=r)));const s=setup(),target=s.select('b',0);s.resource('https://en.wikipedia.org/wiki/A');await tick();if(action==='cancel')s.editor.clipboard.cancel();else s.editor.commands.replaceInlineRange(s.node('b').key,0,0,'!');resolve(new Response(JSON.stringify({Success:true,Data:capture()}),{headers:{'Content-Type':'application/json'}}));await vi.waitFor(()=>expect(s.editor.clipboard.message()).not.toBe('Capturing Wikipedia revision…'));expect(s.host.querySelector('.mutable-web-article')).toBeNull();
  });
  it('keeps plain Wikipedia URL paste network-free',()=>{const request=vi.fn();vi.stubGlobal('fetch',request);const s=setup();s.dispatch('paste',s.select('b',0),{'text/plain':'https://en.wikipedia.org/wiki/A'});expect(request).not.toHaveBeenCalled();expect(s.host.querySelector('.mutable-web-article')).toBeNull();});
 });

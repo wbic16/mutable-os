@@ -1,3 +1,4 @@
+import { MarkdownInput } from '../runtime/markdown-input';
 import { GlossRelationshipController } from "../features/gloss/relationship-controller";
 import { GlossController } from "../features/gloss/controller";
 import { InitialisController } from '../features/initialis/controller';
@@ -101,6 +102,7 @@ export class ReactiveEditor {
   };
   readonly annotationEvents = new AnnotationRangeEvents();
   readonly features: FeatureFlags;
+  readonly markdownInput: MarkdownInput;
   /** Injected/owned by WorkspaceSession only; absent in isolated/legacy hosts. */
   windowManager?: WorkspaceWindowManager;
   readonly decorations = new SessionDecorations();
@@ -164,6 +166,8 @@ export class ReactiveEditor {
 
   constructor(dto: ExistingBlockDto | LoadedWorkspace, configuration: ReactiveEditorConfiguration = {}) {
     this.features = resolveFeatureFlags(configuration);
+    this.markdownInput = new MarkdownInput(this);
+    this.commandRegistry.register({ id: 'markdown.toggleInput', label: 'Toggle Markdown Input Transformation', canExecute: () => true, execute: () => this.markdownInput.toggle() });
     registerInputActions(this.bindings);
     const loadedWorkspace = "state" in dto && "references" in dto ? dto as LoadedWorkspace : undefined;
     if ((loadedWorkspace?.localContainer || loadedWorkspace?.manifest?.schemaVersion === 2) && !this.features.mutableWindowManager) throw new Error("Enable the Mutable Window Manager to open a managed Workspace.");
@@ -371,6 +375,7 @@ export class ReactiveEditor {
       this.clipboard,
       () => this.completionInput,
       key => { const target=this.surfaces.wholeBlockKey(key); return this.surfaces.confirmDelete([target])?target:undefined; },
+      this.markdownInput,
     );
     const dispose = this.gateway.install();
     const crossInput = this.crossInput;

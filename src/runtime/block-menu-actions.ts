@@ -103,11 +103,15 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
   }
 
   const items: BlockMenuItem[] = [...(editor.mounts.get(key)?.contextActions?.() ?? []), historyEntry];
+  items.push(command('markdown.toggleInput', `Markdown Input Transformation: ${editor.markdownInput.enabled() ? 'On' : 'Off'}`));
   items.push(...tabOrientationMenu(editor, ancestor("tab-row-block", "document-tab-row-block")?.key));
   if (editor.features.tableLayouts) items.push({ label: 'Tables and columns', loadChildren: () => tableMenuItems(editor, key) });
   if (editor.features.thesis) items.push(command("thesis.createProposition", "Create Proposition…"));
   if (node.viewType === 'standoff-editor-block' && editor.features.mutableClipboard && editor.features.markdownClipboard) {
-    items.push({ label: 'Paste as Markdown', run: () => editor.clipboard.pasteMarkdown(key) });
+    items.push({ label: 'Paste as Markdown (Ctrl/Cmd+Shift+V)', run: () => editor.clipboard.pasteMarkdown(key) });
+  }
+  if (node.viewType === 'standoff-editor-block' && editor.features.mutableClipboard) {
+    items.push({ label: 'Paste as plain text', run: () => editor.clipboard.pasteMarkdown(key, true) });
   }
   if (node.viewType === 'standoff-editor-block' && editor.features.documentInterchange) {
     items.push({label:'Insert file…',run:()=>editor.interchange.pickInsert(key)},
@@ -127,7 +131,7 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
     items.push(command("sticky.createFloating", "New Sticky Note"));
     items.push({ label: "Add Block", children: [
       { label: "Text", run: () => add(text()) }, { label: "Code", run: () => add({ ...dto("code-mirror-block"), text: "" }) },
-      ...(editor.features.standoffCodeHighlighting ? [{ label: 'Standoff code', children: ['javascript', 'typescript'].map(language => ({ label: language === 'javascript' ? 'JavaScript' : 'TypeScript', run: () => add(standoffCodeDto(language)) })) }] : []),
+      ...(editor.features.standoffCodeHighlighting ? [{ label: 'Standoff code', children: ['javascript', 'typescript', 'markdown'].map(language => ({ label: language === 'javascript' ? 'JavaScript' : language === 'typescript' ? 'TypeScript' : 'Markdown', run: () => add(standoffCodeDto(language)) })) }] : []),
       ...(editor.features.documentInterchange ? (['markdown','html'] as const).map(format=>({label:format==='markdown'?'Markdown source':'HTML source',run:()=>add({...dto(sourceType(format)),...sourcePayload(format)})})) : []),
       ...editor.featureActions.list("add-block-menu").map(item => command(item.command, item.label)),
       { label: "Insert Sticky Note Here", run: () => add(stickyNoteDto()) },

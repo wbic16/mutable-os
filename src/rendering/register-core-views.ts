@@ -25,6 +25,7 @@ import {
   CodeBlockView,
   FlippableSurfaceView,
   GenericContainerView,
+  HorizontalLineView,
   IframeView,
   ImageView,
   ListView,
@@ -73,6 +74,7 @@ export function registerCoreViews(editor: ReactiveEditor, documentView = Contain
   editor.registry.register({ type: "plain-text-block", view: PlainTextBlockView, capabilities: ["native-text", "container", "selectable"] });
   editor.registry.register({ type: "standoff-editor-block", view: StandoffEditorView, capabilities: ["inline-editor", "container", "selectable", "annotations"] });
   editor.registry.register({ type: 'standoff-code-block', view: StandoffCodeView, capabilities: ['container', 'selectable'] });
+  editor.registry.register({ type: 'horizontal-line-block', view: HorizontalLineView, capabilities: ['container', 'selectable'] });
   editor.registry.register({ type: "checkbox-block", view: CheckboxView, capabilities: ["control", "container", "selectable"] });
   editor.registry.register({ type: "sticky-note-block", view: StickyNoteBlockView, capabilities: ["container", "selectable"] });
   editor.registry.register({ type: "code-mirror-block", view: CodeBlockView, capabilities: ["native-text", "container", "opaque-widget"] });

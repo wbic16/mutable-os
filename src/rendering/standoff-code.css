@@ -9,3 +9,9 @@
 .textual-workspace .standoff-code { --syntax-keyword:#ffff55; --syntax-string:#55ffff; --syntax-number:#ffb366; --syntax-comment:#aaaaaa; --syntax-name:#ffffff; padding:var(--tw-cell-width); border-color:currentColor; }
 .textual-workspace .standoff-code__body .reactive-standoff-flow { font-family:inherit; }
 .textual-workspace .standoff-code__language { font-size:inherit; margin-bottom:var(--tw-line-height); gap:var(--tw-cell-width); }
+
+/* Markdown syntax is colour-only: Textual character geometry stays unchanged. */
+.standoff-code__body .syntax-heading, .standoff-code__body .syntax-strong { color:var(--syntax-keyword); }
+.standoff-code__body .syntax-emphasis, .standoff-code__body .syntax-link, .standoff-code__body .syntax-url { color:var(--syntax-string); }
+.standoff-code__body .syntax-atom, .standoff-code__body .syntax-labelName { color:var(--syntax-number); }
+.standoff-code__body .syntax-strikethrough { color:var(--syntax-comment); }

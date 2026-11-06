@@ -1,6 +1,6 @@
 import { parseClipboardHtml } from './html-ast';
 import { importSemanticHtml } from './html-import';
-import { importMarkdown } from './markdown-import';
+import { importNativeMarkdown } from './markdown-native';
 import { LIMITS, validateFragment, type MutableFragment } from './fragment';
 import { emptyFragment } from './fragment';
 import { fragmentText, plainFragment } from './serializer';
@@ -26,7 +26,7 @@ export function importClipboard(data: ClipboardRepresentations, plain = false, s
   const warnings: string[] = [];
   const markdownText = MARKDOWN_MIMES.map(type => data[type]).find(value => value !== undefined);
   const convertMarkdown = (source: string) => {
-    try { return importMarkdown(source); }
+    try { return importNativeMarkdown(source); }
     catch { return { fragment: plainFragment(source), notice: 'Markdown exceeded import limits; pasted literal text.' }; }
   };
   // Explicit intent overrides automatic negotiation. It never interprets HTML as Markdown.
@@ -82,9 +82,7 @@ export function importClipboard(data: ClipboardRepresentations, plain = false, s
       } else warnings.push(imported.notice ?? 'HTML contained no supported content.');
     } catch { warnings.push('HTML exceeded semantic import limits; used text when available.'); }
   }
-  // Normal negotiation keeps semantic HTML ahead of Markdown, per the shared
-  // contract. Only the explicit command overrides a richer representation.
-  if (!plain && markdown && markdownText !== undefined && !html?.carrier) return convertMarkdown(markdownText);
+  // Text-only Markdown stays literal unless the user explicitly requests conversion.
   const text = data['text/plain'] ?? markdownText ?? derivedText;
   if (!text) return { notice: 'Clipboard contains no supported text; the selection was left unchanged.' };
   if (!plain && data['text/html'] && !warnings.length) warnings.push('Pasted text. External semantic HTML import is disabled.');

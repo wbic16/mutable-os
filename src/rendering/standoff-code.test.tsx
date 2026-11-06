@@ -67,7 +67,7 @@ it.each([false, true])('uses the existing renderer, retains Cells and annotation
 it('clears unsupported language, restores on Undo, and offers creation through the existing menu', async () => {
   const f = setup(); await vi.waitFor(() => expect(f.metric()).toBeTruthy());
   const menu = blockMenuItems(f.editor, f.node('a').key).find(item => item.label === 'Add Block');
-  expect(menu?.children?.find(item => item.label === 'Standoff code')?.children).toHaveLength(2);
+  expect(menu?.children?.find(item => item.label === 'Standoff code')?.children).toHaveLength(3);
   const select = f.host.querySelector('select')!; select.value = 'plain'; select.dispatchEvent(new Event('change', { bubbles: true }));
   await vi.waitFor(() => expect(f.metric()!.ranges).toBe(0));
   f.editor.repository.undo(); await vi.waitFor(() => expect(f.metric()!.ranges).toBeGreaterThan(0));

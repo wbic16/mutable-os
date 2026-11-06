@@ -12,6 +12,8 @@ const fontSizes: Record<string, string> = {
   h2: "var(--document-heading-h2, 2.5rem)",
   h3: "var(--document-heading-h3, 2rem)",
   h4: "var(--document-heading-h4, 1.5rem)",
+  h5: "var(--document-heading-h5, 1.25rem)",
+  h6: "var(--document-heading-h6, 1rem)",
   normal: "1rem",
   "three-quarters": ".75rem",
   half: ".5rem",

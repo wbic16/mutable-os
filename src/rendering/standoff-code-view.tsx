@@ -17,8 +17,8 @@ export function StandoffCodeView(props: BlockViewProps) {
       const metadata = JSON.parse(JSON.stringify(node.payload.metadata ?? {}));
       editor.commands.setPayloadField(props.nodeKey, 'metadata', { ...metadata, markdownCode: { ...metadata.markdownCode, language: event.currentTarget.value } }, 'Change code language');
     }}>
-      <option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="plain">Plain text</option>
-      {!['javascript', 'typescript', 'plain'].includes(language()) && <option value={language()}>{language()}</option>}
+      <option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="markdown">Markdown</option><option value="plain">Plain text</option>
+      {!['javascript', 'typescript', 'markdown', 'plain'].includes(language()) && <option value={language()}>{language()}</option>}
     </select></label>
     <ContainerBlockView nodeKey={props.nodeKey} class="standoff-code__body" />
   </div>;

@@ -71,6 +71,43 @@ try {
  await send('Page.navigate',{url:`http://127.0.0.1:${server.httpServer.address().port}/__textual-shell`},sessionId);
  const key=async(key,code,modifiers=0)=>{await send('Input.dispatchKeyEvent',{type:'keyDown',key,code,modifiers,commands:key==='a'&&modifiers===4?['selectAll']:key==='v'?['paste']:undefined,windowsVirtualKeyCode:({Home:36,Backspace:8,Tab:9,ArrowLeft:37,ArrowRight:39,Escape:27,ArrowDown:40,ArrowUp:38,Enter:13,a:65,z:90,s:83,v:86})[key]??0},sessionId);await send('Input.dispatchKeyEvent',{type:'keyUp',key,code,modifiers,windowsVirtualKeyCode:({Home:36,Backspace:8,Tab:9,ArrowLeft:37,ArrowRight:39,Escape:27,ArrowDown:40,ArrowUp:38,Enter:13,a:65,z:90,s:83,v:86})[key]??0},sessionId);};
 
+
+ const markdownResults=[];
+ const checkMarkdown=async presentation=>{
+   await evaluate(`(()=>{const e=proof.editor,doc=e.blockQueries.ancestors(proof.codeNode.key).find(n=>n.viewType==='document-block');const p=e.commands.insert({id:'mit-'+${JSON.stringify(presentation)},type:'standoff-editor-block',text:''},{kind:'at',parentKey:doc.key,index:0});proof.mit=e.nodeForPlacementInView(p,doc.viewId);proof.mitMount=e.mounts.get(proof.mit.key);proof.mitFlow=proof.mitMount.focusElement;proof.mitFlow.scrollIntoView({block:'center'});e.focus.request(proof.mit.key);proof.mitMount.restoreInlineSelection({anchor:0,head:0});proof.snapshots=proof.rebuilds=proof.referenceRebuilds=0;proof.mitTimes=[];proof.trusted=0;proof.originalMit=proof.originalMit??e.markdownInput.typed.bind(e.markdownInput);e.markdownInput.typed=(...args)=>{const t=performance.now();const result=proof.originalMit(...args);proof.mitTimes.push(performance.now()-t);return result;};proof.mitInputAbort=new AbortController();window.addEventListener('beforeinput',event=>{if(!proof.mitFlow.contains(event.target))return;if(event.isTrusted)proof.trusted++;},{capture:true,signal:proof.mitInputAbort.signal});})()`);
+   const type=async text=>{for(const char of text)await send('Input.insertText',{text:char},sessionId);};
+   const value=()=>evaluate('proof.mitFlow.textContent');
+   const reset=()=>evaluate(`proof.editor.commands.replaceInlineRange(proof.mit.key,0,proof.mit.inlineContent.length,'');proof.mitFlow.focus();proof.mitMount.restoreInlineSelection({anchor:0,head:0});`);
+   await type('**bold*');assert.equal(await value(),'**bold*');
+   await evaluate('proof.bodyCells=proof.mit.inlineContent.slice(2,6);proof.bodyElement=proof.mitFlow.children[2]');
+   await type('*');assert.equal(await value(),'bold');
+   assert(await evaluate('proof.bodyCells.every((k,i)=>proof.mit.inlineContent[i]===k)&&proof.bodyElement===proof.mitFlow.firstElementChild'));
+   await key('z','KeyZ',4);assert.equal(await value(),'**bold**');
+   await key('z','KeyZ',12);assert.equal(await value(),'bold');
+   await reset();await type('###### ');assert.equal(await value(),'');
+   assert(await evaluate(`proof.mit.payload.blockProperties.some(p=>p.type==='block/font/size'&&p.value==='h6')`));
+   await key('z','KeyZ',4);assert.equal(await value(),'###### ');await reset();
+   const typedWork=await evaluate('({snapshots:proof.snapshots,rebuilds:proof.rebuilds,references:proof.referenceRebuilds})');assert.deepEqual(typedWork,{snapshots:0,rebuilds:0,references:0});
+   await evaluate(`navigator.clipboard.writeText('**paste**')`);await key('v','KeyV',4);await wait(`proof.mitFlow.textContent==='**paste**'`);
+   await key('z','KeyZ',4);assert.equal(await value(),'');
+   await key('v','KeyV',12);await wait(`proof.mitFlow.textContent==='paste'`);
+   assert(await evaluate(`proof.mit.payload.standoffProperties.some(p=>p.type==='style/bold')`));
+   await key('z','KeyZ',4);assert.equal(await value(),'');
+   await evaluate(`navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob(['rich'],{type:'text/plain'}),'text/html':new Blob(['<i>rich</i>'],{type:'text/html'})})])`);
+   await key('v','KeyV',4);await wait(`proof.mitFlow.textContent==='rich'`);assert(await evaluate(`proof.mit.payload.standoffProperties.some(p=>p.type==='style/italics')`));
+   const clipboardWork=await evaluate('({snapshots:proof.snapshots,rebuilds:proof.rebuilds,references:proof.referenceRebuilds})');await evaluate('proof.snapshots=proof.rebuilds=proof.referenceRebuilds=0');
+   await reset();await type('`*literal*`');assert.equal(await value(),'`*literal*`');
+   await reset();await evaluate(`proof.editor.commandRegistry.execute('markdown.toggleInput',{targetKey:proof.mit.key,args:undefined})`);await type('**literal**');assert.equal(await value(),'**literal**');
+   await evaluate(`proof.editor.commandRegistry.execute('markdown.toggleInput',{targetKey:proof.mit.key,args:undefined})`);
+   await reset();await send('Input.imeSetComposition',{text:'*日',selectionStart:2,selectionEnd:2},sessionId);await send('Input.insertText',{text:'*日本*'},sessionId);assert.equal(await value(),'*日本*');
+   const result=await evaluate(`({trustedInputs:proof.trusted,snapshots:proof.snapshots,projectionRebuilds:proof.rebuilds,referenceRebuilds:proof.referenceRebuilds,meanMitMs:proof.mitTimes.reduce((a,b)=>a+b,0)/proof.mitTimes.length,maxMitMs:Math.max(...proof.mitTimes)})`);
+   await evaluate('proof.mitInputAbort.abort()');console.log('Markdown browser',presentation,result);
+   assert(result.trustedInputs>20);assert.equal(result.snapshots,0);assert.equal(result.projectionRebuilds,0);assert.equal(result.referenceRebuilds,0);
+   await evaluate(`(()=>{const e=proof.editor,doc=e.blockQueries.ancestors(proof.mit.key).find(n=>n.viewType==='document-block');const p=e.commands.insert({type:'standoff-code-block',metadata:{markdownCode:{language:'markdown'}},children:[{type:'standoff-editor-block',text:'# Markdown\\n**bold** and *italic* [link](https://example.com)'}]},{kind:'at',parentKey:doc.key,index:0});const n=e.nodeForPlacementInView(p,doc.viewId);proof.mdFlow=e.mounts.get(e.node(n.children[0]).key).focusElement;proof.mdSource=proof.mdFlow.textContent;proof.mdCell=proof.mdFlow.firstElementChild;proof.mdRevision=e.repository.state.revision;})()`);
+   await wait('proof.mdFlow.querySelector(".syntax-strong")&&proof.mdFlow.querySelector(".syntax-url")');
+   assert(await evaluate('proof.mdFlow.textContent===proof.mdSource&&proof.mdFlow.firstElementChild===proof.mdCell&&proof.editor.repository.state.revision===proof.mdRevision'));
+   markdownResults.push({presentation,typedWork,clipboardWork,...result});
+ };
  await wait('window.proof && document.querySelector(".reactive-standoff-flow")');
  await click(`[...document.querySelectorAll('.flint-document-tab [role=tab]')].find(e=>!e.textContent.includes('Second Document'))`);
  await evaluate(`(()=>{const e=proof.editor,flow=document.querySelector('.reactive-standoff-flow'),key=e.mounts.resolveElement(flow).nodeKey,doc=e.blockQueries.ancestors(key).find(n=>n.viewType==='document-block');const placement=e.commands.insert({type:'standoff-code-block',id:'code-proof',metadata:{markdownCode:{language:'typescript'}},children:[{id:'code-first',type:'standoff-editor-block',text:'const greeting: string = "Hello 😀";',standoffProperties:[{type:'style/bold',start:0,end:4}]},{type:'standoff-editor-block',text:'/* multiple'},{type:'standoff-editor-block',text:'lines */ const n = 42;'}]},{kind:'at',parentKey:doc.key,index:0});proof.code=e.nodeForPlacementInView(placement,doc.viewId);proof.codeNode=e.node(proof.code.children[0]);proof.codeFlow=e.mounts.get(proof.codeNode.key).focusElement;proof.codeMount=e.mounts.get(proof.codeNode.key);proof.originalText=proof.codeFlow.textContent;proof.firstCell=proof.codeFlow.firstChild;proof.syntaxRoot=proof.codeMount.root.closest('.standoff-code');proof.syntaxRoot.scrollIntoView();})()`);
@@ -94,17 +131,19 @@ try {
  await key('v','KeyV',4);await wait('proof.codeFlow.textContent.includes("pasted")');
  assert(await evaluate('proof.codeFlow.textContent.includes(String.fromCharCode(10)) || proof.editor.node(proof.code.key).children.length>3'));await evaluate('proof.editor.repository.undo()');
  await wait('proof.codeFlow.querySelector(".syntax-keyword")');
+ if(process.env.CHECK_MARKDOWN==='1')await checkMarkdown('desktop');
  await evaluate('proof.beforeSwitchCell=proof.codeFlow.firstChild');
  await click(`[...document.querySelectorAll('button')].find(e=>e.textContent==='Textual')`);
  await wait('document.querySelector(".tw-flint-slot .standoff-code")');
  await wait('getComputedStyle(proof.codeFlow).fontFamily.includes("Mono")');
  const textual=await evaluate(`(()=>{const cs=getComputedStyle(proof.codeFlow),cell=proof.codeFlow.firstChild;return {font:cs.fontFamily,color:getComputedStyle(cell).color,width:cell.getBoundingClientRect().width,grid:parseFloat(getComputedStyle(document.querySelector('.textual-workspace')).getPropertyValue('--tw-cell-width')),sameCell:cell===proof.beforeSwitchCell}})()`);
  assert(textual.sameCell);assert(Math.abs(textual.width-textual.grid)<1);assert.notEqual(textual.color,desktop.keyword);
+ if(process.env.CHECK_MARKDOWN==='1')await checkMarkdown('textual');
  await send('Page.captureScreenshot',{format:'png'},sessionId).then(r=>writeFile('/tmp/standoff-code-textual.png',Buffer.from(r.data,'base64')));
  await evaluate(`proof.session.selectPresentation('desktop')`);await wait('!document.querySelector(".textual-workspace")');
  assert.equal(await evaluate('proof.codeFlow.firstChild===proof.beforeSwitchCell && getComputedStyle(proof.codeFlow).fontFamily'),desktop.font);
  const persistence=await evaluate(`(async()=>{const before=proof.editor.repository.state.revision;const {captureNative,nativeText,decodeNative}=await import('/src/persistence/native-resource.ts');const text=nativeText(captureNative(proof.editor.repository.readState(),proof.resourceId));decodeNative(new TextEncoder().encode(text));return {codeTypePersisted:text.includes('standoff-code-block'),syntaxPersisted:text.includes('syntax-keyword'),revisionStable:before===proof.editor.repository.state.revision}})()`);
  assert(persistence.codeTypePersisted);assert.equal(persistence.syntaxPersisted,false);assert(persistence.revisionStable);
  await send('Page.captureScreenshot',{format:'png'},sessionId).then(r=>writeFile('/tmp/standoff-code-desktop.png',Buffer.from(r.data,'base64')));
- console.log(JSON.stringify({desktop,textual,persistence,trustedSelectionTypingUndoRedo:true,trustedIME:true,trustedClipboardPaste:true,retainedDesktopTextualRoundTrip:true},null,2));
+ console.log(JSON.stringify({markdownResults,desktop,textual,persistence,trustedSelectionTypingUndoRedo:true,trustedIME:true,trustedClipboardPaste:true,retainedDesktopTextualRoundTrip:true},null,2));
 } catch(error) { console.error(error);process.exitCode=1; } finally {socket?.close();browser?.kill();server?.httpServer?.closeAllConnections();await Promise.race([server?.close(),new Promise(resolve=>setTimeout(resolve,1500))]);await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}

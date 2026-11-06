@@ -1,3 +1,4 @@
+import { markdownParser } from '../interchange/markdown-native';
 import { parser } from '@lezer/javascript';
 import { classHighlighter, highlightTree } from '@lezer/highlight';
 import { batch } from 'solid-js';
@@ -33,7 +34,7 @@ export function analyseCode(blocks: CodeText[], language: string) {
   });
   const source = segments.map(segment => segment.text).join('\n');
   const sourceMs = performance.now() - start;
-  const selected = ['js', 'javascript'].includes(language) ? javascript : ['ts', 'typescript'].includes(language) ? typescript : undefined;
+  const selected = ['js', 'javascript'].includes(language) ? javascript : ['ts', 'typescript'].includes(language) ? typescript : ['md', 'markdown'].includes(language) ? markdownParser : undefined;
   const parsedAt = performance.now(), tree = selected?.parse(source), parseMs = performance.now() - parsedAt;
   const mappedAt = performance.now(), tokens: SyntaxToken[][] = blocks.map(() => []);
   let cursor = 0;

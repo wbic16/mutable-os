@@ -58,14 +58,14 @@ describe('explicit CommonMark and GFM table import', () => {
       expect(fetch).not.toHaveBeenCalled(); expect(dom).not.toHaveBeenCalled();
     } finally { fetch.mockRestore(); dom.mockRestore(); }
   });
-  it('only interprets Markdown on explicit intent or a supplied Markdown MIME', () => {
+  it('only interprets clipboard Markdown on explicit intent, retaining the broader importer', () => {
     const data = { 'text/plain': '**bold**', 'text/html': '<i>HTML</i>' };
     expect(fragmentText(importClipboard({ 'text/plain': '**bold**' }).fragment!)).toBe('**bold**');
     expect(fragmentText(importClipboard(data).fragment!)).toBe('HTML');
     expect(fragmentText(importClipboard(data, false, true, true, true).fragment!)).toBe('bold');
     for (const mime of ['text/markdown', 'text/x-markdown']) {
       expect(fragmentText(importClipboard({ ...data, [mime]: '# heading' }).fragment!)).toBe('HTML');
-      expect(fragmentText(importClipboard({ 'text/plain': 'fallback', [mime]: '# heading' }).fragment!)).toBe('heading');
+      expect(fragmentText(importClipboard({ 'text/plain': 'fallback', [mime]: '# heading' }).fragment!)).toBe('fallback');
       expect(fragmentText(importClipboard({ [mime]: '**literal**' }, true).fragment!)).toBe('**literal**');
       expect(fragmentText(importClipboard({ [mime]: '**literal**' }, false, true, false).fragment!)).toBe('**literal**');
     }
@@ -77,7 +77,7 @@ describe('explicit CommonMark and GFM table import', () => {
   it('shares preparation and fresh-identity materialization, including worker-safe data', () => {
     const input = { data: { 'text/plain': '# heading\n\n**bold**' }, plain: false, asMarkdown: true, scope: {}, assets: [], blocks: [], selections: 1 };
     const first = preparePaste(input), second = preparePaste(input);
-    expect(roots(first.fragment!)[0].blockProperties[0].type).toBe('block/font/size/h1');
+    expect(roots(first.fragment!)[0].blockProperties[0]).toMatchObject({type:'block/font/size',attributes:{value:'h1'}});
     expect(first.natives![0].roots[0]).not.toBe(second.natives![0].roots[0]);
     expect(() => JSON.parse(JSON.stringify(first))).not.toThrow();
   });

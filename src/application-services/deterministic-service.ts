@@ -263,7 +263,7 @@ export class DeterministicService {
           String(e).slice(0, 500)
         );
         throw Error(
-          `${String(e)}. Resume with Command/Control-Shift-V: mutable-academic-job:${id}; published originals are retained.`
+          `${String(e)}. Resume through Inspect / Import linked resource: mutable-academic-job:${id}; published originals are retained.`
         );
       }
     } finally {

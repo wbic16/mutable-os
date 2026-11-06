@@ -66,6 +66,7 @@ export class InputGateway {
     private readonly clipboard?: MutableClipboard,
     private readonly completion?: () => CompletionInput | undefined,
     private readonly blockDeleteTarget?: (key:NodeKey)=>NodeKey|undefined,
+    private readonly markdown?: { typed(key: string, start: number, end: number, text: string): number | undefined; cancel(): void },
   ) {}
 
   install(): () => void {
@@ -126,9 +127,10 @@ export class InputGateway {
     return resolved.handle.inputPolicy === "standoff" ? ["editor/standoff", "editor"] : ["editor"];
   }
   private onKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1 && event.key !== "Shift") this.markdown?.cancel();
     if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1 && event.key !== "Shift") this.listInput.cancelTask?.();
     this.clipboard?.key(event);
-    if (this.completion?.()?.key(event)) { this.listInput.cancelTask?.(); return; }
+    if (this.completion?.()?.key(event)) { this.markdown?.cancel(); this.listInput.cancelTask?.(); return; }
     const target = event.target instanceof Element ? event.target : undefined;
     const resolved = this.mounts.resolveEvent(event);
     const field = target?.closest('input, textarea, select, [contenteditable="true"]');
@@ -161,8 +163,9 @@ export class InputGateway {
     let start = Math.min(selection.anchor, selection.head);
     let end = Math.max(selection.anchor, selection.head);
     let text: string | undefined;
+    if (event.isComposing || !event.cancelable || event.inputType !== 'insertText' || start !== end || (this.selections.sets[resolved.nodeKey]?.items.length ?? 0) > 1) this.markdown?.cancel();
     if(this.completion?.()?.intercept?.(resolved.nodeKey,start,end,event.data??"",event.inputType)){
-      this.listInput.cancelTask?.();
+      this.markdown?.cancel(); this.listInput.cancelTask?.();
       if(event.cancelable)event.preventDefault();event.stopPropagation();return;
     }
 
@@ -275,13 +278,14 @@ export class InputGateway {
 
     if (event.cancelable) event.preventDefault();
     event.stopPropagation();
-    if(this.completion?.()?.before?.(resolved.nodeKey,start,end,text,event.inputType)) { this.listInput.cancelTask?.(); return; }
-    if (event.cancelable && !event.isComposing && event.inputType === "insertText" && this.listInput.task?.(resolved.nodeKey, start, end, text)) return;
+    if(this.completion?.()?.before?.(resolved.nodeKey,start,end,text,event.inputType)) { this.markdown?.cancel(); this.listInput.cancelTask?.(); return; }
+    if (event.cancelable && !event.isComposing && event.inputType === "insertText" && this.listInput.task?.(resolved.nodeKey, start, end, text)) { this.markdown?.cancel(); return; }
     if (event.cancelable && !event.isComposing && event.inputType === 'insertText' && text === ' ' && start === end &&
-      this.listInput.prefix(resolved.nodeKey, start)) return;
+      this.listInput.prefix(resolved.nodeKey, start)) { this.markdown?.cancel(); return; }
     this.commands.replaceInlineRange(resolved.nodeKey, start, end, text);
-    const caret = start + [...text].length;
+    let caret = start + [...text].length;
     this.selections.mapContentEdit(node.contentKey, start, end, [...text].length);
+    if (event.cancelable && !event.isComposing && event.inputType === 'insertText') caret = this.markdown?.typed(resolved.nodeKey, start, end, text) ?? caret;
     this.selections.setPrimary(resolved.nodeKey, node.contentKey, node.viewId, caret);
     queueMicrotask(() => resolved.handle.restoreInlineSelection?.({ anchor: caret, head: caret }));
     this.completion?.()?.edited(resolved.nodeKey, caret, event.inputType);
@@ -303,9 +307,10 @@ export class InputGateway {
     else this.caretEvents.setCaret();
   };
 
-  private onFocusOut = () => { this.listInput.cancelTask?.(); this.clipboard?.clearIntent(); this.caretEvents?.setComposing?.(false); this.caretEvents?.setCaret(); };
+  private onFocusOut = () => { this.markdown?.cancel(); this.listInput.cancelTask?.(); this.clipboard?.clearIntent(); this.caretEvents?.setComposing?.(false); this.caretEvents?.setCaret(); };
 
   private onCompositionStart = (event: CompositionEvent) => {
+    this.markdown?.cancel();
     this.listInput.cancelTask?.();
     this.bindings.cancelChord();
     const resolved = this.mounts.resolveEvent(event);
@@ -358,6 +363,7 @@ export class InputGateway {
   };
 
   private onPointerDown = (event: PointerEvent) => {
+    this.markdown?.cancel();
     this.listInput.cancelTask?.();
     if (this.bindings.pendingHint()) this.bindings.cancelChord();
     const element = event.target instanceof Element ? event.target : undefined;
@@ -466,6 +472,7 @@ export class InputGateway {
   };
 
   private onPaste = (event: ClipboardEvent) => {
+    this.markdown?.cancel();
     this.listInput.cancelTask?.();
     if(this.completion?.()?.clipboard?.(event))return;
     if (this.clipboard?.enabled()) { this.clipboard.handleText(event); return; }

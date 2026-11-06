@@ -17,6 +17,7 @@
 export type FeatureFlags = Readonly<{
   /** Lezer-derived, session-only syntax on standoff CodeBlocks. */
   standoffCodeHighlighting: boolean;
+  markdownInputTransformation: boolean;
   /** Presentation orientation on existing TabRows. */
   verticalTabs: boolean;
   /** Atlas artwork and application shortcuts on the workspace Desktop. */
@@ -55,7 +56,7 @@ export type FeatureFlags = Readonly<{
   managedAssetClipboard: boolean;
   /** A user paste authorises acquisition of its remote images; failures remain recoverable. */
   automaticClipboardImages: boolean;
-  /** Primary-Shift-V turns a single HTTP(S) URL into its resource Block. */
+  /** Explicit resource-URI processing (Primary-Shift-Enter); ordinary paste stays literal. */
   resourceUrlPaste: boolean;
   academicResourceLoaders: boolean;
   crossResourceLoaders: boolean;
@@ -169,6 +170,7 @@ export type FeatureFlags = Readonly<{
 
 export const featureFlags: FeatureFlags = Object.freeze({
   standoffCodeHighlighting: true,
+  markdownInputTransformation: true,
   verticalTabs: true,
   desktopApplicationIcons: true,
   reversibleBlocks: true,
