@@ -1,6 +1,5 @@
 import { Worker } from 'node:worker_threads';
 import { inspectVaultScope, lockVaultEstablishment } from './vault-scope.mjs';
-import { writerLock } from './paths.mjs';
 import { flockExclusiveSync } from './advisory-lock.mjs';
 import { phextKnowledgeFor } from './phext-registry.mjs';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +13,8 @@ import path from 'node:path';
  * for the VFS path '/.mutable/writer.lock' (see
  * scripts/stage-c-gates/phext-backend.mjs), so the knowledge writer
  * lock is the same logical lock across layers. Held for the worker's
- * lifetime, exactly like paths.writerLock on disk.
+ * lifetime; the disk writer lock it mirrors is deleted with the
+ * phext-only cutover.
  */
 function phextWriterLease(phextPath) {
   const anchor = path.join(path.dirname(phextPath),
@@ -40,20 +40,27 @@ export async function openSqliteFoundation(options) {
   // Selector readers open an existing DB only. They neither establish a Vault
   // nor acquire a writer/indexing lease, so they must not scan its documents.
   if(configuration.entityReader && (!configuration.readOnly || configuration.initialize))throw Error('Entity readers must be read-only');
-  // PhextVFS Phase 4: resolve phext knowledge mode before scope
-  // inspection. A registered lifecycle instance wins; an explicit
-  // path (or `true` for the default cavern.phext) is honored; the
-  // resolved absolute path rides workerData into the worker.
+  // Phext-only (cutover): knowledge always lives in the vault's
+  // cavern.phext. A registered lifecycle path wins; an explicit
+  // path (or `true`) is honored; otherwise the default
+  // <vault>/cavern.phext is used. The resolved absolute path rides
+  // workerData into the worker.
   const phextPath = typeof configuration.phextKnowledge === 'string' ? configuration.phextKnowledge
-    : configuration.phextKnowledge === true ? (configuration.vault ? path.join(configuration.vault, 'cavern.phext') : undefined)
-    : (configuration.vault ? phextKnowledgeFor(configuration.vault)?.phextPath : undefined);
+    : (configuration.vault ? (phextKnowledgeFor(configuration.vault)?.phextPath ?? path.join(configuration.vault, 'cavern.phext')) : undefined);
   if (phextPath) configuration.phextKnowledge = phextPath;
-  else if (configuration.phextKnowledge) throw Error('Phext knowledge mode requires a vault phext path');
-  if (configuration.restoreFrom && phextPath) throw Error('Phext knowledge mode does not restore SQLite snapshots; export from the source Cavern instead');
+  else throw Error('Phext knowledge mode requires a vault phext path');
+  // Upgrade-on-encounter belongs to the Cavern lifecycle (it
+  // converts the whole tree, not just knowledge). A vault that
+  // still holds a disk knowledge home has not been converted;
+  // refuse here rather than mint fresh phext knowledge beside it
+  // and silently orphan the disk state.
+  if (configuration.vault && fs.existsSync(path.join(configuration.vault, '.mutable', 'mutable.db'))) {
+    throw Error('This vault still holds disk knowledge (.mutable/mutable.db); open the Cavern through the server once to convert it to phext');
+  }
   let releaseScope;
   if(!configuration.entityReader){
    for(let attempt=0;;attempt++){try{releaseScope=lockVaultEstablishment();break;}catch(e){if(!['EAGAIN','EWOULDBLOCK'].includes(e.code)||attempt>=100)throw e;await new Promise(resolve=>setTimeout(resolve,20));}}
-   try{inspectVaultScope(configuration.vault, phextPath ? {phextKnowledge:true} : undefined);}catch(e){releaseScope();throw e;}
+   try{inspectVaultScope(configuration.vault);}catch(e){releaseScope();throw e;}
   }
   let worker;try{worker = new Worker(path.join(path.dirname(fileURLToPath(import.meta.url)), 'worker.mjs'), { workerData: {...configuration,scopeValidated:true} });}catch(e){releaseScope?.();throw e;}
   const pending = new Map(); let next = 0, pendingBytes = 0, dead = false, closing = false, startup, unlock;
@@ -71,7 +78,7 @@ export async function openSqliteFoundation(options) {
   worker.on('message', message => {
     if (message.leaseRequest) {
       if (dead) return;
-      try { if (unlock) throw Error('Duplicate writer lease request'); unlock = message.phextKnowledge ? phextWriterLease(message.phextKnowledge) : writerLock(message.home); worker.postMessage({ leaseGranted: true }); }
+      try { if (unlock) throw Error('Duplicate writer lease request'); unlock = phextWriterLease(message.phextKnowledge); worker.postMessage({ leaseGranted: true }); }
       catch (e) { worker.postMessage({ leaseError: e.message }); }
       return;
     }

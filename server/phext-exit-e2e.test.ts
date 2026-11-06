@@ -8,7 +8,8 @@
  * knowledge: entity + proposition + delivered/pending audit) is:
  *
  *   migrated → verification all-green, .mutable renamed aside as
- *   the fallback, legacy strata honestly listed as remaining;
+ *   the fallback, and (since Phase 3b) every legacy store phext-
+ *   backed: the records list no remaining-on-disk stratum;
  *   → the fallback is renamed AWAY and the Cavern is read back
  *     from the phext alone (documents, asset, knowledge dump);
  *   → downloaded raw + sealed (xz -t verifies; sidecar hash is
@@ -21,7 +22,11 @@
  * database (abort leaves the disk Cavern untouched), a corrupt
  * seal, non-phext content, a knowledge-bearing phext missing its
  * control record, a non-empty target folder. And the lifecycle
- * routes all refuse while the phextVfs flag is off.
+ * transfer routes serve the phext-only world (the phextVfs flag is
+ * deleted; there is no flag-off behaviour). Fixture note: the
+ * disk-born knowledge pair is produced by seeding a phext Cavern
+ * and exporting a snapshot, then laying the pair down as real
+ * .mutable files — the disk format the migration consumes.
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import express from 'express';
@@ -62,14 +67,21 @@ function write(root: string, rel: string, content: string | Buffer) {
   fs.writeFileSync(target, content);
 }
 
-/** A disk-mode Cavern with content in every stratum. */
-function diskCavern() {
+/** A disk-born Cavern with content in every stratum. */
+async function diskCavern() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mutable-phext-exit-'));
   cleanups.push(() => fs.rmSync(dir, { recursive: true, force: true }));
   const vault = path.join(dir, 'vault');
   fs.mkdirSync(vault);
 
-  const store = openFoundation({ vault, initialize: true });
+  // Seed knowledge in a scratch phext Cavern, export the snapshot
+  // pair, and lay it down as the vault's real .mutable home.
+  const seedVault = path.join(dir, 'seed-vault');
+  fs.mkdirSync(seedVault);
+  const seedPhext = path.join(seedVault, 'cavern.phext');
+  const seedVfs = PhextVFS.openOrCreate(seedPhext);
+  cleanups.push(() => { try { seedVfs.close(); } catch { /* closed */ } });
+  const store = openFoundation({ vault: seedVault, initialize: true }, { phextVfs: seedVfs, phextPath: seedPhext, scopeValidated: true });
   const entityOp = uuid(), propositionOp = uuid();
   const entity = store.entities({ op: 'create', id: uuid(), operationId: entityOp, name: 'Exit Entity', typename: 'Person' }).entity;
   const proposition = store.propositions({
@@ -78,7 +90,11 @@ function diskCavern() {
   }).proposition;
   expect(store.deliverAudit({ limit: 1 }).delivered).toBe(1);
   const vaultGuid = store.vaultGuid;
+  const exported = await store.backup(path.join(dir, 'disk-source'));
   store.close();
+  fs.mkdirSync(path.join(vault, '.mutable'), { recursive: true });
+  fs.copyFileSync(path.join(exported.directory, 'mutable.db'), path.join(vault, '.mutable', 'mutable.db'));
+  fs.copyFileSync(path.join(exported.directory, 'audit.db'), path.join(vault, '.mutable', 'audit.db'));
 
   const native = fs.readFileSync('artifacts/flint-b1.2/rich.mutable.json');
   write(vault, 'notes/paper.mutable.json', native);
@@ -103,33 +119,38 @@ function diskCavern() {
 
 describe('Phase 5 exit ramps', () => {
   it('migrate → download (raw + sealed) → open sealed → export: full round trip diff-equal', { timeout: 180000 }, async () => {
-    const f = diskCavern();
+    const f = await diskCavern();
     const report = await migrateCavernToPhext({ root: f.vault, openVfs: PhextVFS });
     expect(report.verified).toBe(true);
     expect(report.vaultGuid).toBe(f.vaultGuid);
     expect(report.knowledge.tables.Entity).toBeGreaterThanOrEqual(2);
     expect(report.knowledge.propositions).toBe(1);
     expect(report.smoke.knowledge.vaultGuid).toBe(f.vaultGuid);
-    // Honesty: the 3b remainder is named, never hidden.
-    expect(report.onDisk.join('\n')).toMatch(/Phase 3b pending/);
-    expect(report.onDisk.join('\n')).toMatch(/document-saves/);
-    expect(report.manifest.find((e: any) => e.path === 'uploads/up.bin')?.action).toBe('remaining');
+    // Phase 3b: the legacy stores and uploads migrated too — the
+    // records name no remaining-on-disk stratum for them.
+    expect(report.onDisk).toEqual([]);
+    expect(report.manifest.find((e: any) => e.path === 'uploads/up.bin')?.action).toBe('copy');
+    expect(report.manifest.find((e: any) => e.path === '.mutable/document-saves/rec/record.json')?.action).toBe('copy');
+    expect(report.smoke.documentSaves).toBe('.mutable/document-saves/rec/record.json');
+    expect(report.smoke.upload).toBe('uploads/up.bin');
     // Fallback discipline: .mutable renamed aside, phext published.
     expect(fs.existsSync(path.join(f.vault, '.mutable'))).toBe(false);
     expect(fs.existsSync(path.join(f.vault, '.mutable-disk-fallback', 'mutable.db'))).toBe(true);
     const phextPath = path.join(f.vault, 'cavern.phext');
     expect(fs.existsSync(phextPath)).toBe(true);
 
-    // The migration record lives in L7 and repeats the honesty list.
+    // The migration record lives in L7 and repeats the coverage.
     {
       const vfs = PhextVFS.open(phextPath);
       const record = JSON.parse(vfs.readTextFile('/.control/phext-migration.json'));
       expect(record.format).toBe('phext-cavern-migration');
       expect(record.sourceTreeSha256).toBe(report.sourceTreeSha256);
-      expect(record.onDisk.join('\n')).toMatch(/Phase 3b pending/);
+      expect(record.onDisk).toEqual([]);
       const strata = JSON.parse(vfs.readTextFile('/.control/phext-strata.json'));
       expect(strata.phextBacked.knowledge).toBe(3);
-      expect(strata.onDisk.length).toBeGreaterThan(0);
+      expect(strata.phextBacked.legacyDocumentStores).toBe(1);
+      expect(strata.phextBacked.uploads).toBe(1);
+      expect(strata.onDisk).toEqual([]);
       vfs.close();
     }
 
@@ -139,6 +160,8 @@ describe('Phase 5 exit ramps', () => {
       const vfs = PhextVFS.open(phextPath);
       expect(vfs.readFile('/notes/paper.mutable.json').equals(f.native)).toBe(true);
       expect(vfs.readFile('/.mutable/assets/blob.bin').equals(ASSET_BYTES)).toBe(true);
+      expect(vfs.readFile('/uploads/up.bin').toString()).toBe('uploaded bytes');
+      expect(JSON.parse(vfs.readTextFile('/.mutable/document-saves/rec/record.json'))).toEqual({ save: 1 });
       expect(JSON.parse(vfs.readTextFile('/notes/.memory/record-1.json')).text).toBe('remembered');
       const ks = new PhextKnowledgeStore(vfs);
       expect(canon(dumpPhextKnowledge(ks))).toEqual(canon(f.dump));
@@ -178,6 +201,10 @@ describe('Phase 5 exit ramps', () => {
     expect(exported.verified).toBe(true);
     expect(fs.readFileSync(path.join(destination, 'notes', 'paper.mutable.json')).equals(f.native)).toBe(true);
     expect(fs.readFileSync(path.join(destination, '.mutable', 'assets', 'blob.bin')).equals(ASSET_BYTES)).toBe(true);
+    // Phase 3b strata restore byte-identically too.
+    expect(fs.readFileSync(path.join(destination, 'uploads', 'up.bin')).toString()).toBe('uploaded bytes');
+    expect(JSON.parse(fs.readFileSync(path.join(destination, '.mutable', 'document-saves', 'rec', 'record.json'), 'utf8'))).toEqual({ save: 1 });
+    expect(JSON.parse(fs.readFileSync(path.join(destination, 'legacy.json'), 'utf8'))).toEqual({ kind: 'legacy-document', text: 'old store' });
     const exportedDump = dumpDiskKnowledge({
       mutableFile: path.join(destination, '.mutable', 'mutable.db'),
       auditFile: path.join(destination, '.mutable', 'audit.db'),
@@ -186,7 +213,7 @@ describe('Phase 5 exit ramps', () => {
   });
 
   it('migration refusals: already migrated, no disk state, corrupted source leaves disk untouched', { timeout: 120000 }, async () => {
-    const f = diskCavern();
+    const f = await diskCavern();
     await migrateCavernToPhext({ root: f.vault, openVfs: PhextVFS });
     await expect(migrateCavernToPhext({ root: f.vault, openVfs: PhextVFS }))
       .rejects.toThrow(/already has a cavern\.phext/);
@@ -196,7 +223,7 @@ describe('Phase 5 exit ramps', () => {
     await expect(migrateCavernToPhext({ root: empty, openVfs: PhextVFS }))
       .rejects.toThrow(/no disk knowledge state/);
 
-    const g = diskCavern();
+    const g = await diskCavern();
     const dbPath = path.join(g.vault, '.mutable', 'mutable.db');
     const db = fs.readFileSync(dbPath);
     db.write('NOT A SQLITE DB!', 0);
@@ -208,7 +235,7 @@ describe('Phase 5 exit ramps', () => {
   });
 
   it('open refusals: corrupt seal, non-phext content, missing knowledge control, non-empty target', { timeout: 120000 }, async () => {
-    const f = diskCavern();
+    const f = await diskCavern();
     await migrateCavernToPhext({ root: f.vault, openVfs: PhextVFS });
     const raw = fs.readFileSync(path.join(f.vault, 'cavern.phext'));
     const sealed = await sealPhext(raw);
@@ -243,9 +270,9 @@ describe('Phase 5 exit ramps', () => {
     expect(fs.readFileSync(path.join(occupied, 'keep.txt'), 'utf8')).toBe('mine');
   });
 
-  it('lifecycle routes refuse while the phextVfs flag is off', { timeout: 60000 }, async () => {
-    const root = await fs.promises.realpath(await fs.promises.mkdtemp(path.join(os.tmpdir(), 'mutable-phext-exit-routes-')));
-    cleanups.push(() => fs.rmSync(root, { recursive: true, force: true }));
+  it('lifecycle transfer routes serve the phext-only world (no flag remains)', { timeout: 120000 }, async () => {
+    const f = await diskCavern();
+    const root = f.dir;
     const lifecycle = createCavernLifecycle({ stateFile: path.join(root, 'preferences.json') });
     cleanups.push(() => { void lifecycle.close(); });
     const app = express();
@@ -256,18 +283,23 @@ describe('Phase 5 exit ramps', () => {
     cleanups.push(() => { server.close(); });
     const port = (server.address() as { port: number }).port;
 
+    // The migrate route converts the disk-born Cavern — the flag
+    // that used to gate it is deleted, so the route simply works.
     const migrate = await fetch(`http://127.0.0.1:${port}/api/cavern/migrate`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: root }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: f.vault }),
     });
-    expect(migrate.status).toBe(409);
-    expect((await migrate.json()).Success).toBe(false);
+    expect(migrate.status).toBe(200);
+    expect((await migrate.json()).Success).toBe(true);
+    expect(fs.existsSync(path.join(f.vault, 'cavern.phext'))).toBe(true);
 
+    // Download with no Cavern open refuses explicitly (the
+    // surviving refusal shape: name the missing precondition).
     const download = await fetch(`http://127.0.0.1:${port}/api/cavern/download?format=xz`);
     expect(download.status).toBe(409);
     expect((await download.json()).Success).toBe(false);
 
     const open = await fetch(`http://127.0.0.1:${port}/api/cavern/open-phext`, { method: 'POST' });
-    expect(open.status).toBe(409);
-    expect((await open.json()).Error).toMatch(/phextVfs feature flag/);
+    expect(open.status).toBe(400);
+    expect((await open.json()).Error).toMatch(/Choose a \.phext or \.phext\.xz file/);
   });
 });

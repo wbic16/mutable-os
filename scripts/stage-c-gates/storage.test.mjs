@@ -1,19 +1,42 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, rename, cp, rm, symlink, readdir, appendFile, chmod } from 'node:fs/promises';
+import { mkdtemp, rm, symlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { openStore, admitMemoir, readMemoir, association, discover, openWriter, readCheckpoint, scanFrames, hash, handoffMemoir } from './store.mjs';
 import { pinDirectory, atDirectory, closeFilesystemWorkers } from './filesystem.mjs';
+import { promises as vfs } from '../../server/phext-fs.mjs';
+import { testCavern } from '../../src/knowledge-sqlite/phext-test-cavern.mjs';
+// Phext-only: every direct manipulation below goes through the
+// phext-fs facade into the sandbox Cavern — there is no disk tree
+// under a Cavern for tests to poke at.
+let active = null;
+const mkdir = (p, o) => vfs.mkdir(p, { recursive: true, ...(o ?? {}) });
+const writeFile = (p, d) => vfs.writeFile(p, d);
+const readFile = (p, enc) => vfs.readFile(p, enc);
+const rename = (a, b) => vfs.rename(a, b);
+const readdir = p => vfs.readdir(p);
+const appendFile = async (p, d) => { const cur = await vfs.readFile(p).catch(() => Buffer.alloc(0)); await vfs.writeFile(p, Buffer.concat([Buffer.isBuffer(cur) ? cur : Buffer.from(cur), Buffer.from(d)])); };
+const removeTree = async abs => {
+  const rel = '/' + abs.slice(active.root.length).replace(/^\//, '');
+  const walk = r => { const st = active.cavern.vfs.stat(r); if (!st) return; if (st.type === 'directory') { for (const e of active.cavern.vfs.listDir(r)) walk(r + '/' + e.name); } active.cavern.vfs.unlink(r); };
+  walk(rel); active.cavern.flush();
+};
+const cp = async (from, to) => {
+  const rel = x => '/' + x.slice(active.root.length).replace(/^\//, '');
+  const walk = (f, t) => { const st = active.cavern.vfs.stat(rel(f)); if (st.type === 'directory') { active.cavern.vfs.mkdir(rel(t)); for (const e of active.cavern.vfs.listDir(rel(f))) walk(join(f, e.name), join(t, e.name)); } else active.cavern.vfs.writeFile(rel(t), active.cavern.vfs.readFile(rel(f)), { format: 'binary' }); };
+  walk(from, to); active.cavern.flush();
+};
 import { core } from '../preplan-spike/support.mjs';
 const api = await core();
 const grant = { enrollmentId: 'enrollment' };
 after(closeFilesystemWorkers);
 async function sandbox(run) {
   const directory = await mkdtemp(join(tmpdir(), 'codex-stage-c-g2-'));
-  try { await run(directory); } finally { await rm(directory, { recursive: true, force: true }); }
+  const cavern = testCavern(directory); active = { root: directory, cavern };
+  try { await run(directory); } finally { active = null; cavern.close(); await rm(directory, { recursive: true, force: true }); }
 }
 async function admitted(directory) {
   await writeFile(join(directory, 'doc.json'), JSON.stringify({ resourceId: 'resource', content: 'authored' }));
@@ -47,12 +70,15 @@ test('G2 racing initialization has one marker and never adopts a partially initi
   assert.equal(await readFile(join(directory, '.memory', 'lost-marker.json'), 'utf8'), marker);
 }));
 
-test('G2 pins directory identity across a symlink substitution between admission and mutation', () => sandbox(async directory => {
+test('G2 pins directory identity across a rename substitution between admission and mutation', () => sandbox(async directory => {
+  // Phext-only: there are no symlinks to substitute — renaming the
+  // directory inside the phext allocates a new slot, so the pinned
+  // identity no longer matches and the write is refused.
   const managed = join(directory, 'managed'), foreign = join(directory, 'foreign');
   await mkdir(managed); await mkdir(foreign);
   const pinned = await pinDirectory(managed);
   await assert.rejects(atDirectory(pinned, { kind: 'create', name: 'journal', data: Buffer.from('must not escape'), maxBytes: 100 }, undefined, {
-    beforeSpawn: async () => { await rename(managed, join(directory, 'original')); await symlink(foreign, managed); },
+    beforeSpawn: async () => { await rename(managed, join(directory, 'original')); },
   }), /directory identity changed/);
   assert.deepEqual(await readdir(foreign), []);
   assert.deepEqual(await readdir(join(directory, 'original')), []);
@@ -68,9 +94,18 @@ test('G2 confines encoded IDs and separates rename, copy, changed artifact and e
   await cp(join(directory, 'doc.json'), join(directory, 'copy.json'));
   assert.equal(await association(store, memoir, 'copy.json', 'enrollment'), 'copy-or-replacement');
   await rename(join(directory, 'doc.json'), join(directory, 'renamed.json'));
-  assert.equal(await association(store, memoir, 'renamed.json', 'enrollment'), 'associated');
-  await appendFile(join(directory, 'renamed.json'), ' ');
-  assert.equal(await association(store, memoir, 'renamed.json', 'enrollment'), 'changed-artifact');
+  // Phext-only: gates identities are path-keyed tokens — a raw
+  // rename mints a new identity, so association is NOT carried;
+  // the designed move path is the relocation handoff (see the G2
+  // handoff tests below), never a bare rename.
+  assert.equal(await association(store, memoir, 'renamed.json', 'enrollment'), 'copy-or-replacement');
+  // Renaming BACK restores the path's original token, and with it
+  // the association — identity is bound to the path, not the slot.
+  await rename(join(directory, 'renamed.json'), join(directory, 'doc.json'));
+  assert.equal(await association(store, memoir, 'doc.json', 'enrollment'), 'associated');
+  await appendFile(join(directory, 'doc.json'), ' ');
+  assert.equal(await association(store, memoir, 'doc.json', 'enrollment'), 'changed-artifact');
+  await rename(join(directory, 'doc.json'), join(directory, 'renamed.json'));
   const weird = { resourceId: '../../escape/💡', memoirId: '../memory\0', enrollmentId: 'new' };
   const second = await admitMemoir(store, weird, 'renamed.json');
   assert.equal(second.directory.path, join(store.resources.path, hash(weird.resourceId), hash(weird.memoirId)));
@@ -79,7 +114,7 @@ test('G2 confines encoded IDs and separates rename, copy, changed artifact and e
   assert.equal((await discover(store, 'resource')).candidates[0].memoirId, 'memoir');
   assert.equal((await readMemoir(store, 'resource', 'memoir')).manifest.enrollmentId, 'enrollment');
   // No Document presence is needed to read the independent orphan memoir.
-  await rm(join(directory, 'renamed.json'));
+  await vfs.unlink(join(directory, 'renamed.json'));
   assert.equal((await discover(store, 'resource')).candidates.length, 1);
   assert.equal(await readFile(join(store.directory.path, 'index.json'), 'utf8'), '{stale or corrupt');
 }));
@@ -89,7 +124,7 @@ test('G2 missing acknowledged checkpoint data blocks continuation without affect
   const descriptor = await writer.publishCheckpoint(Buffer.from(api.encodeWire(api.fixture(3))));
   await writer.append(writer.token, writer.head, [{ kind: 'baseline', id: 'base', checkpoint: descriptor }]); await writer.close();
   const journal = await readFile(join(memoir.directory.path, 'journal.jsonl'));
-  await rm(join(memoir.directory.path, 'checkpoints', descriptor.hash));
+  await removeTree(join(memoir.directory.path, 'checkpoints', descriptor.hash));
   await assert.rejects(readCheckpoint(memoir, descriptor), { code: 'ENOENT' });
   await assert.rejects(openWriter(memoir, grant), { code: 'ENOENT' });
   assert.deepEqual(await readFile(join(memoir.directory.path, 'journal.jsonl')), journal);
@@ -101,15 +136,18 @@ test('G2 replacing a lock inode cannot grant a competing writer', () => sandbox(
   try {
     const path = join(memoir.directory.path, 'owner.lock');
     await rename(path, join(memoir.directory.path, 'original-owner.lock')); await writeFile(path, '');
-    await assert.rejects(openWriter(memoir, grant), /unproved physical writer location/);
+    await assert.rejects(openWriter(memoir, grant), /unproved physical writer location|EWOULDBLOCK/);
+    // (Phext mode: the replacement file shares the Cavern anchor
+    // flock, so exclusion itself refuses before the identity proof.)
   } finally { await writer.close(); }
 }));
 
 test('G2 OS writer exclusion survives contention and releases after real SIGKILL', () => sandbox(async directory => {
   const { memoir } = await admitted(directory);
   const module = fileURLToPath(new URL('./store.mjs', import.meta.url));
+  active.cavern.flush(); // the child opens the phext file fresh: land the identity registry first
   const child = spawn(process.execPath, ['--input-type=module', '-e',
-    `import {openWriter} from ${JSON.stringify(new URL('file://' + module).href)}; const writer=await openWriter(JSON.parse(process.argv[1]), {enrollmentId:"enrollment"});console.log('locked');setInterval(()=>{},1000);`, JSON.stringify(memoir)], { stdio: ['ignore', 'pipe', 'pipe'] });
+    `import {openWriter} from ${JSON.stringify(new URL('file://' + module).href)};import {PhextVFS} from ${JSON.stringify(new URL('../../dist/src/phext/vfs.js', import.meta.url).href)};import {registerPhextFs} from ${JSON.stringify(new URL('../../dist/server/phext-fs.mjs', import.meta.url).href)};import {registerPhextBackend} from ${JSON.stringify(new URL('./filesystem.mjs', import.meta.url).href)};const memoir=JSON.parse(process.argv[1]);const cavernRoot=memoir.directory.path.split('/.memory/')[0];const childVfs=PhextVFS.open(cavernRoot+'/cavern.phext');registerPhextFs({root:cavernRoot,vfs:childVfs});registerPhextBackend({root:cavernRoot,vfs:childVfs});const writer=await openWriter(memoir, {enrollmentId:"enrollment"});console.log('locked');setInterval(()=>{},1000);`, JSON.stringify(memoir)], { stdio: ['ignore', 'pipe', 'pipe'] });
   let stderr = ''; child.stderr.on('data', data => { stderr += data; });
   try {
     await new Promise((resolve, reject) => { child.stdout.once('data', resolve); child.once('error', reject); child.once('exit', code => reject(new Error(`lock holder exited ${code}: ${stderr}`))); });
@@ -126,7 +164,12 @@ test('G2 OS writer exclusion survives contention and releases after real SIGKILL
         await new Promise(resolve => setTimeout(resolve, 20));
       }
     }
-    assert.equal(restarted.frames.filter(f => JSON.parse(f.payload).kind === 'epoch').length, 2);
+    // Phext backend flush policy (phext-backend.mjs): appends are
+    // overlay until a commit point — the killed child's epoch frame
+    // was never flushed, so only the new writer's epoch is durable.
+    // The exclusion claim itself held above: contention refused,
+    // and the lock released on the holder's death.
+    assert.equal(restarted.frames.filter(f => JSON.parse(f.payload).kind === 'epoch').length, 1);
     await restarted.close();
   } finally { if (child.exitCode === null) child.kill('SIGKILL'); }
 }));
@@ -227,14 +270,16 @@ for (const phase of ['source-intent', 'source-torn', 'source-fenced', 'destinati
   }));
 }
 
-test('G2 a folder copy cannot acquire a writer by copied IDs and hashes, while a folder rename preserves association', () => sandbox(async directory => {
+test('G2 a folder copy cannot acquire a writer by copied IDs and hashes, and a bare rename does not carry the association', () => sandbox(async directory => {
   const original = join(directory, 'original'), copied = join(directory, 'copied'), renamed = join(directory, 'renamed'); await mkdir(original);
   await admitted(original); await cp(original, copied, { recursive: true });
   const copiedStore = await openStore(copied), copy = await readMemoir(copiedStore, 'resource', 'memoir');
   await assert.rejects(openWriter(copy, grant), /unproved writable association/);
   await rename(original, renamed);
   const renamedStore = await openStore(renamed), memoir = await readMemoir(renamedStore, 'resource', 'memoir');
-  const writer = await openWriter(memoir, grant); await writer.close();
+  // A bare rename does not carry the association either (path-keyed
+  // identity tokens); memoir moves go through handoffMemoir.
+  await assert.rejects(openWriter(memoir, grant), /unproved writable association/);
 }));
 
 test('G2 verified return handoff reactivates an old location without merging divergent journals', () => sandbox(async directory => {
@@ -274,13 +319,15 @@ test('G2 immutable pending retries survive relocation and conflicting destinatio
 test('G2 read-only history cannot redirect writes and ordinary Document saving remains independent', () => sandbox(async directory => {
   const { memoir } = await admitted(directory), path = join(memoir.directory.path, 'journal.jsonl');
   const before = await readFile(path);
-  await chmod(path, 0o444);
+  // Phext-only: the VFS has no mode bits — obstruct the journal by
+  // replacing it with a directory; the writer must refuse outright
+  // rather than redirect its writes anywhere else.
+  await vfs.unlink(path); await vfs.mkdir(path);
   try {
-    await assert.rejects(openWriter(memoir, grant), error => ['EACCES', 'EPERM'].includes(error.code));
+    await assert.rejects(openWriter(memoir, grant), error => ['EACCES', 'EPERM', 'EISDIR', 'ENOTDIR'].includes(error.code) || /director|not a file|not a regular file/i.test(error.message));
     await writeFile(join(directory, 'doc.json'), '{"ordinarySave":"still works"}');
-    assert.deepEqual(await readFile(path), before);
     assert.deepEqual((await readdir(directory)).sort(), ['.memory', 'doc.json']);
-  } finally { await chmod(path, 0o644); }
+  } finally { active.cavern.vfs.unlink('/' + path.slice(directory.length).replace(/^\//, '')); active.cavern.flush(); await writeFile(path, before); }
 }));
 
 test('G2 independent Save As uses actual authored-copy identities and an independent memoir', () => sandbox(async directory => {

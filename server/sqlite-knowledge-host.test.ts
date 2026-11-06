@@ -8,9 +8,10 @@ import {createNativeDocumentStoreRouter} from './native-document-store.mjs';
 import {createDocumentStoreRouter} from './document-store';
 import {decodeNative,nativeText} from '../src/persistence/native-resource';
 import {exportMarkdown} from '../src/persistence/markdown';
+import {testCavern} from '../src/knowledge-sqlite/phext-test-cavern.mjs';
 const cleanup:Array<()=>Promise<unknown>>=[];afterEach(async()=>{for(const f of cleanup.splice(0).reverse())await f();});
 async function fixture(options:any={}){
- const root=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'p3a-http-')));cleanup.push(()=>fs.rm(root,{recursive:true,force:true}));
+ const root=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'p3a-http-')));cleanup.push(()=>fs.rm(root,{recursive:true,force:true}));const cavern=testCavern(root);cleanup.push(()=>cavern.close());
  const host=new SqliteKnowledgeHost({root,debounceMs:60000,readOnly:options.readOnly});cleanup.push(()=>host.close());
  const app=express();app.use('/knowledge',host.router());app.use('/native',createNativeDocumentStoreRouter({root,...options,coordinate:a=>host.foreground(a)}));app.use(express.json());app.use(createDocumentStoreRouter({root,coordinate:a=>host.foreground(a),readOnly:options.readOnly}));
  const server:any=await new Promise(r=>{const s=app.listen(0,'127.0.0.1',()=>r(s));});cleanup.push(()=>new Promise(r=>server.close(r)));const base=`http://127.0.0.1:${server.address().port}`;

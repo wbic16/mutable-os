@@ -1,13 +1,15 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm, cp, readdir, symlink, readFile } from 'node:fs/promises';
+import { mkdtemp, rm, cp, readdir, symlink, readFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';import os from 'node:os';import {createHash} from 'node:crypto';import sharp from 'sharp';import express from 'express';
 import { ManagedAssetStore } from './managed-assets.mjs';
 import { validateImportedImage } from './asset-image-validation.mjs';
 import { createManagedAssetService } from './managed-assets-router.mjs';
 import { closeFilesystemWorkers } from '../scripts/stage-c-gates/filesystem.mjs';
+import { testCavern } from '../src/knowledge-sqlite/phext-test-cavern.mjs';
+import { promises as vfs } from './phext-fs.mjs';
 const roots=[];after(async()=>{await closeFilesystemWorkers();for(const r of roots)await rm(r,{recursive:true,force:true});});
-const fixture=async(options={})=>{const root=await mkdtemp(path.join(os.tmpdir(),'managed-asset-'));roots.push(root);return {root,store:new ManagedAssetStore({root,cavernId:'cavern',session:'session',...options})};};
+const fixture=async(options={})=>{const root=await mkdtemp(path.join(os.tmpdir(),'managed-asset-'));roots.push(root);const cavern=testCavern(root);return {root,cavern,store:new ManagedAssetStore({root,cavernId:'cavern',session:'session',...options})};};
 const png=()=>sharp({create:{width:3,height:2,channels:4,background:'#c06020'}}).png().toBuffer();
 const jpeg=()=>sharp({create:{width:3,height:2,channels:3,background:'#c06020'}}).jpeg().toBuffer();
 
@@ -28,23 +30,37 @@ for(const point of ['intent','object-bytes','object-manifest','published'])test(
 test('removes only unpublished stage bytes after interrupted staging',async()=>{
  const {root,store}=await fixture({fault:async p=>{if(p==='stage-bytes')throw Error('crash');}}),lease=await store.begin(),bytes=await png();await assert.rejects(store.stage(lease,bytes,await validateImportedImage(bytes)),/crash/);
  const reopened=new ManagedAssetStore({root,cavernId:'cavern',session:'next'});assert.deepEqual((await reopened.recover()).diagnostics,[]);
- assert.ok(!(await readdir(path.join(root,'.mutable/assets/operations',lease.id))).some(n=>n.endsWith('.bin')));
+ assert.ok(!(await vfs.readdir(path.join(root,'.mutable/assets/operations',lease.id))).some(n=>n.endsWith('.bin')));
 });
 test('renewed leases survive recovery until expiry; expired leases cannot publish',async()=>{
  let now=0;const {store}=await fixture({now:()=>now}),lease=await store.begin();now=500000;await store.renew(lease);now=700000;await store.recover();await store.status(lease);now=1200000;await assert.rejects(store.publish(lease),/expired/);await store.recover();await assert.rejects(store.status(lease),/aborted/);
 });
 test('portable references survive moving the entire Cavern and cannot authorize foreign scope',async()=>{
- const {root,store}=await fixture(),lease=await store.begin(),bytes=await jpeg(),item=await store.stage(lease,bytes,await validateImportedImage(bytes));await store.publish(lease);await store.finish(lease);
- const dest=await fixture();await cp(path.join(root,'.mutable'),path.join(dest.root,'.mutable'),{recursive:true});const moved=new ManagedAssetStore({root:dest.root,cavernId:'cavern',session:'moved'});await moved.recover();assert.deepEqual((await moved.get(item.assetId,'cavern')).bytes,bytes);
+ const {root,store,cavern}=await fixture(),lease=await store.begin(),bytes=await jpeg(),item=await store.stage(lease,bytes,await validateImportedImage(bytes));await store.publish(lease);await store.finish(lease);
+ const dest=await fixture();
+ // Phext-only: the asset home lives inside cavern.phext — moving
+ // the Cavern carries the /.mutable subtree phext-to-phext.
+ const copyTree=async(from,to)=>{const st=cavern.vfs.stat(from);if(st.type==='directory'){dest.cavern.vfs.mkdir(to);for(const e of cavern.vfs.listDir(from))await copyTree(`${from}/${e.name}`,`${to}/${e.name}`);}else dest.cavern.vfs.writeFile(to,cavern.vfs.readFile(from),{format:'binary'});};
+ await copyTree('/.mutable','/.mutable');dest.cavern.flush();
+ const moved=new ManagedAssetStore({root:dest.root,cavernId:'cavern',session:'moved'});await moved.recover();assert.deepEqual((await moved.get(item.assetId,'cavern')).bytes,bytes);
 });
 test('rejects unsupported/truncated/oversized/concatenated binaries',async()=>{
  const p=await png(),j=await jpeg();
  for(const bytes of [Buffer.from('<svg onload="evil()"/>'),p.subarray(0,p.length-9),Buffer.concat([p,Buffer.from('extra')]),Buffer.concat([j,j]),Buffer.alloc(10*1024*1024+1)])await assert.rejects(validateImportedImage(bytes));
  const giant=await sharp({create:{width:17000,height:1,channels:3,background:'red'}}).png().toBuffer();await assert.rejects(validateImportedImage(giant),/dimensions/);
 });
-test('rejects symlinked asset directories and preserves corrupt publication evidence',async()=>{
- const a=await fixture(),b=await fixture();await a.store.home();await symlink(b.root,path.join(a.root,'.mutable/assets/objects'));
- const lease=await a.store.begin(),bytes=await png();await a.store.stage(lease,bytes,await validateImportedImage(bytes));await assert.rejects(a.store.publish(lease),/symlink/);assert.deepEqual(await readdir(b.root),[]);assert.equal((await a.store.recover()).diagnostics.length,1);
+test('disk symlinks cannot redirect asset storage; corrupt publication evidence is preserved as a diagnostic',async()=>{
+ const a=await fixture(),b=await fixture();await a.store.home();await mkdir(path.join(a.root,'.mutable/assets'),{recursive:true});await symlink(b.root,path.join(a.root,'.mutable/assets/objects'));
+ // Phext-only: the symlink exists only on the real disk, where
+ // the store never looks — publication lands in a's own phext
+ // and b's Cavern gains nothing.
+ const lease=await a.store.begin(),bytes=await png();await a.store.stage(lease,bytes,await validateImportedImage(bytes));await a.store.publish(lease);await a.store.finish(lease);
+ assert.ok((await readdir(b.root)).every(n=>n.startsWith('cavern.phext')));
+ // Corrupt a second operation's ledger entry: recovery reports
+ // it as a diagnostic instead of dropping the evidence.
+ const lease2=await a.store.begin();await a.store.stage(lease2,bytes,await validateImportedImage(bytes));
+ const opDir=path.join(a.root,'.mutable/assets/operations',lease2.id);for(const n of await vfs.readdir(opDir))await vfs.writeFile(path.join(opDir,n),'corrupt');
+ assert.equal((await a.store.recover()).diagnostics.length,1);
 });
 test('HTTP multipart admission, scoped retrieval and denied remote consent use the same store',async()=>{
  const {root}=await fixture(),service=createManagedAssetService({root,cavernId:'cavern',session:'session'}),app=express();app.use(express.json());app.use('/api/assets',service.router);const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base=`http://127.0.0.1:${server.address().port}/api/assets`;

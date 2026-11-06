@@ -1,7 +1,6 @@
 import { extractPackageData } from './package-data.mjs';
 import { parentPort, workerData } from 'node:worker_threads';
 import { openFoundation, restoreSnapshot } from './foundation.mjs';
-import { prepareHome } from './paths.mjs';
 import { PhextVFS } from '../phext/vfs.ts';
 import path from 'node:path';
 import { projectSaved } from './saved-projection.ts';
@@ -11,28 +10,34 @@ import { createEntityLookup } from './entity-lookup.mjs';
 let store, phextVfs;
 try {
   if (workerData.restoreFrom && workerData.readOnly) throw Error('Read-only mode cannot restore databases');
-  if (workerData.restoreFrom && workerData.phextKnowledge) throw Error('Phext knowledge mode does not restore SQLite snapshots; export from the source Cavern instead');
-  const restored = workerData.restoreFrom ? restoreSnapshot(workerData.restoreFrom, workerData.vault, workerData.scopeValidated) : undefined;
-  // PhextVFS Phase 4: in phext knowledge mode the worker owns its own
-  // PhextVFS instance on the Cavern phext (the lifecycle's instance
-  // owns the document strata; flush generations keep them coherent).
-  // No .mutable home is prepared: the knowledge lives in the phext
-  // and in the ephemeral replica the foundation builds in temp.
-  const phextPath = workerData.phextKnowledge
-    ? (typeof workerData.phextKnowledge === 'string' ? workerData.phextKnowledge : path.join(workerData.vault, 'cavern.phext'))
+  if (workerData.initialize && workerData.readOnly) throw Error('Read-only mode cannot initialize databases');
+  // Phext-only (cutover): the worker owns its own PhextVFS instance
+  // on the Cavern phext (the lifecycle's instance owns the document
+  // strata; flush generations keep them coherent). No .mutable home
+  // is prepared: the knowledge lives in the phext and in the
+  // ephemeral replica the foundation builds in temp.
+  const phextPath = typeof workerData.phextKnowledge === 'string'
+    ? workerData.phextKnowledge
+    : path.join(workerData.vault, 'cavern.phext');
+  const home = path.dirname(phextPath);
+  // Creation is explicit, mirroring the disk era's prepareHome: only
+  // an initializing open (or a restore, which establishes by
+  // conversion) may create the phext file. A plain open of an
+  // unestablished Cavern refuses without leaving a file behind.
+  phextVfs = workerData.readOnly || (!workerData.initialize && !workerData.restoreFrom)
+    ? PhextVFS.open(phextPath)
+    : PhextVFS.openOrCreate(phextPath);
+  // Restoring a SQLite snapshot converts it into the phext (the
+  // snapshot stays a transport format; the 4.6 converter does the
+  // verified move). Refused when the phext already has knowledge.
+  const restored = workerData.restoreFrom
+    ? restoreSnapshot(workerData.restoreFrom, workerData.vault, workerData.scopeValidated, phextVfs)
     : undefined;
-  let home;
-  if (phextPath) {
-    home = path.dirname(phextPath);
-    phextVfs = workerData.readOnly ? PhextVFS.open(phextPath) : PhextVFS.openOrCreate(phextPath);
-  } else {
-    ({ home } = prepareHome(workerData));
-  }
   if (!workerData.readOnly) await new Promise((resolve, reject) => {
     parentPort.once('message', message => message.leaseGranted ? resolve() : reject(Error(message.leaseError || 'Writer lease unavailable')));
-    parentPort.postMessage({ leaseRequest: true, home, ...(phextPath ? { phextKnowledge: phextPath } : {}) });
+    parentPort.postMessage({ leaseRequest: true, home, phextKnowledge: phextPath });
   });
-  store = openFoundation(workerData, { hostLeaseHeld: !workerData.readOnly, scopeValidated:workerData.scopeValidated, ...(phextVfs ? { phextVfs, phextPath } : {}) });
+  store = openFoundation(workerData, { hostLeaseHeld: !workerData.readOnly, scopeValidated:workerData.scopeValidated, phextVfs, phextPath });
   parentPort.postMessage({ ready: true, restored });
 } catch (e) { parentPort.postMessage({ startupError: e.message }); parentPort.close(); }
 if (store) {

@@ -304,7 +304,13 @@ export class PhextLattice {
    */
   saveToFile(path: string): void {
     const bytes = this.toPhextBytes();
-    const tmp = `${path}.tmp-${process.pid}-${++saveCounter}`;
+    // The counter is per module copy: two PhextVFS instances in one
+    // process (the lifecycle's and the knowledge worker's, in a
+    // worker thread with the same pid) hold independent counters and
+    // collided on the same temp name. A random suffix makes the
+    // temp name unique per save, not just per process.
+    const suffix = Math.floor(Math.random() * 0xffffffff).toString(16).padStart(8, "0");
+    const tmp = `${path}.tmp-${process.pid}-${++saveCounter}-${suffix}`;
     const fd = openSync(tmp, "w");
     try {
       writeSync(fd, bytes);

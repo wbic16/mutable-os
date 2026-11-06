@@ -596,6 +596,206 @@ refuse (409) and behavior is byte-identical. Stacked on Phase 4.
   and compatible-document fail identically on base ea0c7e8. No
   phext-family src suite failed in any run.
 
+## PhextVFS Phase 3b (2026-11-05) — legacy stores + uploads
+
+The last authored content outside the phext joins it: the legacy
+document store, the workspace store, the recognized-document
+journal, and the legacy uploads endpoint. After this phase a
+phext-mode Cavern accounts for **every** store in its strata
+record — there is no standing remaining-on-disk list anymore.
+
+- Shim extension (`server/phext-fs.mjs`): the dispatch carve-out
+  that kept all of `.mutable` on real disk gains exactly two
+  exceptions — `.mutable` itself (the VFS home directory merging
+  strata 3/5/6, so `NativeVaultStore.resolve()`'s lstat-walk can
+  enter it) and `.mutable/document-saves/**`, the
+  recognized-document journal. No other `.mutable` path crosses:
+  knowledge is phext-native since Phase 4 and never travels
+  through this facade. `constants` is re-exported for facade
+  consumers. One subtlety, found by regression: `statFor` gives
+  the `.mutable` home a deterministic synthetic identity instead
+  of a registry assignment — `operations()` stats that directory
+  from inside discovery fence windows, and a registry assignment
+  would dirty `fs-nodes.json`, making the next flush rewrite the
+  phext mid-fence ("Vault changed during discovery" in the Phase 4
+  knowledge E2E; bisected and fixed, suite green again).
+- Legacy stores routed (`server/document-store.ts`,
+  `server/workspace-store.ts`, `server/recognized-document-store.mjs`):
+  each now imports `promises as fs` from `./phext-fs.mjs` instead
+  of `node:fs` — the Phase 3a pattern. Unregistered roots (every
+  flag-off and non-Cavern use) fall through to real fs untouched.
+  Their tmp+rename publish, `wx` staging, `link` create-only
+  publish, confined `realpath` discipline and lock behavior all
+  run on the facade's existing operations; document saves remain
+  manual (Cmd-S), nothing here adds background saves.
+- Discovery cache retired in phext mode
+  (`server/vault-listing-cache.mjs`): when a phext backend covers
+  the store root, `read()` returns nothing and `write()` is a
+  no-op — browse always reconciles, and reconciliation reads the
+  VFS directory index scrolls, which are the listing source. On
+  disk the cache keeps its exact prior behavior. The Phase 3a
+  scenario test that asserted the disk cache file was updated to
+  the new contract.
+- Uploads embedded (`server/phext-uploads.mjs`, new;
+  `server/index.ts`): behind the flag, multer stores through a
+  phext-aware engine and `/uploads` is served by a phext static
+  handler ahead of the disk one. The engine keeps diskStorage's
+  contract — caller-resolved destination with the same Cavern +
+  session checks, `Date.now() + ext` filenames, identical file
+  info — and writes binary content into the phext (base64-chunked,
+  the stratum-6 encoding of Phase 2's managed assets) at the
+  file's natural path `/uploads/<name>`, flushing before it
+  reports the upload. No backend (disk-mode Cavern) → the engine
+  writes real disk itself, byte-identical to the old behavior.
+  Flag off, neither piece is wired and the original diskStorage
+  stands untouched.
+- Build (`scripts/build-history-worker.mjs`): the tsc-compiled
+  legacy stores import the facade at runtime, so the build now
+  also bundles `server/phext-fs.mjs` → `dist/server/phext-fs.mjs`
+  (the native-store pattern). The facade registry lives on
+  globalThis, so the bundled copy shares registrations with the
+  source module the lifecycle loads by URL. Found by the boot
+  smoke: without this, dist cannot boot at all.
+- Migration/strata (`server/phext-cavern-transfer.mjs`,
+  `server/cavern-lifecycle.ts`): migration classification now
+  copies `uploads/**` and `.mutable/document-saves/**` into the
+  phext under the same per-file SHA-256 verification (with new
+  smoke reads for both), export restores them byte-identically,
+  and `REMAINING_ON_DISK` is empty — per-Cavern remainders
+  (symlinks, unrecognized `.mutable` remnants) are still computed
+  from the manifest and named, never hidden. The strata record
+  gains `legacyDocumentStores: 1, documentSavesJournal: 3,
+  uploads: 1`. Strata reading, stated plainly: the VFS assigns
+  strata by path (Phase 1 design) — the root-tree legacy stores
+  ride stratum 1 with the documents, the journal rides the
+  `.mutable` stratum (3) whose root is its home, and uploads ride
+  their root paths with stratum 6's binary encoding. The Phase 5
+  exit E2E's honesty assertions were updated to the new contract
+  (records now assert `onDisk: []` for a fully-covered fixture).
+- Acceptance: new `server/phext-legacy-e2e.test.ts` — one
+  phext-mode Cavern exercising legacy document save/list/load,
+  workspace save/list/load, a full recognized-document journal
+  save inside the phext, the retired cache, and a binary upload
+  round trip through the real multer engine + static handler,
+  then cold reopen from the phext alone (including an idempotent
+  recognized-save retry). The updated exit E2E covers migration
+  of a disk Cavern carrying all three strata. Gates: serial phext
+  vitest set 88/88 (16 files, incl. both new/updated E2Es and
+  cavern-lifecycle); `test:sqlite`
+  131/131; gates node:test 27/28, identical on base (uid-0
+  artifact); touched-store flag-off baselines identical to base
+  a221108 (document/workspace/listing-cache/vault-lock/collection
+  suites 49/49; native + recognized store suites 70 passed / 9
+  failed on both trees — the missing `data/raven.json` fixture
+  class); typecheck 0; build 0; boot smoke HTTP 200 flag-off and
+  flag-on (temporary flip, reverted; `src/configuration.ts` ends
+  unmodified at `phextVfs: false`).
+
+
+## Phext-only cutover (2026-11-05) — no dual mode remains
+
+Will's ruling (2026-11-05, "go full phext"): all silent backwards
+compatibility is removed. There is no disk mode, no flag, and no
+fallback path left standing; the sections above describe how the
+dual-mode world was built, and this section describes the state
+that replaces it. Phase 3b is merged into this branch first; its
+dual paths were then stripped with everything else's.
+
+**Deleted, not bypassed**
+
+- The `phextVfs` flag: gone from `src/configuration.ts`, every
+  conditional, and every flag-parametrized test. Phext mode is the
+  only mode.
+- phext-fs disk fall-through: paths not covered by a registered
+  Cavern phext throw a coded `ENOPHEXT` refusal. The `.mutable`
+  carve-outs are gone; `.mutable` is virtual like everything else.
+  Real-by-construction exceptions remain only for `cavern.phext*`
+  and `.mutable-disk-fallback/` themselves.
+- The stage-C gates' disk backend: `filesystem.mjs` is a thin
+  dispatch to the phext backend; the disk worker
+  (`scripts/stage-c-gates/filesystem-worker.mjs`, 101 lines) is
+  deleted.
+- The disk multer engine and the disk static `/uploads` mount:
+  uploads exist only inside the Cavern phext (phext multer engine +
+  VFS static handler from Phase 3b).
+- The on-disk discovery cache: `vault-listing-cache.mjs` keeps the
+  reconcile (walk, inspect, pair-state derivation) but the cache
+  file implementation is deleted — the VFS directory index is the
+  listing, every browse reconciles, results are never `cached`.
+- The native relocation helper (`server/native-path-move.c`,
+  `scripts/build-relocation-helper.mjs`): vault relocation is a
+  VFS `renameExclusive`, full stop.
+- `src/settings.json` (audit P10): embedded the absolute path
+  "/data/the-codex"; no production importer. Git history keeps it.
+- The knowledge foundation's disk open path: a vault is its
+  phext or it does not open. Restoring a SQLite snapshot is a
+  *conversion into* the destination phext (Phase 4.6 converter),
+  never a return to disk state.
+
+**Upgrade-on-encounter.** Opening a disk-born Cavern converts it
+automatically in the lifecycle, with the Phase 5 discipline:
+walk → write → per-file SHA-256 re-read verification. The
+`.mutable` directory is preserved as `.mutable-disk-fallback/`;
+document originals stay in place, byte-identical but inactive.
+Conversion failure (corrupt source, unreadable file, verification
+mismatch) refuses the open with an explicit error naming what
+failed; originals are untouched and there is no half-converted
+state. The L7 cavern-state record (`/.control/cavern-state.json`)
+carries the conversion timestamp (`migratedUtc`). The Phase 5
+routes (download, open-phext, migrate) keep their contracts.
+Client-side, opening a vault that still carries live disk
+knowledge refuses and directs the user to open the Cavern through
+the server once, rather than minting fresh phext knowledge beside
+disk state.
+
+**Settings bundle (audit §2.7, with-the-cutover scope).** Each
+Cavern can carry a copy of the user's settings at
+`/.control/settings/`, as a per-field scroll tree (never one JSON
+blob): `bundle/` (schema version, timestamps, source app version,
+optional label), `domains/keybindings/` (per-action trigger
+scrolls), `domains/flint-layout/`, `domains/annotation-bar/`,
+`domains/editor-interactions/`. Capture is an explicit user
+action — "Update Shipped Settings" in the Cavern menu — that
+sends the four domains' current values to `POST /settings/capture`
+(strict validation; a bad capture writes nothing); `GET /settings`
+reads the bundle back. Opening a Cavern **never** imports or
+overwrites live settings; import is a separate, later feature, as
+is the standalone settings-only extract.
+
+**Addressing (audit §1C items assigned to the cutover).**
+P3: Scry usage-history is scoped by the Cavern's `vaultGuid`,
+never by absolute vault path. P9: `/.control/fs-nodes.json` is
+keyed by coordinate (format v2), with renames carrying entries
+old-address → new-address; a v1 path-keyed registry converts in
+place on first load. P10 above. After-cutover remainder (not in
+this branch): P2 (recents), P4 (relocation intent records), P5/P6
+(persisted `DocumentLocation` forms), P7 (in-content upload
+references — PL2 territory), the settings import-preview UI, and
+the standalone settings extract.
+
+**Untouched by design**: `caverns.json` (installation state),
+the `.bak`/anchor/backup mechanism, the ephemeral derived SQLite
+replica, and manual document saving (Cmd-S). Two headline E2Es
+pin the end state (`server/phext-cutover-e2e.test.ts`):
+disk-silence (a full exercise of save/knowledge/upload/history
+leaves only `cavern.phext` + mechanism files on disk) and
+upgrade-on-encounter (including the corrupt-fixture refusal).
+
+**Two phext-mode lookup fixes found by the cutover test conversions.**
+(1) The entity-lookup read cache keyed its invalidation solely on
+SQLite `data_version`, which never moves for same-connection commits;
+the phext replica is single-connection (one worker), so cached lookup
+results — including empty mention searches — never invalidated.
+`entity-lookup.mjs` now pairs `data_version` with `total_changes()`,
+the same formula as `reconcile.mjs`'s `sqlRevision`.
+(2) Derived document rows (Blocks/StandoffProperties) are ephemeral in
+phext mode: they exist only in the open Vault worker's replica and are
+never canonical store records, so the read-only reader replica used by
+`SqliteKnowledgeHost.entityLookup` could never see saved mentions.
+Lookups now route to the live worker when the Vault is open; the
+reader still serves unopened Vaults (canonical names/aliases/get;
+mentions there report as unindexed, per the lookup's own diagnostics).
+
 
 ## New files (no rebase risk beyond additions)
 
@@ -676,6 +876,19 @@ refuse (409) and behavior is byte-identical. Stacked on Phase 4.
   (migration, export, xz seal, open-from-phext); see the Phase 5
   section above.
 - `server/phext-exit-e2e.test.ts` — the Phase 5 exit-ramp E2E.
+- `server/phext-uploads.mjs` — the Phase 3b phext-aware multer
+  storage engine + `/uploads` static handler.
+- `server/phext-legacy-e2e.test.ts` — the Phase 3b acceptance E2E.
+- `server/phext-settings.mjs` + `server/phext-settings.test.mjs` —
+  the cutover settings bundle (L7 `/.control/settings/` per-field
+  scroll tree; validate/write/read); see the cutover section above.
+- `src/application/settings-snapshot.ts` — the client's settings
+  capture snapshot (the four domains' persisted live values).
+- `server/phext-cutover-e2e.test.ts` — the cutover headline E2Es
+  (disk-silence; upgrade-on-encounter + corrupt refusal).
+- `src/knowledge-sqlite/phext-test-cavern.mjs` — the shared test
+  helper that registers a temp directory as a real Cavern
+  (phext-fs + gates + knowledge registries) for in-process suites.
 - `PATCHES.md`, `PHEXT.md` — this file and the phext design notes.
 
 ## Rebase flow

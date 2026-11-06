@@ -3,7 +3,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { openSqliteFoundation } from '../src/knowledge-sqlite/client.mjs';
-import { writerLock, regularFile } from '../src/knowledge-sqlite/paths.mjs';
+import { regularFile } from '../src/knowledge-sqlite/paths.mjs';
+import { flockExclusiveSync } from '../src/knowledge-sqlite/advisory-lock.mjs';
+import { createHash } from 'node:crypto';
 
 const marker = '.sqlite-foundation-disposable';
 let client;
@@ -26,20 +28,40 @@ try {
   if (command === 'restore' && values['read-only']) throw Error('Read-only mode cannot restore databases');
   if (command === 'reset-test') {
     if (values['read-only']) throw Error('Cannot reset in read-only mode');
-    const root = fs.realpathSync(vault), home = path.join(root, '.mutable');
+    const root = fs.realpathSync(vault);
     if (fs.lstatSync(vault).isSymbolicLink() || path.dirname(root) !== fs.realpathSync(os.tmpdir()) || !path.basename(root).startsWith('mutable-sqlite-p1-test-')) throw Error('Reset is restricted to init-test temporary directories');
     regularFile(path.join(root, marker));
-    if (fs.readFileSync(path.join(root, marker), 'utf8') !== 'mutable-sqlite-p1-disposable-v1\n' || fs.readdirSync(root).some(n => ![marker,'.mutable'].includes(n))) throw Error('Not a disposable foundation-only fixture');
-    if (fs.lstatSync(home).isSymbolicLink()) throw Error('Refuse symlink database directory');
-    const unlock = writerLock(home);
+    // Phext-only fixture shape: the marker, the Cavern phext (+ its
+    // .bak generation) and per-lock flock anchors. Anything else —
+    // including a legacy .mutable home — is not this fixture.
+    const allowed = n => n === marker || n === 'cavern.phext' || n === 'cavern.phext.bak' || /^cavern\.phext\.anchor-[0-9a-f]{16}$/.test(n);
+    if (fs.readFileSync(path.join(root, marker), 'utf8') !== 'mutable-sqlite-p1-disposable-v1\n' || fs.readdirSync(root).some(n => !allowed(n))) throw Error('Not a disposable foundation-only fixture');
+    // Take the knowledge writer lease (the flock anchor for the
+    // phext's writer lock) so a live writer cannot race the reset.
+    const anchor = path.join(root, `cavern.phext.anchor-${createHash('sha256').update('/.mutable/writer.lock').digest('hex').slice(0, 16)}`);
+    const fd = fs.openSync(anchor, fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_NOFOLLOW, 0o600);
+    let releaseLock;
     try {
-      const names = fs.readdirSync(home);
-      if (names.some(n => !/^(writer\.lock(\.holder)?|(mutable|audit)\.db(-wal|-shm|-journal)?)$/.test(n))) throw Error('Unexpected file in disposable store');
-      for (const name of names) regularFile(path.join(home,name));
-      for (const name of names) if (name !== 'writer.lock' && name !== 'writer.lock.holder') fs.unlinkSync(path.join(home,name));
-    } finally { unlock(); }
-    // Explicit disposable-only reset removes the empty test home; normal init never repairs partial infrastructure.
-    fs.rmSync(path.join(home,'writer.lock.holder'),{force:true});fs.unlinkSync(path.join(home,'writer.lock'));fs.rmdirSync(home);
+      releaseLock = flockExclusiveSync(fd, `${anchor}.holder`);
+      for (const name of ['cavern.phext', 'cavern.phext.bak']) {
+        const candidate = path.join(root, name);
+        if (fs.existsSync(candidate)) { regularFile(candidate); fs.unlinkSync(candidate); }
+      }
+    } finally { try { releaseLock?.(); } finally { fs.closeSync(fd); } }
+    // Anchors stay: they are mechanism files, created once and never
+    // unlinked, exactly as in production. The open below re-creates
+    // a fresh phext; normal init never repairs partial infrastructure.
+  }
+  // Phext-only: this process must register the vault's Cavern phext
+  // with the phext-fs facade itself (in the server, the Cavern
+  // lifecycle does it). Without a registration the document stores
+  // the indexer drives refuse with ENOPHEXT. The knowledge worker
+  // opens its own instance on the same file; flush generations
+  // rebase between them, as in the server.
+  if (fs.existsSync(path.join(vault, 'cavern.phext')) || ['init','init-test','reset-test','restore'].includes(command)) {
+    const { PhextVFS } = await import('../dist/src/phext/vfs.js');
+    const { registerPhextFs } = await import('../dist/server/phext-fs.mjs');
+    registerPhextFs({ root: vault, vfs: PhextVFS.openOrCreate(path.join(vault, 'cavern.phext')) });
   }
   client = await openSqliteFoundation({ vault, initialize: ['init','init-test','reset-test'].includes(command),
     readOnly: !!values['read-only'] || command === 'inspect', ...(command === 'restore' ? { restoreFrom: values.source } : {}) });

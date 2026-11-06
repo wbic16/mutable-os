@@ -2,16 +2,13 @@ import {isNativeDocumentName,markdownProjectionName,isDerivedMarkdownName} from 
 import { RecognizedDocumentStore } from './recognized-document-store.mjs';
 /** C1a: tree-derived discovery and journalled, same-vault storage relocation.
  * No authored hierarchy, editor, save generation or global resource catalog. */
-import { constants as C, existsSync, realpathSync, lstatSync } from 'node:fs';
+import { constants as C, realpathSync, lstatSync } from 'node:fs';
 import { promises as fs, phextFsBackendFor } from './phext-fs.mjs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import { ManagedPair, hash, nativeFlock } from '../src/persistence/managed-pair.mjs';
 import { nativeKnowledgeJobs } from './native-knowledge-jobs';
 import { decodeNative } from '../src/persistence/native-resource';
-const exec=promisify(execFile), MAX=20*1024*1024, LIMIT=10000;
+const MAX=20*1024*1024, LIMIT=10000;
 const fail=(message,status=409)=>{throw Object.assign(new Error(message),{status,conflict:status===409});};
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const alias=s=>s.normalize('NFC').toLocaleLowerCase('en-US');
@@ -24,7 +21,7 @@ const operationId=id=>{if(typeof id!=='string'||! /^[a-zA-Z0-9-]{1,100}$/.test(i
 const absent=async p=>{try{await fs.lstat(p);return false;}catch(e){if(e.code==='ENOENT')return true;throw e;}};
 const sharedDiscovery = new Map();
 export class NativeVaultStore {
- constructor({root,readOnly=false,fault=async()=>{},helper,inspect,nativeDiscoveryWorker=true}={}) {
+ constructor({root,readOnly=false,fault=async()=>{},inspect,nativeDiscoveryWorker=true}={}) {
   this.root=path.resolve(root);
   try {if(lstatSync(root).isSymbolicLink())fail('Unsafe managed root',400);this.root=realpathSync(root);}catch(e){if(e.code!=='ENOENT')throw e;}
   this.readOnly=readOnly;this.fault=fault;this.shareDiscovery=!inspect&&nativeDiscoveryWorker;
@@ -33,8 +30,6 @@ export class NativeVaultStore {
    const r=decodeNative(bytes),root=r.contents[r.placements[r.rootPlacementKey].target.contentKey];
    return {inspection:{resourceId:r.resourceId,rootBlockId:String(root.payload.id),title:String(root?.payload.metadata?.title??'')},byteHash:hash(bytes)};
   });
-  const sibling=path.join(path.dirname(fileURLToPath(import.meta.url)),'native-path-move');
-  this.helper=helper??(existsSync(sibling)?sibling:path.join(path.dirname(fileURLToPath(import.meta.url)),'../dist/server/native-path-move'));
  }
  writable(){if(this.readOnly)fail('Server Documents are read-only',403);}
  async resolve(p,{missing=false}={}) {
@@ -50,7 +45,20 @@ export class NativeVaultStore {
   catch(e){if(optional&&e.code==='ENOENT')return;throw e;}finally{await h?.close();}
  }
  async stamp(p,kind='file') {
-  const s=await fs.lstat(await this.resolve(p),{bigint:true});
+  const resolved=await this.resolve(p);
+  // Phext-only: the vault root itself is the backend's mount point,
+  // so a real lstat measures container mechanics (the phext file's
+  // rename-swap flush, anchor files appearing on first lock use) —
+  // not vault content. Use the virtual root's own stat, whose fields
+  // derive from the VFS listing, exactly like every other directory
+  // in the Cavern.
+  const backend=phextFsBackendFor(resolved);
+  if(backend&&path.resolve(resolved)===path.resolve(this.root)){
+   const s=backend.statFor('/',{bigint:true});
+   if(kind!=='directory')fail('Expected bounded regular file',400);
+   return [s.dev,s.ino,s.size,s.mtimeNs,s.ctimeNs].join(':');
+  }
+  const s=await fs.lstat(resolved,{bigint:true});
   if(s.isSymbolicLink()||(kind==='directory'?!s.isDirectory():!s.isFile()||s.size>BigInt(MAX)))fail('Expected bounded regular file',400);
   return [s.dev,s.ino,s.size,s.mtimeNs,s.ctimeNs].join(':');
  }
@@ -70,17 +78,38 @@ export class NativeVaultStore {
   };
   const initialRoot=await this.resolve(vault);
   const ancestors=[];if(vault!=='.'){let prefix='.';for(const piece of vault.split('/')){await this.resolve(prefix);ancestors.push({prefix,stamp:await this.stamp(prefix,'directory')});prefix=join(prefix,piece);}}
-  const evidence=(p,s)=>[p,String(s.dev),String(s.ino),String(s.size),String(s.mtimeNs),String(s.ctimeNs)];
+  const rootBackend=phextFsBackendFor(initialRoot);
+  // Phext-backed directories: the facade's directory stamp derives
+  // from the immediate listing hash, which moves when INFRASTRUCTURE
+  // entries (.mutable, .control, pair homes, lock files) appear —
+  // mechanics, not content. A directory therefore contributes its
+  // identity only; every content change still surfaces as a child
+  // row appearing, disappearing, or changing its content stamp.
+  // Real (unregistered) roots keep the full timestamp evidence.
+  const evidence=(p,s)=>rootBackend&&s.isDirectory()?[p,String(s.dev),String(s.ino),'d']:[p,String(s.dev),String(s.ino),String(s.size),String(s.mtimeNs),String(s.ctimeNs)];
+  // Phext-only: for the vault root of a phext-backed store, stat the
+  // VIRTUAL root (see stamp()) — the real directory's stat measures
+  // container mechanics. The .control subtree at the root is L7
+  // infrastructure (identity registry, cavern-state): it can appear
+  // on first registry capture mid-flight, so it is not fence content
+  // either, exactly like the .mutable knowledge home.
+  const statAt=async(p,full)=>p===vault&&rootBackend?rootBackend.statFor(vault==='.'?'/':`/${vault}`,{bigint:true}):await fs.lstat(full,{bigint:true});
   const walk=async(p,full)=>{
    signal?.throwIfAborted();if(++count>100000)fail('Knowledge scope evidence budget exceeded');
    const {s,names}=await bounded(async()=>{
-    const s=await fs.lstat(full,{bigint:true});
+    const s=await statAt(p,full);
     if(s.isSymbolicLink()||!s.isDirectory()&&!s.isFile())fail('Symlink or unsupported Knowledge scope entry');
-    return {s,names:s.isDirectory()?(await fs.readdir(full)).sort().filter(name=>name!=='.mutable'):[]};
+    // The knowledge home is infrastructure, never scope content: the
+    // disk era's .mutable directory, and (phext-only) the Cavern
+    // container files — cavern.phext changes on every knowledge
+    // flush, so fencing it would make every refresh that stages
+    // knowledge report the vault changed. Document content inside
+    // the phext is fenced through the facade's own per-file stamps.
+    return {s,names:s.isDirectory()?(await fs.readdir(full)).sort().filter(name=>name!=='.mutable'&&!name.startsWith('.mutable-')&&name!=='cavern.phext'&&name!=='cavern.phext.bak'&&!name.startsWith('cavern.phext.anchor-')&&!(p===vault&&name==='.control')):[]};
    });
    const children=await Promise.allSettled(names.map(name=>walk(join(p,name),path.join(full,name))));
    const failed=children.find(result=>result.status==='rejected');if(failed)throw failed.reason;
-   if(s.isDirectory()){const after=await bounded(async()=>fs.lstat(full,{bigint:true}));if(!after.isDirectory()||JSON.stringify(evidence(p,after))!==JSON.stringify(evidence(p,s)))fail('Knowledge scope directory changed during traversal');}
+   if(s.isDirectory()){const after=await bounded(async()=>statAt(p,full));if(!after.isDirectory()||JSON.stringify(evidence(p,after))!==JSON.stringify(evidence(p,s)))fail('Knowledge scope directory changed during traversal');}
    return [evidence(p,s),...children.flatMap(result=>result.value)];
   };
   const rows=await walk(vault,initialRoot);
@@ -219,12 +248,14 @@ export class NativeVaultStore {
  }
  async move(from,to) {
   await this.resolve(from);await this.resolve(to,{missing:true});
-  // PhextVFS Phase 3a: inside a registered Cavern the exclusive
-  // rename lives in the VFS (chunk scrolls move verbatim); the C
-  // helper remains the primitive on disk.
+  // Phext-only (cutover): the exclusive rename lives in the VFS
+  // (chunk scrolls move verbatim). The compiled native-path-move
+  // helper that performed it on disk is deleted with the rest of
+  // the disk I/O; a vault no Cavern phext covers cannot relocate.
   const backend=phextFsBackendFor(path.join(this.root,from));
-  if(backend){try{backend.renameExclusive(path.join(this.root,from),path.join(this.root,to));}catch(e){fail(`Exclusive relocation primitive failed: ${e.message}`,409);}await this.sync(path.posix.dirname(from));await this.sync(path.posix.dirname(to));return;}
-  try{await exec(this.helper,[this.root,from,to],{timeout:10000});}catch(e){fail(`Exclusive relocation primitive failed: ${e.stderr||e.message}`,e.code==='ENOENT'?503:409);}
+  if(!backend)fail('Exclusive relocation primitive failed: no Cavern phext is registered for this vault',503);
+  try{backend.renameExclusive(path.join(this.root,from),path.join(this.root,to));}catch(e){fail(`Exclusive relocation primitive failed: ${e.message}`,409);}
+  await this.sync(path.posix.dirname(from));await this.sync(path.posix.dirname(to));
  }
  async mkdir(vault,directory){this.writable();return this.lock(async()=>{relative(vault);relative(directory);if(!inside(vault,directory)||directory===vault)fail('Directory outside selected vault',400);await this.resolve(vault);await this.vacant(directory);for(const r of await this.records())if(!r.done)fail('Recover pending relocation first');await fs.mkdir(await this.resolve(directory,{missing:true}));await this.sync(path.posix.dirname(directory));return {directory};});}
  async checkResourceBytes(resources,moved=false) {

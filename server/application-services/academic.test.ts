@@ -1,6 +1,6 @@
 // @vitest-environment node
 import {afterEach,describe,it,expect} from 'vitest';
-import {mkdtemp,rm,readFile,stat} from 'node:fs/promises';
+import {mkdtemp,rm} from 'node:fs/promises';import {promises as vfs} from '../../server/phext-fs.mjs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
@@ -18,14 +18,14 @@ import {AcademicService} from '../../src/application-services/academic-service';
 import {normalizeScholarly} from '../../src/interchange/scholarly';
 import {CavernJobStorage} from './job-storage';
 import {createNativeDocumentStore} from '../native-document-store.mjs';
-import {ManagedAssetStore} from '../managed-assets.mjs';
+import {ManagedAssetStore} from '../managed-assets.mjs';import {testCavern} from '../../src/knowledge-sqlite/phext-test-cavern.mjs';
 import {migrate,clearDerived,validateSchema,migrations} from '../../src/knowledge-sqlite/schema.mjs';
 import {canonicalLedger} from '../../src/knowledge-sqlite/canonical-ledger.mjs';
 import {canonicalEntities} from '../../src/knowledge-sqlite/entities.mjs';
 import {extractPackageData} from '../../src/knowledge-sqlite/package-data.mjs';
 const disposals:Array<()=>Promise<void>|void>=[];afterEach(async()=>{for(const f of disposals.splice(0).reverse())await f();});
 async function fixture(realHost=false){
- const root=await mkdtemp(path.join(tmpdir(),'academic-'));let cavernId=randomUUID();disposals.push(()=>rm(root,{recursive:true,force:true}));
+ const root=await mkdtemp(path.join(tmpdir(),'academic-'));let cavernId=randomUUID();disposals.push(()=>rm(root,{recursive:true,force:true}));const cavern=testCavern(root);disposals.push(()=>cavern.close());
  const host=realHost?new SqliteKnowledgeHost({root,entitiesEnabled:true}):undefined;const executor=realHost?new NodePreparationExecutor():undefined;
  if(host){disposals.push(()=>host.close());cavernId=(await host.establish('.')).vaultGuid;}if(executor)disposals.push(()=>executor.close());
  const db=new Database(path.join(root,'canonical.db'));migrate(db,'mutable',{fresh:true,vaultGuid:cavernId});const audit=new Database(':memory:');migrate(audit,'audit',{fresh:true,vaultGuid:cavernId});const ledger=canonicalLedger(db,()=>audit);disposals.push(()=>{db.close();audit.close();});
@@ -55,11 +55,11 @@ describe('academic durable workflow and canonical identities',()=>{
   const client=new HttpApplicationServices(()=>({cavernId:f.ports.cavernId,session:'fixture'}),((url:any,init:any)=>fetch(origin+url,init)) as any);
   const result=await client.call('academic.import',{id:randomUUID(),source:'https://doi.org/10.1234/TEST'});expect(result.citation.metadata.title).toBe('Fixture work');
   expect((await f.host!.academic({op:'scholarly-lookup',doi:'10.1234/test'})).citation.entityId).toBe(result.citation.entityId);
-  expect(await stat(path.join(f.root,'citation.ink')).catch(()=>null)).toBeNull();
+  expect(await vfs.stat(path.join(f.root,'citation.ink')).catch(()=>null)).toBeNull();
   const resourceId=randomUUID(),dto={id:resourceId,type:'document-block',children:[{id:randomUUID(),type:'mutable/citation-block',citation:result.citation,sourceUrl:'https://doi.org/10.1234/TEST',blockProperties:[{id:randomUUID(),type:'codex/entity-reference',value:result.citation.entityId}]}]};
   const native=JSON.stringify(nativeEnvelope(captureNative(decodeBlockTree(dto).state,resourceId)));
   const saved=await (await fetch(origin+'/native/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:{folder:'.',filename:'citation.ink'},generation:{resourceId,generation:randomUUID(),native},baseline:{nativeHash:null,markdownHash:null,generation:null}})})).json();
-  expect(saved.Data?.result.phase,JSON.stringify(saved)).toBe('saved');expect(await readFile(path.join(f.root,'citation.ink'),'utf8')).toBe(native);expect(await stat(path.join(f.root,'citation.md')).catch(()=>null)).toBeNull();
+  expect(saved.Data?.result.phase,JSON.stringify(saved)).toBe('saved');expect(await vfs.readFile(path.join(f.root,'citation.ink'),'utf8')).toBe(native);expect(await vfs.stat(path.join(f.root,'citation.md')).catch(()=>null)).toBeNull();
   await expect(client.call('academic.import',{id:randomUUID(),source:'file:///etc/passwd'})).rejects.toThrow('DOI');
   await expect(client.call('academic.import',{id:randomUUID(),source:'10.1234/test',sql:'SELECT 1'} as any)).rejects.toThrow('fields');
   await expect(f.host!.entities({request:{op:'scholarly-commit'}})).rejects.toThrow('scoped academic');

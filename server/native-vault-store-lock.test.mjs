@@ -5,24 +5,33 @@
 // unavailable"; ManagedPair.lock threw the same stub error. The lock now
 // routes through the stage-C gates token fallback
 // (scripts/stage-c-gates/flock.mjs) when fs-ext is missing.
+//
+// Phext-only cutover: the store operates only inside a registered
+// Cavern (an unregistered root refuses ENOPHEXT), and its lock file
+// is the virtual /.mutable-store.lock — flocked through the real
+// anchor file beside the phext, cavern.phext.anchor-<sha256(path)>.
 import { test, expect, beforeAll } from 'vitest';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { NativeVaultStore } from './native-vault-store.mjs';
+import { testCavern } from '../src/knowledge-sqlite/phext-test-cavern.mjs';
 
 const makeStore = async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'nvs-lock-'));
-  return { root, store: new NativeVaultStore({ root, nativeDiscoveryWorker: false }) };
+  const cavern = testCavern(root);
+  return { root, cavern, store: new NativeVaultStore({ root, nativeDiscoveryWorker: false }) };
 };
+const cleanup = async ({ root, cavern }) => { try { cavern.close(); } catch { /* closed */ } await rm(root, { recursive: true, force: true }); };
 
 // Child helper for the cross-process test: holds an exclusive fallback
 // lock (via the same stage-C helper the store's lock routes through) on
-// the file named in argv[2], prints HELD, then exits WITHOUT releasing —
-// the crash shape the token protocol must recover from. Generated into a
-// temp file because a plain node child cannot import the store's
-// TypeScript module chain.
+// the anchor file named in argv[2], prints HELD, then exits WITHOUT
+// releasing — the crash shape the token protocol must recover from.
+// Generated into a temp file because a plain node child cannot import
+// the store's TypeScript module chain.
 let childHelper;
 beforeAll(async () => {
   // Resolved from the working directory, like the application services'
@@ -42,14 +51,15 @@ beforeAll(async () => {
 });
 
 test('store.lock runs the action', async () => {
-  const { root, store } = await makeStore();
+  const f = await makeStore();
   try {
-    await expect(store.lock(async () => 'ACTION RAN')).resolves.toBe('ACTION RAN');
-  } finally { await rm(root, { recursive: true, force: true }); }
+    await expect(f.store.lock(async () => 'ACTION RAN')).resolves.toBe('ACTION RAN');
+  } finally { await cleanup(f); }
 }, 20000);
 
 test('concurrent lock reports contention; lock succeeds again after release', async () => {
-  const { root, store } = await makeStore();
+  const f = await makeStore();
+  const store = f.store;
   try {
     let releaseFirst;
     const first = store.lock(() => new Promise(resolve => { releaseFirst = () => resolve('FIRST DONE'); }));
@@ -59,15 +69,17 @@ test('concurrent lock reports contention; lock succeeds again after release', as
     releaseFirst();
     await expect(first).resolves.toBe('FIRST DONE');
     await expect(store.lock(async () => 'THIRD RAN')).resolves.toBe('THIRD RAN');
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally { await cleanup(f); }
 }, 20000);
 
 test('cross-process holder via the stage-C flock helper contends, and its exit frees the lock', async () => {
-  const { root, store } = await makeStore();
-  const lockFile = path.join(root, '.mutable-store.lock');
+  const f = await makeStore();
+  const { root, store } = f;
+  // The store lock's real anchor beside the phext (see header).
+  const anchor = path.join(root, `cavern.phext.anchor-${createHash('sha256').update('/.mutable-store.lock').digest('hex').slice(0, 16)}`);
   try {
-    await store.lock(async () => {}); // ensures .mutable-store.lock exists
-    const child = spawn(process.execPath, [childHelper, lockFile], { stdio: ['ignore', 'pipe', 'inherit'] });
+    await store.lock(async () => {}); // ensures the lock + its anchor exist
+    const child = spawn(process.execPath, [childHelper, anchor], { stdio: ['ignore', 'pipe', 'inherit'] });
     await new Promise((resolve, reject) => {
       child.stdout.on('data', d => { if (String(d).includes('HELD')) resolve(); });
       child.on('exit', () => reject(new Error('child exited before holding')));
@@ -76,5 +88,5 @@ test('cross-process holder via the stage-C flock helper contends, and its exit f
     await expect(store.lock(async () => 'RAN')).rejects.toThrow('Another managed operation is active; retry');
     await new Promise(r => child.on('exit', r)); // child exits WITHOUT releasing (crash shape)
     await expect(store.lock(async () => 'AFTER CRASH')).resolves.toBe('AFTER CRASH');
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally { await cleanup(f); }
 }, 30000);

@@ -43,11 +43,6 @@ export type FeatureFlags = Readonly<{
   documentInterchange: boolean;
   /** Explicit local .phext import/export of Documents (see src/phext). */
   phextDocuments: boolean;
-  /** PhextVFS gates backend: history, jobs, publications and managed
-   * assets store into the Cavern's single cavern.phext instead of the
-   * on-disk stage-C gates tree (see scripts/stage-c-gates/phext-backend.mjs).
-   * A storage switch: off until proven, unlike the usual default. */
-  phextVfs: boolean;
   /** Cavern application services, durable preparation jobs and bounded host execution. */
   applicationServices: boolean;
   /** Explicit reviewed static publication; independent of ordinary editing. */
@@ -183,7 +178,6 @@ export const featureFlags: FeatureFlags = Object.freeze({
   mutableClipboard: true,
   documentInterchange: true,
   phextDocuments: true,
-  phextVfs: true,
   applicationServices: true,
   webPublishing: true,
   externalHtmlClipboard: true,

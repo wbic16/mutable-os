@@ -5,10 +5,11 @@ import {SqliteKnowledgeHost} from './sqlite-knowledge-host';
 import {openSemanticServices} from '../src/application/semantic-services';
 import {decodeBlockTree} from '../src/block-tree/codecs';
 import {captureNative,nativeText} from '../src/persistence/native-resource';
+import {testCavern} from '../src/knowledge-sqlite/phext-test-cavern.mjs';import {promises as vfs} from './phext-fs.mjs';
 const cleanups:Array<()=>Promise<unknown>>=[];
 afterEach(async()=>{try{for(const cleanup of cleanups.splice(0).reverse())await cleanup();}finally{vi.unstubAllGlobals();}});
 async function fixture(options:Record<string,unknown>={}){
- const root=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'semantic-host-')));cleanups.push(()=>fs.rm(root,{force:true,recursive:true}));
+ const root=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'semantic-host-')));cleanups.push(()=>fs.rm(root,{force:true,recursive:true}));const cavern=testCavern(root);cleanups.push(()=>cavern.close());
  const host=new SqliteKnowledgeHost({root,debounceMs:60000,...options});cleanups.push(()=>host.close());
  const app=express();app.use('/api/sqlite/knowledge',host.router());const server=app.listen(0);await new Promise<void>(resolve=>server.once('listening',resolve));cleanups.push(()=>new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve())));
  const base='http://127.0.0.1:'+(server.address() as any).port,nativeFetch=globalThis.fetch;
@@ -35,13 +36,13 @@ it('typed application services cross the real HTTP/host/worker boundary, preserv
 it('minimal evidence resolves an exact synthetic native span and reports stale/missing/unverified generations',async()=>{
  const f=await fixture(),s=await openSemanticServices({vault:'.'});cleanups.push(()=>s.dispose());const resource=uuid(),block=uuid(),claim=uuid(),evidence=uuid();
  const property=uuid(),doc={id:resource,type:'main-list-block',children:[{id:block,type:'standoff-editor-block',text:'A😀 B.',standoffProperties:[{id:property,type:'style/emphasis',start:1,end:1,value:null}],blockProperties:[]}]};
- const bytes=nativeText(captureNative(decodeBlockTree(doc).state,resource));await fs.writeFile(path.join(f.root,'synthetic.mutable.json'),bytes);const hash=createHash('sha256').update(bytes).digest('hex'),source={location:{folder:'.',filename:'synthetic.mutable.json'},byteHash:hash};
+ const bytes=nativeText(captureNative(decodeBlockTree(doc).state,resource));await vfs.writeFile(path.join(f.root,'synthetic.mutable.json'),bytes);const hash=createHash('sha256').update(bytes).digest('hex'),source={location:{folder:'.',filename:'synthetic.mutable.json'},byteHash:hash};
  await s.claims.create({guid:claim,expression:'synthetic assertion',operationId:uuid()});await s.evidence.attach({guid:evidence,claimGuid:claim,expectedParentRevision:0,resourceGuid:resource,blockGuid:block,authoredPropertyId:property,sourceContentHash:hash,startIndex:1,endIndex:2,coordinate:'cell',evidenceKind:'synthetic',excerpt:'😀',operationId:uuid()});
  expect((await s.evidence.resolve(evidence)).status).toBe('not-verified');const resolved=await s.evidence.resolve(evidence,source);expect(resolved.status).toBe('resolved');expect(resolved.excerpt).toBe('😀');
  const missingProperty=uuid();await s.evidence.attach({guid:missingProperty,claimGuid:claim,expectedParentRevision:1,resourceGuid:resource,blockGuid:block,authoredPropertyId:uuid(),sourceContentHash:hash,startIndex:1,endIndex:2,coordinate:'cell',evidenceKind:'synthetic',operationId:uuid()});expect((await s.evidence.resolve(missingProperty,source)).status).toBe('missing');
- const next=nativeText(captureNative(decodeBlockTree({...doc,children:[{...doc.children[0],text:'A😀 C.'}]}).state,resource));await fs.writeFile(path.join(f.root,'synthetic.mutable.json'),next);
+ const next=nativeText(captureNative(decodeBlockTree({...doc,children:[{...doc.children[0],text:'A😀 C.'}]}).state,resource));await vfs.writeFile(path.join(f.root,'synthetic.mutable.json'),next);
  expect((await s.evidence.resolve(evidence,{...source,byteHash:createHash('sha256').update(next).digest('hex')})).status).toBe('stale');
- await fs.unlink(path.join(f.root,'synthetic.mutable.json'));expect(['missing','unresolved']).toContain((await s.evidence.resolve(evidence,source)).status);
+ await vfs.unlink(path.join(f.root,'synthetic.mutable.json'));expect(['missing','unresolved']).toContain((await s.evidence.resolve(evidence,source)).status);
  expect((await s.evidence.list(claim)).items[0].sourceContentHash).toBe(hash);
 });
 it('feature disabling/read-only leases reject writes and expired capabilities cannot be reused',async()=>{

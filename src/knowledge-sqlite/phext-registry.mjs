@@ -3,8 +3,9 @@
  *
  * Records which Cavern roots keep their knowledge in `cavern.phext`
  * (L3 canonical records + the ephemeral query replica) instead of
- * `.mutable/mutable.db`. cavern-lifecycle registers a root when the
- * `phextVfs` flag is on; `client.mjs` consults the registry when a
+ * `.mutable/mutable.db`. cavern-lifecycle registers every root
+ * unconditionally (phext is the only mode since the cutover);
+ * `client.mjs` consults the registry when a
  * foundation is opened so the choice reaches the knowledge worker's
  * `workerData` without the host needing to know about phext at all;
  * `foundation.mjs` consults it for direct in-process opens.

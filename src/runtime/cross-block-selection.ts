@@ -6,6 +6,12 @@ import type { ViewPosition } from "../block-tree/types";
 export interface TextSegment { nodeKey: string; contentKey: string; start: number; end: number }
 export interface CrossTextRange { anchor: ViewPosition; head: ViewPosition; viewId: string }
 export const CROSS_TEXT_PREFERENCE_KEY = "speedy.cross-block-selection.enabled.v1";
+/** The persisted preference (the constructor's own initial read).
+ *  The settings-bundle capture reads through this. */
+export function readCrossBlockSelectionPreference(): boolean {
+  try { return localStorage.getItem(CROSS_TEXT_PREFERENCE_KEY) === "true"; }
+  catch { return false; }
+}
 
 /** Experimental, ephemeral selection. Never pass these endpoints to local edit APIs. */
 export class CrossBlockSelection {

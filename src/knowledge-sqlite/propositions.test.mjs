@@ -51,20 +51,23 @@ test('invalid/colliding annotations rollback the entire aggregate and receipt',t
  assert.throws(()=>run(request({id:r.id})),/GUID already exists/);
 });
 test('foundation backup, restore, reopen, readonly and flag preserve canonical identity',async t=>{
+ const {testCavern}=await import('./phext-test-cavern.mjs');
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'thesis-functional-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));const vault=path.join(root,'vault'),dest=path.join(root,'restored');fs.mkdirSync(vault);fs.mkdirSync(dest);
- let store=openFoundation({vault,initialize:true});const point=uuid(),r=request({annotations:[{id:point,start:5,end:5,property:{id:point,type:'point',start:4,end:4,isZeroWidth:true}}]}),saved=store.propositions(r).proposition;await store.backup(path.join(root,'backup'));store.close();
- restoreSnapshot(path.join(root,'backup'),dest);store=openFoundation({vault:dest,readOnly:true});assert.deepEqual(store.propositions({op:'get',id:r.id}).proposition,saved);assert.throws(()=>store.propositions(request()),/read-only/);store.close();
- store=openFoundation({vault,thesisEnabled:false});assert.throws(()=>store.propositions({op:'list'}),/disabled/);store.close();
+ const cavern=testCavern(vault);t.after(()=>cavern.close());
+ let store=openFoundation({vault,initialize:true},{phextVfs:cavern.vfs,phextPath:cavern.phextPath});const point=uuid(),r=request({annotations:[{id:point,start:5,end:5,property:{id:point,type:'point',start:4,end:4,isZeroWidth:true}}]}),saved=store.propositions(r).proposition;await store.backup(path.join(root,'backup'));store.close();
+ const destCavern=testCavern(dest);t.after(()=>destCavern.close());
+ restoreSnapshot(path.join(root,'backup'),dest,false,destCavern.vfs);store=openFoundation({vault:dest,readOnly:true},{phextVfs:destCavern.vfs,phextPath:destCavern.phextPath});assert.deepEqual(store.propositions({op:'get',id:r.id}).proposition,saved);assert.throws(()=>store.propositions(request()),/read-only/);store.close();
+ store=openFoundation({vault,thesisEnabled:false},{phextVfs:cavern.vfs,phextPath:cavern.phextPath});assert.throws(()=>store.propositions({op:'list'}),/disabled/);store.close();
 });
 test('canonical aggregate survives real saved projection, no-op reconcile, full rebuild, resource deletion and worker reopen',async t=>{
- const {openSqliteFoundation}=await import('../../dist/server/knowledge-sqlite/client.mjs');const {createSavedIndexer,NativeVaultStore}=await import('../../dist/server/sqlite-saved-indexer.js');
- const root=fs.mkdtempSync(path.join(os.tmpdir(),'thesis-index-functional-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));let client=await openSqliteFoundation({vault:root,initialize:true});t.after(()=>client.close());
+ const {openSqliteFoundation}=await import('../../dist/server/knowledge-sqlite/client.mjs');const {createSavedIndexer,NativeVaultStore}=await import('../../dist/server/sqlite-saved-indexer.js');const {testCavern}=await import('./phext-test-cavern.mjs');
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'thesis-index-functional-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));const cavern=testCavern(root);t.after(()=>cavern.close());let client=await openSqliteFoundation({vault:root,initialize:true});t.after(()=>client.close());
  const r=request(),ann=uuid();r.annotations=[{id:ann,start:1,end:3,property:{id:ann,type:'codex/entity-reference',value:uuid(),start:1,end:1}}];await client.propositions(r);const bytes=JSON.stringify(await client.propositions({op:'get',id:r.id}));
- const resource=uuid(),block=uuid(),file=path.join(root,'source.json');const doc={id:uuid(),type:'main-list-block',metadata:{documentId:resource},children:[{id:block,type:'standoff-editor-block',text:'saved source',standoffProperties:[{id:uuid(),type:'style/bold',start:0,end:4}]}]};fs.writeFileSync(file,JSON.stringify(doc));
+ const resource=uuid(),block=uuid();const doc={id:uuid(),type:'main-list-block',metadata:{documentId:resource},children:[{id:block,type:'standoff-editor-block',text:'saved source',standoffProperties:[{id:uuid(),type:'style/bold',start:0,end:4}]}]};cavern.writeFile('source.json',JSON.stringify(doc));
  const index=createSavedIndexer(client,{root,store:new NativeVaultStore({root})});assert.equal((await index.refresh({mode:'full'})).complete,true);assert.equal((await index.refresh()).reconciled[0].changedBlocks,0);
- assert.equal(JSON.stringify(await client.propositions({op:'get',id:r.id})),bytes);await client.clearDerived();await client.rebuildFts();await index.refresh({mode:'full'});fs.unlinkSync(file);await index.refresh();assert.equal(JSON.stringify(await client.propositions({op:'get',id:r.id})),bytes);
+ assert.equal(JSON.stringify(await client.propositions({op:'get',id:r.id})),bytes);await client.clearDerived();await client.rebuildFts();await index.refresh({mode:'full'});cavern.unlink('source.json');await index.refresh();assert.equal(JSON.stringify(await client.propositions({op:'get',id:r.id})),bytes);
  // File indexing must not adopt a canonical Block even when all other bytes are valid.
- doc.children[0].id=r.blockId;fs.writeFileSync(file,JSON.stringify(doc));const conflict=await index.refresh();assert.equal(conflict.complete,false);assert.equal(JSON.stringify(await client.propositions({op:'get',id:r.id})),bytes);
+ doc.children[0].id=r.blockId;cavern.writeFile('source.json',JSON.stringify(doc));const conflict=await index.refresh();assert.equal(conflict.complete,false);assert.equal(JSON.stringify(await client.propositions({op:'get',id:r.id})),bytes);
  await client.close();client=await openSqliteFoundation({vault:root});assert.equal(JSON.stringify(await client.propositions({op:'get',id:r.id})),bytes);assert.equal((await client.verify()).ok,true);
 });
 test('source provenance, NULL ownership, uniqueness and direct-only definition guards',t=>{

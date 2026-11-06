@@ -33,12 +33,15 @@
  *   record). The caller then hands the folder to the normal
  *   establish flow.
  *
- * HONESTY (Phase 3b pending): the legacy document/workspace stores
- * and the uploads endpoint are NOT phext-backed at runtime yet.
- * Their files are copied with the document tree during migration,
- * but the migration and strata records list them as remaining
- * on-disk strata — nothing here claims a fully-one-phext Cavern.
- * `caverns.json` is server installation state and is never touched.
+ * COVERAGE (Phase 3b): the legacy document/workspace stores, the
+ * recognized-document journal under `.mutable/document-saves`, and
+ * the uploads endpoint are phext-backed at runtime now, so
+ * migration copies their files into the phext like every other
+ * stratum and the migration/strata records list nothing for them —
+ * `onDisk` names only what a given Cavern actually left behind
+ * (symlinks, an unrecognized `.mutable` remnant), never a standing
+ * remainder. `caverns.json` is server installation state and is
+ * never touched.
  *
  * The PhextVFS class is passed in as `openVfs` (its statics: open /
  * create / openOrCreate) because this module is plain .mjs loaded by
@@ -85,16 +88,23 @@ export const STRATA_RECORD_PATH = '/.control/phext-strata.json';
 export const CAVERN_STATE_PATH = '/.control/cavern-state.json';
 export const FALLBACK_DIRNAME = '.mutable-disk-fallback';
 
-/** Strata whose runtime stores are phext-backed (Phases 2, 3a, 4). */
+/** Strata whose runtime stores are phext-backed (Phases 2, 3a, 3b, 4). */
 export const PHEXT_BACKED_STRATA = Object.freeze({
   documents: 1, pairJournals: 2, knowledge: 3, history: 4, services: 5, assets: 6, control: 7,
+  // Phase 3b: the legacy stores join at their natural VFS paths —
+  // the root-tree document/workspace stores ride stratum 1 with the
+  // documents, the recognized-document journal rides the `.mutable`
+  // stratum (3) whose root is its home, and uploads ride stratum 1
+  // paths with stratum 6's binary encoding (media ruling).
+  legacyDocumentStores: 1, documentSavesJournal: 3, uploads: 1,
 });
 
-/** The standing remainder, listed verbatim in every migration/strata record. */
-export const REMAINING_ON_DISK = Object.freeze([
-  'legacy document/workspace stores — files copied with the document tree, runtime still disk-backed (Phase 3b pending)',
-  'uploads/ — legacy upload endpoint, still disk-backed (Phase 3b pending)',
-]);
+/**
+ * The standing remainder: empty since Phase 3b. Per-Cavern
+ * remainders (symlinks, unrecognized `.mutable` remnants) are
+ * still computed from the manifest by remainingSummary().
+ */
+export const REMAINING_ON_DISK = Object.freeze([]);
 
 const BREAK_BYTES = new Set([0x01, 0x17, 0x18, 0x19, 0x1a, 0x1c, 0x1d, 0x1e, 0x1f]);
 
@@ -173,11 +183,12 @@ function classify(relPosix, size) {
       return parts[1].endsWith('shm') || size === 0 ? 'skip' : 'refuse';
     }
     if (GATES_MUTABLE_DIRS.has(parts[1])) return 'copy';
+    if (parts[1] === 'document-saves') return 'copy'; // Phase 3b: the recognized-document journal is shim-backed
     if (parts.length === 2 && OPERATIONAL_MUTABLE_FILES.has(parts[1])) return 'skip';
     return 'remaining';
   }
-  if (parts[0] === 'uploads') return 'remaining';
   if (parts[0] === FALLBACK_DIRNAME) return 'remaining';
+  // Phase 3b: uploads are phext-backed (embedded, binary encoding).
   return 'copy';
 }
 
@@ -204,8 +215,7 @@ const remainingSummary = manifest => {
   const specific = new Set();
   for (const entry of manifest) {
     if (entry.action !== 'remaining') continue;
-    if (entry.path.startsWith('.mutable/document-saves/')) specific.add('.mutable/document-saves/ — recognized-document journal, remains on disk');
-    else if (!entry.path.startsWith('uploads/')) specific.add(entry.path);
+    specific.add(entry.path);
   }
   return [...notes, ...specific];
 };
@@ -220,8 +230,17 @@ const remainingSummary = manifest => {
  * no disk knowledge state, a leftover fallback, live WAL sidecars.
  * On any failure the partial phext is discarded and the disk Cavern
  * is left exactly as found.
+ *
+ * Cutover addition: `allowNoKnowledge` (used only by the lifecycle's
+ * upgrade-on-encounter, where the folder is already confirmed a
+ * Cavern) converts a legacy layout whose home never gained a
+ * knowledge database — the tree is copied and verified the same
+ * way, the knowledge steps are skipped, and the vault identity is
+ * minted by the establishment that follows the conversion. The
+ * explicit /migrate route keeps the strict contract (a disk
+ * knowledge state is required).
  */
-export async function migrateCavernToPhext({ root, openVfs, now = () => new Date().toISOString() }) {
+export async function migrateCavernToPhext({ root, openVfs, now = () => new Date().toISOString(), allowNoKnowledge = false }) {
   const cavernRoot = path.resolve(root);
   const phextPath = path.join(cavernRoot, 'cavern.phext');
   const mutableHome = path.join(cavernRoot, '.mutable');
@@ -235,7 +254,8 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
   if (fs.existsSync(fallbackPath)) {
     throw Error(`A previous migration fallback (${FALLBACK_DIRNAME}) already exists; migration refused`);
   }
-  if (!fs.existsSync(mutableFile)) {
+  const hasKnowledge = fs.existsSync(mutableFile);
+  if (!hasKnowledge && !allowNoKnowledge) {
     throw Error('This folder has no disk knowledge state (.mutable/mutable.db); there is no disk-mode Cavern to migrate');
   }
 
@@ -270,12 +290,14 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
     let vfs = openVfs.create(temporaryPath);
     try {
       for (const entry of copied) writeVirtualFile(vfs, `/${entry.path}`, fs.readFileSync(path.join(cavernRoot, entry.path)));
-      const store = new PhextKnowledgeStore(vfs);
-      knowledgeReport = convertDiskKnowledgeToPhext({
-        mutableFile,
-        auditFile: fs.existsSync(auditFile) ? auditFile : undefined,
-        store,
-      });
+      if (hasKnowledge) {
+        const store = new PhextKnowledgeStore(vfs);
+        knowledgeReport = convertDiskKnowledgeToPhext({
+          mutableFile,
+          auditFile: fs.existsSync(auditFile) ? auditFile : undefined,
+          store,
+        });
+      }
       vfs.flush();
     } finally { vfs.close(); }
 
@@ -304,17 +326,34 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
         }
         smoke.history = historyEntry.path;
       }
-      const store = new PhextKnowledgeStore(vfs);
-      const control = store.readControl();
-      if (!control || control.vaultGuid !== knowledgeReport.vaultGuid) {
-        throw Error('Migration smoke read failed: knowledge control record missing or identity changed');
+      // Phase 3b smoke: the legacy journal and an upload, byte-equal.
+      const journalEntry = copied.find(e => e.path.startsWith('.mutable/document-saves/'));
+      if (journalEntry) {
+        if (!vfs.readFile(`/${journalEntry.path}`).equals(fs.readFileSync(path.join(cavernRoot, journalEntry.path)))) {
+          throw Error(`Migration smoke read failed for document journal ${journalEntry.path}`);
+        }
+        smoke.documentSaves = journalEntry.path;
       }
-      const phextDump = dumpPhextKnowledge(store);
-      const diskDump = dumpDiskKnowledge({ mutableFile, auditFile: fs.existsSync(auditFile) ? auditFile : undefined });
-      if (canonText(phextDump) !== canonText(diskDump)) {
-        throw Error('Migration verification failed: phext knowledge dump differs from the disk dump');
+      const uploadEntry = copied.find(e => e.path.startsWith('uploads/'));
+      if (uploadEntry) {
+        if (!vfs.readFile(`/${uploadEntry.path}`).equals(fs.readFileSync(path.join(cavernRoot, uploadEntry.path)))) {
+          throw Error(`Migration smoke read failed for upload ${uploadEntry.path}`);
+        }
+        smoke.upload = uploadEntry.path;
       }
-      smoke.knowledge = { vaultGuid: control.vaultGuid, entities: phextDump.tables.Entity.length };
+      if (hasKnowledge) {
+        const store = new PhextKnowledgeStore(vfs);
+        const control = store.readControl();
+        if (!control || control.vaultGuid !== knowledgeReport.vaultGuid) {
+          throw Error('Migration smoke read failed: knowledge control record missing or identity changed');
+        }
+        const phextDump = dumpPhextKnowledge(store);
+        const diskDump = dumpDiskKnowledge({ mutableFile, auditFile: fs.existsSync(auditFile) ? auditFile : undefined });
+        if (canonText(phextDump) !== canonText(diskDump)) {
+          throw Error('Migration verification failed: phext knowledge dump differs from the disk dump');
+        }
+        smoke.knowledge = { vaultGuid: control.vaultGuid, entities: phextDump.tables.Entity.length };
+      }
       var smokeReport = smoke;
     } finally { vfs.close(); }
 
@@ -325,20 +364,20 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       v: 1,
       format: 'phext-cavern-migration',
       migratedUtc,
-      vaultGuid: knowledgeReport.vaultGuid,
+      vaultGuid: knowledgeReport?.vaultGuid ?? null,
       sourceTreeSha256,
       manifest,
-      knowledge: {
+      knowledge: knowledgeReport ? {
         tables: Object.fromEntries(Object.entries(knowledgeReport.tables).map(([table, r]) => [table, r.count])),
         propositions: knowledgeReport.propositions.count,
         outbox: knowledgeReport.outbox.count,
         auditMutations: knowledgeReport.audit.mutations,
         auditEvents: knowledgeReport.audit.events,
-      },
+      } : null,
       filesCopied: copied.length,
       bytesCopied: copied.reduce((sum, e) => sum + e.size, 0),
       smoke: smokeReport,
-      converterVersions: { phextVfs: 1, knowledge: 'phext-knowledge-v1', migration: 'phase5' },
+      converterVersions: { phextVfs: 1, knowledge: 'phext-knowledge-v1', migration: 'phase5+3b' },
       fallback: FALLBACK_DIRNAME,
       onDisk,
     };
@@ -347,7 +386,7 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
       vfs.writeFile(STRATA_RECORD_PATH, JSON.stringify({ v: 1, phextBacked: { ...PHEXT_BACKED_STRATA }, onDisk, migrated: true }));
       vfs.writeFile(MIGRATION_RECORD_PATH, JSON.stringify(migrationRecord));
       vfs.writeFile(CAVERN_STATE_PATH, JSON.stringify({
-        v: 1, cavernGuid: knowledgeReport.vaultGuid, migratedUtc, lastOpenedUtc: null,
+        v: 1, ...(knowledgeReport ? { cavernGuid: knowledgeReport.vaultGuid } : {}), migratedUtc, lastOpenedUtc: null,
       }));
       vfs.flush();
     } finally { vfs.close(); }
@@ -357,12 +396,14 @@ export async function migrateCavernToPhext({ root, openVfs, now = () => new Date
     // Cavern is never half-migrated.
     fs.renameSync(temporaryPath, phextPath);
     try { fs.unlinkSync(`${temporaryPath}.bak`); } catch { /* no prior generation */ }
-    try {
-      fs.renameSync(mutableHome, fallbackPath);
-    } catch (error) {
-      try { fs.renameSync(phextPath, temporaryPath); } catch { /* report the original failure */ }
-      discardTemporary();
-      throw Error(`Migration could not move .mutable aside as the fallback; aborted with the disk Cavern untouched: ${error.message}`);
+    if (fs.existsSync(mutableHome)) {
+      try {
+        fs.renameSync(mutableHome, fallbackPath);
+      } catch (error) {
+        try { fs.renameSync(phextPath, temporaryPath); } catch { /* report the original failure */ }
+        discardTemporary();
+        throw Error(`Migration could not move .mutable aside as the fallback; aborted with the disk Cavern untouched: ${error.message}`);
+      }
     }
     return { ...migrationRecord, phextPath, fallbackPath, verified: true };
   } catch (error) {

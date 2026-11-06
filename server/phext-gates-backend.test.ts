@@ -4,7 +4,9 @@
  * the same public filesystem.mjs surface the four gates consumers use
  * (pinDirectory / atDirectory / createDirectory / lockFile), with a
  * PhextVFS registered for the Cavern root — the wiring cavern-lifecycle
- * performs when the phextVfs flag is on.
+ * performs. Phext-only cutover: there is no disk mode behind this
+ * surface any more — the Cavern root pin itself is a phext identity,
+ * and folders inside the Cavern are VFS directories.
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import { execFile } from 'node:child_process';
@@ -64,11 +66,11 @@ describe('phext gates backend', () => {
   it('runs the op vocabulary end-to-end and persists across a cold reopen', async () => {
     const { root, phextPath, vfs, fs } = await fixture();
     const rootPin = await fs.pinDirectory(root);
-    expect(rootPin.identity.dev).not.toMatch(/^phext:/); // the Cavern root itself stays a disk pin
+    expect(rootPin.identity.dev).toMatch(/^phext:/); // the Cavern root itself is a phext pin — no disk surface remains
 
     const mutableStat = await fs.atDirectory(rootPin, { kind: 'stat', name: '.mutable' });
     expect(mutableStat.directory).toBe(true);
-    expect(mutableStat.identity.dev).toMatch(/^phext:/); // descent crosses into the phext
+    expect(mutableStat.identity.dev).toMatch(/^phext:/);
 
     const jobs = await jobsHome(fs, root);
     const job = await fs.createDirectory(jobs, 'job-1');
@@ -156,9 +158,10 @@ describe('phext gates backend', () => {
 
   it('keeps real flock semantics in-process: exclusive fences, shared coexists', async () => {
     const { root, fs } = await fixture();
-    await mkdir(path.join(root, 'docs'));
-    await writeFile(path.join(root, 'docs', 'doc.json'), '{}');
-    const folderPin = await fs.pinDirectory(path.join(root, 'docs'));
+    // The document folder lives in the phext (post-cutover there is
+    // no real docs/ tree inside a Cavern).
+    const folderPin = await descend(fs, await fs.pinDirectory(root), 'docs');
+    await fs.atDirectory(folderPin, { kind: 'create', name: 'doc.json', data: Buffer.from('{}'), maxBytes: 16 });
     const memory = await fs.createDirectory(folderPin, '.memory');
     const memoir = await fs.createDirectory(memory, 'document-abc');
     await fs.atDirectory(memoir, { kind: 'create', name: 'writer.lock', data: Buffer.alloc(0), maxBytes: 0 });
@@ -178,15 +181,14 @@ describe('phext gates backend', () => {
 
     const again = await fs.lockFile(memoir, 'writer.lock', lockInfo.identity);
     await again.close();
-    // The .memory tree lives only in the phext.
-    expect(existsSync(path.join(root, 'docs', '.memory'))).toBe(false);
+    // The docs tree lives only in the phext.
+    expect(existsSync(path.join(root, 'docs'))).toBe(false);
   });
 
   it('excludes a second process through the anchor flock and frees on release', async () => {
     const { root, vfs, fs } = await fixture();
-    await mkdir(path.join(root, 'docs'));
-    await writeFile(path.join(root, 'docs', 'doc.json'), '{}');
-    const folderPin = await fs.pinDirectory(path.join(root, 'docs'));
+    const folderPin = await descend(fs, await fs.pinDirectory(root), 'docs');
+    await fs.atDirectory(folderPin, { kind: 'create', name: 'doc.json', data: Buffer.from('{}'), maxBytes: 16 });
     const memory = await fs.createDirectory(folderPin, '.memory');
     const memoir = await fs.createDirectory(memory, 'document-abc');
     await fs.atDirectory(memoir, { kind: 'create', name: 'writer.lock', data: Buffer.alloc(0), maxBytes: 0 });
