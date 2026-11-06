@@ -368,7 +368,7 @@ export function StandoffEditorView(props: BlockViewProps) {
   // remain visible until the next animation frame.
   const activeVisualKeys=createMemo(()=>new Set(legacyAnnotations().flatMap((annotation,index)=>hasActiveRange(annotation)?[annotationKey(annotation,index)]:[])));
   const legacySvgKeys=createMemo(()=>new Set(legacyAnnotations().flatMap((annotation,index)=>hasActiveRange(annotation)&&(editor.effects.get(annotation.type)||standoffStyleSchema(annotation.type)?.svg)?[annotationKey(annotation,index)]:[])));
-  const temporaryLayout=createMemo(()=>JSON.stringify((editor.decorations.nodes[props.nodeKey]??[]).map(d=>editor.features.standoffPropertyRendering
+  const temporaryLayout=createMemo(()=>JSON.stringify((editor.decorations.nodes[props.nodeKey]??[]).filter(d=>!editor.features.standoffPropertyRendering||d.excludable).map(d=>editor.features.standoffPropertyRendering
     ? [d.runtimeKey,d.range.start,d.range.end,d.excludable,d.excludeLabel,d.excludeTitle,d.active]
     : d)));
   const logicalRanges=createMemo(()=>{
@@ -551,6 +551,8 @@ export function StandoffEditorView(props: BlockViewProps) {
     const origin = searchVisible && (editor.decorations.nodes[props.nodeKey] ?? []).some(d => d.excludable) ? surface.getBoundingClientRect() : undefined;
     if (origin) measuredOrigin = { x: origin.left,y: origin.top };
     for (const decoration of searchVisible ? editor.decorations.nodes[props.nodeKey] ?? [] : []) {
+      // Shared range renderers measure their own overlays. Cell colours require no rectangles.
+      if (editor.features.standoffPropertyRendering && !decoration.excludable) continue;
       const fragments = fragmentsFor(decoration.range.start, decoration.range.end - 1);
       if(!editor.features.standoffPropertyRendering){
         search.push(...highlightShapes(decoration.id, fragments, decoration.fill).map(shape => ({ ...shape, propertyType: decoration.type })));
@@ -692,7 +694,7 @@ export function StandoffEditorView(props: BlockViewProps) {
     coordinates?.scale();
     editor.effects.track();
     rendering.layout();
-    rendering.classes();
+    rendering.layoutClasses();
     node()?.inlineContent.length;
     concealedRanges();
     selectedShowHideRanges();

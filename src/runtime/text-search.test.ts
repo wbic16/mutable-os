@@ -4,6 +4,22 @@ import { matchSources } from "./search-matching";
 import { resolveSearchScope, TextSearch } from "./text-search";
 import { SessionDecorations } from "./session-decorations";
 const cleanup: (() => void)[] = [];
+it('publishes only affected decoration owners/nodes, preserving tie order and terminal invalidation', () => {
+  const d=new SessionDecorations();
+  const range=(nodeKey:string)=>({nodeKey,contentKey:nodeKey,placementKey:nodeKey,version:0,start:0,end:1,coordinate:'cell' as const});
+  d.attachRanges('unrelated',[range('other')]);
+  const layers=(d as any).owners as Map<string,any>, unrelated=layers.get('unrelated');
+  const matches=unrelated.matches, reads=vi.fn(()=>matches);
+  Object.defineProperty(unrelated,'matches',{configurable:true,get:reads});
+  d.attachRanges('a',[range('text')]); d.attachRanges('b',[range('text')]);
+  d.setActiveMatch('a','a'); expect(d.nodes.text.map(item=>item.owner)).toEqual(['a','b']);
+  expect(reads).not.toHaveBeenCalled();
+  d.setHighlightsVisible('a',false); d.invalidateContent('text'); d.setHighlightsVisible('a',true);
+  expect(d.nodes.text).toEqual([]);
+  d.removeOccurrence('text'); d.attachRanges('b',[range('text')]);
+  expect(d.nodes.text.map(item=>item.owner)).toEqual(['b']);
+  d.dispose();
+});
 afterEach(() => { cleanup.splice(0).forEach(fn => fn()); vi.restoreAllMocks(); });
 function setup(size = 2) {
   const editor = new ReactiveEditor({ type: "document-block", children: [

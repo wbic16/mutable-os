@@ -7,6 +7,7 @@
 // BENCHMARK_IIIF=off|idle|active qualifies IIIF isolation with a controlled tile service.
 // BENCHMARK_ENCYCLOPEDIA=off|idle|pending uses the Wikipedia dispatcher instead.
 // BENCHMARK_ACADEMIC=off|idle|pending qualifies DOI loader isolation (pending uses a controlled service response).
+// BENCHMARK_CODE=5|50|200|embedded adds a standoff CodeBlock to the real editor fixture.
 // Requires Node 22+ (WebSocket).
 import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -47,6 +48,8 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
    host.style.cssText = 'position:fixed;inset:0;overflow:auto;background:white;z-index:99999';
    const documentUrl = ${JSON.stringify(process.env.BENCHMARK_DOCUMENT_URL ?? "")};
    const dto = documentUrl ? (await (await fetch(documentUrl)).json()).Data.document : {id:'typing-benchmark-document',type:'document-block',children:Array.from({length:250},(_,i)=>({id:'bench-'+i,type:'standoff-editor-block',text:'x'.repeat(100),standoffProperties:[{type:'style/bold',start:40,end:60}]}))};
+   const codeMode=${JSON.stringify(process.env.BENCHMARK_CODE??'')}, codeEnabled=${JSON.stringify(process.env.BENCHMARK_CODE_HIGHLIGHT!=='off')};
+   if(codeMode){const lines=Array.from({length:codeMode==='embedded'?200:Number(codeMode)},(_,i)=>'const value'+i+': number = '+i+'; // code with a stable trailing comment for trusted caret tests');dto.children.unshift({id:'syntax-code',type:'standoff-code-block',metadata:{markdownCode:{language:'typescript'}},children:(codeMode==='embedded'?[lines.join(String.fromCharCode(10))]:lines).map((text,i)=>({id:'code-line-'+i,type:'standoff-editor-block',text}))});}
    const structuredMode=${JSON.stringify(process.env.BENCHMARK_STRUCTURED??'')};let structuredWorkers=0;
    if(structuredMode){dto.children.push(...[{filename:'data.json',presentation:'json',text:JSON.stringify({values:Array.from({length:1000},(_,i)=>({id:i,name:'Example'}))})},{filename:'code.ts',presentation:'source',text:'const value: number = 42;'}, {filename:'flow.mmd',presentation:'mermaid',text:'flowchart TD; A-->B'}].map((r,i)=>({id:'structured-'+i,type:'mutable/structured-resource-block',structured:{version:1,filename:r.filename,presentation:r.presentation},text:r.text})));}
    const pdfMode=${JSON.stringify(process.env.BENCHMARK_PDF??'')};let pdfCalls=0,pdfNavigation;
@@ -67,7 +70,7 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
      const {WorkspaceSession}=await import('/src/application/workspace-session.ts');
      const {WorkspacePresentationView}=await import('/src/application/workspace-presentation-view.tsx');
      const {materializeLocalWorkspace}=await import('/src/reactive-editor/workspace-manifest.ts');
-     const session=new WorkspaceSession(materializeLocalWorkspace({type:'workspace-block',children:[{id:'bench-window',type:'document-window-block',metadata:{size:{w:900,h:700}},children:[dto]}]}),{features:{spatialWorkspace:true}});
+     const session=new WorkspaceSession(materializeLocalWorkspace({type:'workspace-block',children:[{id:'bench-window',type:'document-window-block',metadata:{size:{w:900,h:700}},children:[dto]}]}),{features:{spatialWorkspace:true,standoffCodeHighlighting:codeEnabled}});
      editor=session.editor;projection=session.projection;
      if(presentation==='spatial')session.selectPresentation('spatial');
      const stop=render(()=>createComponent(WorkspacePresentationView,{session}),host);
@@ -77,7 +80,7 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
        if(!session.spatial.document.activate('block:bench-window'))throw new Error('Benchmark Document authorization failed');
      }
    } else {
-     editor = new ReactiveEditor(dto,{features:{structuredResources:structuredMode!=='off',crossResourceLoaders:pdfMode!=='off',iiifResourceLoaders:iiifMode!=='off',academicResourceLoaders:${JSON.stringify((process.env.BENCHMARK_ENCYCLOPEDIA??process.env.BENCHMARK_ACADEMIC) !== 'off')}}}); registerApplicationViews(editor);
+     editor = new ReactiveEditor(dto,{features:{standoffCodeHighlighting:codeEnabled,structuredResources:structuredMode!=='off',crossResourceLoaders:pdfMode!=='off',iiifResourceLoaders:iiifMode!=='off',academicResourceLoaders:${JSON.stringify((process.env.BENCHMARK_ENCYCLOPEDIA??process.env.BENCHMARK_ACADEMIC) !== 'off')}}}); registerApplicationViews(editor);
      if(iiifMode||pdfMode)editor.clipboard.setContext(()=>({cavernId:'fixture',session:'fixture'}));
      projection = editor.createView('browser-performance');
      dispose = render(() => createComponent(ReactiveTreeView,{editor,projection}), host);
@@ -119,6 +122,10 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
    }
    if(structuredMode==='active'){for(let i=0;i<200;i++){if(host.querySelector('.structured-resource .cm-content')&&host.querySelector('.structured-resource iframe')?.dataset.rendered==='true'&&host.querySelector('.structured-resource summary'))break;await new Promise(r=>setTimeout(r,50));}if(host.querySelector('.structured-resource iframe')?.dataset.rendered!=='true')throw Error('Structured benchmark did not settle');}
    const previousWorker=window.Worker;if(structuredMode)window.Worker=new Proxy(previousWorker,{construct(target,args){structuredWorkers++;return Reflect.construct(target,args);}});
+   const codeModule=(await (await fetch('/src/rendering/standoff-code-view.tsx')).text()).split('"').find(part=>part.includes('/src/runtime/standoff-code.ts'));
+   const {codeSyntaxDiagnostics}=await import(codeModule);
+   if(codeMode&&codeEnabled)for(let i=0;i<100&&!codeSyntaxDiagnostics.get(editor)?.size;i++)await new Promise(r=>setTimeout(r,25));
+   const codeInitial=codeMode&&codeEnabled?[...codeSyntaxDiagnostics.get(editor).values()][0]:undefined;
    const study=host.querySelector('.workspace-spatial');const sceneFramesBefore=Number(study?.dataset.frames??0);
    const flows = host.querySelectorAll('[contenteditable=true]');
    const flow=documentUrl ? [...flows].sort((a,b)=>b.textContent.length-a.textContent.length)[0] : flows[0];
@@ -157,7 +164,7 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
    const restored=flow.textContent===before;
    window.typingBench={editor,projection,host,flow,dispose:()=>{stopBacklinks();dispose();},stopMarkdown,caret,midpoint,before,originalCell,unrelated};
    samples.sort((a,b)=>a-b);
-   window.Worker=previousWorker;return {structuredMode,structuredWorkersDuringTyping:structuredWorkers,pdfMode,pdfCallsDuringTyping:pdfCalls-pdfBefore,iiifMode,iiifCallsDuringTyping:iiifCalls-iiifBefore,academicMode,academicRequests,backlinks:${JSON.stringify(process.env.BENCHMARK_BACKLINKS === '1')},markdownExperiment:${JSON.stringify(process.env.BENCHMARK_MARKDOWN === '1')},presentation:presentation||"standalone",sceneFramesDuringTyping:Number(study?.dataset.frames??0)-sceneFramesBefore,characters:[...flows].reduce((n,f)=>n+[...f.textContent].length,0),paragraphCharacters:[...before].length,paragraphs:flows.length,edits:samples.length,meanMs:samples.reduce((a,b)=>a+b)/samples.length,medianMs:samples[20],p95Ms:samples[38],maxMs:samples[39],snapshots,restored,unrelatedCellStable:unrelated.firstChild===originalCell};
+   window.Worker=previousWorker;return {codeMode,codeInitial,codeRefresh:codeMode&&codeEnabled?[...codeSyntaxDiagnostics.get(editor).values()][0]:undefined,structuredMode,structuredWorkersDuringTyping:structuredWorkers,pdfMode,pdfCallsDuringTyping:pdfCalls-pdfBefore,iiifMode,iiifCallsDuringTyping:iiifCalls-iiifBefore,academicMode,academicRequests,backlinks:${JSON.stringify(process.env.BENCHMARK_BACKLINKS === '1')},markdownExperiment:${JSON.stringify(process.env.BENCHMARK_MARKDOWN === '1')},presentation:presentation||"standalone",sceneFramesDuringTyping:Number(study?.dataset.frames??0)-sceneFramesBefore,characters:[...flows].reduce((n,f)=>n+[...f.textContent].length,0),paragraphCharacters:[...before].length,paragraphs:flows.length,edits:samples.length,meanMs:samples.reduce((a,b)=>a+b)/samples.length,medianMs:samples[20],p95Ms:samples[38],maxMs:samples[39],snapshots,restored,unrelatedCellStable:unrelated.firstChild===originalCell};
  })()`);
  console.log(JSON.stringify(result,null,2)); assert.equal(result.restored,true);if(result.pdfMode)assert.equal(result.pdfCallsDuringTyping,0);if(result.iiifMode)assert.equal(result.iiifCallsDuringTyping,0);assert.equal(result.snapshots,0);assert.equal(result.unrelatedCellStable,true);
  const before = await evaluate('window.typingBench.before');

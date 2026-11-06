@@ -149,9 +149,10 @@ export function createRangeRendering(options:{
     const source=binding.source(),p=binding.layoutParams();
     return [source.key,binding.key,source.start,source.end,...r.layoutParams.map(key=>p[key])];
   }),undefined,{equals:equal});
-  const classes=createMemo<ClassRun[]>(()=>{
+  const classRuns=(layoutOnly:boolean):ClassRun[]=>{
     const changes=new Map<number,{token:string;delta:number}[]>();
     for(const binding of bindings())if(binding.renderer.target==='cell-style'){
+      if(layoutOnly&&binding.renderer.affectsLayout?.(binding.params())===false)continue;
       const {start,end}=binding.source();if(end<=start)continue;
       for(const token of new Set(binding.renderer.classes(binding.params()))){
         for(const [index,delta] of [[start,1],[end,-1]]){const list=changes.get(index)??[];list.push({token,delta});changes.set(index,list);}
@@ -161,10 +162,12 @@ export function createRangeRendering(options:{
       for(const {token,delta} of entries){const n=(counts.get(token)??0)+delta;if(n)counts.set(token,n);else counts.delete(token);}
       return {start,classes:[...counts.keys()].sort().join(' ')};
     });
-  },[],{equals:equal});
+  };
+  const classes=createMemo(()=>classRuns(false),[],{equals:equal});
+  const layoutClasses=createMemo(()=>classRuns(true),[],{equals:equal});
   onCleanup(()=>{live=false;for(const instance of mounted.values())instance.dispose();mounted.clear();});
   return {
-    overlays,classes,layout,eventRanges,
+    overlays,classes,layoutClasses,layout,eventRanges,
     // Keep unavailable/invalid bindings represented: two owners must conflict
     // even when one has no ready artwork. Reuses the existing source lifetime.
     surfaces: createMemo(()=>instances().filter(instance=>instance.source().definition.renderers.some(b=>registry.renderer(b.name)?.target==='character-surface'))

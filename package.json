@@ -57,6 +57,8 @@
     "@codemirror/lang-markdown": "^6.2.5",
     "@codemirror/language-data": "^6.5.1",
     "@kobalte/core": "^0.13.9",
+    "@lezer/javascript": "^1.5.6",
+    "@lezer/highlight": "^1.2.5",
     "@paper-design/shaders": "^0.0.16",
     "@retorquere/bibtex-parser": "12.1.9",
     "@solid-primitives/autofocus": "^0.0.111",

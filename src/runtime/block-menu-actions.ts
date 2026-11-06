@@ -9,6 +9,7 @@ import { createTextTab } from "./text-tabs";
 import { backgroundImages, defaultBackgroundUrls, isBackgroundType, mediaUrl, youtubeId, type BackgroundType } from "../rendering/backgrounds";
 import { stickyNoteDto } from "./sticky-notes";
 import { exportDocument } from './export-document';
+import { standoffCodeDto } from './standoff-code';
 
 import type { BlockMenuItem } from "./block-menu-types";
 export type { BlockMenuItem } from "./block-menu-types";
@@ -126,6 +127,7 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
     items.push(command("sticky.createFloating", "New Sticky Note"));
     items.push({ label: "Add Block", children: [
       { label: "Text", run: () => add(text()) }, { label: "Code", run: () => add({ ...dto("code-mirror-block"), text: "" }) },
+      ...(editor.features.standoffCodeHighlighting ? [{ label: 'Standoff code', children: ['javascript', 'typescript'].map(language => ({ label: language === 'javascript' ? 'JavaScript' : 'TypeScript', run: () => add(standoffCodeDto(language)) })) }] : []),
       ...(editor.features.documentInterchange ? (['markdown','html'] as const).map(format=>({label:format==='markdown'?'Markdown source':'HTML source',run:()=>add({...dto(sourceType(format)),...sourcePayload(format)})})) : []),
       ...editor.featureActions.list("add-block-menu").map(item => command(item.command, item.label)),
       { label: "Insert Sticky Note Here", run: () => add(stickyNoteDto()) },

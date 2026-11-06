@@ -15,6 +15,8 @@
  * disabled unless a host or dedicated demo explicitly enables it.
  */
 export type FeatureFlags = Readonly<{
+  /** Lezer-derived, session-only syntax on standoff CodeBlocks. */
+  standoffCodeHighlighting: boolean;
   /** Presentation orientation on existing TabRows. */
   verticalTabs: boolean;
   /** Atlas artwork and application shortcuts on the workspace Desktop. */
@@ -166,6 +168,7 @@ export type FeatureFlags = Readonly<{
 }>;
 
 export const featureFlags: FeatureFlags = Object.freeze({
+  standoffCodeHighlighting: true,
   verticalTabs: true,
   desktopApplicationIcons: true,
   reversibleBlocks: true,

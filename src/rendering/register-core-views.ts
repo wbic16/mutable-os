@@ -41,6 +41,7 @@ import {
 } from "./core-block-views";
 import { PlainTextBlockView } from "./plain-text-block-view";
 import { StandoffEditorView } from "./standoff-editor-view";
+import { StandoffCodeView } from './standoff-code-view';
 import { UnknownBlockView } from "./unknown-block-view";
 import { DocumentReferenceView } from "./document-reference-view";
 import { StickyNoteBlockView } from "./sticky-note";
@@ -71,6 +72,7 @@ export function registerCoreViews(editor: ReactiveEditor, documentView = Contain
   if (editor.features.documentInterchange) many(editor, [...sourceTypes], SourceBlockView, ["native-text", "container", "selectable"]);
   editor.registry.register({ type: "plain-text-block", view: PlainTextBlockView, capabilities: ["native-text", "container", "selectable"] });
   editor.registry.register({ type: "standoff-editor-block", view: StandoffEditorView, capabilities: ["inline-editor", "container", "selectable", "annotations"] });
+  editor.registry.register({ type: 'standoff-code-block', view: StandoffCodeView, capabilities: ['container', 'selectable'] });
   editor.registry.register({ type: "checkbox-block", view: CheckboxView, capabilities: ["control", "container", "selectable"] });
   editor.registry.register({ type: "sticky-note-block", view: StickyNoteBlockView, capabilities: ["container", "selectable"] });
   editor.registry.register({ type: "code-mirror-block", view: CodeBlockView, capabilities: ["native-text", "container", "opaque-widget"] });

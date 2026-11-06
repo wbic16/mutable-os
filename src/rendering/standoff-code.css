@@ -1,0 +1,11 @@
+.standoff-code { --syntax-keyword:#9347b8; --syntax-string:#237044; --syntax-number:#a34c14; --syntax-comment:#65746d; --syntax-name:#235c9b; border:1px solid #89958e; padding:8px; }
+.standoff-code__language { display:flex; align-items:center; gap:.5em; margin-bottom:8px; font-size:.85em; }
+.standoff-code__body .reactive-standoff-flow { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+.standoff-code__body .syntax-keyword { color:var(--syntax-keyword); }
+.standoff-code__body .syntax-string, .standoff-code__body .syntax-string2 { color:var(--syntax-string); }
+.standoff-code__body .syntax-number, .standoff-code__body .syntax-bool, .standoff-code__body .syntax-null { color:var(--syntax-number); }
+.standoff-code__body .syntax-comment, .standoff-code__body .syntax-meta { color:var(--syntax-comment); }
+.standoff-code__body .syntax-typeName, .standoff-code__body .syntax-propertyName, .standoff-code__body .syntax-variableName { color:var(--syntax-name); }
+.textual-workspace .standoff-code { --syntax-keyword:#ffff55; --syntax-string:#55ffff; --syntax-number:#ffb366; --syntax-comment:#aaaaaa; --syntax-name:#ffffff; padding:var(--tw-cell-width); border-color:currentColor; }
+.textual-workspace .standoff-code__body .reactive-standoff-flow { font-family:inherit; }
+.textual-workspace .standoff-code__language { font-size:inherit; margin-bottom:var(--tw-line-height); gap:var(--tw-cell-width); }

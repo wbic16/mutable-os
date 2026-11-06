@@ -33,8 +33,9 @@ export function registerVisualEffectRenderers(registry:VisualEffectRegistry){
     layoutParams:['thickness','offset'],laneHeight:p=>Number(p.thickness),View:Underline});
   for(const outline of [false,true]) registry.registerRenderer({name:outline?'svg-outline':'svg-highlight',target:'range-overlay',defaults:{color:'#ffd34d',opacity:outline?1:.34,thickness:outline?3:1,outline},
     validate(p){if(typeof p.color!=='string'||!p.color)throw Error('Invalid region color');finite(p,'opacity',0,1);finite(p,'thickness',0,100);if(typeof p.outline!=='boolean')throw Error('Invalid outline');},layoutParams:[],laneHeight:()=>0,View:Region});
-  registry.registerRenderer({name:'css-class',target:'cell-style',defaults:{classes:[]},
-    validate(p){if(!Array.isArray(p.classes)||p.classes.some(c=>typeof c!=='string'||!c||/\s/.test(c)||c.startsWith('reactive-')))throw Error('CSS classes must be tokens outside the reserved reactive- namespace');},
+  registry.registerRenderer({name:'css-class',target:'cell-style',defaults:{classes:[],affectsLayout:true},
+    validate(p){if(typeof p.affectsLayout!=='boolean')throw Error('Invalid CSS layout declaration');if(!Array.isArray(p.classes)||p.classes.some(c=>typeof c!=='string'||!c||/\s/.test(c)||c.startsWith('reactive-')))throw Error('CSS classes must be tokens outside the reserved reactive- namespace');},
+    affectsLayout:p=>p.affectsLayout!==false,
     classes:p=>p.classes as string[]});
   registry.registerType({type:'codex/claim-reference',renderers:[{id:'underline',name:'svg-underline',params:{color:'red'}}]});
   registry.registerType({type:'mutable/opaque-property',renderers:[{id:'inactive',name:'svg-underline',params:{color:'#888',lineStyle:'dotted'}}]});

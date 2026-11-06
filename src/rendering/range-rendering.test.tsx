@@ -30,6 +30,13 @@ function setup(properties:Record<string,unknown>[] = [], direct=true, shared=tru
   return {editor,view,key,host,dispose,release,paths,cells,replace,range,rectangles,entered};
 }
 const p=(id:string,start=0,end=3)=>({id,type:'test',start,end});
+it('does not measure colour-only class publication, while preserving layout-changing classes', async () => {
+  const f=setup(); await tick(); f.rectangles.mockClear();
+  const collection=f.editor.temporaryRanges.createCollection('colour');
+  collection.replace([{id:'colour',range:f.range(),renderers:[{id:'colour',name:'css-class',params:{classes:['syntax-keyword'],affectsLayout:false}}]}]);
+  await tick(); expect(f.cells()[0].classList.contains('syntax-keyword')).toBe(true); expect(f.rectangles).not.toHaveBeenCalled();
+  collection.dispose(); await tick(); expect(f.rectangles).not.toHaveBeenCalled();
+});
 it.each([true,false])('removes only an individual overlapping contribution, preserving text and the other owner (direct=%s)',async direct=>{
   const f=setup([p('a'),p('b')],direct);await tick();const nodes=f.cells(),paths=f.paths();
   expect(paths).toHaveLength(2);expect(nodes[0].classList.contains('common')).toBe(true);

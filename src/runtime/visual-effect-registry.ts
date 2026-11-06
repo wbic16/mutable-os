@@ -54,7 +54,7 @@ export type VisualRenderer = {
   validate(params:EffectParams):void;
 } & ({ target:'range-overlay'; layoutParams:readonly string[]; laneHeight(params:EffectParams):number; View:Component<VisualEffectProps> }
   | { target:'character-surface'; surface(text:string, params:EffectParams, document:Document, readiness?:CharacterSurfaceReadiness):CharacterSurface|undefined }
-  | { target:'cell-style'; classes(params:EffectParams):readonly string[] }
+  | { target:'cell-style'; classes(params:EffectParams):readonly string[]; affectsLayout?(params:EffectParams):boolean }
   | { target:'text-presentation'; focusKinds: readonly FocusRegion['kind'][];
       /** Called within a Solid root; own resources with onCleanup. */
       create(context: { owner: VisualEffectOwner; params: EffectParams; document: Document }): TextPresentationEffect }

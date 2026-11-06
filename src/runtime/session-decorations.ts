@@ -38,17 +38,21 @@ export class SessionDecorations {
   private assertLive() { if (this.disposed) throw Error("Temporary ranges are disposed"); }
   private owners = new Map<string, Layer>();
   private contentIndex = new Map<string, { nodes: Set<string>; matches: { layer: Layer; owner:string; match: DecorationMatch }[] }>();
+  private ownerIndex = new Map<string, { nodes: Set<string>; contents: Set<string> }>();
+  private nodeOwners = new Map<string, Map<string, SessionDecoration[]>>();
+  private ownerOrder = new Map<string, number>();
+  private nextOrder = 0;
   constructor() { [this.nodes, this.setNodes] = createStore<Record<string, SessionDecoration[]>>({}); }
   attachMatches(owner: string, set: SearchMatchSet, style: { type?: string; fill?: string; priority?: number; excludeLabel?: string; excludeTitle?: string; exclude?: (id: string, context: { keyboard: boolean }) => void } = {}) {
     this.assertLive();
     const previous = this.owners.get(owner);
     this.owners.set(owner, { matches: set.matches, visible: previous?.visible ?? true, hidden: new Set(), invalid:new Set(), type: style.type ?? "editor/search-match", fill: style.fill ?? "#ffd34d", priority: style.priority ?? 0, exclude: style.exclude, excludeLabel: style.excludeLabel, excludeTitle: style.excludeTitle });
-    this.rebuild();
+    this.refreshOwner(owner);
   }
   attachRanges(owner: string, ranges: TextRangeSnapshot[], style: { type?: string; fill?: string; priority?: number } = {}) {
     this.assertLive();
     this.owners.set(owner, { matches: [{ id: owner, ranges, capabilities: { highlight: true } }], visible: true, hidden: new Set(), invalid:new Set(), type: style.type ?? "editor/range-preview", fill: style.fill ?? "#ffd34d", priority: style.priority ?? 0 });
-    this.rebuild();
+    this.refreshOwner(owner);
   }
   /** One collection per feature/interaction. Callers bind dispose to their Solid/feature owner. */
   createCollection(owner: string): TemporaryRangeCollection {
@@ -74,7 +78,7 @@ export class SessionDecorations {
       // a different item or toggles visibility later.
       for(const [id,item] of items)try{this.validate?.([item.range]);}catch{items.delete(id);}
       this.owners.set(owner, { matches: [...items.values()].map(temporary => ({ id: temporary.id, ranges: [temporary.range], temporary, capabilities: {highlight:true} })), visible:true, hidden:new Set(), invalid:new Set(), type:'editor/temporary-range', fill:'#ffd34d', priority:0 });
-      this.rebuild();
+      this.refreshOwner(owner);
     };
     return {
       replace: ranges => { check(); const next=admit(ranges); items.clear(); for(const r of next) items.set(r.id,r); publish(); },
@@ -85,19 +89,19 @@ export class SessionDecorations {
   }
   /** Release only this mounted occurrence; other views of shared content survive. */
   removeOccurrence(nodeKey: string) {
-    let changed=false;
-    for(const layer of this.owners.values()) layer.matches=layer.matches.map(match => {
-      const next=match.ranges.filter(range=>range.nodeKey!==nodeKey);
-      if(next.length===match.ranges.length)return match;
-      changed=true;return {...match,ranges:next};
-    });
-    if(changed)this.rebuild();
+    const owners = [...(this.nodeOwners.get(nodeKey)?.keys() ?? [])];
+    batch(() => { for (const owner of owners) {
+      const layer = this.owners.get(owner); if (!layer) continue;
+      layer.matches = layer.matches.map(match => ({ ...match, ranges: match.ranges.filter(range => range.nodeKey !== nodeKey) }));
+      this.refreshOwner(owner);
+    } });
   }
+
   dispose() { if(this.disposed)return; this.disposed=true; this.clearAll(); this.claims.clear(); }
-  setHighlightsVisible(owner: string, visible: boolean) { const layer = this.owners.get(owner); if (layer) { layer.visible = visible; this.rebuild(); } }
-  setMatchVisible(owner: string, id: string, visible: boolean) { const layer = this.owners.get(owner); if (layer) { visible ? layer.hidden.delete(id) : layer.hidden.add(id); this.rebuild(); } }
-  setActiveMatch(owner: string, id?: string) { const layer = this.owners.get(owner); if (layer) { layer.active = id; this.rebuild(); } }
-  clearHighlights(owner: string) { this.owners.delete(owner); this.rebuild(); }
+  setHighlightsVisible(owner: string, visible: boolean) { const layer = this.owners.get(owner); if (layer) { layer.visible = visible; this.refreshOwner(owner); } }
+  setMatchVisible(owner: string, id: string, visible: boolean) { const layer = this.owners.get(owner); if (layer) { visible ? layer.hidden.delete(id) : layer.hidden.add(id); this.refreshOwner(owner); } }
+  setActiveMatch(owner: string, id?: string) { const layer = this.owners.get(owner); if (layer) { layer.active = id; this.refreshOwner(owner); } }
+  clearHighlights(owner: string) { this.owners.delete(owner); this.refreshOwner(owner); }
   disposeSession(owner: string) { this.clearHighlights(owner); }
   exclude(owner: string, id: string, keyboard = false) { this.owners.get(owner)?.exclude?.(id, { keyboard }); }
   /** Called only for changed content; does not scan text or measure geometry. */
@@ -108,29 +112,56 @@ export class SessionDecorations {
       layer.invalid.add(match.id);
       for(const range of match.ranges){const keys=removals.get(range.nodeKey)??new Set();keys.add(JSON.stringify([owner,match.id]));removals.set(range.nodeKey,keys);}
     }
-    batch(()=>{for(const [node,keys] of removals)this.setNodes(node,(current:SessionDecoration[]|undefined)=>(current??[]).filter(d=>!keys.has(JSON.stringify([d.owner,d.id]))));});
+    batch(()=>{for(const [node,keys] of removals) {
+      const keep = (d:SessionDecoration) => !keys.has(JSON.stringify([d.owner,d.id]));
+      const owners = this.nodeOwners.get(node);
+      if (owners) for (const [owner, decorations] of owners) owners.set(owner, decorations.filter(keep));
+      this.setNodes(node,(current:SessionDecoration[]|undefined)=>(current??[]).filter(keep));
+    }});
     this.contentIndex.delete(contentKey);
   }
 
-  clearAll() { this.owners.clear(); this.rebuild(); }
-  private rebuild() {
-    const next: Record<string, SessionDecoration[]> = {};
-    this.contentIndex.clear();
-    for (const [owner, layer] of this.owners) for (const match of layer.matches) {
+  clearAll() { const owners = [...this.ownerIndex.keys()]; this.owners.clear(); batch(() => owners.forEach(owner => this.refreshOwner(owner))); }
+  /** Rebuild only this owner's indexes and the nodes its old/new ranges touch. */
+  private refreshOwner(owner: string) {
+    if (this.owners.has(owner) && !this.ownerOrder.has(owner)) this.ownerOrder.set(owner, this.nextOrder++);
+    const previous = this.ownerIndex.get(owner), affected = new Set(previous?.nodes);
+    for (const key of previous?.contents ?? []) {
+      const entry = this.contentIndex.get(key); if (!entry) continue;
+      entry.matches = entry.matches.filter(item => item.owner !== owner);
+      if (!entry.matches.length) this.contentIndex.delete(key);
+    }
+    for (const node of affected) this.nodeOwners.get(node)?.delete(owner);
+    const index = { nodes: new Set<string>(), contents: new Set<string>() };
+    const next = new Map<string, SessionDecoration[]>(), layer = this.owners.get(owner);
+    if (layer) for (const match of layer.matches) {
+      if (layer.invalid.has(match.id)) continue;
       for (const range of match.ranges) {
+        index.nodes.add(range.nodeKey); index.contents.add(range.contentKey); affected.add(range.nodeKey);
         let entry = this.contentIndex.get(range.contentKey);
         if (!entry) this.contentIndex.set(range.contentKey, entry = { nodes: new Set(), matches: [] });
         entry.nodes.add(range.nodeKey); entry.matches.push({ layer, owner, match });
       }
-      if (!layer.visible || layer.hidden.has(match.id) || layer.invalid.has(match.id) || !match.capabilities.highlight) continue;
-      for (const [index,range] of match.ranges.entries()) (next[range.nodeKey] ??= []).push({
-        runtimeKey: JSON.stringify([owner,match.id,range.nodeKey,index]), temporary: match.temporary,
-        renderers: match.temporary ? match.temporary.renderers ?? [] : [{id:'highlight',name:'svg-highlight',params:{color:layer.fill}}, ...(layer.active===match.id?[{id:'active',name:'svg-outline',params:{color:'#8a5100'}}]:[])],
-        owner, type: match.temporary?.type ?? layer.type, id: match.id, range, fill: layer.fill, active: layer.active === match.id, priority: layer.priority, excludeLabel: layer.excludeLabel, excludeTitle: layer.excludeTitle, excludable: !!layer.exclude && index === match.ranges.length - 1 });
+      if (!layer.visible || layer.hidden.has(match.id) || !match.capabilities.highlight) continue;
+      for (const [i, range] of match.ranges.entries()) {
+        const values = next.get(range.nodeKey) ?? []; next.set(range.nodeKey, values);
+        values.push({
+          runtimeKey: JSON.stringify([owner,match.id,range.nodeKey,i]), temporary: match.temporary,
+          renderers: match.temporary ? match.temporary.renderers ?? [] : [{id:'highlight',name:'svg-highlight',params:{color:layer.fill}}, ...(layer.active===match.id?[{id:'active',name:'svg-outline',params:{color:'#8a5100'}}]:[])],
+          owner, type: match.temporary?.type ?? layer.type, id: match.id, range, fill: layer.fill, active: layer.active === match.id, priority: layer.priority, excludeLabel: layer.excludeLabel, excludeTitle: layer.excludeTitle, excludable: !!layer.exclude && i === match.ranges.length - 1,
+        });
+      }
     }
-    batch(() => { for (const key of new Set([...Object.keys(this.nodes), ...Object.keys(next)])) {
-      const value = (next[key] ?? []).sort((a,b) => a.priority - b.priority);
+    if (layer) this.ownerIndex.set(owner, index); else this.ownerIndex.delete(owner);
+    batch(() => { for (const key of affected) {
+      let owners = this.nodeOwners.get(key);
+      if (!owners) this.nodeOwners.set(key, owners = new Map());
+      // Retain empty/hidden owners for occurrence disposal as well.
+      if (index.nodes.has(key)) owners.set(owner, next.get(key) ?? []);
+      const value = [...owners.values()].flat().sort((a,b) => a.priority - b.priority || this.ownerOrder.get(a.owner)! - this.ownerOrder.get(b.owner)!);
       if (JSON.stringify(this.nodes[key] ?? []) !== JSON.stringify(value)) this.setNodes(key, value);
+      if (!owners.size) this.nodeOwners.delete(key);
     } });
+    if (!layer) this.ownerOrder.delete(owner);
   }
 }
