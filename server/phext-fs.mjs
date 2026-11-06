@@ -8,17 +8,18 @@
  * collection-inventory.mjs, recognized-source.mjs) import their
  * `promises as fs` from here instead of node:fs.
  *
- * PHEXT-ONLY CUTOVER (2026-11-05): this facade has no disk mode and
- * no fall-through. A path under a registered Cavern root is served
- * by the Cavern's PhextVFS; a path no registered Cavern covers is an
- * explicit error (code `ENOPHEXT`) — a Mutable store operating
- * outside a Cavern phext is a programming error, never a silent
- * disk write. The only real files the facade still serves are the
- * ones that are real by construction inside a Cavern folder: the
- * phext file family itself (`cavern.phext`, its `.bak`, its flock
- * anchors) and the `.mutable-disk-fallback/` backup tree a
- * conversion preserved (a backup inside the thing it backs up is
- * not a backup).
+ * MODE SELECTION (2026-11-06): the fall-through is restored. A path
+ * under a registered Cavern root is served by the Cavern's PhextVFS;
+ * a path no registered Cavern covers falls through to the real
+ * node:fs call — a native-mode Cavern registers nothing, so its
+ * document stores see exactly the pre-cutover disk behaviour through
+ * this same facade, and the standalone mounts are native by
+ * definition. Inside a registered root there is still no disk mode:
+ * the only real files the facade serves there are the ones that are
+ * real by construction inside a Cavern folder: the phext file family
+ * itself (`cavern.phext`, its `.bak`, its flock anchors) and the
+ * `.mutable-disk-fallback/` backup tree an old conversion preserved
+ * (a backup inside the thing it backs up is not a backup).
  *
  * Registration mirrors Phase 2: cavern-lifecycle registers the
  * Cavern's VFS at open (registerPhextFs), next to the gates backend
@@ -808,29 +809,24 @@ class PhextFileHandle {
 export { constants };
 
 /**
- * Facade dispatch (cutover contract): a path no registered Cavern
- * covers is an explicit ENOPHEXT error — there is no disk to fall
- * through to. A path a Cavern covers but that names a real-by-
- * construction file (the phext family, the fallback tree) is served
- * by real fs; everything else is virtual.
+ * Facade dispatch (mode-selection contract): registration is the
+ * mode signal. A path under a registered (phext-mode) Cavern root is
+ * served by its backend — which itself serves the real-by-
+ * construction paths (the phext family, the fallback tree) through
+ * real fs. A path no registered Cavern covers falls through to real
+ * fs: native-mode Caverns and the standalone mounts live there.
  */
-function backendFor(absPath) {
-  const backend = phextFsBackendFor(absPath);
-  if (!backend) {
-    throw coded('ENOPHEXT', `No Cavern phext is registered for ${absPath}; Mutable stores only operate inside a Cavern phext`);
-  }
-  return backend;
-}
-
 function dispatch(absPath) {
-  const backend = backendFor(absPath);
+  const backend = phextFsBackendFor(absPath);
+  if (!backend) return undefined;
   const vfsPath = backend.vfsPathFor(absPath);
   return vfsPath === undefined ? undefined : { backend, vfsPath };
 }
 
 /** readdir/opendir dispatch: the registered root lists the virtual root. */
 function dispatchListing(absPath) {
-  const backend = backendFor(absPath);
+  const backend = phextFsBackendFor(absPath);
+  if (!backend) return undefined;
   if (path.resolve(absPath) === backend.root) return { backend, vfsPath: '/' };
   const vfsPath = backend.vfsPathFor(absPath);
   return vfsPath === undefined ? undefined : { backend, vfsPath };
@@ -838,7 +834,8 @@ function dispatchListing(absPath) {
 
 export const promises = {
   async open(absPath, flags, mode) {
-    const backend = backendFor(absPath);
+    const backend = phextFsBackendFor(absPath);
+    if (!backend) return realFs.open(absPath, flags, mode);
     // backend.open itself serves the real-by-construction paths and
     // the root-read flush handle.
     return backend.open(absPath, flags);
@@ -872,21 +869,21 @@ export const promises = {
     return hit ? hit.backend.statFor(hit.vfsPath, options) : realFs.stat(absPath, options);
   },
   async rename(absFrom, absTo) {
-    const backend = backendFor(absFrom);
-    if (backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
+    const backend = phextFsBackendFor(absFrom);
+    if (backend && backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
       return backend.rename(absFrom, absTo);
     }
-    if (phextFsBackendFor(absTo) && phextFsBackendFor(absTo) !== backend) {
+    if (backend && phextFsBackendFor(absTo) && phextFsBackendFor(absTo) !== backend) {
       throw coded('EXDEV', 'Rename crosses Cavern phexts');
     }
     return realFs.rename(absFrom, absTo);
   },
   async link(absFrom, absTo) {
-    const backend = backendFor(absFrom);
-    if (backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
+    const backend = phextFsBackendFor(absFrom);
+    if (backend && backend.vfsPathFor(absFrom) !== undefined && backend.vfsPathFor(absTo) !== undefined) {
       return backend.link(absFrom, absTo);
     }
-    if (phextFsBackendFor(absTo) && phextFsBackendFor(absTo) !== backend) {
+    if (backend && phextFsBackendFor(absTo) && phextFsBackendFor(absTo) !== backend) {
       throw coded('EXDEV', 'Link crosses Cavern phexts');
     }
     return realFs.link(absFrom, absTo);
