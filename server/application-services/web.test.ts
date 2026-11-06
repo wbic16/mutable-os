@@ -2,6 +2,7 @@
 import { it, expect, afterEach, vi } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { testCavern } from "../../src/knowledge-sqlite/phext-test-cavern.mjs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { WebResourceService } from "../../src/application-services/web-service";
@@ -17,6 +18,7 @@ async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "web-g-")),
     cavernId = randomUUID();
   cleanup.push(() => rm(root, { recursive: true, force: true }));
+  const cavern = testCavern(root); cleanup.push(() => cavern.close());
   const jobs = new CavernJobStorage(root, cavernId),
     executor = new NodePreparationExecutor(),
     assets = new ManagedAssetStore({ root, cavernId, session: "test" });

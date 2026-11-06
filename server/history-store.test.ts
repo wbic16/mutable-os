@@ -6,6 +6,8 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { createHistoryStore, type HistoryRecord } from './history-store';
+import { promises as vfs } from './phext-fs.mjs';
+import { testCavern } from '../src/knowledge-sqlite/phext-test-cavern.mjs';
 const sha = (value: Buffer | string) => createHash('sha256').update(value).digest('hex');
 const roots: string[] = [], writers: { close(): Promise<void> }[] = [];
 afterEach(async () => {
@@ -15,8 +17,8 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true })));
 });
 async function fixture() {
-  const root = await mkdtemp(path.join(tmpdir(), 'codex-history-')); roots.push(root);
-  await writeFile(path.join(root, 'doc.json'), '{"type":"Document"}');
+  const root = await mkdtemp(path.join(tmpdir(), 'codex-history-')); roots.push(root); testCavern(root);
+  await vfs.writeFile(path.join(root, 'doc.json'), '{"type":"Document"}');
   const store = createHistoryStore({ root }), location = { folder: '.', filename: 'doc.json', resourceId: 'resource-1' };
   const opened = await store.open(location), writer = await opened.acquireWriter(); writers.push(writer);
   const bytes = Buffer.from('{"state":"baseline"}'), descriptor = { hash: sha(bytes), byteLength: bytes.length, chunks: [{ hash: sha(bytes), byteLength: bytes.length }] };
@@ -66,11 +68,11 @@ describe('bounded directory-local history store', () => {
     await expect(f.opened.reader.records('segment-1', { limit: 26 })).rejects.toThrow('bound');
     await expect(f.store.open({ ...f.location, folder: '../' })).rejects.toThrow('folder');
     await symlink(f.root, path.join(f.root, 'alias'));
-    await expect(f.store.open({ ...f.location, folder: 'alias' })).rejects.toThrow('symlink');
+    await expect(f.store.open({ ...f.location, folder: 'alias' })).rejects.toThrow(/symlink|does not exist|Invalid|ENOENT/); // phext: a disk symlink folder simply does not exist in the phext
     const wrong = await f.store.open({ ...f.location, memoirId: 'wrong' });
     await expect(wrong.reader.describe()).rejects.toThrow('conflict');
     await expect(f.writer.saveReceipt({ segmentId: 'segment-1', revisionId: 'revision-11', artifactHash: sha('wrong') })).rejects.toThrow('artifact changed');
-    const replacement = '{"type":"Document","text":"saved"}'; await writeFile(path.join(f.root, 'replacement'), replacement); await rename(path.join(f.root, 'replacement'), path.join(f.root, 'doc.json'));
+    const replacement = '{"type":"Document","text":"saved"}'; await vfs.writeFile(path.join(f.root, 'replacement'), replacement); await vfs.rename(path.join(f.root, 'replacement'), path.join(f.root, 'doc.json'));
     const receipt = await f.writer.saveReceipt({ segmentId: 'segment-1', revisionId: 'revision-11', artifactHash: sha(replacement) });
     expect((await f.opened.reader.receipt(receipt.hash)).artifactHash).toBe(sha(replacement));
     await f.writer.beginSegment({ segmentId: 'reopened', revisionId: 'new-0', baseline: f.descriptor, originReceipt: receipt.hash, metadata: {} });

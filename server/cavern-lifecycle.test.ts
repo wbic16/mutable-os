@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { createCavernLifecycle } from './cavern-lifecycle';
 import { SqliteKnowledgeHost } from './sqlite-knowledge-host';
+import { EventEmitter } from 'node:events';
 
 const cleanup: Array<() => Promise<unknown>> = [];
 afterEach(async () => {
@@ -87,4 +88,48 @@ it('mounts managed assets in the active Cavern and rejects stale activation head
   expect(begin.Data.cavernId).toBe(f.current.cavernGuid);
   expect(await f.asset('begin', 'stale-session')).toMatchObject({status:409,Success:false});
   expect(await f.asset('verify', f.current.session, {cavernId:'foreign',assetId:'sha256:'+'a'.repeat(64)})).toMatchObject({Success:false,Error:'Asset belongs to another Cavern.'});
+});
+
+it('a Cavern switch proceeds when an in-flight request never finishes (H1 drain timeout)', { timeout: 60000 }, async () => {
+  const root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'cavern-drain-')));
+  cleanup.push(() => fs.rm(root, { recursive: true, force: true }));
+  const lifecycle = createCavernLifecycle({ stateFile: path.join(root, 'preferences.json'), drainTimeoutMs: 200 });
+  cleanup.push(() => lifecycle.close());
+  const app = express();
+  app.use(express.json());
+  app.use('/api/cavern', lifecycle.router);
+  app.use('/api', lifecycle.middleware);
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise<void>(resolve => server.once('listening', resolve));
+  cleanup.push(() => new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())));
+  const port = (server.address() as { port: number }).port;
+  const call = async (action: string, body?: unknown) => {
+    const response = await fetch(`http://127.0.0.1:${port}/api/cavern/${action}`, body === undefined ? undefined : {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    return { status: response.status, ...await response.json() };
+  };
+  const opened = await call('establish', { path: path.join(root, 'vault-a'), intent: 'create' });
+  expect(opened.Success, opened.Error).toBe(true);
+  const session = opened.Data.current.session as string;
+
+  // Hold one API request in flight forever: it passes the counting
+  // middleware with a valid session, but its response never emits
+  // finish/close — the dead-client shape behind H1. Before the fix,
+  // the switch below waited on the drain promise forever and the
+  // whole lifecycle wedged.
+  const heldRes: any = new EventEmitter();
+  heldRes.status = () => heldRes; heldRes.json = () => heldRes; heldRes.send = () => heldRes;
+  heldRes.set = () => heldRes; heldRes.setHeader = () => heldRes; heldRes.writeHead = () => heldRes; heldRes.end = () => heldRes;
+  const heldReq: any = {
+    method: 'GET', url: '/held-request', body: undefined,
+    header: (name: string) => name.toLowerCase() === 'x-mutable-cavern' ? session : undefined,
+  };
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  lifecycle.middleware(heldReq, heldRes, () => {});
+
+  const switched = await call('establish', { path: path.join(root, 'vault-b'), intent: 'create' });
+  expect(switched.Success, switched.Error).toBe(true);
+  expect(switched.Data.current.path).toBe(path.join(root, 'vault-b'));
+  expect(warn.mock.calls.some(args => String(args[0]).includes('still in flight'))).toBe(true);
 });

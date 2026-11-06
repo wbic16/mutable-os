@@ -13,6 +13,11 @@ function readPolicy(): AnnotationBarPolicy | undefined {
   try { const value = localStorage.getItem(ANNOTATION_BAR_KEY); return validAnnotationBarPolicy(value) ? value : undefined; }
   catch { return undefined; }
 }
+/** The live policy value (persisted choice, else the product
+ *  default). The settings-bundle capture reads through this. */
+export function readAnnotationBarPolicy(): AnnotationBarPolicy {
+  return readPolicy() ?? 'auto';
+}
 /** Same local UI-preference convention as Flint's compact layout. No Document data. */
 export function createAnnotationBarPreference(defaultPolicy: () => AnnotationBarPolicy = () => 'auto') {
   const [savedPolicy, update] = createSignal(readPolicy());

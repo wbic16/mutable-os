@@ -60,7 +60,7 @@ export function anchorCapabilities(editor: ReactiveEditor, scope: FeatureScope):
         let hidden = false, zIndex = 1;
         for (let parent: HTMLElement | null = documentAnchor ? frame : target; parent; parent = parent.parentElement) {
           const css = getComputedStyle(parent);
-          hidden ||= parent.hidden || parent.getAttribute("aria-hidden") === "true" || css.display === "none" || css.visibility === "hidden";
+          hidden ||= !!parent.hidden || parent.getAttribute("aria-hidden") === "true" || css.display === "none" || css.visibility === "hidden";
           zIndex = Math.max(zIndex, Number.parseInt(css.zIndex) || 0);
           if (parent === frame || (parent !== target && /(auto|scroll|hidden|clip)/.test(css.overflow + css.overflowY + css.overflowX))) {
             const box = rect(parent);

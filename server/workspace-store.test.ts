@@ -5,6 +5,8 @@ import os from "node:os";
 import path from "node:path";
 import type { Server } from "node:http";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { promises as vfs } from "./phext-fs.mjs";
+import { testCavern } from "../src/knowledge-sqlite/phext-test-cavern.mjs";
 import { createWorkspaceStoreRouter } from "./workspace-store";
 import { createHash } from "node:crypto";
 
@@ -19,9 +21,9 @@ describe("Workspace store HTTP routes", () => {
   let root: string, documents: string, workspaces: string, base: string, server: Server;
   const indexDocument = vi.fn();
   beforeEach(async () => {
-    root = await fs.mkdtemp(path.join(os.tmpdir(), "speedy-workspace-test-"));
+    root = await fs.mkdtemp(path.join(os.tmpdir(), "speedy-workspace-test-")); testCavern(root);
     documents = path.join(root, "documents"); workspaces = path.join(root, "workspaces");
-    await fs.mkdir(path.join(documents, "research"), { recursive: true }); await fs.mkdir(workspaces);
+    await vfs.mkdir(path.join(documents, "research"), { recursive: true }); await vfs.mkdir(workspaces);
     indexDocument.mockReset(); indexDocument.mockResolvedValue(undefined);
     const app = express(); app.use(express.json()); app.use("/api", createWorkspaceStoreRouter({ documentRoot: documents, workspaceRoot: workspaces, indexDocument }));
     server = await new Promise<Server>(resolve => { const listener = app.listen(0, "127.0.0.1", () => resolve(listener)); });
@@ -46,8 +48,8 @@ describe("Workspace store HTTP routes", () => {
     Object.assign(value.workspace.root, { metadata: { workspacePresentation: { version: 99, active: "future", layouts: { retained: true } } } });
     const response = await fetch(`${base}/saveWorkspaceBundle`, { method: "POST", headers: { "Content-Type": "application/json", "X-Speedy-Revision": "9" }, body: JSON.stringify({ filename: "Desk.json", workspace: value.workspace, documents: [{ documentId: "document-one", source: value.source, document: value.document, contentHash: value.contentHash }] }) });
     expect(response.status).toBe(200); expect(response.headers.get("X-Speedy-Revision")).toBe("9");
-    expect(JSON.parse(await fs.readFile(path.join(documents, "research", "Notes.json"), "utf8"))).toEqual(value.document);
-    const storedWorkspace = JSON.parse(await fs.readFile(path.join(workspaces, "Desk.json"), "utf8"));
+    expect(JSON.parse(await vfs.readFile(path.join(documents, "research", "Notes.json"), "utf8"))).toEqual(value.document);
+    const storedWorkspace = JSON.parse(await vfs.readFile(path.join(workspaces, "Desk.json"), "utf8"));
     expect(storedWorkspace.root.children[0].type).toBe("image-background-block");
     expect(JSON.stringify(storedWorkspace)).not.toContain("Separate");
     const loaded = await (await fetch(`${base}/loadWorkspaceJson?filename=Desk.json`)).json();
@@ -67,7 +69,7 @@ describe("Workspace store HTTP routes", () => {
       expect(saved.status).toBe(200);
       const loaded = await (await fetch(`${base}/loadWorkspaceJson?filename=${filename}`)).json();
       expect(loaded.Data.workspace.root.metadata.workspacePresentation).toEqual(presentation);
-      const document = JSON.parse(await fs.readFile(path.join(documents, "bank-document.json"), "utf8"));
+      const document = JSON.parse(await vfs.readFile(path.join(documents, "bank-document.json"), "utf8"));
       const reopened = materializeWorkspace(loaded.Data.workspace, new Map([["bank-document", document]]));
       expect(Object.values(reopened.state.contents).filter(c => c.viewType === "document-block")).toHaveLength(1);
       expect(Object.values(reopened.state.contents).find(c => c.viewType === "canvas-counter-block")?.payload.count).toBe(9);
@@ -81,46 +83,46 @@ describe("Workspace store HTTP routes", () => {
     expect(invalid.status).toBe(400);
     const mismatch = await fetch(`${base}/saveWorkspaceBundle`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: "Bad.json", workspace: value.workspace, documents: [{ documentId: "document-one", source: value.source, document: value.document, contentHash: "sha256:wrong" }] }) });
     expect(mismatch.status).toBe(409);
-    expect(await fs.readdir(workspaces)).toEqual([]);
+    expect(await vfs.readdir(workspaces)).toEqual([]);
     const unsafe = structuredClone(value.workspace); unsafe.documents["document-one"].source.folder = "../outside";
     expect((await fetch(`${base}/saveWorkspaceBundle`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: "Bad.json", workspace: unsafe, documents: [] }) })).status).toBe(400);
   });
 
   it("keeps the previous files when a bundle fails validation", async () => {
     const value = values();
-    await fs.writeFile(path.join(documents, "research", "Notes.json"), JSON.stringify({ old: "document" }));
-    await fs.writeFile(path.join(workspaces, "Desk.json"), JSON.stringify({ old: "workspace" }));
+    await vfs.writeFile(path.join(documents, "research", "Notes.json"), JSON.stringify({ old: "document" }));
+    await vfs.writeFile(path.join(workspaces, "Desk.json"), JSON.stringify({ old: "workspace" }));
     const broken = structuredClone(value.workspace); broken.documents["document-one"].contentHash = "sha256:wrong";
     const response = await fetch(`${base}/saveWorkspaceBundle`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: "Desk.json", workspace: broken, documents: [{ documentId: "document-one", source: value.source, document: value.document, contentHash: value.contentHash }] }) });
     expect(response.status).toBe(409);
-    expect(JSON.parse(await fs.readFile(path.join(documents, "research", "Notes.json"), "utf8"))).toEqual({ old: "document" });
-    expect(JSON.parse(await fs.readFile(path.join(workspaces, "Desk.json"), "utf8"))).toEqual({ old: "workspace" });
+    expect(JSON.parse(await vfs.readFile(path.join(documents, "research", "Notes.json"), "utf8"))).toEqual({ old: "document" });
+    expect(JSON.parse(await vfs.readFile(path.join(workspaces, "Desk.json"), "utf8"))).toEqual({ old: "workspace" });
   });
 
   it("does not overwrite a Document changed outside the loaded Workspace", async () => {
     const value = values();
     const external = { ...value.document, children: [{ type: "plain-text-block", text: "External edit" }] };
-    await fs.writeFile(path.join(documents, "research", "Notes.json"), JSON.stringify(external));
+    await vfs.writeFile(path.join(documents, "research", "Notes.json"), JSON.stringify(external));
     const response = await fetch(`${base}/saveWorkspaceBundle`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ filename: "Desk.json", workspace: value.workspace, documents: [{ documentId: "document-one", source: value.source, document: value.document, contentHash: value.contentHash, expectedContentHash: hash(value.document) }] }),
     });
     expect(response.status).toBe(409);
     expect((await response.json()).Code).toBe("document-write-conflict");
-    expect(JSON.parse(await fs.readFile(path.join(documents, "research", "Notes.json"), "utf8"))).toEqual(external);
-    expect(await fs.readdir(workspaces)).toEqual([]);
+    expect(JSON.parse(await vfs.readFile(path.join(documents, "research", "Notes.json"), "utf8"))).toEqual(external);
+    expect(await vfs.readdir(workspaces)).toEqual([]);
   });
 
   it("supports conditional creation for Workspace Save As", async () => {
     const value = values();
-    await fs.writeFile(path.join(workspaces, "Desk.json"), JSON.stringify({ existing: true }));
+    await vfs.writeFile(path.join(workspaces, "Desk.json"), JSON.stringify({ existing: true }));
     const response = await fetch(`${base}/saveWorkspaceBundle`, {
       method: "POST", headers: { "Content-Type": "application/json", "If-None-Match": "*" },
       body: JSON.stringify({ filename: "Desk.json", workspace: value.workspace, documents: [{ documentId: "document-one", source: value.source, document: value.document, contentHash: value.contentHash }] }),
     });
     expect(response.status).toBe(409);
-    expect(JSON.parse(await fs.readFile(path.join(workspaces, "Desk.json"), "utf8"))).toEqual({ existing: true });
-    expect(await fs.readdir(path.join(documents, "research"))).toEqual([]);
+    expect(JSON.parse(await vfs.readFile(path.join(workspaces, "Desk.json"), "utf8"))).toEqual({ existing: true });
+    expect(await vfs.readdir(path.join(documents, "research"))).toEqual([]);
   });
 
   it("allows Workspace reads but rejects bundle writes in read-only hosted mode", async () => {
@@ -133,6 +135,6 @@ describe("Workspace store HTTP routes", () => {
     const response = await fetch(`${base}/saveWorkspaceBundle`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: "Desk.json", workspace: value.workspace, documents: [] }) });
     expect(response.status).toBe(403);
     expect(await response.json()).toMatchObject({ Success: false, Code: "read-only" });
-    expect(await fs.readdir(workspaces)).toEqual([]);
+    expect(await vfs.readdir(workspaces)).toEqual([]);
   });
 });
