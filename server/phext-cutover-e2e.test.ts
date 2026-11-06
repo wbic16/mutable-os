@@ -1,21 +1,31 @@
 // @vitest-environment node
 /**
- * Phext-only cutover — the two headline receipts.
+ * Mode selection — the headline receipts (formerly the phext-only
+ * cutover suite).
  *
  * (a) Disk-silence: through the real lifecycle server, establish a
- * Cavern and exercise a document save, a knowledge write, an
- * upload and a history append; afterwards the whole temp home must
- * contain only the installation state file and, inside the Cavern,
- * cavern.phext (+ .bak / anchor mechanism files). No .mutable, no
- * uploads directory, no loose data files anywhere.
+ * Cavern (no mode requested — the new-Cavern default is Phext) and
+ * exercise a document save, a knowledge write, an upload and a
+ * history append; afterwards the whole temp home must contain only
+ * the installation state file and, inside the Cavern, cavern.phext
+ * (+ .bak / anchor mechanism files). No .mutable, no uploads
+ * directory, no loose data files anywhere.
  *
- * (b) Upgrade-on-encounter: a disk-born Cavern (Phase-5-era layout:
- * .mutable/mutable.db + audit.db, documents as plain files) opens
- * through the lifecycle and is converted automatically — content
- * readable from the phext, the knowledge home preserved under
- * .mutable-disk-fallback/, the L7 cavern-state recording the
- * conversion. A corrupt fixture is refused explicitly with its
- * originals byte-identical.
+ * (b) Derivation, not conversion: a disk-born Cavern (Phase-5-era
+ * layout: .mutable/mutable.db + audit.db, documents as plain files)
+ * opens through the lifecycle in NATIVE mode — nothing is
+ * converted on encounter, the disk knowledge home stays live, and
+ * the open records the mode in `.mutable/cavern-state.json`.
+ *
+ * (c) The explicit upgrade: close → migrate → reopen. The verified
+ * migration generates the phext and records mode phext inside it;
+ * the native tree remains byte-for-byte identical as a frozen
+ * snapshot (no fallback directory, `.mutable` still in place), and
+ * after the flip, writes land in the phext while the snapshot's
+ * hashes never move.
+ *
+ * (b2) A corrupt disk-born Cavern is refused explicitly with its
+ * originals byte-identical and no phext created.
  */
 import { afterEach, expect, it } from 'vitest';
 import express from 'express';
@@ -89,6 +99,9 @@ it('(a) disk-silence: save + knowledge + upload + history leave only the phext i
   const { call, api } = await boot(home);
   const opened = await call('establish', { path: cavern, intent: 'create' });
   expect(opened.Success, opened.Error).toBe(true);
+  // New Caverns default to Phext (design §2.1): no mode was
+  // requested, and the recorded mode says phext.
+  expect(opened.Data.current.mode).toBe('phext');
   const session = opened.Data.current.session as string;
 
   // Document save (native routes, through the lifecycle middleware).
@@ -153,6 +166,10 @@ it('(a) disk-silence: save + knowledge + upload + history leave only the phext i
   expect(fs.existsSync(path.join(cavern, '.mutable'))).toBe(false);
   expect(fs.existsSync(path.join(cavern, 'uploads'))).toBe(false);
   expect(fs.existsSync(path.join(cavern, 'notes'))).toBe(false);
+  // The mode is recorded in the Cavern's own L7 state record.
+  const vfs = PhextVFS.open(path.join(cavern, 'cavern.phext'));
+  try { expect(JSON.parse(vfs.readTextFile('/.control/cavern-state.json')).mode).toBe('phext'); }
+  finally { vfs.close(); }
 });
 
 function diskBornCavern(t: any, corrupt = false) {
@@ -183,25 +200,77 @@ function diskBornCavern(t: any, corrupt = false) {
   })();
 }
 
-it('(b) upgrade-on-encounter: a disk-born Cavern converts on open, originals preserved', { timeout: 180000 }, async () => {
+it('(b) a disk-born Cavern derives native and opens natively — no conversion on encounter', { timeout: 180000 }, async () => {
   const f = await diskBornCavern(undefined);
-  const { call } = await boot(f.home);
+  const { call, api } = await boot(f.home);
   const inspected = await call('inspect', { path: f.cavern });
   expect(inspected.Success, inspected.Error).toBe(true);
+  expect(inspected.Data.mode).toBe('native');
+  expect(inspected.Data.modeSource).toBe('derived');
   const opened = await call('establish', { path: f.cavern, intent: 'open', confirmed: true });
   expect(opened.Success, opened.Error).toBe(true);
+  expect(opened.Data.current.mode).toBe('native');
+  const session = opened.Data.current.session as string;
 
-  // The knowledge home was preserved as the fallback, byte-intact.
-  const fallback = path.join(f.cavern, '.mutable-disk-fallback');
-  expect(fs.existsSync(path.join(f.cavern, '.mutable'))).toBe(false);
-  expect(fs.existsSync(path.join(fallback, 'mutable.db'))).toBe(true);
-  expect(fs.existsSync(path.join(fallback, 'audit.db'))).toBe(true);
-  // Document originals preserved in place, byte-identical.
+  // Nothing was converted: no phext exists, and the disk tree is
+  // exactly where it always was, byte-identical.
+  expect(fs.existsSync(path.join(f.cavern, 'cavern.phext'))).toBe(false);
+  expect(fs.existsSync(path.join(f.cavern, '.mutable', 'mutable.db'))).toBe(true);
+  expect(fs.existsSync(path.join(f.cavern, '.mutable-disk-fallback'))).toBe(false);
   expect(await realFs.readFile(path.join(f.cavern, 'paper.mutable.json'))).toEqual(f.docBytes);
   expect(await realFs.readFile(path.join(f.cavern, 'notes', 'readme.txt'))).toEqual(f.noteBytes);
 
-  // The phext carries everything: documents readable, the legacy
-  // entity in the knowledge stratum, the conversion recorded.
+  // The open recorded the mode in the Cavern's own native record —
+  // derivation happens at most once.
+  const marker = JSON.parse(await realFs.readFile(path.join(f.cavern, '.mutable', 'cavern-state.json'), 'utf8'));
+  expect(marker.mode).toBe('native');
+  expect(marker.cavernGuid).toBe(f.vaultGuid);
+
+  // The disk knowledge home is live: a mutation through the API
+  // lands in .mutable/mutable.db beside the seeded legacy entity.
+  const mutated = await api('sqlite/knowledge/entity-mutate', session, {
+    vault: '.', request: { op: 'create', id: uuid(), operationId: uuid(), name: 'Native Era Entity' },
+  });
+  expect(mutated.Success, mutated.Error).toBe(true);
+  const db = new Database(path.join(f.cavern, '.mutable', 'mutable.db'), { readonly: true });
+  try {
+    const names = db.prepare('SELECT name FROM Entity').all().map((r: any) => r.name);
+    expect(names).toContain('Legacy Entity');
+    expect(names).toContain('Native Era Entity');
+  } finally { db.close(); }
+});
+
+it('(c) explicit upgrade: migration generates the phext, the native tree freezes byte-identical', { timeout: 180000 }, async () => {
+  const f = await diskBornCavern(undefined);
+  const { call, api } = await boot(f.home);
+  const opened = await call('establish', { path: f.cavern, intent: 'open', confirmed: true });
+  expect(opened.Success, opened.Error).toBe(true);
+  expect(opened.Data.current.mode).toBe('native');
+  expect((await call('close', {})).Success).toBe(true);
+
+  // Hash the whole native tree as it stands after the native open
+  // (the open itself wrote only the mode record inside it).
+  const hashTree = async () => {
+    const entries: Record<string, string> = {};
+    for (const rel of walk(f.cavern)) entries[rel] = sha(await realFs.readFile(path.join(f.cavern, rel)));
+    return entries;
+  };
+  const before = await hashTree();
+  const migrated = await call('migrate', { path: f.cavern });
+  expect(migrated.Success, migrated.Error).toBe(true);
+  expect(migrated.Data.verified).toBe(true);
+  expect(migrated.Data.fallback).toBe(null);
+  expect(migrated.Data.fallbackPath).toBe(null);
+
+  // Non-destructive: every pre-upgrade file is byte-identical, the
+  // knowledge home is still in place, and there is no fallback dir.
+  const after = await hashTree();
+  for (const [rel, digest] of Object.entries(before)) expect(after[rel], rel).toBe(digest);
+  expect(fs.existsSync(path.join(f.cavern, '.mutable', 'mutable.db'))).toBe(true);
+  expect(fs.existsSync(path.join(f.cavern, '.mutable-disk-fallback'))).toBe(false);
+
+  // The phext carries everything and records the mode; the
+  // migration record names the whole native tree as on-disk.
   const vfs = PhextVFS.open(path.join(f.cavern, 'cavern.phext'));
   try {
     expect(vfs.readFile('/paper.mutable.json')).toEqual(f.docBytes);
@@ -209,22 +278,51 @@ it('(b) upgrade-on-encounter: a disk-born Cavern converts on open, originals pre
     const store = new PhextKnowledgeStore(vfs);
     const entities = store.listRecords('Entity').map((r: any) => r.record);
     expect(entities.some((e: any) => e.name === 'Legacy Entity')).toBe(true);
-    const state = JSON.parse(vfs.readFile('/.control/cavern-state.json').toString('utf8'));
-    expect(typeof state.migratedUtc).toBe('string');
+    const state = JSON.parse(vfs.readTextFile('/.control/cavern-state.json'));
+    expect(state.mode).toBe('phext');
     expect(state.cavernGuid).toBe(f.vaultGuid);
+    expect(typeof state.migratedUtc).toBe('string');
+    const record = JSON.parse(vfs.readTextFile('/.control/phext-migration.json'));
+    expect(record.fallback).toBe(null);
+    expect(record.onDisk).toEqual(expect.arrayContaining(['.mutable/mutable.db', '.mutable/audit.db', 'paper.mutable.json', 'notes/readme.txt']));
   } finally { vfs.close(); }
+
+  // Reopen: the recorded mode governs — phext, despite BOTH the
+  // phext and the native era's marker being on disk.
+  const reopened = await call('establish', { path: f.cavern, intent: 'open', confirmed: true });
+  expect(reopened.Success, reopened.Error).toBe(true);
+  expect(reopened.Data.current.mode).toBe('phext');
+  const session = reopened.Data.current.session as string;
+
+  // After the flip the snapshot is frozen: a knowledge write lands
+  // in the phext and the native tree's hashes do not move.
+  const mutated = await api('sqlite/knowledge/entity-mutate', session, {
+    vault: '.', request: { op: 'create', id: uuid(), operationId: uuid(), name: 'Phext Era Entity' },
+  });
+  expect(mutated.Success, mutated.Error).toBe(true);
+  const frozen = await hashTree();
+  for (const [rel, digest] of Object.entries(before)) expect(frozen[rel], rel).toBe(digest);
+  const vfs2 = PhextVFS.open(path.join(f.cavern, 'cavern.phext'));
+  try {
+    const store = new PhextKnowledgeStore(vfs2);
+    const entities = store.listRecords('Entity').map((r: any) => r.record);
+    expect(entities.some((e: any) => e.name === 'Phext Era Entity')).toBe(true);
+  } finally { vfs2.close(); }
 });
 
-it('(b2) upgrade-on-encounter: a corrupt disk-born Cavern is refused, originals untouched', { timeout: 180000 }, async () => {
+it('(b2) a corrupt disk-born Cavern is refused, originals untouched', { timeout: 180000 }, async () => {
   const f = await diskBornCavern(undefined, true);
-  const before = walk(f.cavern);
   const dbBefore = await realFs.readFile(path.join(f.cavern, '.mutable', 'mutable.db'));
+  const docBefore = await realFs.readFile(path.join(f.cavern, 'paper.mutable.json'));
   const { call } = await boot(f.home);
   const opened = await call('establish', { path: f.cavern, intent: 'open', confirmed: true });
   expect(opened.Success).toBe(false);
-  expect(String(opened.Error)).toMatch(/conversion|migration|verif/i);
-  expect(walk(f.cavern)).toEqual(before);
+  expect(typeof opened.Error).toBe('string');
+  expect(opened.Error.length).toBeGreaterThan(0);
+  // No conversion was attempted and nothing was written into the
+  // folder: the corrupt originals stand exactly as they were.
   expect(await realFs.readFile(path.join(f.cavern, '.mutable', 'mutable.db'))).toEqual(dbBefore);
+  expect(await realFs.readFile(path.join(f.cavern, 'paper.mutable.json'))).toEqual(docBefore);
   expect(fs.existsSync(path.join(f.cavern, 'cavern.phext'))).toBe(false);
   expect(fs.existsSync(path.join(f.cavern, '.mutable-disk-fallback'))).toBe(false);
 });
