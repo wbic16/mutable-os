@@ -112,6 +112,11 @@ export function entityService(editor:ReactiveEditor,owner:string):EntityService 
   if(result.entity?.attributes!==undefined)result.entity.attributes=decodeAuthoredValue(result.entity.attributes);
   return result.entity;
  };
+ // Usage history is scoped by the Cavern's own identity (its
+ // knowledge vaultGuid), never by its absolute path on disk: a
+ // Cavern that moves keeps its history, and two Caverns at the
+ // same path over time never share it. (Audit item P3.)
+ let scopeGuid:string|undefined,scopeRoot:string|undefined;
  return {
   historyScope:()=>lookupRoot(),
   async documentAssociation(source,signal){

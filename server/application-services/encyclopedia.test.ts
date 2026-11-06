@@ -18,13 +18,13 @@ import {extractPackageData} from '../../src/knowledge-sqlite/package-data.mjs';
 import {EncyclopediaService} from '../../src/application-services/encyclopedia-service';
 import {CavernJobStorage} from './job-storage';
 import {NodePreparationExecutor} from './executor';
-import {ManagedAssetStore} from '../managed-assets.mjs';
+import {ManagedAssetStore} from '../managed-assets.mjs';import {testCavern} from '../../src/knowledge-sqlite/phext-test-cavern.mjs';
 import {wikiFixture,wdFixture} from '../../src/interchange/encyclopedia-fixtures';
 import type {ArticleCapture,EnrichmentCapture} from '../../src/interchange/encyclopedia';
 vi.setConfig({testTimeout:20000});
 const clean:Array<()=>any>=[];afterEach(async()=>{for(const f of clean.splice(0).reverse())await f();});
 async function fixture(realHost=false){
- const root=await mkdtemp(path.join(tmpdir(),'encyclopedia-'));let cavernId=randomUUID();clean.push(()=>rm(root,{recursive:true,force:true}));
+ const root=await mkdtemp(path.join(tmpdir(),'encyclopedia-'));let cavernId=randomUUID();clean.push(()=>rm(root,{recursive:true,force:true}));const cavern=testCavern(root);clean.push(()=>cavern.close());
  const host=realHost?new SqliteKnowledgeHost({root,entitiesEnabled:true}):undefined;if(host){clean.push(()=>host.close());cavernId=(await host.establish('.')).vaultGuid;}
  const db=new Database(':memory:'),audit=new Database(':memory:');migrate(db,'mutable',{fresh:true,vaultGuid:cavernId});migrate(audit,'audit',{fresh:true,vaultGuid:cavernId});clean.push(()=>{db.close();audit.close();});const ledger=canonicalLedger(db,()=>audit);
  const jobs=new CavernJobStorage(root,cavernId),assets=new ManagedAssetStore({root,cavernId,session:'fixture'}),executor=new NodePreparationExecutor();clean.push(()=>jobs.close(),()=>assets.close(),()=>executor.close());let fetches=0,fail=false;

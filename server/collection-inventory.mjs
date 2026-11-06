@@ -1,4 +1,4 @@
-import {promises as fs} from 'node:fs';
+import {promises as fs} from './phext-fs.mjs';
 import path from 'node:path';
 /** Bounded, read-only destination inventory. No symlink traversal or knowledge indexing. */
 export async function collectionInventory(vault, folder, signal) {

@@ -5,7 +5,7 @@ import { RecognizedDocumentStore } from './recognized-document-store.mjs';
 import { verifyDocumentSource } from './recognized-source.mjs';
 import { openSqliteFoundation } from '../src/knowledge-sqlite/client.mjs';
 import { Router, json } from 'express';
-import { promises as fs } from 'node:fs';
+import { promises as fs } from './phext-fs.mjs';
 import path from 'node:path';
 import { ManagedPair, hash } from '../src/persistence/managed-pair.mjs';
 import { installNativeKnowledgeRoutes } from './native-knowledge-routes.mjs';

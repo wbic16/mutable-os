@@ -29,7 +29,7 @@ export function createStudioDrift(
     invalidate();
   };
   const hidden = () => disposed || lost || !inView || hostHidden || document.hidden ||
-    canvas.hidden || !root.isConnected || lighting.effects.reducedEffects;
+    !!canvas.hidden || !root.isConnected || lighting.effects.reducedEffects;
   const reduced = () => motion.matches || lighting.effects.reducedMotion;
   const wake = () => {
     cancel();

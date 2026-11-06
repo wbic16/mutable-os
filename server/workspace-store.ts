@@ -1,6 +1,6 @@
 import { assertJson, validateManagedContainer, desktopOf } from "../src/persistence/managed-desktop.js";
 import { createHash, randomUUID } from "node:crypto";
-import { promises as fs } from "node:fs";
+import { promises as fs } from "./phext-fs.mjs";
 import path from "node:path";
 import { Router } from "express";
 import { validateDocument } from "./document-store.js";
