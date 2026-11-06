@@ -279,7 +279,7 @@ export function CavernControl() {
   const nativeGateTitle = 'This Cavern is in Native mode; upgrade it to Phext to use this.';
   // Settings bundle: ship a COPY of the current settings into this
   // Cavern's phext (explicit action; opening a Cavern never imports
-  // settings back). The server validates all four domains before
+  // settings back). The server validates all five domains before
   // writing the L7 settings tree.
   const updateShippedSettings = async () => {
     setDlError(''); setSettingsNote('');
