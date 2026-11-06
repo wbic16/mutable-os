@@ -1,5 +1,5 @@
 // Settings-bundle capture (client side). Builds the capture payload
-// from the four live settings domains, each read through its own
+// from the five live settings domains, each read through its own
 // module's reader — the same persisted state a restart restores:
 //
 //   keybindings          the BindingRegistry's persisted export
@@ -9,6 +9,10 @@
 //   flint-layout         readPersistedFlintLayout()
 //   annotation-bar       readAnnotationBarPolicy()
 //   editor-interactions  readCrossBlockSelectionPreference()
+//   textual-fonts        loadPreferences().font — the Textual
+//                        preferences reader normalises the font on
+//                        load, so the captured value is the live
+//                        TextualFontSettings a restart restores
 //
 // Capture is an explicit user action ("Update shipped settings" in
 // the Cavern menu). Nothing here runs in the background, and there
@@ -18,6 +22,7 @@ import { STORAGE_KEY as BINDINGS_STORAGE_KEY } from '../input/bindings';
 import { readPersistedFlintLayout } from '../features/flint/compact-layout';
 import { readAnnotationBarPolicy } from '../rendering/annotation-bar-policy';
 import { readCrossBlockSelectionPreference } from '../runtime/cross-block-selection';
+import { loadPreferences } from '../features/textual/grid';
 
 export function currentSettingsCapture() {
   let keybindings: { version: number; overrides: Record<string, unknown> } = { version: 2, overrides: {} };
@@ -29,8 +34,9 @@ export function currentSettingsCapture() {
         keybindings = { version: typeof parsed.version === 'number' ? parsed.version : 2, overrides: parsed.overrides };
       }
     }
-  } catch { /* Unreadable stored bindings: capture the empty override set rather than fail the other three domains; the server validates the whole payload. */ }
+  } catch { /* Unreadable stored bindings: capture the empty override set rather than fail the other four domains; the server validates the whole payload. */ }
   const flint = readPersistedFlintLayout();
+  const font = loadPreferences().font;
   return {
     keybindings,
     'flint-layout': {
@@ -40,5 +46,15 @@ export function currentSettingsCapture() {
     },
     'annotation-bar': { policy: readAnnotationBarPolicy() },
     'editor-interactions': { crossBlockSelection: readCrossBlockSelectionPreference() },
+    // The font normaliser can leave a system family empty (a stored
+    // string that strips to nothing); the domain's own default for
+    // an unspecified system family is Courier New — the same name
+    // normaliseTextualFont and the settings panel fall back to.
+    'textual-fonts': {
+      source: font.source,
+      family: font.source === 'system' && font.family.trim() === '' ? 'Courier New' : font.family,
+      size: font.size,
+      lineHeight: font.lineHeight,
+    },
   };
 }
