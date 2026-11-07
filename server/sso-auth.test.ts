@@ -120,15 +120,24 @@ it('callback clamps a hostile ret to / on landing — re-validated, never follow
   expect(setCookies(response).some(c => c.startsWith('mutable_session='))).toBe(true);
 });
 
-it('gate bounces document requests to edit and answers 401 JSON for API requests', async () => {
+it('gate serves the signed-out overview for page requests and 401 JSON for API requests', async () => {
   const { call } = await fixture(TEST_ENV);
   const root = await call('/');
-  expect(root.status).toBe(302);
-  expect(root.headers.get('location')).toBe('https://edit.phext.io/api/auth/sso/mutable?return=%2F');
+  expect(root.status).toBe(200);
+  expect(root.headers.get('content-type')).toContain('text/html');
+  const rootPage = await root.text();
+  // The overview explains the arrangement and offers exactly one
+  // action: the login leg, aimed back at the requested page.
+  expect(rootPage).toContain('Sign in with edit.phext.io');
+  expect(rootPage).toContain('href="/api/auth/login?return=%2F"');
+  expect(rootPage).toContain('one account across the phext.io sites');
+  expect(rootPage).toContain('GitHub');
+  expect(rootPage).toContain('Google');
+  expect(rootPage).toContain('no separate Mutable password');
+  expect(rootPage).not.toContain('signed out of Mutable OS');
   const deep = await call('/superposition?x=1');
-  expect(deep.status).toBe(302);
-  expect(deep.headers.get('location'))
-    .toBe(`https://edit.phext.io/api/auth/sso/mutable?return=${encodeURIComponent('/superposition?x=1')}`);
+  expect(deep.status).toBe(200);
+  expect(await deep.text()).toContain(`href="/api/auth/login?return=${encodeURIComponent('/superposition?x=1')}"`);
   const api = await call('/api/cavern/status', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
   });
@@ -172,7 +181,11 @@ it('login clears the suppression cookie and clamps hostile returns; logout sets 
 
   const page = await call('/', { headers: { Cookie: 'mutable_logged_out=1' } });
   expect(page.status).toBe(200);
-  expect(await page.text()).toContain('signed out of Mutable OS');
+  const landing = await page.text();
+  // The post-logout landing is the same overview, marked as the
+  // signed-out variant, still carrying the login leg back in.
+  expect(landing).toContain('signed out of Mutable OS');
+  expect(landing).toContain('href="/api/auth/login?return=%2F"');
 });
 
 it('with no secrets configured the gate is off and every request passes through', async () => {
