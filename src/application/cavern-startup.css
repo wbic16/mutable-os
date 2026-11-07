@@ -12,7 +12,21 @@
 .cavern-mode-badge{font-style:normal;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#126c76;border:1px solid #b6c8c2;border-radius:3px;padding:1px 5px;margin-left:8px}
 .cavern-mode-choice{border:1px solid #b6c8c2;border-radius:5px;padding:10px 14px;margin-top:16px}.cavern-mode-choice legend{font-weight:bold;padding:0 4px}.cavern-mode-choice label{display:block;margin-top:6px}
 .cavern-mode-line{display:block;font-size:12px;color:#50645f;margin-top:4px}
-.cavern-identity{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:7px 16px;background:#fafdfb;color:#273b38;border-bottom:1px solid #b7c8c2;font:13px/1.5 Arial,sans-serif}
+.cavern-identity{display:flex;flex-wrap:nowrap;align-items:center;gap:6px 14px;height:43px;box-sizing:border-box;padding:7px 16px;background:#fafdfb;color:#273b38;border-bottom:1px solid #b7c8c2;font:13px/1.5 Arial,sans-serif}
 .cavern-identity a{color:#126c76}
 .cavern-identity button{font:inherit;color:inherit;border:1px solid #b6c8c2;border-radius:5px;background:#f0f6f3;padding:3px 10px;cursor:pointer}
 .cavern-identity button:focus-visible,.cavern-identity a:focus-visible{outline:2px solid #087c89;outline-offset:2px}
+/* The workspace shell's system bar is position:fixed at the
+   viewport top (codex-system-bar.css: height 28px) and the
+   workspace reserves exactly that bar's space (36px of top
+   padding). The identity bar renders above the workspace in
+   normal flow, so the fixed bar painted over its top 28px and
+   hid the Sign out button. When the identity bar is present it
+   owns the top 43px (its height, pinned above): the system bar
+   drops below it and the workspace's reserved top space grows
+   by the same 43px, so both bars are fully visible and the
+   identity bar's controls stay clickable. */
+body:has(.cavern-identity) .codex-system-bar{top:43px}
+body:has(.cavern-identity) .workspace-demo--system-bar{padding-top:79px;--workspace-desktop-top:79px}
+body:has(.cavern-identity) .workspace-demo--system-bar[data-window-work-area]{--window-work-area-top:71px}
+@media(max-width:600px){.cavern-identity{gap:4px 8px;padding:7px 10px;font-size:12px}}

@@ -2,14 +2,15 @@
  * SSO against edit.phext.io (sso-design.md, task 27.6.8/7.5.9/6.5.8).
  *
  * Mutable has no accounts of its own: edit.phext.io is the identity
- * provider. A logged-out hit on a gated route bounces to edit's SSO
- * endpoint; edit (signed-in there, possibly after a provider login)
- * redirects back to /api/auth/callback with a short-lived signed
- * assertion; the callback verifies it and seals Mutable's own
- * session cookie. The whole gate is env-gated: with the secrets
- * absent, the middleware passes everything through and the auth
- * routes answer 404, so local and test instances behave exactly as
- * before this module existed.
+ * provider. A logged-out page request gets a signed-out overview
+ * explaining that; its sign-in button enters the login leg to
+ * edit's SSO endpoint; edit (signed-in there, possibly after a
+ * provider login) redirects back to /api/auth/callback with a
+ * short-lived signed assertion; the callback verifies it and seals
+ * Mutable's own session cookie. The whole gate is env-gated: with
+ * the secrets absent, the middleware passes everything through and
+ * the auth routes answer 404, so local and test instances behave
+ * exactly as before this module existed.
  *
  * The user session here (the `mutable_session` cookie) is a
  * different concept from the Cavern session (`X-Mutable-Cavern`
@@ -115,13 +116,39 @@ const clearCookie = (name: string) =>
 const suppressionCookie = () =>
   `${LOGGED_OUT_COOKIE}=1; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${LOGGED_OUT_MAX_AGE}`;
 
-const SIGNED_OUT_PAGE = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Signed out — Mutable OS</title></head>
-<body style="font:15px/1.5 Arial,sans-serif;color:#273b38;background:#fafdfb;padding:40px">
-<h1 style="font-size:22px">You are signed out of Mutable OS</h1>
-<p>Mutable OS uses your edit.phext.io sign-in. Your sign-in there is untouched by signing out here.</p>
-<p><a href="/api/auth/login">Sign in via edit.phext.io</a> · <a href="https://edit.phext.io/">edit.phext.io</a></p>
-</body></html>`;
+/**
+ * The signed-out overview (Will's direction, 2026-11-06): a
+ * page request without a session gets this page at 200, not a
+ * bare bounce to edit — it explains that Mutable has no accounts
+ * of its own, that sign-in happens at edit.phext.io with GitHub,
+ * Google, or X, and that the browser returns here on its own.
+ * The one action is the sign-in button, which enters the login
+ * leg with the page the user originally wanted as the return
+ * target (already safePath-validated by the caller). Pure inline
+ * CSS, no external assets — the gate serves it before any Cavern
+ * or static surface exists. `signedOut` is set on the post-logout
+ * landing (suppression cookie present) and only adds the note.
+ */
+const overviewPage = (signedOut: boolean, loginHref: string) => `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sign in — Mutable OS</title>
+<style>
+body{font:15px/1.5 Arial,sans-serif;color:#273b38;background:linear-gradient(145deg,#dfe8e4,#b9d3d3);margin:0;min-height:100dvh;display:grid;place-items:center;padding:28px;box-sizing:border-box}
+main{width:min(560px,100%);box-sizing:border-box;padding:32px;border:1px solid #b7c8c2;border-radius:14px;background:#fafdfb;box-shadow:0 24px 70px #17373525}
+small{letter-spacing:.08em}h1{font-size:25px;line-height:1.2;margin:8px 0 16px}p{margin:12px 0}
+.note{background:#eef6f2;border:1px solid #b7c8c2;border-radius:8px;padding:10px 14px}
+a.signin{display:inline-block;margin-top:14px;background:#126c76;color:#fff;border:1px solid #126c76;border-radius:5px;padding:11px 20px;font-weight:bold;text-decoration:none}
+a.signin:focus-visible{outline:2px solid #087c89;outline-offset:2px}
+footer{margin-top:22px;font-size:13px;color:#50645f}footer a{color:#126c76}
+</style></head>
+<body><main>
+<small>MUTABLE OS</small>
+<h1>Sign in to Mutable OS</h1>
+${signedOut ? '<p class="note">You\u2019re signed out of Mutable OS. Your edit.phext.io sign-in is untouched by signing out here.</p>' : ''}
+<p>Mutable OS keeps no accounts of its own. It uses your <strong>edit.phext.io</strong> account — one account across the phext.io sites.</p>
+<p>Signing in takes you to edit.phext.io, where you sign in with <strong>GitHub</strong>, <strong>Google</strong>, or <strong>X</strong>. When you\u2019re done you are returned here automatically — there is no separate Mutable password to create or remember.</p>
+<p><a class="signin" href="${loginHref}">Sign in with edit.phext.io</a></p>
+<footer>New to the phext.io sites? Start at <a href="https://edit.phext.io/">edit.phext.io</a> — the same account works here.</footer>
+</main></body></html>`;
 
 export function createSsoAuth(options: { env?: NodeJS.ProcessEnv } = {}) {
   const env = options.env ?? process.env;
@@ -265,15 +292,17 @@ export function createSsoAuth(options: { env?: NodeJS.ProcessEnv } = {}) {
       next();
       return;
     }
-    // No valid session. Document navigations bounce to edit (or,
-    // just after a logout, land on the signed-out page); API and
-    // upload calls get a 401 the client turns into the same bounce.
+    // No valid session. A document/page request gets the
+    // signed-out overview at 200 (with the sign-in button aimed
+    // back at the page the user wanted); just after a logout the
+    // suppression cookie marks the same overview as the
+    // post-logout landing, so the browser is not bounced straight
+    // back through edit's still-live session. API and upload
+    // calls get a 401 the client turns into the login leg.
     if (!apiClass && (req.method === 'GET' || req.method === 'HEAD')) {
-      if (parseCookies(req)[LOGGED_OUT_COOKIE]) {
-        res.status(200).type('html').send(SIGNED_OUT_PAGE);
-        return;
-      }
-      res.redirect(302, `${editUrl}/api/auth/sso/mutable?return=${encodeURIComponent(req.originalUrl || '/')}`);
+      const ret = safePath(req.originalUrl || '/');
+      const loginHref = `/api/auth/login?return=${encodeURIComponent(ret)}`;
+      res.status(200).type('html').send(overviewPage(Boolean(parseCookies(req)[LOGGED_OUT_COOKIE]), loginHref));
       return;
     }
     res.status(401).json({ Success: false, Error: 'Sign in via edit.phext.io.' });

@@ -1637,6 +1637,76 @@ serial phext vitest set 108/108 across 19 files;
 `server/phext-settings.test.mjs` 5/5; `npm run test:sqlite`
 149/149** — every tally identical to the pre-lift qualification.
 
+### UX fixes from the first live night (2026-11-06)
+
+Three defects Will hit on the deployed site within the hour,
+each fixed here on `emise/sso-ux-fixes` (task coordinate
+31.6.8/7.5.9/6.5.8), off the SSO merge `d46b5fd`:
+
+- **CSRF startup race** (`src/application/cavern-startup.tsx`).
+  `onMount` fired `loadIdentity()` and `startup()` unordered;
+  `request()` attaches the `x-csrf-token` header only when the
+  identity is already loaded, so whenever the
+  `/api/auth/session` fetch lost the race the startup POST went
+  out tokenless and the gate 403'd ("Missing or invalid CSRF
+  token.") at first paint, leaving the chooser's error + Retry.
+  The identity load is now one shared promise: `loadIdentity()`
+  starts it once, `request()` awaits it before any gated request
+  leaves, and `openFromPhext` — the one gated POST that bypasses
+  `request()` — awaits it too. With the gate unconfigured the
+  session call 404s fast, the promise settles with no identity,
+  and behaviour is exactly as before. Regression coverage is two
+  new files (the identity promise is module state, so each
+  scenario needs a module registry no other mount has settled):
+  `src/application/cavern-startup-sso.test.tsx` holds the
+  startup POST until a deliberately slow session fetch releases,
+  then proves the token rode on it;
+  `src/application/cavern-startup-sso-unconfigured.test.tsx`
+  proves the 404 case proceeds tokenless with no identity bar.
+- **Signed-out overview** (`server/sso-auth.ts`). A page
+  request without a session no longer bounces bare to edit: the
+  gate serves a 200 overview page (inline CSS, no external
+  assets) explaining that Mutable uses the visitor's
+  edit.phext.io account — one account across the phext.io
+  sites, sign-in there with GitHub, Google, or X, automatic
+  return, no separate Mutable password — with one prominent
+  "Sign in with edit.phext.io" button into
+  `/api/auth/login?return=<the requested path, safePath-
+  validated as before>`. The post-logout landing is the same
+  overview with a signed-out note (suppression cookie mechanics
+  unchanged); API/upload requests keep the 401 JSON, and the
+  `/api/auth/*` routes are untouched. The old `SIGNED_OUT_PAGE`
+  is gone. `server/sso-auth.test.ts` updated to the new
+  contract (overview content + login href on `/` and on a deep
+  path, API 401, logout → suppression + overview); the
+  callback, clamp, CSRF, login, and disabled-gate legs are
+  unchanged.
+- **Identity bar under the system bar**
+  (`src/application/cavern-startup.css`). The workspace
+  shell's `.codex-system-bar` is `position: fixed` at the
+  viewport top (28px) and the workspace reserves exactly its
+  own space; the identity bar renders above the workspace in
+  flow, so the fixed bar painted over it and hid Sign out.
+  The identity bar's height is now pinned (43px, its natural
+  rendered height) and, when it is present
+  (`body:has(.cavern-identity)`), the system bar drops below
+  it (`top: 43px`) and the workspace's reserved top space
+  grows by the same 43px (`padding-top` /
+  `--workspace-desktop-top` 36px → 79px,
+  `--window-work-area-top` 28px → 71px). Both bars fully
+  visible in chooser and workspace states; with SSO off there
+  is no identity bar, no `:has` match, and no change.
+
+Re-qualified on this branch, fresh `npm run build` first:
+**build PASS; `npm run typecheck` exit 0; SSO suite 7/7;
+cavern-startup 6/6 plus the two new SSO client files 1/1 +
+1/1; the recorded phext vitest set serially — 102/102 across
+its 18 vitest files, 108/108 with cavern-startup counted as
+in the recorded set (`server/phext-settings.test.mjs` swept
+by the glob fails collection under vitest, as recorded
+before, and passes 5/5 under `node --test`); `npm run
+test:sqlite` 149/149.**
+
 ## Appendix — complete per-file accounting (final state)
 
 Every file the one-commit landing changes relative to its upstream
