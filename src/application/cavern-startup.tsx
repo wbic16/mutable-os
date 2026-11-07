@@ -24,9 +24,21 @@ export const useCurrentCavern = () => useContext(Context);
 // redirect; this client behaves exactly as it did before SSO.
 type SsoIdentity = { signed_in: boolean; who?: string; handle?: string; name?: string; editor?: boolean; csrf?: string };
 let ssoIdentity: SsoIdentity | undefined;
+// The identity load, shared: loadIdentity() starts it once and
+// request() awaits it, so a gated request can never leave before
+// the CSRF token is known. Before SSO this raced — onMount fired
+// the session fetch and the startup POST unordered, and whenever
+// the session fetch lost, startup went out tokenless and the gate
+// 403'd ("Missing or invalid CSRF token.") at first paint.
+let ssoIdentityLoad: Promise<void> | undefined;
 const ssoLoginUrl = () => '/api/auth/login?return=' + encodeURIComponent(window.location.pathname);
 
 async function request(action: string, body?: unknown) {
+  // No gated request leaves before the identity load settles.
+  // When the gate is unconfigured the session call 404s fast and
+  // ssoIdentity stays undefined, so this costs one settled promise
+  // and behaviour is unchanged.
+  if (ssoIdentityLoad) await ssoIdentityLoad;
   const unavailable = 'Mutable cannot reach its local server. Start or restart Mutable, then try again.';
   const invalid = 'Mutable received an invalid response from its local server. Restart Mutable, then try again.';
   let response: Response;
@@ -97,14 +109,20 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
   // Ask the server who is signed in (design §3.4). Any failure —
   // a 404 from an unconfigured gate, a stopped server, a non-JSON
   // proxy error — leaves the identity unset and the chrome bare.
-  const loadIdentity = async () => {
-    try {
-      const response = await originalFetch('/api/auth/session');
-      const data = await response.json().catch(() => undefined);
-      if (!alive || !data || typeof data.signed_in !== 'boolean') return;
-      ssoIdentity = data as SsoIdentity;
-      setIdentity(ssoIdentity);
-    } catch { /* SSO unconfigured or unreachable: no identity UI. */ }
+  // The load is shared (ssoIdentityLoad): request() awaits the
+  // same promise, which is what orders the first gated POSTs
+  // after the CSRF token.
+  const loadIdentity = () => {
+    ssoIdentityLoad ??= (async () => {
+      try {
+        const response = await originalFetch('/api/auth/session');
+        const data = await response.json().catch(() => undefined);
+        if (!alive || !data || typeof data.signed_in !== 'boolean') return;
+        ssoIdentity = data as SsoIdentity;
+        setIdentity(ssoIdentity);
+      } catch { /* SSO unconfigured or unreachable: no identity UI. */ }
+    })();
+    return ssoIdentityLoad;
   };
   // Mutable logout is local (design §3.5): it clears the Mutable
   // session and lands on the gate's signed-out page; the edit
@@ -151,6 +169,10 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     if (!safeToSwitch()) return;
     setBusy(true); setError('');
     try {
+      // This POST bypasses request(), so it awaits the shared
+      // identity load itself — the CSRF header below must never
+      // be read before the session fetch has settled.
+      await loadIdentity();
       const form = new FormData();
       form.append('phext', phextFile);
       form.append('target', phextTarget());
@@ -250,6 +272,10 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     },
   };
   onMount(() => {
+    // Order is load-bearing, not incidental: loadIdentity() starts
+    // the shared identity promise and startup()'s first request()
+    // awaits it, so the startup POST always carries the CSRF
+    // token when a session exists.
     void loadIdentity();
     void startup();
     const timer = setInterval(() => {
