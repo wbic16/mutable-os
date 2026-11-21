@@ -31,7 +31,7 @@ test('worker init, bounded queue, graceful shutdown, restart and explicit read-o
   const {vault}=fixture(t); let client=await openSqliteFoundation({vault,initialize:true});
   try {
     const info=await client.inspect(); assert.equal(info.mutable.vaultGuid,info.audit.vaultGuid);
-    assert.deepEqual({...info.mutable.pragmas},{foreign_keys:1,journal_mode:'wal',synchronous:2,busy_timeout:1000,user_version:10,application_id:0x4d55544b});
+    assert.deepEqual({...info.mutable.pragmas},{foreign_keys:1,journal_mode:'wal',synchronous:2,busy_timeout:1000,user_version:12,application_id:0x4d55544b});
     const work=Array.from({length:32},()=>client.inspect());
     await assert.rejects(client.inspect(),/queue is full/); assert.equal((await Promise.all(work)).length,32);
     assert.equal((await client.verify()).mutable.fts,'ok');
@@ -48,7 +48,7 @@ test('one writer, simultaneous read-only inspection, worker termination releases
   try {
     await assert.rejects(openSqliteFoundation({vault}),/writer unavailable/);
     const reader=await openSqliteFoundation({vault,readOnly:true});
-    try { assert.equal((await reader.inspect()).mutable.version,10); } finally { await reader.close(); }
+    try { assert.equal((await reader.inspect()).mutable.version,12); } finally { await reader.close(); }
     await first.terminate();
     const next=await openSqliteFoundation({vault}); try { assert.ok((await next.verify()).ok); } finally { await next.close(); }
   } finally { await first.close(); }
