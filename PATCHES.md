@@ -1963,3 +1963,14 @@ lease (`writerLock(home, 'retrieval.lock')`).
   upstream's `^1.0.0-beta.3` pin has no such export and the server
   typecheck fails on it. Same class as the bibtex pin above:
   upstream's code requires the newer package its pin denies.
+- Addendum 3 (2026-11-21, Emise verification pass): `typescript`
+  is pinned back to upstream's `^5.6.2` (the band's dependency
+  refresh had carried `^6.0.0`). Under TS 6, upstream's own
+  `src/features/dialectic/view.tsx` fails typecheck (TS2322 at
+  34,188, the `inert` assignment) — the band's bump, not
+  upstream's code, is the divergence, so the pin follows
+  upstream. Verified: with `^5.6.2`, both typecheck projects
+  pass clean and the build + sqlite suite pass; the band's
+  code needs nothing from TS 6. `@types/node ^26.6.6` is
+  retained (typecheck passes with it; no upstream conflict
+  observed). Revisit when upstream moves its own TS pin.
