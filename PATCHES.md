@@ -1944,3 +1944,22 @@ lease (`writerLock(home, 'retrieval.lock')`).
   `package-lock.json` was **regenerated** with
   `npm install --package-lock-only --ignore-scripts` from the merged
   `package.json`; never hand-merged.
+- Addendum (same day): `@retorquere/bibtex-parser` is pinned back to
+  the band's `13.0.11` in a follow-up deps commit. Upstream's own
+  `src/academic/bibliography.ts` imports
+  `@retorquere/bibtex-parser/js`, a subpath that does not exist in
+  upstream's `12.1.9` pin (its package exports are `.`, `./wasm`
+  only), so the client build fails on upstream's pin; 13.0.11 is the
+  version whose exports carry `./js`. The lock was regenerated with
+  `npm install --legacy-peer-deps --package-lock-only
+  --ignore-scripts` (the merged dependency set has peer conflicts
+  under strict resolution, as at the db3ed30 landing).
+- Addendum 2 (same day): the `@surrealdb/node` set is likewise
+  restored to the band's pins (`@surrealdb/node ^3.2.0`,
+  `@surrealdb/node-native ^4.0.0`; `surrealdb ^2.2.1` already
+  survived the merge). Upstream's own `server/index.ts` and
+  `server/entity-search.test.ts` call `createNodeEngines`, the
+  3.x API this band's surrealdb 2.x renames (theme 02) introduced;
+  upstream's `^1.0.0-beta.3` pin has no such export and the server
+  typecheck fails on it. Same class as the bibtex pin above:
+  upstream's code requires the newer package its pin denies.
