@@ -36,6 +36,7 @@ import { createHash } from 'node:crypto';
 
 /** Canonical table → L3 directory. Actor is reserved (design D5). */
 export const RECORD_KINDS = Object.freeze({
+  DocumentEntityAssociation: 'document-entity-associations',
   SourceClaimReview: 'reviews',
   ExternalIdentity: 'identities',
   SourceSnapshot: 'snapshots',

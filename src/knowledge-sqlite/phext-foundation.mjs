@@ -44,6 +44,7 @@ import { canonicalPropositions, propositionMutation } from './propositions.mjs';
 import { canonicalEntities, entityMutation } from './entities.mjs';
 import { canonicalSemantics, semanticMutation } from './semantics.mjs';
 import { canonicalCardex } from './cardex.mjs';
+import { sharedCache } from './cache.mjs';
 import { canonicalTables } from './canonical-ledger.mjs';
 import * as indexing from './reconcile.mjs';
 import { PhextKnowledgeStore, recordToRow } from './phext-store.mjs';
@@ -173,6 +174,7 @@ export function openPhextFoundation(options = {}, context = {}) {
   return {
     vaultGuid,
     entities(request, check) { active(); if (entityMutation(request.op)) writable(); return canonicalEntities(replica, request, check, ledger); },
+    cache(request, check) { active(); check?.(); if (request.op !== 'get') writable(); return sharedCache(replica, request); },
     cardex(request, check) {
       active();
       if (request.op === 'semantic') semanticActive();
