@@ -1862,3 +1862,85 @@ exists.
 | `server/phext-cavern-transfer.mjs` | 08 (transfer machinery) | fixes (H2 decompression cap + child timeout) |
 | `server/phext-uploads.mjs` | 08 (phext upload engine) | fixes (H3 engine-side cap) |
 | `src/configuration.ts` | 04 (`phextDocuments`) | 09 deleted the `phextVfs` flag history had added here — a net no-op |
+
+## Rebase onto upstream 58732c6 (2026-11-21)
+
+The fork's divergence — the db3ed30 landing's four commits (squashed
+phext commit, step 3 mode selection, step 4 font settings, and the
+db3ed30 record commit) — was replayed onto upstream HEAD
+`58732c62a2101f225dbc952cad25092aecb4cbf9` (the 19 "milestone" commits
+through `2f65fd9` "First working draft", plus upstream's own merge of
+its `dialectic-app` branch into main). Direction for the rebase, from
+Will: follow the shape of Ian's changes; revise our sqlite changes to
+be consistent with his. Upstream is the base shape everywhere; the
+phext deltas are re-applied additively in his form.
+
+**What upstream did since db3ed30** — the milestone series rebuilt
+parts of the knowledge and application layers: a disk-shaped sqlite
+foundation with a shared cache (migration
+`0011-shared-cache.sql`), document–entity associations (migration
+`0012-document-entity-associations.sql`), a `cache` operation on the
+foundation, an attachment-services surface on the Cavern lifecycle, an
+entity-service scope split (`historyScope` returns the lookup root;
+`scopeIdentity` resolves the vault GUID; `documentAssociation` added),
+lazy fs-ext loading in the persistence layer, and a retrieval writer
+lease (`writerLock(home, 'retrieval.lock')`).
+
+**Sqlite revision (the headline change):**
+
+- Upstream's migrations `0011-shared-cache.sql` and
+  `0012-document-entity-associations.sql` are adopted as-is. The phext
+  layer adds NO numbered migrations of its own.
+- `scripts/build-sqlite-foundation.mjs` — the copy list is the merged
+  union: upstream's list (including `entity-resolution.mjs`, the
+  identity-contract and entity-enrichment modules, and migrations
+  0011/0012) with the band's six modules inserted after `paths.mjs`:
+  `advisory-lock.mjs`, `phext-registry.mjs`, `phext-store.mjs`,
+  `phext-ledger.mjs`, `phext-foundation.mjs`, `phext-convert.mjs`.
+- `src/knowledge-sqlite/foundation.mjs` — the dual-mode seam from
+  step 3 is kept (phext mode entered only with a live PhextVFS;
+  no silent downgrade to disk), and upstream's new foundation body is
+  adopted under it, including the `cache` operation backed by
+  `sharedCache` (`src/knowledge-sqlite/cache.mjs`). The band's
+  snapshot provenance (`sourceMode`) is retained.
+- `src/knowledge-sqlite/paths.mjs` — upstream's `prepareHome` /
+  `writerLock` shape is kept, including the `writerLock(home, name)`
+  lease-name parameter upstream's retrieval client requires; the lock
+  itself is taken through the band's `flockExclusiveSync`
+  (`advisory-lock.mjs`), which prefers the native binding and falls
+  back to a portable token lock.
+
+**Re-anchoring and merged resolutions:**
+
+- `server/index.ts` — upstream now creates the Cavern lifecycle
+  earlier in the file; the band's duplicate creation was dropped and
+  the `phextUploads` import re-anchored after upstream's creation
+  point. (Step 3's mode-aware upload comment supersedes the cutover's
+  phext-only comment.)
+- `src/application/entity-service.ts` — upstream's scope split is
+  adopted wholesale; the band's GUID-returning `historyScope` is
+  superseded by upstream's `scopeIdentity`, so no phext delta remains
+  in this file.
+- `server/cavern-lifecycle.ts` — unions, not choices: the runtime
+  object carries upstream's `attachmentServices` alongside the band's
+  `mode`, `phextReady` and `phextVfs`; `close()` runs upstream's
+  retrieval close first and the band's phext teardown last, gated on
+  `mode === 'phext'` (step 3) with upstream's attachments surface and
+  the band's bounded lifecycle close both retained.
+- `src/persistence/managed-pair.mjs` — upstream's lazy fs-ext load
+  (never import eagerly in worker contexts) combined with the band's
+  stage-C fallback: `nativeFlock` loads the binding on first use and
+  routes to `fallbackFlock` when it is absent.
+- `server/application-services/pdf.test.ts` — upstream's fixture
+  expectations adopted (including the managed-asset media-type check
+  in `original()`); the band's phext `testCavern` fixture kept.
+- `src/application/cavern-startup.tsx` — upstream's save-diagnostics
+  menu entry and reconnect-on-reopen kept alongside step 3's mode
+  choice, mode-gated downloads, and upgrade-to-phext flow.
+- `package.json` — upstream's lines win every conflicted hunk (the
+  band's dependency refresh survives only where upstream did not
+  touch a line; no phext code imports a band-only package —
+  `@surrealdb/node-native` was dropped with upstream's set).
+  `package-lock.json` was **regenerated** with
+  `npm install --package-lock-only --ignore-scripts` from the merged
+  `package.json`; never hand-merged.
