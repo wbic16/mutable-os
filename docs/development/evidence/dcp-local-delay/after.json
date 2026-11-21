@@ -1,0 +1,90 @@
+{
+  "all": [
+    {
+      "mounted": false,
+      "loadEditorMs": 315.30000001192093,
+      "contributions": 8,
+      "cells": 8635,
+      "xmlBytes": 3222,
+      "manifestMs": 5,
+      "requestBuildMs": 2.5,
+      "workspaceMs": 12.399999976158142,
+      "xmlProjectionMs": 1.199999988079071,
+      "historyColdMs": 14,
+      "historyWarmMs": 0.19999998807907104,
+      "xmlLowerMs": 4.899999976158142,
+      "nativePrepareMs": 11.300000011920929,
+      "definitions": 12,
+      "addedAnnotations": 11,
+      "admitMs": 287.2000000476837,
+      "admissionToSaveStartMs": 26,
+      "admissionToPaintOpportunityMs": 25.900000035762787,
+      "admissionToDurableCompletionMs": 2229.900000035763,
+      "saveCoordinatorWithFilesystemMs": 2203.900000035763,
+      "postAdmissionLongTasks": [
+        {
+          "start": 11390.899999976158,
+          "duration": 1132
+        },
+        {
+          "start": 12530.799999952316,
+          "duration": 743
+        }
+      ],
+      "historyAfterMs": 1.699999988079071,
+      "saveCaptureMs": 590.3999999761581,
+      "saveEncodeMs": 109.89999997615814,
+      "saveBytes": 777793,
+      "snapshotCloneMs": 76.09999996423721,
+      "fullSaveWithInMemoryAdapterMs": 584.5,
+      "domNodes": 0,
+      "firstPaintTraceMs": 19.132,
+      "paintsBeforeCapture": 2
+    },
+    {
+      "mounted": true,
+      "loadEditorMs": 274.60000002384186,
+      "mountMs": 168.39999997615814,
+      "contributions": 8,
+      "cells": 8635,
+      "xmlBytes": 3222,
+      "manifestMs": 2.199999988079071,
+      "requestBuildMs": 0.5,
+      "workspaceMs": 36.60000002384186,
+      "xmlProjectionMs": 0.7999999523162842,
+      "historyColdMs": 4.800000011920929,
+      "historyWarmMs": 0.09999996423721313,
+      "xmlLowerMs": 1.699999988079071,
+      "nativePrepareMs": 4.800000011920929,
+      "definitions": 12,
+      "addedAnnotations": 11,
+      "admitMs": 272.4000000357628,
+      "admissionToSaveStartMs": 33.10000002384186,
+      "admissionToPaintOpportunityMs": 33.10000002384186,
+      "admissionToDurableCompletionMs": 2287.5,
+      "saveCoordinatorWithFilesystemMs": 2254.399999976158,
+      "postAdmissionLongTasks": [
+        {
+          "start": 16845.799999952316,
+          "duration": 370
+        },
+        {
+          "start": 17226,
+          "duration": 776
+        }
+      ],
+      "historyAfterMs": 1.199999988079071,
+      "saveCaptureMs": 526.6999999880791,
+      "saveEncodeMs": 112.20000004768372,
+      "saveBytes": 777793,
+      "snapshotCloneMs": 107.19999998807907,
+      "fullSaveWithInMemoryAdapterMs": 627.1000000238419,
+      "domNodes": 11084,
+      "firstPaintTraceMs": 19.188,
+      "paintsBeforeCapture": 2
+    }
+  ],
+  "blockedCalls": [],
+  "phase": "after",
+  "baselineCommit": "72ebce52e18e737645ca4b134370f18d86986684"
+}

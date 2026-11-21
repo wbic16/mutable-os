@@ -1,0 +1,22 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="semantic-fixture">
+  <teiHeader>
+    <fileDesc><titleStmt><title>Invented semantic qualification fixture</title><author><persName ref="#editor">Editor</persName></author></titleStmt></fileDesc>
+    <profileDesc>
+      <listPerson><person xml:id="editor"><persName>Editor</persName></person><person xml:id="alice"><persName>Alice</persName></person></listPerson>
+      <listPlace><place xml:id="city"><placeName>City</placeName></place></listPlace>
+      <listOrg><org xml:id="press"><orgName>Press</orgName></org></listOrg>
+      <correspDesc><correspAction type="sent"><persName ref="#alice">Alice</persName><date from="1842-01" to="1842-02">Early 1842</date></correspAction></correspDesc>
+      <listRelation><relation name="corresponded-with" active="#alice" passive="#editor #unknown" cert="low"/><relation name="colleagues" mutual="#alice #editor #alice"/></listRelation>
+    </profileDesc>
+    <encodingDesc><listWit><witness xml:id="w1">First witness</witness><witness xml:id="w2">Second witness</witness></listWit></encodingDesc>
+  </teiHeader>
+  <text><body>
+    <p xml:id="alternatives">Before <choice xml:id="choice" resp="#editor"><orig xml:id="original">olde <hi rend="italic">😀é</hi></orig><reg cert="high">old <choice><abbr/><expan>expanded</expan></choice></reg></choice> after <app xml:id="apparatus" from="#start" to="#finish"><rdg wit="#w2 #missing #w2" resp="#editor">first</rdg><lem wit="#w1">lemma</lem><rdgGrp type="orthographic" wit="#w1 #w2"><rdg>colour</rdg><rdg>color</rdg></rdgGrp></app>.</p>
+    <p xml:id="positions"><anchor xml:id="start"/>A😀<pb n="2" facs="scan.jpg#zone"/><lb break="no"/>é<cb n="ii"/><milestone unit="stanza" n="3"/> B<space quantity="2" unit="chars"/><anchor xml:id="finish"/><lb/>C</p>
+    <p xml:id="editorial"><subst xml:id="substitution" resp="#editor"><del hand="#old-hand">old</del><add place="above" hand="#new-hand">new</add></subst> <supplied reason="lost" cert="low" resp="#editor">supplied</supplied> <surplus>extra</surplus> <damage agent="water"><unclear cert="unknown">blurred</unclear></damage> <restore><del>restored</del></restore><gap reason="illegible" quantity="3" unit="chars"/><handShift new="#new-hand"/></p>
+    <p xml:space="preserve"> A <hi rend="bold"><supplied>😀 é</supplied></hi>
+ B </p>
+    <p><persName ref="#alice">Alice</persName> <placeName ref="#city">City</placeName> <orgName ref="#press">Press</orgName> <name ref="#unknown">Unknown</name></p>
+    <add resp="#editor"><p>Structural addition one.</p><p>Structural addition two.</p></add>
+  </body></text>
+</TEI>

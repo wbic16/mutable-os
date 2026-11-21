@@ -7,7 +7,7 @@ import path from 'node:path';
 export const APPLICATION_IDS = Object.freeze({ mutable: 0x4d55544b, audit: 0x4d555441 });
 export const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export const migrations = Object.freeze(Object.fromEntries(Object.keys(APPLICATION_IDS).map(kind => {
-  const files = kind === 'mutable' ? ['0001-foundation.sql','0002-semantic-knowledge.sql','0003-scholarly-identities.sql','0004-encyclopedia.sql','0005-iiif.sql','0006-resources.sql','0007-deterministic-academic.sql','0008-propositions.sql','0009-cardex.sql','0010-cardex-soft-delete.sql'] : ['0001-foundation.sql'];
+  const files = kind === 'mutable' ? ['0001-foundation.sql','0002-semantic-knowledge.sql','0003-scholarly-identities.sql','0004-encyclopedia.sql','0005-iiif.sql','0006-resources.sql','0007-deterministic-academic.sql','0008-propositions.sql','0009-cardex.sql','0010-cardex-soft-delete.sql','0011-shared-cache.sql','0012-document-entity-associations.sql'] : ['0001-foundation.sql'];
   return [kind, Object.freeze(files.map((file,index) => {
     const sql = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'migrations', kind, file), 'utf8');
     return Object.freeze({version:index+1,sql,checksum:hash(sql)});

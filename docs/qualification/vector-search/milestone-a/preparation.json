@@ -1,0 +1,69 @@
+{
+  "createdUtc": "2026-11-13T21:08:27.233Z",
+  "sources": [
+    {
+      "name": "poe",
+      "path": "vaults/imported/documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+      "sha256": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+      "bytes": 166147,
+      "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+      "timings": {
+        "decodeValidationMs": 364.264167,
+        "projectionMs": 40.07958300000007,
+        "totalMs": 404.876875
+      },
+      "projectionDiagnostics": []
+    },
+    {
+      "name": "symposium",
+      "path": "vaults/imported/Conversation on November 11, 2026 (3).ink",
+      "sha256": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+      "bytes": 1195272,
+      "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+      "timings": {
+        "decodeValidationMs": 366.85737499999993,
+        "projectionMs": 164.05449999999996,
+        "totalMs": 530.922167
+      },
+      "projectionDiagnostics": []
+    }
+  ],
+  "profile": {
+    "model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "metric": "cosine",
+    "extension": "0.1.9",
+    "tokenizer": "js-tiktoken@1.0.21/cl100k_base",
+    "maxTokens": 384,
+    "fixedOverlap": 64,
+    "structureOverlap": 0
+  },
+  "variants": {
+    "fixed": {
+      "chunks": 32,
+      "tokens": 6785
+    },
+    "structure": {
+      "chunks": 34,
+      "tokens": 6212
+    }
+  },
+  "queries": 14,
+  "uniqueInputs": 58,
+  "plannedTokens": 10027,
+  "cap": 50000,
+  "priceUsdPerMillion": 0.02,
+  "queryFileHash": "83046bb686a4b1080ffbc5b470f6548a7f3cd4af7dec1496cc84c85bdfa7c4fe",
+  "corpusHash": "6bdb28c5bb9f793b7b57cc753186319c12e6e75a6561c119ab853b7a21932cb7",
+  "estimatedUsd": 0.00020054,
+  "sourceChecks": {
+    "chunks": 66,
+    "spans": 164,
+    "allExact": true,
+    "contributionBoundaries": true
+  },
+  "localTiming": {
+    "chunkAndGoldMs": 711.123959,
+    "totalPrepareMs": 1723.853708
+  }
+}

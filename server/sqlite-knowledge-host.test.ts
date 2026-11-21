@@ -1,12 +1,15 @@
+// @vitest-environment node
 import {afterEach,expect,it} from 'vitest';
 import express from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import os from 'node:os';
 import {SqliteKnowledgeHost} from './sqlite-knowledge-host';
 import {createNativeDocumentStoreRouter} from './native-document-store.mjs';
 import {createDocumentStoreRouter} from './document-store';
-import {decodeNative,nativeText} from '../src/persistence/native-resource';
+import {decodeBlockTree} from '../src/block-tree/codecs';
+import {captureNative,decodeNative,nativeText} from '../src/persistence/native-resource';
 import {exportMarkdown} from '../src/persistence/markdown';
 import {testCavern} from '../src/knowledge-sqlite/phext-test-cavern.mjs';
 const cleanup:Array<()=>Promise<unknown>>=[];afterEach(async()=>{for(const f of cleanup.splice(0).reverse())await f();});
@@ -46,4 +49,25 @@ it('Vault establishment reuses a warm application policy without replacing it or
  await expect(f.host.acquire('.',{version:1,opaqueTypes:[]})).rejects.toThrow(/policy differs/);
  await f.host.release(open.lease);
  expect((await f.host.establish('.')).vaultGuid).toBe(open.vaultGuid);
+});
+it('retrieval receives only confirmed saved projections and never delays a foreground save',async()=>{
+ const make=(text:string)=>{const r=captureNative(decodeBlockTree({id:'retrieval-doc',type:'document-block',children:[{id:'retrieval-text',type:'standoff-editor-block',text}]}).state,'retrieval-doc'),md=exportMarkdown(r);return {resourceId:r.resourceId,generation:crypto.randomUUID(),native:nativeText(r),markdown:md.text,profile:md.profile,targets:[]};};
+ const f=await fixture(),lease=await f.host.acquire('.');const firstStart=performance.now();const saved=await f.save(make('first saved text'));const baselineSaveMs=performance.now()-firstStart;expect(saved.Data.result.phase).toBe('saved');await f.host.flush();
+ const {openRetrievalService}=await import('../src/retrieval/client.mjs');
+ const service=await openRetrievalService({vault:f.root,vaultGuid:lease.vaultGuid,profile:{provider:'test',model:'deterministic-test',dimensions:32},providerModule:pathToFileURL(path.resolve('src/retrieval/test-provider.mjs')).href,providerOptions:{delayMs:250}});
+ await f.host.attachRetrieval(lease.lease,service);expect(await f.host.flushRetrieval(lease.lease)).toMatchObject({complete:true,issues:[]});expect((await service.status()).passages).toBeGreaterThan(0);
+ const output=await service.query('first saved text');expect(output.results.length).toBeGreaterThan(0);expect(output.results[0].source.liveCurrency).toBe('unknown');
+ let release!:()=>void;const gate=new Promise<void>(r=>{release=r;});const foreground=f.host.foreground(()=>gate);await expect(service.query('during unconfirmed save')).rejects.toThrow(/not currently confirmed/);release();await foreground;await f.host.flush();await f.host.flushRetrieval(lease.lease);
+ const pending=service.query('superseded by a save');const cancelled=expect(pending).rejects.toThrow(/cancel|superseded|confirmed/i);await new Promise(r=>setTimeout(r,20));
+ const start=performance.now();const next=await f.save(make('second saved text'),saved.Data.baseline);const concurrentSaveMs=performance.now()-start;await cancelled;console.log('retrieval-save-qualification',JSON.stringify({baselineSaveMs,concurrentSaveMs,providerDelayMs:250,maxForegroundWaitMs:f.host.metrics.maxForegroundWaitMs}));expect(next.Data.result.phase).toBe('saved');await f.host.flush();await f.host.flushRetrieval(lease.lease);expect((await service.query('second saved text')).results.some((r:any)=>r.text.includes('second saved text'))).toBe(true);
+ const timings:{idle:number[],active:number[]}={idle:[],active:[]};let baseline=next.Data.baseline;
+ for(let i=0;i<6;i++){
+   const active=i%2===1,pending=active?service.query('obsolete timing query'):undefined;
+   const cancelled=pending?expect(pending).rejects.toThrow(/cancel|superseded|confirmed/i):undefined;
+   if(active)await new Promise(r=>setTimeout(r,20));
+   const start=performance.now(),result=await f.save(make('timing text '+i),baseline);timings[active?'active':'idle'].push(performance.now()-start);expect(result.Data.result.phase).toBe('saved');baseline=result.Data.baseline;
+   await cancelled;await f.host.flush();await f.host.flushRetrieval(lease.lease);
+ }
+ console.log('retrieval-warm-save-qualification',JSON.stringify(timings));
+ await f.host.release(lease.lease);
 });

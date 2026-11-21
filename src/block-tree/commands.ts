@@ -1,9 +1,15 @@
+import {prepareMargin,marginText} from './compound-authoring';
+import {INLINE_READING, isReadingRelation} from './inline-alternative';
+import { replaceCompact, contentLength, inlineSlice, normalizeInline, logicalInline, inlineText } from "./inline-sequence";
 import { StructuralDraft } from "./structural-draft";
+import { hasBlockMode, modeContinuationError, modeJoinError } from './mode-editing';
 import { isAutomaticListMetadata, type AutomaticListMetadata } from "./list-wrap-plan";
-import { diffRecordBatch } from "./record-batch";
+import { diffRecordBatch, recordOperations } from "./record-batch";
 import { conversionSource } from '../interchange/conversion';
 import { mapStandoffPropertiesForReplacement, pointAffinity } from '../interchange/ranges';
-import { planFragmentInsertion } from '../interchange/insertion';
+import { planFragmentInsertion, planCompactFragmentInsertion } from '../interchange/insertion';
+import { serializeSelection } from '../interchange/serializer';
+import { materializeFragment } from '../interchange/materialize';
 import type { MutableFragment } from '../interchange/fragment';
 import { planBlockRestore, type BlockRestorePlan, type LeafAuthoredState } from "./block-restore";
 import { type DeepReadonly } from "./commit-capture";
@@ -11,7 +17,7 @@ import { clone } from "./clone";
 import { ownNewDefinitions } from "./definition-ownership";
 import { planCrossTextEdit, type CrossTextSegment } from "./cross-text-edit";
 import { linkedRegistry, linkedSourcesForMove } from "./linked-annotations";
-import { resourceOwner, resourceSource } from "./resource-identity";
+import { resourceOwner, resourceSource, indexedResourceLookup } from "./resource-identity";
 import { captureBlocks, cloneBlocks, remapKnownBlockReferences, type BlockFragment } from "./clipboard";
 import type { BlockCommitSubject, CommandDescriptor } from "./commit-capture";
 import { isAuthoredBlock, prepareNewBlockIdentities, readBlockId } from "./identity";
@@ -27,6 +33,7 @@ import type {
   Destination,
   ExistingBlockDto,
   InlineImageDescriptor,
+  CompactInlineAddress,
   NodeKey,
   PlacementKey,
   RepositoryOperation,
@@ -34,6 +41,7 @@ import type {
 } from "./types";
 
 interface PendingTransaction {
+  requireBounded?:boolean;
   label: string;
   operations: RepositoryOperation[];
   draft: RepositoryState;
@@ -58,6 +66,19 @@ export class TreeCommands {
     if(this.pending)throw new TreeCommandError('Finish the current operation first');
     const state=this.repository.readState(),placement=this.placementKey(key,state),content=state.contents[state.placements[placement].contentKey];
     if(content.inlineKind!=='standoff'||content.inlineRevision!==version)throw new TreeCommandError('Scry source changed; draft was not committed');
+    if(content.compactInline){
+      const reviewedSource=reviewed.find(op=>op.kind==='put-content'&&op.record.key===content.key) as Extract<RepositoryOperation,{kind:'put-content'}>|undefined;
+      let next=clone(reviewedSource?.record??content),origins:(number|null)[]=(next.payload.standoffProperties as unknown[]??[]).map((_,i)=>i);
+      for(const edit of edits){if(inlineSlice(next.compactInline!.spans,edit.start,edit.end).some(a=>a.kind==='alternative'))throw new TreeCommandError('Finish provisional input before replacing an inline alternative slot');const mapped:(number|null)[]=[];next=replaceCompact(next,edit.start,edit.end,edit.text?[{kind:'text',text:edit.text}]:[],mapped);origins=mapped.map(i=>i===null?null:origins[i]??null);}
+      if(JSON.stringify(next.compactInline)===JSON.stringify(content.compactInline)){next.payload.standoffProperties=clone(reviewedSource?.record.payload.standoffProperties??content.payload.standoffProperties??[]);origins=(next.payload.standoffProperties as unknown[]).map((_,i)=>i<(content.payload.standoffProperties as unknown[]??[]).length?i:null);}
+      if(annotation){
+        if(!annotation.value||!Number.isInteger(annotation.start)||!Number.isInteger(annotation.end)||annotation.start<0||annotation.end<=annotation.start||annotation.end>contentLength(next))throw new TreeCommandError('Invalid Scry annotation');
+        const properties=next.payload.standoffProperties as Record<string,unknown>[]??[];
+        if(!properties.some((p,i)=>i>=(content.payload.standoffProperties as unknown[]??[]).length&&p.type==='codex/entity-reference'&&p.value===annotation.value&&p.start===annotation.start&&p.end===annotation.end-1)){properties.push({id:crypto.randomUUID(),type:'codex/entity-reference',start:annotation.start,end:annotation.end-1,value:annotation.value,metadata:{entityId:annotation.value,entityName:annotation.name}});origins.push(null);}next.payload.standoffProperties=properties;
+      }
+      next.revision=content.revision+1;
+      this.publish(annotation?'Link Scry Entity':'Finish Scry text',[...reviewed.filter(op=>op!==reviewedSource),{kind:'put-content',record:next,annotationOrigins:origins}],{commandId:'autocomplete.finish',subjects:[this.subject(state,placement)]});return;
+    }
     const keys=[...content.inlineContent],fresh=new Map<string,{content:ContentRecord;placement:PlacementKey}>();
     const reviewedSource=reviewed.find(op=>op.kind==='put-content'&&op.record.key===content.key) as Extract<RepositoryOperation,{kind:'put-content'}>|undefined;
     const originalProperties=content.payload.standoffProperties as Record<string,unknown>[]??[];
@@ -93,6 +114,14 @@ export class TreeCommands {
   insertMutableText(edits: Array<{ segments: CrossTextSegment[]; fragment: BlockFragment; slices: MutableFragment['roots'] }>, cut = false, operation: 'paste' | 'import' | 'convert' = 'paste') {
     if (!edits.length) return [];
     const before = this.current();
+    if(edits.some(e=>e.segments.some(s=>before.contents[before.placements[this.placementKey(s.placementKey,before)].contentKey].compactInline))){
+      if(!this.inlineInteroperability())throw new TreeCommandError('Compact clipboard interoperability is disabled.');
+      const draft=new StructuralDraft(before,k=>this.repository.locationOf(k),k=>this.repository.contentReferenceCount(k),k=>this.repository.ownedPlacementKeys(k));
+      const results=[];
+      for(const edit of edits){if(operation==='convert')throw new TreeCommandError('Compact source conversion is not supported by this clipboard operation.');const result=planCompactFragmentInsertion(draft.state,edit.segments,edit.fragment,edit.slices,{locationOf:k=>draft.locationOf(k),referenceCount:k=>draft.referenceCount(k),ownerOf:k=>resourceOwner(before,k,indexedResourceLookup(this.repository))});draft.apply(result.operations!);results.push({placementKey:result.placementKey,caret:result.caret});}
+      this.publish(cut?'Cut selected text':'Paste Mutable content',draft.operations(),{commandId:cut?'selection.cut':'selection.paste',subjects:results.map(r=>this.subject(draft.state,r.placementKey)),clipboard:{token:crypto.randomUUID(),action:cut?'cut':'paste',preservedIds:false}});return results;
+    }
+    if(edits.some(e=>Object.values(e.fragment.state.contents).some(c=>c.compactInline?.spans.some(a=>a.kind==='alternative'))))throw new TreeCommandError('Inline alternatives require a compact destination; nothing was pasted.');
     let state = before;
     const results: Array<{ placementKey: string; caret: number }> = [];
     for (const edit of edits) {
@@ -127,11 +156,13 @@ export class TreeCommands {
 
 
   replaceAcrossBlocks(segments: CrossTextSegment[], text: string) {
-    const state = this.current();
+    for(const segment of segments)this.assertContentEdit?.(segment.placementKey);
+    const state = this.current(true);
     const resolved = segments.map(segment => ({ ...segment, placementKey: this.placementKey(segment.placementKey, state) }));
-    const result = planCrossTextEdit(state, resolved, text);
-    this.pruneUnreachable(result.state);
-    this.publish("Replace selected text", this.diff(state, result.state), {
+    if(!this.inlineInteroperability()&&resolved.some(s=>state.contents[state.placements[s.placementKey].contentKey].compactInline?.spans.some(a=>a.kind==='alternative')))throw new TreeCommandError('Inline alternative structural interoperability is disabled.');
+    const result = planCrossTextEdit(state, resolved, text,state.contents[state.placements[resolved[0]?.placementKey]?.contentKey]?.compactInline&&(!this.pending||this.pending.local)?{locationOf:k=>this.location(k,state),referenceCount:k=>this.pending?.local?.referenceCount(k)??this.repository.contentReferenceCount(k)}:undefined);
+    if(!result.operations)this.pruneUnreachable(result.state);
+    this.publish("Replace selected text", result.operations??this.diff(state, result.state), {
       commandId: "tree.replaceAcrossBlocks", subjects: [...result.inputs, ...result.outputs],
       relation: { kind: "cross-text-replace", inputs: result.inputs, outputs: result.outputs },
     });
@@ -144,7 +175,7 @@ export class TreeCommands {
     const properties = content.payload.standoffProperties;
     if (content.inlineKind !== "standoff" || !Array.isArray(properties) || !Number.isInteger(index) ||
       !properties[index] || JSON.stringify(properties[index]) !== JSON.stringify(expected)) throw new TreeCommandError("Annotation changed; reopen the monitor");
-    const next = editAnnotation(properties[index], action, content, () => content.inlineContent.map(key => String(state.contents[state.placements[key].contentKey].payload.text ?? "\uFFFC")).join(""));
+    const next = editAnnotation(properties[index], action, content, () => inlineText(logicalInline(state,content)));
     if (JSON.stringify(next) === JSON.stringify(properties[index])) return next;
     const updated = clone(properties); updated[index] = next;
     this.publish("Edit Standoff annotation", [{ kind: "put-content", annotationOrigins: properties.map((_, i) => i), record: {
@@ -158,7 +189,7 @@ export class TreeCommands {
     if(!text.length||text.length>1000||!type)throw new TreeCommandError('Invalid replacement annotation');
     this.transaction('Replace text and annotate',()=>{
       this.replaceInlineRange(key,start,end,text);
-      const state=this.state(),content=state.contents[state.placements[this.placementKey(key,state)].contentKey];
+      const state=this.current(true),content=state.contents[state.placements[this.placementKey(key,state)].contentKey];
       const properties=clone(content.payload.standoffProperties as Record<string,unknown>[]??[]);
       properties.push({id:crypto.randomUUID(),type,value,metadata:clone(metadata),start,end:start+[...text].length-1});
       this.setPayloadField(key,'standoffProperties',properties,undefined,properties.map((_,i)=>i<properties.length-1?i:null));
@@ -168,10 +199,14 @@ export class TreeCommands {
   constructor(
     private readonly repository: CanonicalRepository,
     private readonly resolveOccurrence: (key: NodeKey | PlacementKey) => PlacementKey | undefined,
+    private readonly assertContentEdit?: (key: NodeKey | PlacementKey) => void,
+    private readonly resolveEditingAtom?: (key:NodeKey)=>{placementKey:string;index:number}|undefined,
+    private readonly inlineInteroperability:()=>boolean=()=>true,
   ) {}
 
   private current(local = false): RepositoryState {
     if (this.pending?.local && !local) {
+      if(this.pending.requireBounded)throw new TreeCommandError('Operation requires broad transaction planning');
       this.pending.draft = this.pending.local.materialize();
       this.pending.local = undefined;
     }
@@ -201,6 +236,11 @@ export class TreeCommands {
       key = at.ownerContentKey;
     }
   }
+
+  isCompactText(key:NodeKey|PlacementKey):boolean {const state=this.current(true);return !!state.contents[state.placements[this.placementKey(key,state)].contentKey].compactInline;}
+
+  /** Identity lookup inside an in-flight native structural transaction. */
+  blockIdOf(key:NodeKey|PlacementKey):string|undefined {const state=this.current(true);return readBlockId(state.contents[state.placements[this.placementKey(key,state)].contentKey]);}
 
   /** Transaction-aware structural reads, including freshly inserted wrappers. */
   childrenOf(key: NodeKey | PlacementKey): PlacementKey[] {
@@ -272,11 +312,15 @@ export class TreeCommands {
   structuralTransaction(label: string, operation: () => void, descriptor?: CommandDescriptor): void {
     this.runTransaction(label, operation, descriptor, true);
   }
-  transaction(label: string, operation: () => void, descriptor?: CommandDescriptor): void {
-    this.runTransaction(label, operation, descriptor, false);
+  boundedStructuralTransaction(label:string, operation:()=>void):void {
+    this.runTransaction(label,operation,undefined,true,true);
   }
-  private runTransaction(label: string, operation: () => void, descriptor: CommandDescriptor | undefined, local: boolean): void {
+  transaction(label: string, operation: () => void, descriptor?: CommandDescriptor): void {
+    this.runTransaction(label, operation, descriptor, this.repository.compactCanonicalText);
+  }
+  private runTransaction(label: string, operation: () => void, descriptor: CommandDescriptor | undefined, local: boolean, requireBounded=false): void {
     if (this.pending) {
+      if(requireBounded&&!this.pending.requireBounded)throw new TreeCommandError('Bounded transaction cannot join a broader batch');
       const index = this.pending.commands.length;
       operation();
       if (descriptor) this.pending.commands.splice(index, 0, clone(descriptor));
@@ -284,13 +328,13 @@ export class TreeCommands {
     }
     const writeSet = local ? new StructuralDraft(this.repository.readState(), key => this.repository.locationOf(key),
       key => this.repository.contentReferenceCount(key), key => this.repository.ownedPlacementKeys(key)) : undefined;
-    this.pending = { label, operations: [], local: writeSet, draft: writeSet?.state ?? this.repository.snapshot(), commands: descriptor ? [clone(descriptor)] : [] };
+    this.pending = { label, requireBounded, operations: [], local: writeSet, draft: writeSet?.state ?? this.repository.snapshot(), commands: descriptor ? [clone(descriptor)] : [] };
     try {
       operation();
       const operations = this.pending.local?.operations() ?? this.pending.operations;
       const commands = this.pending.commands;
       this.pending = undefined;
-      this.repository.commit(label, operations, true, { commands });
+      this.repository.commit(label, operations, true, { commands, requireBounded });
     } catch (error) {
       this.pending = undefined;
       throw error;
@@ -439,8 +483,9 @@ export class TreeCommands {
   replaceSourceWithFragment(fragment: BlockFragment, key: NodeKey | PlacementKey): PlacementKey[] {
     const state = this.current();
     const pk = this.placementKey(key, state), p = state.placements[pk], c = state.contents[p.contentKey];
+    if (hasBlockMode(c.payload)) throw new TreeCommandError('Conversion would remove this Block Mode; clear it explicitly first');
     if (p.kind !== "owned" || p.externalReference || p.resolvedReference || p.resourceRegistration ||
-      c.children.length || c.inlineContent.length || Object.keys(c.ownedRelations).length || Object.keys(c.opaqueRelations).length ||
+      c.children.length || contentLength(c) || Object.keys(c.ownedRelations).length || Object.keys(c.opaqueRelations).length ||
       Object.values(state.placements).filter(edge => edge.contentKey === c.key).length !== 1) {
       throw new TreeCommandError("Conversion requires an unshared source leaf in an ordinary child slot");
     }
@@ -459,7 +504,11 @@ export class TreeCommands {
       copiedDocument.payload.linkedAnnotations={...(copiedDocument.payload.linkedAnnotations as JsonObject??{}),...fragment.linkedAnnotations};
       fragment.linkedAnnotations={};
     }
-    const state = this.current();
+    // Newly prepared fragments without registry merges use the same local
+    // record operations as insert(dto). Keep broader clipboard cases on their
+    // existing path; canonical ownership/admission still checks the full batch.
+    const bounded = !!this.pending?.requireBounded && !replaceKey && !Object.keys(fragment.linkedAnnotations ?? {}).length;
+    const state = this.current(bounded);
     const target = this.resolveInsertion(destination, undefined, state);
     if (Object.keys(fragment.state.contents).some(key => state.contents[key]) || Object.keys(fragment.state.placements).some(key => state.placements[key])) throw new TreeCommandError("Clipboard keys collide with existing Blocks");
     const children = [...target.children];
@@ -490,7 +539,7 @@ export class TreeCommands {
       if (!removed.definitionOwnerKey) changes.contents[removed.key] = null;
     }
     for (const op of extra) if (op.kind === "put-content") changes.contents[op.record.key] = op.record;
-    this.publish(replaceKey ? "Convert source Block to Mutable Ink" : "Paste Blocks", [changes], {
+    this.publish(replaceKey ? "Convert source Block to Mutable Ink" : "Paste Blocks", bounded ? [...recordOperations([changes])] : [changes], {
       commandId: "tree.insertFragment", subjects: fragment.roots.map(key => this.subject(fragment.state, key)),
       ...(fragment.copyIdentities?.length ? { relation: { kind: "copy" as const, pairs: fragment.copyIdentities } } : {}), ...descriptor });
     return [...fragment.roots];
@@ -609,7 +658,7 @@ export class TreeCommands {
     const location = resolved && this.repository.locationOf(resolved);
     if (!placement || !location || location.slot.kind !== "children") return false;
     const child = state.contents[placement.contentKey];
-    if (!child || child.inlineKind !== "standoff" || child.inlineContent.length || child.children.length ||
+    if (!child || child.inlineKind !== "standoff" || contentLength(child) || child.children.length ||
       Object.keys(child.ownedRelations).length || this.repository.contentReferenceCount(child.key) !== 1) return false;
     const owner = state.contents[location.ownerContentKey];
     const operations: RepositoryOperation[] = [
@@ -648,6 +697,7 @@ export class TreeCommands {
     return true;
   }
   remove(key: NodeKey | PlacementKey): void {
+    this.assertContentEdit?.(key);
     if (this.removeLocal(key)) return;
     if (this.removeEmptyParagraph(key)) return;
     const state = this.state();
@@ -686,6 +736,10 @@ export class TreeCommands {
   }
 
   unwrap(key: NodeKey | PlacementKey): void {
+    const current = this.current();
+    if (hasBlockMode(current.contents[current.placements[this.placementKey(key, current)].contentKey].payload)) {
+      throw new TreeCommandError('Unwrapping would remove this Block Mode; clear it explicitly first');
+    }
     const state = this.state();
     const placementKey = this.placementKey(key, state);
     const unwrapped = state.placements[placementKey];
@@ -724,6 +778,11 @@ export class TreeCommands {
     dto: ExistingBlockDto,
     childPolicy: "preserve" | "replace",
   ): PlacementKey {
+    const current = this.current();
+    const previous = current.contents[current.placements[this.placementKey(key, current)].contentKey];
+    if (hasBlockMode(previous.payload) && (dto.mode !== previous.payload.mode || dto.type !== previous.payload.type)) {
+      throw new TreeCommandError('Replacement would reinterpret this Block Mode; clear it explicitly first');
+    }
     const state = this.state();
     const placementKey = this.placementKey(key, state);
     if (placementKey === state.rootPlacementKey) {
@@ -780,12 +839,7 @@ export class TreeCommands {
     const owner = state.contents[state.placements[this.placementKey(ownerKey, state)].contentKey];
     if (owner.inlineKind !== "standoff") throw new TreeCommandError("Margins require a Standoff source block");
     const name = side === "left" ? "leftMargin" : "rightMargin";
-    const text: ExistingBlockDto = {
-      id: globalThis.crypto.randomUUID(), type: "standoff-editor-block", text: "", children: [],
-      standoffProperties: [], blockProperties: [
-        { type: "block/alignment", value: side }, { type: "block/font/size/three-quarters" },
-      ],
-    };
+    const text=marginText(side);
     const existing = owner.ownedRelations[name];
     if (existing) {
       const margin = state.contents[state.placements[existing].contentKey];
@@ -794,14 +848,7 @@ export class TreeCommands {
       if (firstText) return firstText;
       return this.insert(text, { kind: "at", parentKey: existing, index: margin.children.length });
     }
-    const placement = this.setRelation(ownerKey, name, {
-      id: globalThis.crypto.randomUUID(), type: `${side}-margin-block`,
-      blockProperties: [
-        { type: `block/marginalia/${side}` },
-        ...(side === "right" ? [{ type: "block/alignment", value: "right" }] : []),
-      ],
-      children: [text],
-    });
+    const placement = this.setRelation(ownerKey, name, prepareMargin(side,[text]));
     const next = this.current();
     return next.contents[next.placements[placement].contentKey].children[0];
   }
@@ -861,13 +908,15 @@ export class TreeCommands {
     const placement = state.placements[this.placementKey(key, state)];
     const content = state.contents[placement.contentKey];
     if (Object.is(content.payload[field], value)) return;
+    const payload = { ...clone(content.payload), [field]: clone(value) };
+    if (field === 'mode' && value === undefined) delete payload.mode;
     this.publish(label, [
       {
         kind: "put-content",
         ...(field === "standoffProperties" && annotationOrigins ? { annotationOrigins } : {}),
         record: {
           ...clone(content),
-          payload: { ...clone(content.payload), [field]: clone(value) },
+          payload,
           revision: content.revision + 1,
         },
       },
@@ -894,6 +943,17 @@ export class TreeCommands {
     const content = state.contents[placement.contentKey];
     if (content.inlineKind !== "standoff") {
       throw new TreeCommandError("Inline text operations require a Standoff content record");
+    }
+    if(content.compactInline){
+      const annotationOrigins:(number|null)[]=[],insert=text?[{kind:'text' as const,text}]:[];
+      const record=replaceCompact(content,start,end,insert,annotationOrigins);
+      if(Object.keys(record.ownedRelations).length!==Object.keys(content.ownedRelations).length){
+        // Deleting a slot is a structural edit: retain the established liveness,
+        // reference and inverse-operation semantics for its owned closure.
+        const next=clone(state);next.contents[content.key]=record;this.pruneUnreachable(next);
+        return this.diff(state,next).map(op=>op.kind==='put-content'&&op.record.key===content.key?{...op,annotationOrigins,inlineSplice:{start,end,insert}}:op);
+      }
+      return [{kind:'put-content',record,annotationOrigins,inlineSplice:{start,end,insert}}];
     }
     if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < start || end > content.inlineContent.length) {
       throw new TreeCommandError(`Invalid inline range ${start}..${end}`);
@@ -1106,8 +1166,17 @@ export class TreeCommands {
   }
 
   copy(key: NodeKey | PlacementKey, destination: Destination): PlacementKey {
-    const state = this.state();
+    const state = this.current();
     const placementKey = this.placementKey(key, state);
+    const content=state.contents[state.placements[placementKey].contentKey];
+    if(content.compactInline?.spans.some(a=>a.kind==='alternative')){
+      if(!this.inlineInteroperability())throw new TreeCommandError('Inline alternative clipboard interoperability is disabled.');
+      const owner=resourceOwner(state,content.key,indexedResourceLookup(this.repository)),scope=owner?{resourceId:String(owner.payload.id)}:{};
+      const serialized=serializeSelection(state,[{placementKey}],scope,false,undefined,undefined,indexedResourceLookup(this.repository));
+      if(serialized.embeds.length)throw new TreeCommandError('Use native clipboard copy and paste for alternatives containing images so resource availability can be checked. Nothing was copied.');
+      const fragment=materializeFragment(serialized,scope);
+      return this.insertFragment(fragment,destination,{commandId:'tree.copy',subjects:[this.subject(state,placementKey),this.subject(fragment.state,fragment.roots[0])]})[0];
+    }
     // Stage A retains the old command's explicit legacy-export limitations.
     // Copy the canonical graph itself so internal shared identity is preserved.
     encodeDocument(state, placementKey);
@@ -1118,17 +1187,20 @@ export class TreeCommands {
   }
 
   insertEmptyStandoffSibling(key: NodeKey | PlacementKey, side: "before" | "after", checked?: boolean): PlacementKey {
-    const state = this.current();
+    const state = this.current(true);
     const placementKey = this.placementKey(key, state);
     const content = state.contents[state.placements[placementKey].contentKey];
+    const modeError = modeContinuationError(content.payload);
+    if (modeError) throw new TreeCommandError(modeError);
     if (content.inlineKind !== "standoff") throw new TreeCommandError("Expected a Standoff paragraph");
-    const location = this.pending ? deriveLocations(state).get(placementKey) : this.repository.locationOf(placementKey);
+    const location = this.location(placementKey,state);
     if (!location || location.slot.kind !== "children") throw new TreeCommandError("A Standoff relation/root needs an explicit insertion policy");
     const parent = state.contents[location.ownerContentKey];
     const decoded = decodeDetachedSubtree({
       ...clone(content.payload), id: createBlockId(), type: "standoff-editor-block",
       text: "", standoffProperties: [], children: [], ...(checked === undefined ? {} : { checked }),
     });
+    if(content.compactInline)decoded.state.contents[decoded.state.placements[decoded.rootPlacementKey].contentKey].compactInline={version:1,spans:[]};
     const children = [...parent.children];
     children.splice(location.index! + (side === "after" ? 1 : 0), 0, decoded.rootPlacementKey);
     this.publish("Insert Standoff paragraph", [
@@ -1140,17 +1212,20 @@ export class TreeCommands {
   }
 
   splitStandoff(key: NodeKey | PlacementKey, index: number, checked?: boolean): PlacementKey {
-    const state = this.current();
+    const state = this.current(true);
     const placementKey = this.placementKey(key, state);
     const placement = state.placements[placementKey];
     const content = state.contents[placement.contentKey];
+    const modeError = modeContinuationError(content.payload);
+    if (modeError) throw new TreeCommandError(modeError);
     if (content.inlineKind !== "standoff") {
       throw new TreeCommandError("Only Standoff content can be split");
     }
-    if (!Number.isInteger(index) || index <= 0 || index >= content.inlineContent.length) {
+    if(content.compactInline&&(this.pending?.local?.referenceCount(content.key)??this.repository.contentReferenceCount(content.key))>1)throw new TreeCommandError('Detach shared content before splitting its structure');
+    if (!Number.isInteger(index) || index <= 0 || index >= contentLength(content)) {
       throw new TreeCommandError("Boundary splits use ordinary before/after insertion");
     }
-    const location = this.pending ? deriveLocations(state).get(placementKey) : this.repository.locationOf(placementKey);
+    const location = this.location(placementKey,state);
     if (!location || location.slot.kind !== "children") {
       throw new TreeCommandError("A Standoff relation/root needs an explicit split policy");
     }
@@ -1167,9 +1242,9 @@ export class TreeCommands {
       if (!Number.isFinite(start) || !Number.isFinite(end)) {
         leftAnnotations.push(clone(annotation));
       } else if (annotation.isZeroWidth === true) {
-        const affinity = pointAffinity(annotation, content.inlineContent.length);
+        const affinity = pointAffinity(annotation, contentLength(content));
         if (start < index || start === index && affinity === "before") leftAnnotations.push({ ...clone(annotation), affinity });
-        else rightAnnotations.push({ ...clone(annotation), start: start - index, end: start - index, affinity });
+        else rightAnnotations.push({ ...clone(annotation), start: start - index, end: (content.compactInline ? end : start) - index, affinity });
       } else if (end < index) {
         leftAnnotations.push(clone(annotation));
       } else if (start >= index) {
@@ -1188,10 +1263,15 @@ export class TreeCommands {
     const rightPayload: Record<string, unknown> = { ...clone(content.payload), standoffProperties: rightAnnotations };
     rightPayload.id = createBlockId();
     if (checked !== undefined) rightPayload.checked = checked;
+    const rightReadingNames=new Set(content.compactInline?inlineSlice(content.compactInline.spans,index,contentLength(content)).flatMap(a=>a.kind==='alternative'?a.properties.readings:[]):[]);
+    const leftRelations=Object.fromEntries(Object.entries(content.ownedRelations).filter(([name])=>!rightReadingNames.has(name)));
+    const rightRelations=Object.fromEntries(Object.entries(content.ownedRelations).filter(([name])=>rightReadingNames.has(name)));
     operations.push({ kind: "put-content", record: {
       ...clone(content),
+      ownedRelations:leftRelations,
       payload: leftPayload,
       inlineContent: content.inlineContent.slice(0, index),
+      ...(content.compactInline ? {compactInline:{version:1 as const,spans:inlineSlice(content.compactInline.spans,0,index)}}:{}),
       inlineRevision: content.inlineRevision + 1,
       revision: content.revision + 1,
     } });
@@ -1201,11 +1281,12 @@ export class TreeCommands {
       payload: rightPayload,
       children: [],
       inlineContent: content.inlineContent.slice(index),
+      ...(content.compactInline ? {compactInline:{version:1 as const,spans:inlineSlice(content.compactInline.spans,index,contentLength(content))}}:{}),
       inlineRevision: 0,
-      ownedRelations: {},
+      ownedRelations: rightRelations,
       opaqueRelations: {},
       wireChildren: "present",
-      wireRelation: "omitted",
+      wireRelation: Object.keys(rightRelations).length?"present":"omitted",
       revision: 0,
     } });
     operations.push({ kind: "put-placement", record: {
@@ -1226,6 +1307,21 @@ export class TreeCommands {
     leftKey: NodeKey | PlacementKey,
     rightKey: NodeKey | PlacementKey,
   ): number {
+    const current = this.current(true);
+    const modeError = modeJoinError(
+      current.contents[current.placements[this.placementKey(leftKey, current)].contentKey].payload,
+      current.contents[current.placements[this.placementKey(rightKey, current)].contentKey].payload,
+    );
+    if (modeError) throw new TreeCommandError(modeError);
+    const compactLeft=current.contents[current.placements[this.placementKey(leftKey,current)].contentKey],compactRight=current.contents[current.placements[this.placementKey(rightKey,current)].contentKey];
+    if(compactLeft.compactInline||compactRight.compactInline){
+      if(!this.inlineInteroperability()&&[compactLeft,compactRight].some(c=>c.compactInline?.spans.some(a=>a.kind==='alternative')))throw new TreeCommandError('Inline alternative structural interoperability is disabled.');
+      if(!compactLeft.compactInline||!compactRight.compactInline)throw new TreeCommandError('Joining different canonical representations is not supported');
+      if(compactRight.children.length||Object.keys(compactRight.ownedRelations).some(name=>!isReadingRelation(name))||Object.keys(compactRight.opaqueRelations).length)throw new TreeCommandError('Move paragraph attachments before joining');
+      const left=this.placementKey(leftKey,current),right=this.placementKey(rightKey,current),at=contentLength(compactLeft);
+      const result=planCrossTextEdit(current,[{placementKey:left,start:at,end:at},{placementKey:right,start:0,end:0}],'',{locationOf:k=>this.location(k,current),referenceCount:k=>this.pending?.local?.referenceCount(k)??this.repository.contentReferenceCount(k)});
+      this.publish('Join Standoff Blocks',result.operations!,{commandId:'tree.joinStandoff',subjects:result.inputs,relation:{kind:'join',survivor:result.inputs[0],absorbed:result.inputs[1],at}});return at;
+    }
     const state = this.state();
     const leftPlacementKey = this.placementKey(leftKey, state);
     const rightPlacementKey = this.placementKey(rightKey, state);
@@ -1255,7 +1351,8 @@ export class TreeCommands {
     if (Object.values(state.placements).filter((candidate) => candidate.contentKey === right.key).length !== 1) {
       throw new TreeCommandError("Detach shared right-hand content before joining it");
     }
-    const joinIndex = left.inlineContent.length;
+    if (!!left.compactInline !== !!right.compactInline) throw new TreeCommandError("Joining different canonical representations is not supported");
+    const joinIndex = contentLength(left);
     const leftAnnotations = (left.payload.standoffProperties as Array<Record<string, unknown>> | undefined) ?? [];
     const rightAnnotations = ((right.payload.standoffProperties as Array<Record<string, unknown>> | undefined) ?? []).map((annotation) => ({
       ...clone(annotation),
@@ -1267,6 +1364,7 @@ export class TreeCommands {
       ...clone(left),
       payload: { ...clone(left.payload), standoffProperties: [...clone(leftAnnotations), ...rightAnnotations] },
       inlineContent: [...left.inlineContent, ...right.inlineContent],
+      ...(left.compactInline ? {compactInline:{version:1 as const,spans:normalizeInline([...left.compactInline.spans,...right.compactInline!.spans])}}:{}),
       inlineRevision: left.inlineRevision + 1,
       revision: left.revision + 1,
     };
@@ -1284,16 +1382,42 @@ export class TreeCommands {
     return joinIndex;
   }
 
+  /** One native structural transaction. Reading coordinates are never inserted
+   * into the host sequence, and no character records are materialised. */
+  insertInlineAlternative(key:NodeKey|PlacementKey,index:number,readings:ExistingBlockDto[],metadata:JsonObject={}):string {
+    const state=this.current(true),placement=this.placementKey(key,state),host=state.contents[state.placements[placement].contentKey];
+    if(!host.compactInline||!readings.length)throw new TreeCommandError('Inline alternatives require compact text and at least one reading');
+    const prepare=(dto:ExistingBlockDto):ExistingBlockDto=>{
+      if(dto.type!=='standoff-editor-block'||dto.children?.length||Object.keys(dto.relation??{}).some(name=>!isReadingRelation(name)))throw new TreeCommandError('Inline readings must be rich inline TextBlocks');
+      const {text, ...rest}=clone(dto);
+      return {...rest,id:crypto.randomUUID(),inlineAtoms:dto.inlineAtoms??(text?[{kind:'text',text}]:[]),
+        ...(dto.relation?{relation:Object.fromEntries(Object.entries(dto.relation).map(([name,d])=>[name,prepare(d as ExistingBlockDto)]))}:{})};
+    };
+    const decoded=readings.map(d=>decodeDetachedSubtree(prepare(d))),names=readings.map(()=>INLINE_READING+crypto.randomUUID());
+    const id=crypto.randomUUID(),insert=[{kind:'alternative' as const,properties:{version:1 as const,id,readings:names,metadata:clone(metadata)}}];
+    const staged={...clone(host),ownedRelations:{...host.ownedRelations,...Object.fromEntries(names.map((n,i)=>[n,decoded[i].rootPlacementKey]))},wireRelation:'present' as const};
+    const origins:(number|null)[]=[],record=replaceCompact(staged,index,index,insert,origins);
+    const operations:RepositoryOperation[]=decoded.flatMap(d=>[...Object.values(d.state.contents).map(record=>({kind:'put-content' as const,record})),...Object.values(d.state.placements).map(record=>({kind:'put-placement' as const,record}))]);
+    operations.push({kind:'put-content',record,annotationOrigins:origins,inlineSplice:{start:index,end:index,insert}});
+    this.publish('Insert inline alternative',operations,{commandId:'tree.insertInlineAlternative',subjects:[this.subject(state,placement)]});return id;
+  }
+
   insertInlineImage(
     key: NodeKey | PlacementKey,
     index: number,
     descriptor: InlineImageDescriptor,
-  ): PlacementKey {
-    const state = this.state();
+  ): PlacementKey | CompactInlineAddress {
+    const state = this.current(true);
     const hostPlacement = state.placements[this.placementKey(key, state)];
     const host = state.contents[hostPlacement.contentKey];
     if (host.inlineKind !== "standoff") {
       throw new TreeCommandError("Inline images require a Standoff host");
+    }
+    if(host.compactInline){
+      const insert=[{kind:'image' as const,properties:clone(descriptor) as unknown as JsonObject}],annotationOrigins:(number|null)[]=[];
+      const record=replaceCompact(host,index,index,insert,annotationOrigins);
+      this.publish('Insert inline image',[{kind:'put-content',record,annotationOrigins,inlineSplice:{start:index,end:index,insert}}],{commandId:'tree.insertInlineImage',subjects:[this.subject(state,hostPlacement.key)]});
+      return {kind:'compact-inline',ownerPlacementKey:hostPlacement.key,index,inlineRevision:record.inlineRevision};
     }
     if (index < 0 || index > host.inlineContent.length) {
       throw new TreeCommandError(`Invalid inline insertion index ${index}`);
@@ -1363,11 +1487,22 @@ export class TreeCommands {
   }
 
   updateInlineImage(
-    key: NodeKey | PlacementKey,
+    key: NodeKey | PlacementKey | CompactInlineAddress,
     patch: Partial<InlineImageDescriptor>,
   ): void {
-    const state = this.state();
-    const placement = state.placements[this.placementKey(key, state)];
+    const state = this.current(true);
+    let editing: {placementKey:string;index:number}|undefined;
+    if(typeof key==='string')editing=this.resolveEditingAtom?.(key);
+    else {const owner=state.contents[state.placements[key.ownerPlacementKey]?.contentKey];if(!owner?.compactInline||owner.inlineRevision!==key.inlineRevision)throw new TreeCommandError('The inline object address is stale');editing={placementKey:key.ownerPlacementKey,index:key.index};}
+    if(editing){
+      const host=state.contents[state.placements[editing.placementKey].contentKey],atom=inlineSlice(host.compactInline!.spans,editing.index,editing.index+1)[0];
+      if(atom?.kind!=='image')throw new TreeCommandError('The inline item is not an image');
+      const updated={kind:'image' as const,properties:{...clone(atom.properties),...clone(patch)}};
+      if(JSON.stringify(updated)===JSON.stringify(atom))return;
+      const record={...clone(host),compactInline:{version:1 as const,spans:normalizeInline([...inlineSlice(host.compactInline!.spans,0,editing.index),updated,...inlineSlice(host.compactInline!.spans,editing.index+1,contentLength(host))])},inlineRevision:host.inlineRevision+1,revision:host.revision+1};
+      this.publish('Update inline image',[{kind:'put-content',record,inlineSplice:{start:editing.index,end:editing.index+1,insert:[updated]}}],{commandId:'tree.updateInlineImage',subjects:[this.subject(state,editing.placementKey)]});return;
+    }
+    const placement = state.placements[this.placementKey(key as string, state)];
     const content = state.contents[placement.contentKey];
     if (content.viewType !== "image-cell") throw new TreeCommandError("The inline item is not an image");
     this.publish("Update inline image", [
@@ -1391,6 +1526,10 @@ export class TreeCommands {
     const current = state.contents[currentPlacement.contentKey];
     const currentType = String(current.payload.type ?? current.viewType);
     const nextType = String(descriptor.type ?? "");
+    if (hasBlockMode(current.payload) && (nextType !== currentType ||
+      Object.prototype.hasOwnProperty.call(descriptor, 'mode') && descriptor.mode !== current.payload.mode)) {
+      throw new TreeCommandError('Background conversion would reinterpret this Block Mode; clear it explicitly first');
+    }
     const types = ["image-background-block", "video-background-block", "youtube-video-background-block", "canvas-background-block"];
     if (!types.includes(currentType) || !types.includes(nextType)) {
       throw new TreeCommandError("Background replacement requires two background descriptors");

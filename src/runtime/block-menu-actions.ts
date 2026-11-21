@@ -1,7 +1,11 @@
+import {prepareImage} from '../block-tree/media-authoring';
+import {canvasPreviewDto} from '../block-tree/note-authoring';
+import {prepareTabs,tabPanel} from '../block-tree/compound-authoring';
+import {listShell} from '../block-tree/layout-authoring';
 import { tabOrientationMenu } from './tab-orientation';
 import { tabOrientation } from '../block-tree/tab-orientation';
 import { tableMenuItems } from './table-menu';
-import { sourcePayload, sourceType } from '../interchange/source-block';
+import { sourceBlockDto } from '../interchange/source-block';
 import type { BlockNode, ExistingBlockDto, NodeKey } from "../block-tree/types";
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import { unwrap as unwrapStore } from "solid-js/store";
@@ -10,6 +14,7 @@ import { backgroundImages, defaultBackgroundUrls, isBackgroundType, mediaUrl, yo
 import { stickyNoteDto } from "./sticky-notes";
 import { exportDocument } from './export-document';
 import { standoffCodeDto } from './standoff-code';
+import {prepareGrid,prepareYouTube} from '../block-tree/native-authoring';
 
 import type { BlockMenuItem } from "./block-menu-types";
 export type { BlockMenuItem } from "./block-menu-types";
@@ -65,7 +70,7 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
     const visit = (key: NodeKey) => { const current = editor.node(key); if (!current) return; [...current.children].forEach(visit); if (types.includes(current.viewType) && key !== root) unwrap(key); };
     visit(target.key);
   });
-  const grid = (rows: number, columns: number, emptyFirst = false) => dto("grid-block", Array.from({ length: rows }, (_, row) => dto("grid-row-block", Array.from({ length: columns }, (_, column) => dto("grid-cell-block", emptyFirst && !row && !column ? [] : [text()])))));
+  const grid = (rows: number, columns: number, emptyFirst = false) => prepareGrid(Array.from({length:rows},(_,row)=>Array.from({length:columns},(_,column)=>emptyFirst&&!row&&!column?[]:[text()])));
   const convert = (value: ExistingBlockDto, depth: number) => {
     editor.commands.structuralTransaction("Convert Block", () => {
     let target = editor.commands.insert(value, { kind: "before", anchorKey: key });
@@ -76,7 +81,7 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
   };
   const mediaInput = (label: string, type: string) => input(label, (url) => {
     if (type === "youtube-video-block" ? !youtubeId(url) : !mediaUrl(url)) throw new Error("Enter a valid media URL (YouTube videos also accept a video ID).");
-    add(dto(type, [], { url }));
+    add(type==='youtube-video-block'?prepareYouTube(url):prepareImage(url));
   });
   const historyEntry = editor.features.blockHistory
     ? command("history.open", "History…")
@@ -103,6 +108,11 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
   }
 
   const items: BlockMenuItem[] = [...(editor.mounts.get(key)?.contextActions?.() ?? []), historyEntry];
+  if (editor.features.quill && editor.commandRegistry.owner("quill.edit")) {
+    const composition=ancestors.some(n=>n.viewType==='mutable/svg-text-composition-block');
+    if(composition){items.push(command('quill.edit','Edit in Quill'));items.push({...command('quill.toText','Convert to Standoff Text'),reason:'Removes SVG presentation and preserves native text and annotations. Undo restores the composition.'});}
+    else if(node.viewType==='standoff-editor-block')items.push(command('quill.convert','Convert to Quill'),command('quill.edit','Edit in Quill'),command('quill.convertSelection','Convert selection to Quill'),command('quill.copySelection','Compose independently from selection'));
+  }
   items.push(command('markdown.toggleInput', `Markdown Input Transformation: ${editor.markdownInput.enabled() ? 'On' : 'Off'}`));
   items.push(...tabOrientationMenu(editor, ancestor("tab-row-block", "document-tab-row-block")?.key));
   if (editor.features.tableLayouts) items.push({ label: 'Tables and columns', loadChildren: () => tableMenuItems(editor, key) });
@@ -132,11 +142,11 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
     items.push({ label: "Add Block", children: [
       { label: "Text", run: () => add(text()) }, { label: "Code", run: () => add({ ...dto("code-mirror-block"), text: "" }) },
       ...(editor.features.standoffCodeHighlighting ? [{ label: 'Standoff code', children: ['javascript', 'typescript', 'markdown'].map(language => ({ label: language === 'javascript' ? 'JavaScript' : language === 'typescript' ? 'TypeScript' : 'Markdown', run: () => add(standoffCodeDto(language)) })) }] : []),
-      ...(editor.features.documentInterchange ? (['markdown','html'] as const).map(format=>({label:format==='markdown'?'Markdown source':'HTML source',run:()=>add({...dto(sourceType(format)),...sourcePayload(format)})})) : []),
+      ...(editor.features.documentInterchange ? (['markdown','html'] as const).map(format=>({label:format==='markdown'?'Markdown source':'HTML source',run:()=>add(sourceBlockDto(format))})) : []),
       ...editor.featureActions.list("add-block-menu").map(item => command(item.command, item.label)),
       { label: "Insert Sticky Note Here", run: () => add(stickyNoteDto()) },
       mediaInput("Image URL…", "image-block"), mediaInput("YouTube video URL…", "youtube-video-block"),
-      { label: "Canvas", run: () => add(dto("canvas-block")) },
+      { label: "Canvas", run: () => add(canvasPreviewDto()) },
       { label: "Add Grid", children: [1, 2].flatMap(rows => [1, 2, 3].map(columns => ({ label: `${rows} × ${columns}`, run: () => add(grid(rows, columns)) }))) },
     ] });
     items.push({ label: "File", children: [...files, unavailable("Duplicate document", "Independent document-window sessions are not yet migrated; use Save as to make a stored copy."), unavailable("Rename document", "The original action is unimplemented; Save as creates a named copy.")] });
@@ -144,9 +154,9 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
       if (!ancestor("grid-block")) items.push({ label: "Convert to grid (1 × 2)", run: () => convert(grid(1, 2, true), 2) });
       if (!ancestor("tab-row-block")) items.push({ label: "Convert to tab", run: () => {
         if (node.viewType === "standoff-editor-block") createTextTab(editor, key);
-        else convert(dto("tab-row-block", [dto("tab-block", [], { name: "Tab 1", active: true })]), 1);
+        else convert(prepareTabs([{label:'Tab 1',content:[]}]), 1);
       } });
-      if (!ancestor("indented-list-block")) items.push({ label: "Convert to list", run: () => convert(dto("indented-list-block"), 0) });
+      if (!ancestor("indented-list-block")) items.push({ label: "Convert to list", run: () => convert(listShell(), 0) });
       items.push(unavailable("Convert to pocket", "This action is a no-op in the original source; existing pocket controls are available."));
     }
     const containsPage = (key: NodeKey): boolean => {
@@ -163,7 +173,7 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
       if (!canConvertDocumentToPage()) return;
       editor.commands.transaction("Convert Document to Page", () => {
         const children = editor.commands.childrenOf(document.key);
-        const row = editor.commands.insert(dto("document-tab-row-block", [dto("document-tab-block", [dto("page-block")], { name: "Page 1", active: true })]), { kind: "at", parentKey: document.key, index: 0 });
+        const row = editor.commands.insert(prepareTabs([{label:'Page 1',content:[]}],undefined,true), { kind: "at", parentKey: document.key, index: 0 });
         const tab = editor.commands.childrenOf(row)[0];
         const page = editor.commands.childrenOf(tab)[0];
         children.forEach((child, index) => editor.commands.move(child, { kind: "at", parentKey: page, index }));
@@ -184,8 +194,9 @@ export function blockMenuItems(editor: ReactiveEditor, key: NodeKey): BlockMenuI
           const length = editor.commands.childrenOf(owner).length;
           // PageView reserves the left/right gutters around its main-text children.
           // A bare TextBlock under the tab bypasses that layout and page scrolling.
-          const content = label === "Pages" ? dto("page-block", [text()]) : text();
-          placement = editor.commands.insert(dto(tabType, [content], { name: `${label === "Pages" ? "Page" : "Tab"} ${length + 1}`, text: `Sticky tag ${length + 1}`, active: true }), { kind: "at", parentKey: owner, index: length });
+          const panel = label === "Tags" ? dto(tabType,[text()],{name:`Tab ${length+1}`,text:`Sticky tag ${length+1}`,active:true}) : tabPanel(`${label === "Pages" ? "Page" : "Tab"} ${length + 1}`,[text()],label === "Pages");
+          panel.metadata={...panel.metadata as Record<string,unknown>,text:`Sticky tag ${length+1}`};
+          placement = editor.commands.insert(panel, { kind: "at", parentKey: owner, index: length });
         });
         focus(find(placement).key);
       };

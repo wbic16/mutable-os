@@ -5,10 +5,10 @@ export function authorityIdentity(db,r,ledger,entity,check){
  const record=r.record;
  if(!record||record.provider!=='wikidata'||!/^Q[1-9]\d{0,14}$/.test(record.id))throw Error('Only the existing Wikidata identity namespace supports import');
  const mapping=()=>db.prepare('SELECT entityGuid FROM ExternalIdentity WHERE namespace=? AND externalKey=?').get('wikidata',record.id);
- if(r.op==='authority-lookup'){const found=mapping();return {entity:found?entity(db,found.entityGuid):undefined};}
+ if(r.op==='authority-lookup'){const found=mapping(),value=found?entity(db,found.entityGuid):undefined;return {entity:value&&!value.deletedUtc?value:undefined};}
  return ledger.mutate(r,ctx=>{
   guid(r.id);const old=mapping();
-  if(old){if(r.targetId&&r.targetId!==old.entityGuid)throw Error('This authority ID belongs to another Entity; no merge was performed');return {entity:entity(db,old.entityGuid)};}
+  if(old){if(entity(db,old.entityGuid)?.deletedUtc)throw Error('Authority identity belongs to a deleted Entity; restore it in Cardex first');if(r.targetId&&r.targetId!==old.entityGuid)throw Error('This authority ID belongs to another Entity; no merge was performed');return {entity:entity(db,old.entityGuid)};}
   if(typeof record.name!=='string'||!record.name.trim()||record.name.length>1000||typeof record.description!=='string'||record.description.length>4000||!Array.isArray(record.aliases)||record.aliases.length>20||record.aliases.some(a=>typeof a!=='string'||!a.trim()||a.length>1000)||!Number.isFinite(Date.parse(record.retrievedAt))||record.url!=='https://www.wikidata.org/wiki/'+record.id)throw Error('Invalid authority identity preview');
   const id=r.targetId?guid(r.targetId):r.id;
   if(r.targetId){const existing=entity(db,id);if(!existing||existing.revision!==expected(r.expected))throw Error('Reconciliation target changed');}

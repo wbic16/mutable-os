@@ -1,0 +1,870 @@
+[
+  {
+    "model": "gpt-5.4",
+    "scenario": "A",
+    "prompt": "Why can museum interpretations change while remaining accountable to evidence? Explain briefly, including what it means to call an object authentic.",
+    "reasoning": "provider default",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_A",
+      "intent": "reply",
+      "replyTargets": [
+        "src:fYXi-gctP4yCmVVVj5yqzA:c1"
+      ],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "paragraph",
+          "markup": "Museum interpretations can change because <annotation type=\"style/bold\">new evidence</annotation>, new questions, and new social perspectives alter how people understand the same object. They remain accountable to evidence when those interpretations are still tested against the object itself, its provenance, historical records, and comparable material rather than being treated as mere opinion.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        },
+        {
+          "id": "new:b2",
+          "kind": "paragraph",
+          "markup": "To call an object <annotation type=\"style/italics\" id=\"new:s1\">authentic</annotation> usually means it is genuinely what it is claimed to be, with a traceable history and credible relation to its original time, maker, use, or cultural context. That does not always mean perfectly unchanged; an object may still be authentic even if it has aged, been repaired, or been reinterpreted, so long as those claims are honestly supported by evidence.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [
+        {
+          "id": "new:g1",
+          "target": "new:s1",
+          "type": "definition",
+          "text": "In museum work, authenticity is an evidence-based judgment about identity and history, not simply a claim that the object looks old or original."
+        }
+      ],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-2026-03-05",
+        "responseId": "resp_0e8b066971b85987016af3a9ba78dc87d1a877b87943e8e70c",
+        "startedUtc": "2026-11-10T23:33:13.094Z",
+        "completedUtc": "2026-11-10T23:33:22.794Z",
+        "usage": {
+          "input_tokens": 15258,
+          "output_tokens": 354,
+          "total_tokens": 15612
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": []
+  },
+  {
+    "model": "gpt-5.4",
+    "scenario": "B",
+    "prompt": "Help me choose between handwritten notes, a spreadsheet and a relational database for recording a small museum collection. Compare their best uses and limitations concisely.",
+    "reasoning": "provider default",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_B",
+      "intent": "reply",
+      "replyTargets": [
+        "src:Klcf5T1hgLwyn2wXGO8EPA:c1"
+      ],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "table",
+          "rows": [
+            [
+              [
+                {
+                  "id": "new:b2",
+                  "kind": "paragraph",
+                  "markup": "Option",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b3",
+                  "kind": "paragraph",
+                  "markup": "Best use",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b4",
+                  "kind": "paragraph",
+                  "markup": "Main limitations",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "id": "new:b5",
+                  "kind": "paragraph",
+                  "markup": "<annotation type=\"style/bold\">Handwritten notes</annotation>",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b6",
+                  "kind": "paragraph",
+                  "markup": "Very small collections, field notes, sketching object details, or situations where flexibility matters more than consistency.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b7",
+                  "kind": "paragraph",
+                  "markup": "Hard to search, sort, back up or share. Entries often become inconsistent over time.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "id": "new:b8",
+                  "kind": "paragraph",
+                  "markup": "<annotation type=\"style/bold\">Spreadsheet</annotation>",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b9",
+                  "kind": "paragraph",
+                  "markup": "Small to medium collections needing sortable records, simple reporting and low setup effort.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b10",
+                  "kind": "paragraph",
+                  "markup": "Good for flat data, but weaker for complex relationships such as objects, makers, locations and loans linked across many records.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "id": "new:b11",
+                  "kind": "paragraph",
+                  "markup": "<annotation type=\"style/bold\">Relational database</annotation>",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b12",
+                  "kind": "paragraph",
+                  "markup": "Collections that need consistent cataloguing, linked records, multi-user access and room to grow.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b13",
+                  "kind": "paragraph",
+                  "markup": "More setup, design and maintenance. Usually overkill for a tiny collection with simple needs.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ]
+          ],
+          "configuration": {
+            "headers": [
+              [
+                true,
+                true,
+                true
+              ],
+              [
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                false
+              ]
+            ]
+          }
+        },
+        {
+          "id": "new:b14",
+          "kind": "paragraph",
+          "markup": "<annotation type=\"style/bold\">Practical rule:</annotation> use handwritten notes for capture, a spreadsheet for a small stable catalogue, and a relational database if you expect growth, repeated queries, or complex relationships between records.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-2026-03-05",
+        "responseId": "resp_0aa2f1c9ce1416b0016af3a9c35e9c87d18ce4cf24f81f7d5c",
+        "startedUtc": "2026-11-10T23:33:22.919Z",
+        "completedUtc": "2026-11-10T23:33:36.295Z",
+        "usage": {
+          "input_tokens": 15259,
+          "output_tokens": 703,
+          "total_tokens": 15962
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": []
+  },
+  {
+    "model": "gpt-5.4",
+    "scenario": "C",
+    "prompt": "Revisit my earlier assertion about green bronze. Is that conclusion justified? Explain the strongest objection and how the evidence relates to the conclusion. Please keep it concise.",
+    "reasoning": "provider default",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_C",
+      "intent": "reply",
+      "replyTargets": [
+        "src:aMUYsbCORrfmaeMX78oaEg:c1",
+        "new:r1"
+      ],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "paragraph",
+          "markup": "Your earlier conclusion looks <annotation type=\"style/bold\">too strong to be justified as stated</annotation>. The strongest objection is that <annotation type=\"style/italics\">green colour alone is not decisive evidence of age</annotation>: bronze can turn green through several corrosion processes, environmental exposure, or later treatment, so the observation does not by itself prove antiquity.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        },
+        {
+          "id": "new:b2",
+          "kind": "paragraph",
+          "markup": "So the evidence may <annotation type=\"style/bold\">support a possibility</annotation>, but it does not warrant the universal claim that every green bronze surface proves the object is ancient. To reach that conclusion, you would need additional evidence about context, composition, corrosion pattern, and provenance.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        }
+      ],
+      "anchors": [
+        {
+          "id": "new:r1",
+          "source": "src:aMUYsbCORrfmaeMX78oaEg:b3",
+          "revision": "007a0b1a-606e-4f94-9efe-59541ad2aab8",
+          "selector": {
+            "exact": "Every green surface on bronze proves that the object is ancient.",
+            "prefix": "",
+            "suffix": ""
+          }
+        }
+      ],
+      "entities": [],
+      "interpretations": [
+        {
+          "id": "new:m1",
+          "target": "new:r1",
+          "type": "dialectic/claim",
+          "ref": null,
+          "attributes": []
+        }
+      ],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [
+      {
+        "blockId": "44444444-4444-4444-8444-444444444444",
+        "marks": [
+          {
+            "id": "ef428621-08d3-488c-94bd-cc721ef77a37",
+            "type": "dialectic/range-anchor",
+            "annotationId": "ed3b0802-f729-4a5f-a7c8-82939769e629",
+            "start": 0,
+            "end": 63
+          },
+          {
+            "id": "4269cf47-5179-43bd-ad1e-661153e5c76f",
+            "type": "dialectic/claim",
+            "metadata": {
+              "dcp": {
+                "version": 1,
+                "actor": "ai",
+                "exchangeId": "EDITORIAL_C",
+                "protocol": "dcp/1.0",
+                "sourceResourceId": "11111111-1111-4111-8111-111111111111",
+                "appliedTo": "existing-source",
+                "sourceAuthor": "human",
+                "participantId": "11111111-1111-4111-8111-111111111111:ai"
+              }
+            },
+            "start": 0,
+            "end": 63
+          }
+        ]
+      }
+    ],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-2026-03-05",
+        "responseId": "resp_04c4c882ce67e412016af3a9d138d487d1821af93a8631405d",
+        "startedUtc": "2026-11-10T23:33:36.446Z",
+        "completedUtc": "2026-11-10T23:33:38.912Z",
+        "usage": {
+          "input_tokens": 15237,
+          "output_tokens": 39,
+          "total_tokens": 15276
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      },
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-2026-03-05",
+        "responseId": "resp_04c4c882ce67e412016af3a9d3491087d1bcf37cc4e15c2802",
+        "startedUtc": "2026-11-10T23:33:38.918Z",
+        "completedUtc": "2026-11-10T23:33:40.924Z",
+        "usage": {
+          "input_tokens": 15819,
+          "output_tokens": 32,
+          "total_tokens": 15851
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      },
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-2026-03-05",
+        "responseId": "resp_04c4c882ce67e412016af3a9d55b8487d197c7053ec4a64ec4",
+        "startedUtc": "2026-11-10T23:33:40.929Z",
+        "completedUtc": "2026-11-10T23:33:49.266Z",
+        "usage": {
+          "input_tokens": 16464,
+          "output_tokens": 378,
+          "total_tokens": 16842
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": [
+      {
+        "call": {
+          "id": "call_RDZp57A3jaB7jEKUjqpdvkFG",
+          "tool": "list_text_blocks",
+          "arguments": {
+            "cursor": null,
+            "limit": 20,
+            "contributionId": null,
+            "participantId": null,
+            "fromOrdinal": 1
+          }
+        },
+        "status": "complete"
+      },
+      {
+        "call": {
+          "id": "call_8U40wai6BG5X9RdQi5IQBCrg",
+          "tool": "read_source",
+          "arguments": {
+            "handle": "src:aMUYsbCORrfmaeMX78oaEg:b3"
+          }
+        },
+        "status": "complete"
+      }
+    ]
+  },
+  {
+    "model": "gpt-5.4",
+    "scenario": "D",
+    "prompt": "Thanks — Saturday works for me. Let us leave the detailed planning until then.",
+    "reasoning": "provider default",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_D",
+      "intent": "reply",
+      "replyTargets": [],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "paragraph",
+          "markup": "Sounds good — <annotation type=\"style/bold\">Saturday it is</annotation>. We can sort out the details then.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-2026-03-05",
+        "responseId": "resp_0b251cf1ba552693016af3a9ddcaa087d1b518abcdc34e83f8",
+        "startedUtc": "2026-11-10T23:33:49.389Z",
+        "completedUtc": "2026-11-10T23:33:52.253Z",
+        "usage": {
+          "input_tokens": 8892,
+          "output_tokens": 122,
+          "total_tokens": 9014
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": []
+  },
+  {
+    "model": "gpt-5.4-mini",
+    "scenario": "A",
+    "prompt": "Why can museum interpretations change while remaining accountable to evidence? Explain briefly, including what it means to call an object authentic.",
+    "reasoning": "low",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_A",
+      "intent": "reply",
+      "replyTargets": [
+        "src:pCwyd3thgDRYlrOPFP9Jsw:c1"
+      ],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "paragraph",
+          "markup": "Museum interpretations can change because new evidence, methods, or questions can shift what a collection object is understood to mean. That is still accountable if the museum shows how the new reading fits the object’s documented provenance, materials, use, and comparison with other evidence. To call an object <annotation type=\"style/bold\">authentic</annotation> means it is genuinely what it is claimed to be according to the relevant criterion — for example, original rather than a later copy, or truly belonging to a stated maker, period, or context.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_010d8e9ded9141a2016af3a9e0b23887d18cec3a821114a947",
+        "startedUtc": "2026-11-10T23:33:52.302Z",
+        "completedUtc": "2026-11-10T23:33:54.795Z",
+        "usage": {
+          "input_tokens": 15235,
+          "output_tokens": 310,
+          "total_tokens": 15545
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": []
+  },
+  {
+    "model": "gpt-5.4-mini",
+    "scenario": "B",
+    "prompt": "Help me choose between handwritten notes, a spreadsheet and a relational database for recording a small museum collection. Compare their best uses and limitations concisely.",
+    "reasoning": "low",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_B",
+      "intent": "reply",
+      "replyTargets": [
+        "src:b4_rRNzZmKtDrSje37O1OA:c1"
+      ],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "table",
+          "rows": [
+            [
+              [
+                {
+                  "id": "new:b2",
+                  "kind": "paragraph",
+                  "markup": "Option",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b3",
+                  "kind": "paragraph",
+                  "markup": "Best uses",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b4",
+                  "kind": "paragraph",
+                  "markup": "Limitations",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "id": "new:b5",
+                  "kind": "paragraph",
+                  "markup": "Handwritten notes",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b6",
+                  "kind": "paragraph",
+                  "markup": "Very small, informal collections; quick field notes; rough ideas before they are structured.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b7",
+                  "kind": "paragraph",
+                  "markup": "Hard to search, sort, back up, and keep consistent; awkward as the collection grows.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "id": "new:b8",
+                  "kind": "paragraph",
+                  "markup": "Spreadsheet",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b9",
+                  "kind": "paragraph",
+                  "markup": "Good default for a small collection: easy to start, filter, sort, and export.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b10",
+                  "kind": "paragraph",
+                  "markup": "Weak for complex relationships, controlled vocabularies, and data integrity at scale.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "id": "new:b11",
+                  "kind": "paragraph",
+                  "markup": "Relational database",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b12",
+                  "kind": "paragraph",
+                  "markup": "Best when you need multiple linked tables, stricter consistency, and long-term growth.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ],
+              [
+                {
+                  "id": "new:b13",
+                  "kind": "paragraph",
+                  "markup": "More setup and maintenance; usually overkill if the collection is tiny and simple.",
+                  "ranges": [],
+                  "textStyle": null,
+                  "margins": null
+                }
+              ]
+            ]
+          ],
+          "configuration": null
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_066d5543a6eacd81016af3a9e349ec87d1b0307bc5b9082e86",
+        "startedUtc": "2026-11-10T23:33:54.889Z",
+        "completedUtc": "2026-11-10T23:33:58.528Z",
+        "usage": {
+          "input_tokens": 15244,
+          "output_tokens": 635,
+          "total_tokens": 15879
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": []
+  },
+  {
+    "model": "gpt-5.4-mini",
+    "scenario": "C",
+    "prompt": "Revisit my earlier assertion about green bronze. Is that conclusion justified? Explain the strongest objection and how the evidence relates to the conclusion. Please keep it concise.",
+    "reasoning": "low",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_C",
+      "intent": "answer",
+      "replyTargets": [
+        "src:sT-7SD6zcqAejYwSBcYLbA:c1"
+      ],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "paragraph",
+          "markup": "Probably <annotation type=\"style/bold\">not fully</annotation>. The strongest objection is that <annotation type=\"style/italics\">green bronze</annotation> may reflect surface oxidation or a coating rather than a stable material property, so the evidence points to a plausible observation but not a secure conclusion. In short: the evidence supports the claim tentatively, but it does not by itself settle it.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_0feae681f24e5c1f016af3a9e6f99c87d1bc60e4523d2697bd",
+        "startedUtc": "2026-11-10T23:33:58.633Z",
+        "completedUtc": "2026-11-10T23:34:00.938Z",
+        "usage": {
+          "input_tokens": 15280,
+          "output_tokens": 301,
+          "total_tokens": 15581
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": []
+  },
+  {
+    "model": "gpt-5.4-mini",
+    "scenario": "D",
+    "prompt": "Thanks — Saturday works for me. Let us leave the detailed planning until then.",
+    "reasoning": "low",
+    "maxOutputTokens": 2048,
+    "continuity": false,
+    "nativeAdmitted": true,
+    "repaired": false,
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "EDITORIAL_D",
+      "intent": "reply",
+      "replyTargets": [],
+      "composition": [
+        {
+          "id": "new:b1",
+          "kind": "paragraph",
+          "markup": "Thanks — Saturday works for me. Let us leave the detailed planning until then.",
+          "ranges": [],
+          "textStyle": null,
+          "margins": null
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "sourceAnnotations": [],
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_02dc91433f052523016af3a9e94c8487d1a6ed25de9147c930",
+        "startedUtc": "2026-11-10T23:34:01.011Z",
+        "completedUtc": "2026-11-10T23:34:03.445Z",
+        "usage": {
+          "input_tokens": 8893,
+          "output_tokens": 197,
+          "total_tokens": 9090
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "tools": []
+  }
+]

@@ -1,0 +1,191 @@
+.dialectic-app{display:flex;flex-direction:column;height:100%;min-height:0;background:#f7f6f2;color:#263c38;font:14px/1.5 system-ui,sans-serif;--dialectic-accent:#315f55}
+[data-block-type="dialectic-application-block"]{height:100%;min-height:0}
+.reactive-window__content:has([data-block-type="dialectic-application-block"]){padding:0;overflow:hidden}
+.reactive-window__document-body:has([data-block-type="dialectic-application-block"]),.reactive-window__document-body .block-selectable:has(> [data-block-type="dialectic-application-block"]){height:100%;min-height:0}
+.dialectic-app button{font:inherit;border:1px solid #d3dcd6;border-radius:6px;background:#fff;color:inherit;padding:6px 10px;cursor:pointer}
+.dialectic-app button:hover{background:#edf2ed}.dialectic-app button:disabled{opacity:.45;cursor:default}.dialectic-app button:focus-visible{outline:2px solid #427a69;outline-offset:2px}
+.dialectic-bar{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid #d8dfd9;background:#fefdf9}.dialectic-bar strong{font:600 24px Georgia,serif;letter-spacing:-.5px}.dialectic-subtitle{display:block;font-size:11px;color:#78827b}.dialectic-bar nav{display:flex;gap:5px;flex-wrap:wrap}
+.dialectic-body{display:grid;grid-template-columns:190px minmax(0,1fr) 244px;flex:1;min-height:0}.dialectic-sidebar,.dialectic-inspector{padding:20px 16px;overflow:auto}.dialectic-sidebar{border-right:1px solid #d8dfd9}.dialectic-inspector{border-left:1px solid #d8dfd9;background:#f1f3ed}.dialectic-eyebrow{font-size:10px;letter-spacing:1.7px;font-weight:700;color:#60756b}.dialectic-muted{color:#758079;font-size:12px;margin:8px 0 16px}.dialectic-entry{display:flex;gap:12px;width:100%;text-align:left;margin:8px 0}.dialectic-entry small{display:block;font-size:10px;line-height:1.5}.dialectic-number{color:#86998b;font:24px Georgia,serif}.dialectic-entry[aria-current]{background:#e0ebe2;border-color:#8ca797}.dialectic-history{display:flex;gap:4px;margin:22px 0 8px;font-size:11px}.dialectic-present{width:100%}
+.dialectic-main{display:flex;flex-direction:column;min-width:0;min-height:0;background:#fffefa}.dialectic-reading-header{display:flex;justify-content:space-between;gap:8px;padding:12px 22px;border-bottom:1px solid #e8ebe4}.dialectic-reading-header .dialectic-muted{margin:0}.dialectic-canvas{flex:1;min-height:0;overflow:auto;position:relative}.dialectic-canvas>.reactive-tabs{min-height:100%;height:auto}.dialectic-canvas .reactive-tabs__panel{overflow:visible}.dialectic-canvas .reactive-document-occurrence__content{padding:18px 28px}.dialectic-canvas .document-style-bar{font-size:12px}
+.dialectic-canvas [data-dialectic-contribution]{position:relative;border:1px solid #e2e7df;border-radius:8px;padding:18px;margin:0 0 24px;background:#fff}.dialectic-canvas [data-dialectic-contribution]::before{content:attr(data-dialectic-contribution);display:block;font:700 10px/20px system-ui,sans-serif;letter-spacing:1.4px;color:#64846d;margin-bottom:12px}.dialectic-canvas [data-dialectic-draft="true"]{border:1px dashed #759d89;background:#fcfefa}.dialectic-canvas .reactive-standoff-surface{background:transparent}.dialectic-canvas .reactive-standoff-flow{line-height:1.6}
+.dialectic-compose-bar{display:flex;gap:10px;align-items:center;padding:14px 20px;border-top:1px solid #d8dfd9;background:#f0f4ec}.dialectic-compose-bar>div{flex:1}.dialectic-compose-bar small{display:block;font-size:11px;color:#677f70}.dialectic-app .dialectic-primary{background:var(--dialectic-accent);color:#fff;border-color:var(--dialectic-accent)}.dialectic-inspector>button{display:block;width:100%;margin:7px 0;font-size:12px;text-align:left}.dialectic-inspector h3{font:22px Georgia,serif;margin:12px 0}.dialectic-inspector hr{border:0;border-top:1px solid #d8dfd9;margin:22px 0}.dialectic-footnote{font-size:11px;color:#7d897c;margin-top:14px}.dialectic-pins{list-style:none;margin:12px 0;padding:0}.dialectic-pins li{display:flex;gap:3px;margin-bottom:5px;font-size:11px}.dialectic-pins li button:first-child{flex:1;text-align:left}.dialectic-status{display:flex;justify-content:space-between;gap:10px;padding:7px 18px;font-size:11px;color:#6c8074;background:#eaf0e7;border-top:1px solid #d8dfd9}.dialectic-notice{padding:8px 20px;background:#fff0d3;color:#704922}
+@media(max-width:1000px){.dialectic-body{grid-template-columns:155px minmax(0,1fr) 200px}.dialectic-sidebar,.dialectic-inspector{padding:14px 10px}.dialectic-canvas .reactive-document-occurrence__content{padding:12px}.dialectic-reading-header .dialectic-muted{display:none}}
+@media(max-width:740px){.dialectic-body{grid-template-columns:minmax(0,1fr) 180px}.dialectic-sidebar{display:none}.dialectic-subtitle{display:none}.dialectic-compose-bar{flex-wrap:wrap}.dialectic-bar{padding:8px;gap:8px}}
+.textual-workspace .dialectic-textual{position:absolute;inset:var(--tw-line-height) 0 var(--tw-line-height)}.textual-workspace .dialectic-app{font:inherit;color:var(--tw-ink);background:var(--tw-bg);--dialectic-accent:var(--tw-surface)}.textual-workspace .dialectic-body{grid-template-columns:22ch minmax(0,1fr) 28ch}.textual-workspace .dialectic-bar,.textual-workspace .dialectic-status,.textual-workspace .dialectic-compose-bar{background:var(--tw-menu);color:var(--tw-menu-ink);padding:0}.textual-workspace .dialectic-app button{font:inherit;border-radius:0;padding:0 1ch;border:0}.textual-workspace .dialectic-app h3,.textual-workspace .dialectic-bar strong,.textual-workspace .dialectic-number{font:inherit}.textual-workspace .dialectic-sidebar,.textual-workspace .dialectic-inspector,.textual-workspace .dialectic-main{background:var(--tw-bg);padding:0}.textual-workspace .dialectic-reading-header{padding:0 1ch}.textual-workspace .dialectic-eyebrow,.textual-workspace .dialectic-muted,.textual-workspace .dialectic-footnote,.textual-workspace .dialectic-entry small,.textual-workspace .dialectic-compose-bar small{font:inherit;color:inherit;letter-spacing:0}.textual-workspace .dialectic-subtitle,.textual-workspace .dialectic-reading-header .dialectic-muted{display:none}.textual-workspace .dialectic-canvas [data-dialectic-contribution]{padding:var(--tw-line-height) 1ch;margin:0 0 var(--tw-line-height);background:transparent;border:1px solid currentColor;border-radius:0}.textual-workspace .dialectic-canvas [data-dialectic-contribution]::before{font:inherit;color:var(--tw-focus);letter-spacing:0}.textual-workspace .dialectic-entry[aria-current]{background:var(--tw-focus);color:var(--tw-bg)}
+.dialectic-retained-source{display:flex;flex:1;min-height:0;flex-direction:column}.dialectic-retained-source[hidden],.dialectic-compose-bar[hidden]{display:none}
+.dialectic-sequence-list{margin-top:24px;border-top:1px solid #b8c6bd;padding-top:12px}.dialectic-sequence-entry{margin:12px 0}.dialectic-sequence-entry strong{display:block;overflow-wrap:anywhere}.dialectic-sequence-entry div{display:flex;gap:3px;flex-wrap:wrap}
+.dialectic-sequence-author{max-height:55%;overflow:auto;padding:14px;background:#f0f3ed;border-bottom:1px solid #b9c9bc}.dialectic-sequence-author header,.dialectic-sequence-reader>header{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dialectic-sequence-author input,.dialectic-sequence-author select{font:inherit;max-width:100%;padding:4px;margin:4px}.dialectic-sequence-author label{display:inline-block}.dialectic-sequence-author fieldset{margin:8px 0}.dialectic-member-edit{display:flex;flex-wrap:wrap;align-items:center;border-top:1px solid #cad4cb;padding:4px}.dialectic-sequence-author small{display:block}
+.dialectic-sequence-reader{flex:1;min-height:0;overflow:auto;padding:16px;background:#edf1eb}.dialectic-sequence-reader>header{justify-content:space-between}.dialectic-sequence-reader>nav,.dialectic-sequence-controls{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.dialectic-sequence-reader [aria-current=step]{background:#284e46;color:white}
+.dialectic-perspectives{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}.dialectic-perspectives[data-arrangement=stacked]{grid-template-columns:minmax(0,1fr)}.dialectic-perspective{min-width:0;border:1px solid #b5c6b9;background:#fffdf8;overflow:hidden}.dialectic-perspective[data-emphasised=true]{outline:2px solid #b78627}.dialectic-perspective>header{padding:10px;border-bottom:1px solid #d6dfd6;background:#e6ece4}.dialectic-perspective>header>div{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.native-passive-composition{padding:12px;min-height:120px;overflow:auto;max-height:65vh;outline-offset:-2px}.native-passive-unavailable{padding:12px;border:1px dashed #9c8b62}.native-passive-composition [data-dialectic-contribution]{margin:0}.native-passive-composition .reactive-standoff-flow{cursor:text}
+.dialectic-textual .dialectic-sequence-author,.dialectic-textual .dialectic-sequence-reader,.dialectic-textual .dialectic-perspective,.dialectic-textual .dialectic-perspective>header{background:var(--tw-bg);color:var(--tw-ink);border-color:currentColor}.dialectic-textual .dialectic-sequence-reader{padding:1ch}.dialectic-textual .dialectic-perspectives{gap:1ch}.dialectic-textual .native-passive-composition{padding:1ch;font:inherit}.dialectic-textual .native-passive-composition .reactive-standoff-flow{font:inherit;line-height:var(--tw-line-height);letter-spacing:normal}.dialectic-textual .dialectic-sequence-author input,.dialectic-textual .dialectic-sequence-author select{font:inherit;border-radius:0}
+@media(max-width:1100px){.dialectic-perspectives{grid-template-columns:minmax(0,1fr)}}
+
+/* Native tabs retain their layout and local state in the Textual palette. */
+.textual-workspace .dialectic-textual .native-passive-composition .reactive-tabs__labels>button{background:var(--tw-menu);color:var(--tw-menu-ink)}
+.textual-workspace .dialectic-textual .native-passive-composition .reactive-tabs__labels>button[aria-selected=true]{background:var(--tw-focus);color:var(--tw-bg)}
+.textual-workspace .dialectic-textual .native-passive-composition .reactive-tabs[data-tab-orientation=vertical]{grid-template-columns:minmax(0,clamp(8ch,28%,16ch)) minmax(0,1fr)}
+.textual-workspace .dialectic-textual .native-passive-composition .reactive-tabs[data-tab-orientation=vertical]>.reactive-tabs__labels>button{padding:0 var(--tw-cell-width)!important}
+
+.native-passive-composition .reactive-tabs[data-tab-orientation=vertical]{grid-template-columns:minmax(0,clamp(5rem,25%,7rem)) minmax(0,1fr)}
+
+.dialectic-app .dialectic-dcp-preview pre, .dialectic-app .dialectic-dcp-record { max-height: 14em; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.dialectic-provider-settings{margin:12px 0;font-size:12px}.dialectic-provider-settings fieldset{border:0;padding:0;min-width:0}.dialectic-provider-settings label{display:block;margin:8px 0}.dialectic-provider-settings input:not([type=checkbox]),.dialectic-provider-settings select{display:block;box-sizing:border-box;width:100%;min-width:0;font:inherit}.dialectic-provider-settings p{overflow-wrap:anywhere}.textual-workspace .dialectic-provider-settings{font:inherit;margin:var(--tw-line-height) 0}.textual-workspace .dialectic-provider-settings input,.textual-workspace .dialectic-provider-settings select{font:inherit;color:var(--tw-menu-ink);background:var(--tw-menu);border-radius:0}
+
+.dialectic-native-structures button { display:block; max-width:100%; text-align:left; overflow-wrap:anywhere; margin-block:.3em; }
+.dialectic-native-structures small, .dialectic-annotation-inspection small { overflow-wrap:anywhere; }
+.dialectic-annotation-inspection { border-inline-start:2px solid currentColor; padding-inline-start:.6em; }
+
+/* Keep the one retained native composer at the bottom of the conversation viewport. */
+.dialectic-canvas>.reactive-tabs{display:flex;flex-direction:column}
+/* Inactive Documents remain mounted; do not override their native hidden state. */
+.dialectic-canvas>.reactive-tabs>.reactive-tabs__panel:not([hidden]){display:flex;flex-direction:column;flex:1;padding-bottom:0}
+.dialectic-canvas .reactive-document-occurrence{display:flex;flex-direction:column;flex:1}
+.dialectic-canvas .reactive-document-occurrence__content{display:flex;flex-direction:column;flex:1;padding-bottom:0}
+.dialectic-canvas [data-dialectic-document]{display:flex;flex-direction:column;flex:1}
+.dialectic-canvas [data-dialectic-contribution]{padding-inline-end:48px}
+.dialectic-canvas [data-dialectic-draft="true"]{position:sticky;bottom:0;z-index:5;margin-top:auto;margin-bottom:0;max-height:35vh;overflow:auto;border-style:solid;background:#fcfefa;box-shadow:0 -5px 12px #263c3810}
+.dialectic-canvas [data-dialectic-draft="true"]::before{display:none}
+.dialectic-contribution-menu{position:absolute;inset-block-start:10px;inset-inline-end:10px;z-index:6;font:14px/1.5 system-ui,sans-serif}
+.dialectic-contribution-menu summary{list-style:none;cursor:pointer;padding:2px 6px;border-radius:4px}
+.dialectic-contribution-menu summary::-webkit-details-marker{display:none}
+.dialectic-contribution-menu summary:hover{background:#e8eee8}
+.dialectic-contribution-menu details>button{position:absolute;inset-inline-end:0;white-space:nowrap;box-shadow:2px 3px 8px #0002}
+.textual-workspace .dialectic-contribution-menu{font:inherit;inset-block-start:0;inset-inline-end:0}
+.textual-workspace .dialectic-contribution-menu summary{border-radius:0;padding:0 1ch}
+.textual-workspace .dialectic-contribution-menu details>button{background:var(--tw-menu);color:var(--tw-menu-ink)}
+.textual-workspace .dialectic-canvas [data-dialectic-draft="true"]{background:var(--tw-bg);margin-bottom:0}
+.textual-workspace .dialectic-canvas [data-dialectic-contribution]{padding-inline-end:4ch}
+
+/* Derived native activity; no persistent per-contribution inspector or layout probes. */
+.dialectic-contribution-activity{margin-top:12px;padding-top:8px;border-top:1px solid #e2e7df;font:12px/1.5 system-ui,sans-serif;color:#4c6d61}
+.dialectic-activity-controls,.dialectic-contribution-notices{display:flex;flex-wrap:wrap;gap:4px}
+.dialectic-app .dialectic-contribution-activity button{padding:2px 6px;background:transparent;border-color:transparent;font:inherit}
+.dialectic-app .dialectic-contribution-activity button:hover{background:#edf2ed;border-color:#c5d4c9}
+.dialectic-contribution-notices{color:#795319;margin-top:4px}
+.dialectic-activity-compact{display:none}
+.dialectic-activity-inspection{border-bottom:1px solid #b8c6bd;padding-bottom:12px;margin-bottom:12px;outline-offset:2px}
+.dialectic-activity-inspection h4{margin:0 0 8px}.dialectic-activity-item{margin:8px 0}.dialectic-activity-item button{max-width:100%;overflow-wrap:anywhere;text-align:left}.dialectic-activity-item small{display:block}.dialectic-activity-item blockquote{margin:4px 0 8px 8px;overflow-wrap:anywhere}
+.textual-workspace .dialectic-contribution-activity{font:inherit;line-height:var(--tw-line-height);margin-top:var(--tw-line-height);padding-top:0;color:var(--tw-ink);border-color:currentColor}
+.textual-workspace .dialectic-activity-controls,.textual-workspace .dialectic-contribution-notices{gap:0}.textual-workspace .dialectic-contribution-notices{color:var(--tw-focus);margin:0}
+.textual-workspace .dialectic-activity-full{display:none}.textual-workspace .dialectic-activity-compact{display:inline}.textual-workspace .dialectic-app .dialectic-contribution-activity button{padding:0 1ch;line-height:var(--tw-line-height)}
+
+/* Conversation chrome: native composition and host ownership remain unchanged. */
+.dialectic-chat{background:#fff;color:#242424;--dialectic-accent:#171717;font:14px/1.55 system-ui,sans-serif}
+.dialectic-chat button{border-color:#938e9e;border-radius:7px;background:#f8f7fa}
+.dialectic-chat button:hover:not(:disabled){background:#eeebf3;border-color:#6f657d}.dialectic-chat button:active:not(:disabled){background:#e1dbea}.dialectic-chat button:focus-visible{outline:2px solid #65459b;outline-offset:2px}
+.dialectic-chat .dialectic-bar{background:#fafafa;border-color:#eee;padding:12px 20px;min-height:56px;box-sizing:border-box}
+.dialectic-chat .dialectic-bar strong{font:600 19px system-ui,sans-serif;letter-spacing:-.4px}
+.dialectic-chat .dialectic-subtitle{display:none}
+.dialectic-options{position:relative}.dialectic-options>summary{list-style:none;cursor:pointer;font-size:24px;line-height:1;padding:5px 12px;border-radius:8px}.dialectic-options>summary::-webkit-details-marker{display:none}.dialectic-options>summary:hover{background:#ececec}
+.dialectic-options>div{position:absolute;right:0;top:100%;z-index:30;min-width:160px;display:flex;flex-direction:column;padding:6px;background:white;color:#242424;border:1px solid #ddd;border-radius:12px;box-shadow:0 5px 22px #0002}.dialectic-options button{text-align:left}
+.dialectic-chat .dialectic-body{grid-template-columns:58px minmax(0,1fr)}
+.dialectic-chat .dialectic-body[data-sidebar-open=true]{grid-template-columns:228px minmax(0,1fr)}
+.dialectic-chat .dialectic-body[data-inspector-open=true]{grid-template-columns:58px minmax(0,1fr) 272px}
+.dialectic-chat .dialectic-body[data-sidebar-open=true][data-inspector-open=true]{grid-template-columns:228px minmax(0,1fr) 272px}
+.dialectic-chat .dialectic-sidebar{display:flex;flex-direction:column;overflow:hidden;padding:8px;background:#f7f7f7;border-color:#eaeaea;min-height:0}
+.dialectic-rail-actions{display:flex;flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid #e5e5e5;flex-shrink:0}
+.dialectic-rail-actions button{display:flex;align-items:center;justify-content:center;min-height:38px;padding:8px}
+.dialectic-chat svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.dialectic-chat [data-sidebar-open=true] .dialectic-rail-actions{flex-direction:row;justify-content:space-between}
+.dialectic-contribution-list{min-height:0;overflow:auto;flex:1;overscroll-behavior:contain}
+.dialectic-chat .dialectic-entry{margin:5px 0;padding:9px 6px;align-items:center;justify-content:center;gap:9px;min-height:38px}
+.dialectic-chat [data-sidebar-open=true] .dialectic-entry{justify-content:flex-start;padding-inline:10px}
+.dialectic-chat .dialectic-number{font:500 12px/1.4 system-ui,sans-serif;color:#666;font-variant-numeric:tabular-nums}
+.dialectic-chat .dialectic-entry[aria-current=true]{background:#e9e9e9;border-color:transparent}
+.dialectic-chat .dialectic-eyebrow{color:#777;letter-spacing:0;font-size:12px;font-weight:500;margin-top:16px}
+.dialectic-chat .dialectic-sidebar-details{max-height:40%;overflow:auto;flex-shrink:0;border-top:1px solid #e5e5e5}
+.dialectic-chat .dialectic-history{margin:12px 0 8px}
+.dialectic-chat .dialectic-main{background:#fff}
+.dialectic-chat .dialectic-reading-header{border:0;padding:14px 24px;font-size:15px;font-weight:500}
+.dialectic-chat .dialectic-muted,.dialectic-chat .dialectic-footnote{color:#777}
+.dialectic-chat .dialectic-inspector{background:#fafafa;border-color:#eaeaea}.dialectic-inspector[hidden]{display:none}
+.dialectic-chat .dialectic-inspector h3{font:600 17px system-ui,sans-serif}
+.dialectic-chat .dialectic-canvas .reactive-document-occurrence__content{width:100%;max-width:900px;box-sizing:border-box;margin-inline:auto;padding:24px 42px 0}
+.dialectic-chat .dialectic-canvas [data-dialectic-contribution]{background:transparent;border:0;border-radius:18px;padding:16px 40px 16px 0;margin:0 0 28px}
+.dialectic-chat .dialectic-canvas [data-dialectic-contribution]::before{color:#777;font-size:11px;letter-spacing:.3px}
+.dialectic-chat .dialectic-canvas [data-dialectic-author=human][data-dialectic-draft=false]{background:#f4f4f4;padding:18px 44px 18px 22px;margin-left:12%}
+.dialectic-chat .dialectic-canvas .reactive-standoff-flow{line-height:1.75}
+.dialectic-chat .dialectic-canvas [data-dialectic-draft=true]{border:1px solid #e7e7e7;background:#fff;border-radius:24px;box-shadow:0 2px 12px #00000008;padding:16px 38px 16px 20px;margin-top:auto;margin-bottom:0;min-height:56px;box-sizing:border-box}
+.dialectic-chat .dialectic-compose-bar{width:100%;max-width:900px;box-sizing:border-box;margin-inline:auto;padding:8px 42px 18px;background:white;border:0}
+.dialectic-chat .dialectic-compose-bar small{color:#888;font-size:12px}
+.dialectic-chat .dialectic-send{border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;padding:8px;flex-shrink:0;background:#171717;color:#fff}
+.dialectic-chat .dialectic-send:hover{background:#333}
+.dialectic-chat .dialectic-status{background:#fff;border-color:#f0f0f0;color:#888;padding:5px 18px;font-size:10px}
+.dialectic-chat .dialectic-contribution-activity{color:#666;border-color:#eee}
+.dialectic-chat .dialectic-contribution-activity button:hover{background:#f3f3f3;border-color:#ddd}
+.dialectic-composer-feedback:empty{display:none}
+.dialectic-paste-progress{display:flex;align-items:center;gap:8px;font:12px/1.5 system-ui,sans-serif;color:#777;padding-bottom:8px}
+.dialectic-spinner{width:12px;height:12px;border:2px solid #ddd;border-top-color:#555;border-radius:50%;animation:dialectic-spin .8s linear infinite}
+.dialectic-response-progress{font:600 25px/1 system-ui,sans-serif;color:#777;margin-bottom:10px;letter-spacing:4px}
+.dialectic-response-progress i{font-style:normal;animation:dialectic-dot 1.2s ease-in-out infinite}.dialectic-response-progress i:nth-child(2){animation-delay:.16s}.dialectic-response-progress i:nth-child(3){animation-delay:.32s}
+.dialectic-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+@keyframes dialectic-spin{to{transform:rotate(360deg)}}@keyframes dialectic-dot{0%,80%,100%{opacity:.3}40%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.dialectic-spinner,.dialectic-response-progress i{animation:none}}
+@media(max-width:800px){.dialectic-chat .dialectic-body[data-sidebar-open=true]{grid-template-columns:180px minmax(0,1fr)}.dialectic-chat .dialectic-body[data-inspector-open=true]{grid-template-columns:50px minmax(0,1fr) 220px}.dialectic-chat .dialectic-body[data-sidebar-open=true][data-inspector-open=true]{grid-template-columns:150px minmax(0,1fr) 220px}.dialectic-chat .dialectic-canvas .reactive-document-occurrence__content{padding:16px 20px 0}.dialectic-chat .dialectic-compose-bar{padding-inline:20px}.dialectic-chat .dialectic-reading-header .dialectic-muted{display:none}}
+.textual-workspace .dialectic-chat .dialectic-body{grid-template-columns:6ch minmax(0,1fr)}.textual-workspace .dialectic-chat .dialectic-body[data-sidebar-open=true]{grid-template-columns:22ch minmax(0,1fr)}.textual-workspace .dialectic-chat .dialectic-body[data-inspector-open=true]{grid-template-columns:6ch minmax(0,1fr) 28ch}.textual-workspace .dialectic-chat .dialectic-body[data-sidebar-open=true][data-inspector-open=true]{grid-template-columns:22ch minmax(0,1fr) 28ch}
+.textual-workspace .dialectic-chat .dialectic-sidebar,.textual-workspace .dialectic-chat .dialectic-main,.textual-workspace .dialectic-chat .dialectic-inspector{background:var(--tw-bg);color:var(--tw-ink)}
+.dialectic-chat[data-formatting=false] .document-style-bar{display:none}
+.dialectic-chat .dialectic-canvas>.reactive-tabs>.reactive-tabs__labels{background:#fff;border-color:#eee;font-size:12px}
+.dialectic-chat .dialectic-canvas>.reactive-tabs>.reactive-tabs__labels button{background:#fff;color:#777;border-color:#eee}
+.dialectic-chat .dialectic-canvas>.reactive-tabs>.reactive-tabs__labels [aria-selected=true]{background:#f3f3f3;color:#333;border-color:#ddd}
+/* The native draft stays mounted. Its feedback sits above the input border. */
+.dialectic-chat .dialectic-canvas [data-dialectic-draft=true]{background:transparent;border:0;box-shadow:none;isolation:isolate;--dialectic-feedback-space:0px}
+.dialectic-chat .dialectic-canvas [data-dialectic-draft=true]::after{content:"";position:absolute;inset:var(--dialectic-feedback-space) 0 0;z-index:-1;border:1px solid #e7e7e7;border-radius:24px;background:white;pointer-events:none}
+.dialectic-chat .dialectic-canvas [data-dialectic-draft=true]:has(.dialectic-response-progress){--dialectic-feedback-space:51px}
+.dialectic-chat .dialectic-canvas [data-dialectic-draft=true]:has(.dialectic-paste-progress){--dialectic-feedback-space:44px}
+.dialectic-chat .dialectic-canvas [data-dialectic-draft=true]:has(.dialectic-response-progress):has(.dialectic-paste-progress){--dialectic-feedback-space:95px}
+.dialectic-chat .dialectic-response-progress{margin-bottom:26px}
+.dialectic-chat .dialectic-paste-progress{padding:0;margin-bottom:26px;line-height:18px}
+.dialectic-chat [data-dialectic-draft=true] .reactive-standoff-flow:focus{outline:none}
+.dialectic-chat [data-dialectic-draft=true]:focus-within::after{border-color:#c8c8c8}
+.dialectic-chat [data-dialectic-draft=true] .dialectic-contribution-menu{inset-block-start:calc(var(--dialectic-feedback-space) + 10px)}
+
+/* Native Entity-reference cell effect: colour only, no layout/geometry work. */
+.dialectic-app .dialectic-entity-mention {
+ background-color: rgba(119, 88, 177, .09);
+ text-decoration: underline;
+ text-decoration-color: #8c73ad;
+ text-decoration-thickness: 1px;
+ text-underline-offset: 3px;
+ cursor: pointer;
+}
+.dialectic-app .dialectic-entity-mention:hover { background-color: rgba(119, 88, 177, .19); }
+
+.dialectic-contribution-warning{position:relative;color:#795319}
+.dialectic-contribution-warning>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px;border-radius:4px}
+.dialectic-contribution-warning>summary::-webkit-details-marker{display:none}
+.dialectic-contribution-warning>summary:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.dialectic-warning-explanation{max-width:36rem;padding:4px 8px;font-size:.85rem}
+.dialectic-warning-explanation p{margin:4px 0}
+
+.dialectic-contents-synopsis{min-width:0;text-align:left;overflow-wrap:anywhere;line-height:1.35}
+.dialectic-contents-counts{display:flex;flex-wrap:wrap;gap:2px 6px;margin:0 8px 12px 36px;font-size:11px;color:#666}
+.dialectic-contents-counts button{font:inherit;color:inherit;background:none;border:0;padding:1px 0;cursor:pointer}
+.dialectic-contents-counts button:disabled{opacity:.65;cursor:default}
+.textual-workspace .dialectic-contents-synopsis{font:inherit;line-height:var(--tw-cell-height,1.4)}
+.textual-workspace .dialectic-contents-counts{font:inherit;color:var(--tw-muted);gap:0 1ch;margin:0 0 1em 3ch}
+.textual-workspace .dialectic-contents-counts button:focus-visible{outline:1px solid var(--tw-focus)}
+.dialectic-notice-target { border: 0; padding: 0; background: transparent; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; }
+.dialectic-image-fetch { min-height: 6rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; }
+.dialectic-image-fetch small { color: #666; }
+
+.dialectic-image-fetch-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+
+.dialectic-app { position: relative; }
+.dialectic-file-drop { position: absolute; inset: 0; z-index: 50; pointer-events: auto; display: grid; place-items: center; padding: 14px; background: #eef5f2e8; border: 2px dashed #688a78; text-align: center; }
+.dialectic-attachments { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.dialectic-attachment { flex: 1 1 240px; min-width: 0; border: 1px solid #b8c7bd; border-radius: 8px; padding: 10px; background: #f6f8f5; color: #27382f; }
+.dialectic-attachment strong, .dialectic-attachment small { display: block; overflow-wrap: anywhere; }
+.dialectic-attachment button { margin: 6px 6px 0 0; }
+.dialectic-attachment-preview { max-height: 600px; overflow: auto; }
+.dialectic-attachment-preview img { max-width: 100%; max-height: 500px; object-fit: contain; }
+.dialectic-attachment-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.dialectic-file-status { flex: 0 0 auto; padding: 8px 20px; max-height: 240px; overflow: auto; border-top: 1px solid #ddd; font-size: 12px; }
+.dialectic-file-status small { color: #666; }
+.dialectic-file-names { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 4px 0; padding-left: 18px; }
+.dialectic-file-confirmation, .dialectic-file-failure { margin-top: 6px; padding: 10px; border: 1px solid #b98535; border-radius: 6px; background: #fff4d9; color: #463315; overflow-wrap: anywhere; }
+.dialectic-file-status p { margin: 6px 0; }
+.dialectic-file-status button { margin-right: 8px; }
+
+.dialectic-app .dialectic-add-conversation{display:inline-flex;align-items:center;justify-content:center;align-self:stretch;flex:none;min-width:36px}

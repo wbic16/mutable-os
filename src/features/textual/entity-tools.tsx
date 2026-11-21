@@ -31,7 +31,7 @@ export function TextualCompletion(props:{model:CompletionModel}) {
   <Show when={s.state.kind!=='entity'} fallback={<m.Entity/>}>
    <header><strong>Scry · {s.state.kind}</strong><button onClick={m.close}>Cancel</button></header>
    <Show when={s.state.expanded} fallback={<button onPointerDown={e=>e.preventDefault()} onClick={m.expand}>Query: {s.parsed.query||'Show candidates'} · Edit query</button>}>
-    <label>Query <input ref={m.refs.input} aria-label="Scry query" role="combobox" aria-expanded="true" aria-controls={m.id} value={s.state.input} disabled={s.state.pending} onInput={e=>{if(!e.isComposing)s.input(e.currentTarget.value);}} onCompositionEnd={e=>s.input(e.currentTarget.value)}/></label>
+    <Show when={s.state.retrievalStatus}><p role="status">{s.state.retrievalStatus}</p></Show><label>Query <input ref={m.refs.input} aria-label="Scry query" role="combobox" aria-expanded="true" aria-controls={m.id} value={s.state.input} disabled={s.state.pending} onInput={e=>{if(!e.isComposing)s.input(e.currentTarget.value);}} onCompositionEnd={e=>s.input(e.currentTarget.value)}/></label>
    </Show>
    <Show when={s.source.brackets}><p>Source: {s.state.sourceText}</p><button onClick={()=>s.follow()}>Follow source</button></Show>
    <div id={m.id} class="tw-instrument-body" role="listbox" aria-label="Completion candidates"><For each={s.state.rows}>{row=><button role="option" aria-selected={s.state.selected===row.id} disabled={s.state.pending||row.disabled} onPointerDown={e=>e.preventDefault()} onMouseMove={()=>s.select(row.id)} onClick={()=>{s.select(row.id);void s.choose();}}>{row.name}<small>{row.reason}</small></button>}</For></div>

@@ -1,0 +1,2910 @@
+[
+  {
+    "query": "P2",
+    "variant": "fixed",
+    "mode": "vector",
+    "allContextFacetsAt5": true,
+    "allContextFacetsAt768": false,
+    "boundedTokens": 768,
+    "hits": [
+      {
+        "chunk": "fixed-2",
+        "distance": 0.5302219986915588,
+        "text": "ple. The third was green throughout, and so were the casements. The fourth was furnished and lighted with orange — the fifth with white — the sixth with violet. The seventh apartment was closely shrouded in black velvet tapestries that hung all over the ceiling and down the walls, falling in heavy folds upon a carpet of the same material and hue. But in this chamber only, the color of the windows failed to correspond with the decorations. The panes were scarlet — a deep blood color. Now in no one of any of the seven apartments was there any lamp or candelabrum, amid the profusion of golden ornaments that lay scattered to and fro and depended from the roof. There was no light of any kind emanating from lamp or candle within the suite of chambers. But in the corridors that followed the suite, there stood, opposite each window, a heavy tripod, bearing a brazier of fire, that projected its rays through the tinted glass and so glaringly lit the room. And thus were produced a multitude of gaudy and fantastic appearances. But in the western or black chamber the effect of the fire-light that streamed upon the dark hangings through the blood-tinted panes was ghastly in the extreme, and produced so wild a look upon the countenances of those who entered, that there were few of the company bold enough to set foot within its precincts at all.\r\n\nIt was within this apartment, also, that there stood against the western wall, a gigantic clock of ebony. Its pendulum swung to and fro with a dull, heavy, monotonous clang; and when the minute-hand made the circuit of the face, and the hour was to be stricken, there came from the brazen lungs of the clock a sound which was clear and loud and deep and exceedingly musical, but of so peculiar a note and emphas",
+        "sourceSpans": [
+          {
+            "record": "poe:5",
+            "blockGuid": "1228c86a-1908-43a9-826e-04279a36387e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:28ca4fbd-0f1e-4047-bef3-4f574d08575f"
+            ],
+            "contribution": null,
+            "start": 1065,
+            "end": 2417,
+            "runStart": 1065,
+            "runEnd": 2417,
+            "chunkStart": 0,
+            "chunkEnd": 1352,
+            "textHash": "429e68446dcf094494ba4f66455ff4c22ff20a9e202a55bf85c9082f44596473"
+          },
+          {
+            "record": "poe:6",
+            "blockGuid": "2949aabf-bf5f-4f0d-8edb-ba3c25fc5738",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:ce8c136e-459f-49d5-84ca-493dc3ce7cfc"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 411,
+            "runStart": 0,
+            "runEnd": 411,
+            "chunkStart": 1354,
+            "chunkEnd": 1765,
+            "textHash": "74869fde11fcf3c0a4658686ed87b74c3b1865978b54d83a4a0cbff20dd90450"
+          }
+        ]
+      },
+      {
+        "chunk": "fixed-5",
+        "distance": 0.5380145311355591,
+        "text": "stant — and a light half-subdued laughter floats after them as they depart. And now the music swells, and the dreams live, and writhe to and fro more merrily than ever, taking hue from the many-tinted windows through which stream the rays of the tripods. But to the chamber which lies most westwardly of the seven there are now none of the maskers who venture, for the night is waning away; and there flows a ruddier light through the blood-colored panes; and the blackness of the sable drapery appalls; and to him whose foot falls on the sable carpet, there comes from the near clock of ebony a muffled peal more solemnly emphatic than any which reaches their ears who indulge in the more remote gaieties of the other apartments.\r\n\nBut these other apartments were densely crowded, and in them beat feverishly the heart of life. And the revel went whirlingly on, until at length there commenced the sounding of midnight upon the clock. And then the music ceased, as I have told; and the evolutions of the waltzers were quieted; and there was an uneasy cessation of all things as before. But now there were twelve strokes to be sounded by the bell of the clock; and thus it happened, perhaps that more of thought crept, with more of time into the meditations of the thoughtful among those who revelled. And thus too, it happened, that before the last echoes of the last chime had utterly sunk into silence, there were many individuals in the crowd who had found leisure to become aware of the presence of a masked figure which had arrested the attention of no single individual before. And the rumor of this new presence having spread itself whisperingly around, there arose at length from the whole company a buzz, or murmur, of horror, and of",
+        "sourceSpans": [
+          {
+            "record": "poe:8",
+            "blockGuid": "022574ae-3283-4b37-a3e0-7b4a193d202e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:675dd646-9527-4f21-b57f-46cc8e81252b"
+            ],
+            "contribution": null,
+            "start": 1115,
+            "end": 1846,
+            "runStart": 1115,
+            "runEnd": 1846,
+            "chunkStart": 0,
+            "chunkEnd": 731,
+            "textHash": "2aaf2bcc1d0cab20a896c123e7b9aa4c05db6bb5f515a1d82c9561a12ac9ffc5"
+          },
+          {
+            "record": "poe:9",
+            "blockGuid": "73a1bd69-9546-4eb9-a7b9-a906551890bc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:f3d6acb6-840a-49b5-a6ee-c780162b0414"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1010,
+            "runStart": 0,
+            "runEnd": 1010,
+            "chunkStart": 733,
+            "chunkEnd": 1743,
+            "textHash": "43aec256b5bb181b7061be64a2c91ce60837f108538aa8627df37d3272e8a9fe"
+          }
+        ]
+      },
+      {
+        "chunk": "fixed-3",
+        "distance": 0.5437175035476685,
+        "text": "ro with a dull, heavy, monotonous clang; and when the minute-hand made the circuit of the face, and the hour was to be stricken, there came from the brazen lungs of the clock a sound which was clear and loud and deep and exceedingly musical, but of so peculiar a note and emphasis that, at each lapse of an hour, the musicians of the orchestra were constrained to pause, momentarily, in their performance, to hearken to the sound; and thus the waltzers perforce ceased their evolutions; and there was a brief disconcert of the whole gay company; and while the chimes of the clock yet rang. it was observed that the giddiest grew pale, and the more aged and sedate passed their hands over their brows as if in confused revery or meditation. But when the echoes had fully ceased, a light laughter at once pervaded the assembly; the musicians looked at each other and smiled as if at their own nervousness and folly, and made whispering vows, each to the other, that the next chiming of the clock should produce in them no similar emotion; and then, after the lapse of sixty minutes (which embrace three thousand and six hundred seconds of Time that flies), there came yet another chiming of the clock, and then were the same disconcert and tremulousness and meditation as before.\r\n\nBut, in spite of these things, it was a gay and magnificent revel. The tastes of the duke were peculiar. He had a fine eye for color and effects. He disregarded the \"decora\" of mere fashion. His plans were bold and fiery, and his conceptions glowed with barbaric lustre. There are some who would have thought him mad. His followers felt that he was not. It was necessary to hear and see and touch him to be sure he was not.\r\n\nHe had directed",
+        "sourceSpans": [
+          {
+            "record": "poe:6",
+            "blockGuid": "2949aabf-bf5f-4f0d-8edb-ba3c25fc5738",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:ce8c136e-459f-49d5-84ca-493dc3ce7cfc"
+            ],
+            "contribution": null,
+            "start": 133,
+            "end": 1411,
+            "runStart": 133,
+            "runEnd": 1411,
+            "chunkStart": 0,
+            "chunkEnd": 1278,
+            "textHash": "ad845bab97c5411820292cc41a7aadbb04820478b2679467be2c08912e4d9d35"
+          },
+          {
+            "record": "poe:7",
+            "blockGuid": "2a3c5217-b299-4bd2-8fb7-0a6b8e97c9aa",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:02e72195-4385-4f2b-9d8f-760e685ff96b"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 424,
+            "runStart": 0,
+            "runEnd": 424,
+            "chunkStart": 1280,
+            "chunkEnd": 1704,
+            "textHash": "7e49830175c9f4a483c677ef3f638d95910b865db952b9a76ea5c9dfa703b87d"
+          },
+          {
+            "record": "poe:8",
+            "blockGuid": "022574ae-3283-4b37-a3e0-7b4a193d202e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:675dd646-9527-4f21-b57f-46cc8e81252b"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 15,
+            "runStart": 0,
+            "runEnd": 15,
+            "chunkStart": 1706,
+            "chunkEnd": 1721,
+            "textHash": "e9803e81c87d400a7641d464a282b9db74ff04128e6345931920d8a800977a9f"
+          }
+        ]
+      },
+      {
+        "chunk": "fixed-9",
+        "distance": 0.5606467127799988,
+        "text": " so violent a rudeness, untenanted by any tangible form.\r\n\nAnd now was acknowledged the presence of the Red Death. He had come like a thief in the night. And one by one dropped the revellers in the blood-bedewed halls of their revel, and died each in the despairing posture of his fall. And the life of the ebony clock went out with that of the last of the gay. And the flames of the tripods expired. And Darkness and Decay and the Red Death held illimitable dominion over all.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 1967,
+            "end": 2024,
+            "runStart": 1967,
+            "runEnd": 2024,
+            "chunkStart": 0,
+            "chunkEnd": 57,
+            "textHash": "de55cdee8fdc68f7972e9926cc3864c66fb69c026f8123cdec5a9a9b54aef85e"
+          },
+          {
+            "record": "poe:15",
+            "blockGuid": "a3e823e6-47cd-43d3-99e8-af223ba7f42a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e84a94ce-3e40-4a52-92c2-412b623a533e"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 419,
+            "runStart": 0,
+            "runEnd": 419,
+            "chunkStart": 59,
+            "chunkEnd": 478,
+            "textHash": "02761ca251c8abd9563be9feb555b2d0290d5ca75d9fca9295f1a3ec0f379726"
+          }
+        ]
+      },
+      {
+        "chunk": "fixed-8",
+        "distance": 0.6025071144104004,
+        "text": "; so that, unimpeded, he passed within a yard of the prince's person; and while the vast assembly, as with one impulse, shrank from the centers of the rooms to the walls, he made his way uninterruptedly, but with the same solemn and measured step which had distinguished him from the first, through the blue chamber to the purple — to the purple to the green — through the green to the orange — through this again to the white — and even thence to the violet, ere a decided movement had been made to arrest him. It was then, however, that the Prince Prospero, maddened with rage and the shame of his own momentary cowardice, rushed hurriedly through the six chambers, while none followed him on account of a deadly terror that had seized upon all. He bore aloft a drawn dagger, and had approached, in rapid impetuosity, to within three or four feet of the retreating figure, when the latter, having attained the extremity of the velvet apartment, turned suddenly and confronted his pursuer. There was a sharp cry — and the dagger dropped gleaming upon the sable carpet, upon which most instantly afterward, fell prostrate in death the Prince Prospero. Then summoning the wild courage of despair, a throng of the revellers at once threw themselves into the black apartment, and seizing the mummer whose tall figure stood erect and motionless within the shadow of the ebony clock, gasped in unutterable horror at finding the grave cerements and corpse-like mask, which they handled with so violent a rudeness, untenanted by any tangible form.\r\n\nAnd now was acknowledged the presence of the Red Death. He had come like a thief in the night. And one by one dropped the revellers in the blood-bedewed halls of their revel, and died each in the despairing posture of his fall",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 483,
+            "end": 2024,
+            "runStart": 483,
+            "runEnd": 2024,
+            "chunkStart": 0,
+            "chunkEnd": 1541,
+            "textHash": "95d56414f18d6085422bad9051e62541bc3b28249ad0be370b317a029eca5843"
+          },
+          {
+            "record": "poe:15",
+            "blockGuid": "a3e823e6-47cd-43d3-99e8-af223ba7f42a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e84a94ce-3e40-4a52-92c2-412b623a533e"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 226,
+            "runStart": 0,
+            "runEnd": 226,
+            "chunkStart": 1543,
+            "chunkEnd": 1769,
+            "textHash": "2987fc7a0e71056392efd92e4562d1c61f819639072a5e045f5a9529b9529146"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "P2",
+    "variant": "structure",
+    "mode": "vector",
+    "allContextFacetsAt5": true,
+    "allContextFacetsAt768": true,
+    "boundedTokens": 486,
+    "hits": [
+      {
+        "chunk": "structure-4",
+        "distance": 0.4540649652481079,
+        "text": "It was within this apartment, also, that there stood against the western wall, a gigantic clock of ebony. Its pendulum swung to and fro with a dull, heavy, monotonous clang; and when the minute-hand made the circuit of the face, and the hour was to be stricken, there came from the brazen lungs of the clock a sound which was clear and loud and deep and exceedingly musical, but of so peculiar a note and emphasis that, at each lapse of an hour, the musicians of the orchestra were constrained to pause, momentarily, in their performance, to hearken to the sound; and thus the waltzers perforce ceased their evolutions; and there was a brief disconcert of the whole gay company; and while the chimes of the clock yet rang. it was observed that the giddiest grew pale, and the more aged and sedate passed their hands over their brows as if in confused revery or meditation. But when the echoes had fully ceased, a light laughter at once pervaded the assembly; the musicians looked at each other and smiled as if at their own nervousness and folly, and made whispering vows, each to the other, that the next chiming of the clock should produce in them no similar emotion; and then, after the lapse of sixty minutes (which embrace three thousand and six hundred seconds of Time that flies), there came yet another chiming of the clock, and then were the same disconcert and tremulousness and meditation as before.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:6",
+            "blockGuid": "2949aabf-bf5f-4f0d-8edb-ba3c25fc5738",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:ce8c136e-459f-49d5-84ca-493dc3ce7cfc"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1411,
+            "runStart": 0,
+            "runEnd": 1411,
+            "chunkStart": 0,
+            "chunkEnd": 1411,
+            "textHash": "381bf437eb11902814059d21b324f1b6846f9af3a8c953a76a9309827c1f7329"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-11",
+        "distance": 0.48981598019599915,
+        "text": "Then summoning the wild courage of despair, a throng of the revellers at once threw themselves into the black apartment, and seizing the mummer whose tall figure stood erect and motionless within the shadow of the ebony clock, gasped in unutterable horror at finding the grave cerements and corpse-like mask, which they handled with so violent a rudeness, untenanted by any tangible form.\r\n\nAnd now was acknowledged the presence of the Red Death. He had come like a thief in the night. And one by one dropped the revellers in the blood-bedewed halls of their revel, and died each in the despairing posture of his fall. And the life of the ebony clock went out with that of the last of the gay. And the flames of the tripods expired. And Darkness and Decay and the Red Death held illimitable dominion over all.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 1635,
+            "end": 2024,
+            "runStart": 1635,
+            "runEnd": 2024,
+            "chunkStart": 0,
+            "chunkEnd": 389,
+            "textHash": "84de4f18c507a9f1e1b6d40b46b74a38b4b018e177b6aa793a117095d061042b"
+          },
+          {
+            "record": "poe:15",
+            "blockGuid": "a3e823e6-47cd-43d3-99e8-af223ba7f42a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e84a94ce-3e40-4a52-92c2-412b623a533e"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 419,
+            "runStart": 0,
+            "runEnd": 419,
+            "chunkStart": 391,
+            "chunkEnd": 810,
+            "textHash": "02761ca251c8abd9563be9feb555b2d0290d5ca75d9fca9295f1a3ec0f379726"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-7",
+        "distance": 0.528202474117279,
+        "text": "But to the chamber which lies most westwardly of the seven there are now none of the maskers who venture, for the night is waning away; and there flows a ruddier light through the blood-colored panes; and the blackness of the sable drapery appalls; and to him whose foot falls on the sable carpet, there comes from the near clock of ebony a muffled peal more solemnly emphatic than any which reaches their ears who indulge in the more remote gaieties of the other apartments.\r\n\nBut these other apartments were densely crowded, and in them beat feverishly the heart of life. And the revel went whirlingly on, until at length there commenced the sounding of midnight upon the clock. And then the music ceased, as I have told; and the evolutions of the waltzers were quieted; and there was an uneasy cessation of all things as before. But now there were twelve strokes to be sounded by the bell of the clock; and thus it happened, perhaps that more of thought crept, with more of time into the meditations of the thoughtful among those who revelled. And thus too, it happened, that before the last echoes of the last chime had utterly sunk into silence, there were many individuals in the crowd who had found leisure to become aware of the presence of a masked figure which had arrested the attention of no single individual before. And the rumor of this new presence having spread itself whisperingly around, there arose at length from the whole company a buzz, or murmur, of horror, and of disgust.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:8",
+            "blockGuid": "022574ae-3283-4b37-a3e0-7b4a193d202e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:675dd646-9527-4f21-b57f-46cc8e81252b"
+            ],
+            "contribution": null,
+            "start": 1370,
+            "end": 1846,
+            "runStart": 1370,
+            "runEnd": 1846,
+            "chunkStart": 0,
+            "chunkEnd": 476,
+            "textHash": "6272400800ded520cd99942867d700449560ac15b9bb686974f3d6b88155723c"
+          },
+          {
+            "record": "poe:9",
+            "blockGuid": "73a1bd69-9546-4eb9-a7b9-a906551890bc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:f3d6acb6-840a-49b5-a6ee-c780162b0414"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1020,
+            "runStart": 0,
+            "runEnd": 1020,
+            "chunkStart": 478,
+            "chunkEnd": 1498,
+            "textHash": "68673beb36cd758b11818a5fcdc1558e576973f1370a2092ee87ab832a8534cc"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-6",
+        "distance": 0.6393267512321472,
+        "text": "He had directed, in great part, the movable embellishments of the seven chambers, upon occasion of this great fete; and it was his own guiding taste which had given character to the masqueraders. Be sure they were grotesque. There were much glare and glitter and piquancy and phantasm — much of what has been seen in \"Hernani.\" There were arabesque figures with unsuited limbs and appointments. There were delirious fancies such as the madman fashions. There were much of the beautiful, much of the wanton, much of the bizarre, something of the terrible, and not a little of that which might have excited disgust. To and fro in the seven chambers stalked, in fact, a multitude of dreams. And these the dreams — writhed in and about, taking hue from the rooms, and causing the wild music of the orchestra to seem as the echo of their steps. And, anon, there strikes the ebony clock which stands in the hall of the velvet. And then, for a moment, all is still, and all is silent save the voice of the clock. The dreams are stiff-frozen as they stand. But the echoes of the chime die away — they have endured but an instant — and a light half-subdued laughter floats after them as they depart. And now the music swells, and the dreams live, and writhe to and fro more merrily than ever, taking hue from the many-tinted windows through which stream the rays of the tripods. ",
+        "sourceSpans": [
+          {
+            "record": "poe:8",
+            "blockGuid": "022574ae-3283-4b37-a3e0-7b4a193d202e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:675dd646-9527-4f21-b57f-46cc8e81252b"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1370,
+            "runStart": 0,
+            "runEnd": 1370,
+            "chunkStart": 0,
+            "chunkEnd": 1370,
+            "textHash": "77ca7deb30304fe4b5a383c536193c2af765cc9fd9892db80982735547886cc4"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-8",
+        "distance": 0.6531546711921692,
+        "text": "In an assembly of phantasms such as I have painted, it may well be supposed that no ordinary appearance could have excited such sensation. In truth the masquerade license of the night was nearly unlimited; but the figure in question had out-Heroded Herod, and gone beyond the bounds of even the prince's indefinite decorum. There are chords in the hearts of the most reckless which cannot be touched without emotion. Even with the utterly lost, to whom life and death are equally jests, there are matters of which no jest can be made. The whole company, indeed, seemed now deeply to feel that in the costume and bearing of the stranger neither wit nor propriety existed. The figure was tall and gaunt, and shrouded from head to foot in the habiliments of the grave. The mask which concealed the visage was made so nearly to resemble the countenance of a stiffened corpse that the closest scrutiny must have difficulty in detecting the cheat. And yet all this might have been endured, if not approved, by the mad revellers around. But the mummer had gone so far as to assume the type of the Red Death. His vesture was dabbled in blood — and his broad brow, with all the features of his face, was besprinkled with the scarlet horror.\r\n\nWhen the eyes of Prince Prospero fell on this spectral image (which, with a slow and solemn movement, as if more fully to sustain its role, stalked to and fro among the waltzers) he was seen to be convulsed, in the first moment with a strong shudder either of terror or distaste; but in the next, his brow reddened with rage.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:10",
+            "blockGuid": "8a8baef6-569d-42e4-b8d9-ea20c298a748",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:997e7ecb-69b4-4b28-914e-bd3f874d06a3"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1232,
+            "runStart": 0,
+            "runEnd": 1232,
+            "chunkStart": 0,
+            "chunkEnd": 1232,
+            "textHash": "b04f72542cadf99ca06a195256ae3726a2629cd40ac648acbc910b4439b688a9"
+          },
+          {
+            "record": "poe:11",
+            "blockGuid": "de356f7e-88c0-414a-9e40-96f5245c03bc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:842941e9-aeea-411c-ae95-5b6a100a0823"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 326,
+            "runStart": 0,
+            "runEnd": 326,
+            "chunkStart": 1234,
+            "chunkEnd": 1560,
+            "textHash": "0b409627ca0b3286898ed64f4f5b9b5822f86bf911e8f01f856384a14786e6e0"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "P4",
+    "variant": "structure",
+    "mode": "hybrid",
+    "allContextFacetsAt5": true,
+    "allContextFacetsAt768": true,
+    "boundedTokens": 476,
+    "hits": [
+      {
+        "chunk": "structure-13",
+        "text": "Directly influenced by the first Gothic novel, Horace Walpole's The Castle of Otranto, in \"The Masque of the Red Death\" Poe adopts many conventions of traditional Gothic fiction, including the castle setting.[1] The multiple single-toned rooms may be representative of the human mind, showing different personality types. The imagery of blood and time throughout also indicates corporeality. The plague may, in fact, represent typical attributes of human life and mortality,[2] which would imply the entire story is an allegory about man's futile attempts to stave off death (a commonly accepted interpretation).[3]: 137  However, there is much dispute over how to interpret \"The Masque of the Red Death\"; some suggest it is not allegorical, especially due to Poe's admission of a distaste for didacticism in literature.[3]: 134  If the story really does have a moral, Poe does not explicitly state that moral in the text.[4]\r",
+        "sourceSpans": [
+          {
+            "record": "poe:19",
+            "blockGuid": "d056f623-641e-426c-848e-7994ef8f0ed1",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:130e310e-6755-43dc-ab59-8a340747a69c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:8f5ef703-ce7e-422f-b009-70630cd82064",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:eb5a3c5d-ae8e-4d22-8c19-21d9c73ae1a4",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:edf4fb0b-cf10-4248-aa1e-384f012b8c5a"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 926,
+            "runStart": 0,
+            "runEnd": 926,
+            "chunkStart": 0,
+            "chunkEnd": 926,
+            "textHash": "13a461dfa1fd17982df6ec21bc087fd22ab57e717fde311084bf6b819f80890f"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-12",
+        "text": "\"The Masque of the Red Death\" (originally published as \"The Mask of the Red Death: A Fantasy\") is a short story by American writer Edgar Allan Poe, first published in 1842. The story follows Prince Prospero's attempts to avoid a dangerous plague, known as the Red Death, by hiding in his abbey. He, along with many other wealthy nobles, hosts a masquerade ball in seven rooms of the abbey, each decorated with a different color. In the midst of their revelry, a mysterious figure disguised as a Red Death victim enters and makes his way through each of the rooms. Prospero dies after confronting this stranger, whose \"costume\" proves to contain nothing tangible inside it. The guests also die in turn.\r\n\nPoe's story follows many traditions of Gothic fiction and is often analyzed as an allegory about the inevitability of death, though some critics advise against an allegorical reading. Many different interpretations have been presented, as well as attempts to identify the true nature of the eponymous disease. The story was first published in May 1842 in Graham's Magazine and has since been adapted in many different forms, including a 1964 film starring Vincent Price. Poe's short story has also been alluded to by other works in many types of media.\r\n\nAnalysis\r",
+        "sourceSpans": [
+          {
+            "record": "poe:16",
+            "blockGuid": "34ca1e40-9d82-4683-9f7b-62a49d632a57",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:1e961ec6-4b6c-46a9-a541-5688780ac93b"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 702,
+            "runStart": 0,
+            "runEnd": 702,
+            "chunkStart": 0,
+            "chunkEnd": 702,
+            "textHash": "b095cd21ffd13d03cf156553e32f4905194dacf507f1349b31cf6d6dce201402"
+          },
+          {
+            "record": "poe:17",
+            "blockGuid": "c7efb0e1-f1de-401d-b6ca-cc9a2d97600a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e2d6fe82-1c05-4380-8b48-f3f58fbb37a9"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 553,
+            "runStart": 0,
+            "runEnd": 553,
+            "chunkStart": 704,
+            "chunkEnd": 1257,
+            "textHash": "d032135e9e6fd856e20c923850bca5439213646fa0465d645b3c57ae1543dac1"
+          },
+          {
+            "record": "poe:18",
+            "blockGuid": "09e0fe09-a956-407d-a25c-70f99294ae79",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:186ce0fe-d761-4281-be6f-bab2199e983d"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 9,
+            "runStart": 0,
+            "runEnd": 9,
+            "chunkStart": 1259,
+            "chunkEnd": 1268,
+            "textHash": "661c2dd3b2e135cacfb506151b82b6d8f436b41c096ec7fa6ef9aa0d930793af"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-0",
+        "text": "The Masque of the Red Death\r\n\nThe red death had long devastated the country. No pestilence had ever been so fatal, or so hideous. Blood was its Avatar and its seal - the madness and the horror of blood. There were sharp pains, and sudden dizziness, and then profuse bleeding at the pores, with dissolution. The scarlet stains upon the body and especially upon the face of the victim, were the pest ban which shut him out from the aid and from the sympathy of his fellow-men. And the whole seizure, progress, and termination of the disease, were incidents of half an hour.\r\n\nBut Prince Prospero was happy and dauntless and sagacious. When his dominions were half depopulated, he summoned to his presence a thousand hale and light-hearted friends from among the knights and dames of his court, and with these retired to the deep seclusion of one of his crenellated abbeys. This was an extensive and magnificent structure, the creation of the prince's own eccentric yet august taste. A strong and lofty wall girdled it in. This wall had gates of iron. The courtiers, having entered, brought furnaces and massy hammers and welded the bolts.\r\n\nThey resolved to leave means neither of ingress nor egress to the sudden impulses of despair or of frenzy from within. The abbey was amply provisioned. With such precautions the courtiers might bid defiance to contagion. The external world could take care of itself. In the meantime it was folly to grieve or to think. The prince had provided all the appliances of pleasure. There were buffoons, there were improvisatori, there were ballet-dancers, there were musicians, there was Beauty, there was wine. All these and security were within. Without was the \"Red Death.\"\r",
+        "sourceSpans": [
+          {
+            "record": "poe:0",
+            "blockGuid": "53b35322-db68-4273-90dd-5db527fec3a3",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:ad4dfdb4-b77e-41ce-a25e-87d452f58a0f"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 28,
+            "runStart": 0,
+            "runEnd": 28,
+            "chunkStart": 0,
+            "chunkEnd": 28,
+            "textHash": "255d9ed2df0790daf69a1571a696347f79ef19fe86798b24459a593e0bd00603"
+          },
+          {
+            "record": "poe:1",
+            "blockGuid": "b28cbb8b-6945-42b9-b86f-eab820a5f99e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:4a52cbd0-5af8-488e-b261-cfeebf06baaa"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 542,
+            "runStart": 0,
+            "runEnd": 542,
+            "chunkStart": 30,
+            "chunkEnd": 572,
+            "textHash": "add7c92bc749e305e36ecc137a6b19df6380d3dc8b38022212231de7bcf43596"
+          },
+          {
+            "record": "poe:2",
+            "blockGuid": "7d81ed11-fa71-49d1-9bcc-c44888ed7dbc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e5d9e04e-c30d-48d8-8270-88da41880b37"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 563,
+            "runStart": 0,
+            "runEnd": 563,
+            "chunkStart": 574,
+            "chunkEnd": 1137,
+            "textHash": "567447ea2e39a43e56ffa40464d0a05b0729bd2819f84d8d75c0e2ae5c622bdf"
+          },
+          {
+            "record": "poe:3",
+            "blockGuid": "7c879a5d-937d-40c7-bcbf-fd8266680d98",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:919f414b-7dec-45b0-b73e-f47c34b7f6a8"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 570,
+            "runStart": 0,
+            "runEnd": 570,
+            "chunkStart": 1139,
+            "chunkEnd": 1709,
+            "textHash": "f02395ddee22e1161b28a829162610398d5c087b015f9a8155eb7449ac519a84"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-11",
+        "text": "Then summoning the wild courage of despair, a throng of the revellers at once threw themselves into the black apartment, and seizing the mummer whose tall figure stood erect and motionless within the shadow of the ebony clock, gasped in unutterable horror at finding the grave cerements and corpse-like mask, which they handled with so violent a rudeness, untenanted by any tangible form.\r\n\nAnd now was acknowledged the presence of the Red Death. He had come like a thief in the night. And one by one dropped the revellers in the blood-bedewed halls of their revel, and died each in the despairing posture of his fall. And the life of the ebony clock went out with that of the last of the gay. And the flames of the tripods expired. And Darkness and Decay and the Red Death held illimitable dominion over all.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 1635,
+            "end": 2024,
+            "runStart": 1635,
+            "runEnd": 2024,
+            "chunkStart": 0,
+            "chunkEnd": 389,
+            "textHash": "84de4f18c507a9f1e1b6d40b46b74a38b4b018e177b6aa793a117095d061042b"
+          },
+          {
+            "record": "poe:15",
+            "blockGuid": "a3e823e6-47cd-43d3-99e8-af223ba7f42a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e84a94ce-3e40-4a52-92c2-412b623a533e"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 419,
+            "runStart": 0,
+            "runEnd": 419,
+            "chunkStart": 391,
+            "chunkEnd": 810,
+            "textHash": "02761ca251c8abd9563be9feb555b2d0290d5ca75d9fca9295f1a3ec0f379726"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-8",
+        "text": "In an assembly of phantasms such as I have painted, it may well be supposed that no ordinary appearance could have excited such sensation. In truth the masquerade license of the night was nearly unlimited; but the figure in question had out-Heroded Herod, and gone beyond the bounds of even the prince's indefinite decorum. There are chords in the hearts of the most reckless which cannot be touched without emotion. Even with the utterly lost, to whom life and death are equally jests, there are matters of which no jest can be made. The whole company, indeed, seemed now deeply to feel that in the costume and bearing of the stranger neither wit nor propriety existed. The figure was tall and gaunt, and shrouded from head to foot in the habiliments of the grave. The mask which concealed the visage was made so nearly to resemble the countenance of a stiffened corpse that the closest scrutiny must have difficulty in detecting the cheat. And yet all this might have been endured, if not approved, by the mad revellers around. But the mummer had gone so far as to assume the type of the Red Death. His vesture was dabbled in blood — and his broad brow, with all the features of his face, was besprinkled with the scarlet horror.\r\n\nWhen the eyes of Prince Prospero fell on this spectral image (which, with a slow and solemn movement, as if more fully to sustain its role, stalked to and fro among the waltzers) he was seen to be convulsed, in the first moment with a strong shudder either of terror or distaste; but in the next, his brow reddened with rage.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:10",
+            "blockGuid": "8a8baef6-569d-42e4-b8d9-ea20c298a748",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:997e7ecb-69b4-4b28-914e-bd3f874d06a3"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1232,
+            "runStart": 0,
+            "runEnd": 1232,
+            "chunkStart": 0,
+            "chunkEnd": 1232,
+            "textHash": "b04f72542cadf99ca06a195256ae3726a2629cd40ac648acbc910b4439b688a9"
+          },
+          {
+            "record": "poe:11",
+            "blockGuid": "de356f7e-88c0-414a-9e40-96f5245c03bc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:842941e9-aeea-411c-ae95-5b6a100a0823"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 326,
+            "runStart": 0,
+            "runEnd": 326,
+            "chunkStart": 1234,
+            "chunkEnd": 1560,
+            "textHash": "0b409627ca0b3286898ed64f4f5b9b5822f86bf911e8f01f856384a14786e6e0"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "S1",
+    "variant": "structure",
+    "mode": "vector",
+    "allContextFacetsAt5": false,
+    "allContextFacetsAt768": false,
+    "boundedTokens": 360,
+    "hits": [
+      {
+        "chunk": "structure-25",
+        "distance": 0.29565858840942383,
+        "text": "I'm beginning to doubt my earlier claim that physical composition is irrelevant to identity. I think I was too categorical. How would you revise that position?",
+        "sourceSpans": [
+          {
+            "record": "symposium:26",
+            "blockGuid": "b373c764-a223-4e28-a9c8-252646d25466",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc660786-f9be-417c-89ec-a75556c92536",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6fa2f0d-cf45-45a1-b442-37be760d67e5"
+            ],
+            "contribution": {
+              "blockGuid": "5cc3ded9-2942-4437-acd8-295c6a66af8e",
+              "ordinal": 11,
+              "author": "human",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                "kind": "human",
+                "name": "Local author"
+              }
+            },
+            "start": 0,
+            "end": 159,
+            "runStart": 0,
+            "runEnd": 159,
+            "chunkStart": 0,
+            "chunkEnd": 159,
+            "textHash": "95a7a64175b03135937970afa3d952dfdedaa65f18efb788093d891abe9cc18c"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-21",
+        "distance": 0.4815402030944824,
+        "text": "Here's my position: an object remains the same object as long as its history is continuous, even if none of its original material survives. Physical composition is irrelevant to identity.",
+        "sourceSpans": [
+          {
+            "record": "symposium:16",
+            "blockGuid": "1f6ceb47-fc95-4687-ba0a-48d4d9d35824",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9d6619a5-180c-4748-a109-8237ea6f7b16",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:615eefa8-2cd0-4f9f-866f-54e757790b44"
+            ],
+            "contribution": {
+              "blockGuid": "cce46b92-34f2-4e82-be0f-0096f58b23cb",
+              "ordinal": 7,
+              "author": "human",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                "kind": "human",
+                "name": "Local author"
+              }
+            },
+            "start": 0,
+            "end": 187,
+            "runStart": 0,
+            "runEnd": 187,
+            "chunkStart": 0,
+            "chunkEnd": 187,
+            "textHash": "ac63bad1317e73a6b5aa166d21929bd71e85f85be4cf2b43801a096ad420a164"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-31",
+        "distance": 0.4846501052379608,
+        "text": "Returning to the original ship, do you think our discussion of personal identity has changed the way we should understand the difference between material continuity and historical continuity?",
+        "sourceSpans": [
+          {
+            "record": "symposium:46",
+            "blockGuid": "96b285b3-b992-41ad-a5a6-365a02a3a994",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:fd99610a-8fcf-4060-8174-364d719d0426",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:4d6ddb54-c21f-4df5-a0e9-d52dd8e63fd7"
+            ],
+            "contribution": {
+              "blockGuid": "168cd252-1119-46f3-9b04-1ddb444e51f7",
+              "ordinal": 17,
+              "author": "human",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                "kind": "human",
+                "name": "Local author"
+              }
+            },
+            "start": 0,
+            "end": 191,
+            "runStart": 0,
+            "runEnd": 191,
+            "chunkStart": 0,
+            "chunkEnd": 191,
+            "textHash": "c85f2c8a31ec5dd552fe5e6363487792885e093a6bc40db967aa0ec8c4613bbf"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-22",
+        "distance": 0.5258530974388123,
+        "text": "I’m sympathetic to giving historical continuity priority, but I’d separate two claims: original material need not survive, and physical composition is irrelevant. The first doesn’t establish the second. Material and structural changes might affect whether an object survives, even if no particular plank is indispensable.\n\nConsider a ship gradually consumed by fire. There’s an uninterrupted causal history connecting the vessel to the resulting ash, but we ordinarily say the ship was destroyed—not that it became a ship made of ash. That puts pressure on continuity alone as a sufficient condition for numerical identity: causal succession can connect an object to its remains without preserving the object.\n\nYour view could distinguish identity-preserving continuity from mere causal succession. But then it needs an independent account of that distinction; otherwise “its history remains continuous” risks meaning “it continues to be the same object.” Preserving an organised whole through repairs is one possible answer, though that gives physical organisation a role again.\n\nWhat, on your account, distinguishes replacing the ship’s planks from burning it—without already assuming which process preserves the ship?",
+        "sourceSpans": [
+          {
+            "record": "symposium:17",
+            "blockGuid": "607cfdad-9607-4379-b0f2-fa8413aa6f32",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:73a2cbf0-968c-4159-bd5a-2e7007496f8f"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 321,
+            "runStart": 0,
+            "runEnd": 321,
+            "chunkStart": 0,
+            "chunkEnd": 321,
+            "textHash": "71408f03e74b814c7c6083f956c1ebc81486e5dfd80282c160c97b670f2ba1cf"
+          },
+          {
+            "record": "symposium:18",
+            "blockGuid": "a255bc30-d869-40d6-a652-f33562e76633",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc68af9b-6c72-402c-8438-6361c831c646"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 386,
+            "runStart": 0,
+            "runEnd": 386,
+            "chunkStart": 323,
+            "chunkEnd": 709,
+            "textHash": "b319a5e765705c148f31f6fa27ac21e3702b15ed8fc7402d9733a8b32942ab66"
+          },
+          {
+            "record": "symposium:19",
+            "blockGuid": "bd6fb13f-442d-4dd8-a4fc-39736994d3bc",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c8d71a11-770b-4d94-989b-431b511ef3e0"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 368,
+            "runStart": 0,
+            "runEnd": 368,
+            "chunkStart": 711,
+            "chunkEnd": 1079,
+            "textHash": "ef3b82c59f941bb25dc08bc2c021b91e61f11e4c11af3738e9e419127db33829"
+          },
+          {
+            "record": "symposium:20",
+            "blockGuid": "46b8d4a1-978d-453f-a507-cbdc2be79749",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:6118982b-81c4-4732-9750-82bbd6025e6a"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 139,
+            "runStart": 0,
+            "runEnd": 139,
+            "chunkStart": 1081,
+            "chunkEnd": 1220,
+            "textHash": "731b36ec643646fcddfa0c705a3c0d3deee3063162796ecb40c5a97bc6129270"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-27",
+        "distance": 0.5291316509246826,
+        "text": "Could we apply the same reasoning to a person? My body replaces many of its constituent cells over time, and my memories and personality also change. Yet I still regard myself as the same person. Is personal identity fundamentally different from the identity of an artefact?",
+        "sourceSpans": [
+          {
+            "record": "symposium:32",
+            "blockGuid": "61add584-2e46-49a9-bddd-8b61259b6219",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9db991b1-3963-4d63-8050-e41d1de518ff",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:0445930d-257f-4b5f-8b0a-ed269fbbb833"
+            ],
+            "contribution": {
+              "blockGuid": "25eea994-1072-4eea-862d-4a8efb3ed5c6",
+              "ordinal": 13,
+              "author": "human",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                "kind": "human",
+                "name": "Local author"
+              }
+            },
+            "start": 0,
+            "end": 274,
+            "runStart": 0,
+            "runEnd": 274,
+            "chunkStart": 0,
+            "chunkEnd": 274,
+            "textHash": "971631c134f830bae9ceda88b495fdf666e8485692169973a190cdef571ab77c"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "S1",
+    "variant": "structure",
+    "mode": "hybrid",
+    "allContextFacetsAt5": true,
+    "allContextFacetsAt768": true,
+    "boundedTokens": 536,
+    "hits": [
+      {
+        "chunk": "structure-25",
+        "text": "I'm beginning to doubt my earlier claim that physical composition is irrelevant to identity. I think I was too categorical. How would you revise that position?",
+        "sourceSpans": [
+          {
+            "record": "symposium:26",
+            "blockGuid": "b373c764-a223-4e28-a9c8-252646d25466",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc660786-f9be-417c-89ec-a75556c92536",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6fa2f0d-cf45-45a1-b442-37be760d67e5"
+            ],
+            "contribution": {
+              "blockGuid": "5cc3ded9-2942-4437-acd8-295c6a66af8e",
+              "ordinal": 11,
+              "author": "human",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                "kind": "human",
+                "name": "Local author"
+              }
+            },
+            "start": 0,
+            "end": 159,
+            "runStart": 0,
+            "runEnd": 159,
+            "chunkStart": 0,
+            "chunkEnd": 159,
+            "textHash": "95a7a64175b03135937970afa3d952dfdedaa65f18efb788093d891abe9cc18c"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-21",
+        "text": "Here's my position: an object remains the same object as long as its history is continuous, even if none of its original material survives. Physical composition is irrelevant to identity.",
+        "sourceSpans": [
+          {
+            "record": "symposium:16",
+            "blockGuid": "1f6ceb47-fc95-4687-ba0a-48d4d9d35824",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9d6619a5-180c-4748-a109-8237ea6f7b16",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:615eefa8-2cd0-4f9f-866f-54e757790b44"
+            ],
+            "contribution": {
+              "blockGuid": "cce46b92-34f2-4e82-be0f-0096f58b23cb",
+              "ordinal": 7,
+              "author": "human",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                "kind": "human",
+                "name": "Local author"
+              }
+            },
+            "start": 0,
+            "end": 187,
+            "runStart": 0,
+            "runEnd": 187,
+            "chunkStart": 0,
+            "chunkEnd": 187,
+            "textHash": "ac63bad1317e73a6b5aa166d21929bd71e85f85be4cf2b43801a096ad420a164"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-22",
+        "text": "I’m sympathetic to giving historical continuity priority, but I’d separate two claims: original material need not survive, and physical composition is irrelevant. The first doesn’t establish the second. Material and structural changes might affect whether an object survives, even if no particular plank is indispensable.\n\nConsider a ship gradually consumed by fire. There’s an uninterrupted causal history connecting the vessel to the resulting ash, but we ordinarily say the ship was destroyed—not that it became a ship made of ash. That puts pressure on continuity alone as a sufficient condition for numerical identity: causal succession can connect an object to its remains without preserving the object.\n\nYour view could distinguish identity-preserving continuity from mere causal succession. But then it needs an independent account of that distinction; otherwise “its history remains continuous” risks meaning “it continues to be the same object.” Preserving an organised whole through repairs is one possible answer, though that gives physical organisation a role again.\n\nWhat, on your account, distinguishes replacing the ship’s planks from burning it—without already assuming which process preserves the ship?",
+        "sourceSpans": [
+          {
+            "record": "symposium:17",
+            "blockGuid": "607cfdad-9607-4379-b0f2-fa8413aa6f32",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:73a2cbf0-968c-4159-bd5a-2e7007496f8f"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 321,
+            "runStart": 0,
+            "runEnd": 321,
+            "chunkStart": 0,
+            "chunkEnd": 321,
+            "textHash": "71408f03e74b814c7c6083f956c1ebc81486e5dfd80282c160c97b670f2ba1cf"
+          },
+          {
+            "record": "symposium:18",
+            "blockGuid": "a255bc30-d869-40d6-a652-f33562e76633",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc68af9b-6c72-402c-8438-6361c831c646"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 386,
+            "runStart": 0,
+            "runEnd": 386,
+            "chunkStart": 323,
+            "chunkEnd": 709,
+            "textHash": "b319a5e765705c148f31f6fa27ac21e3702b15ed8fc7402d9733a8b32942ab66"
+          },
+          {
+            "record": "symposium:19",
+            "blockGuid": "bd6fb13f-442d-4dd8-a4fc-39736994d3bc",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c8d71a11-770b-4d94-989b-431b511ef3e0"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 368,
+            "runStart": 0,
+            "runEnd": 368,
+            "chunkStart": 711,
+            "chunkEnd": 1079,
+            "textHash": "ef3b82c59f941bb25dc08bc2c021b91e61f11e4c11af3738e9e419127db33829"
+          },
+          {
+            "record": "symposium:20",
+            "blockGuid": "46b8d4a1-978d-453f-a507-cbdc2be79749",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:6118982b-81c4-4732-9750-82bbd6025e6a"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 139,
+            "runStart": 0,
+            "runEnd": 139,
+            "chunkStart": 1081,
+            "chunkEnd": 1220,
+            "textHash": "731b36ec643646fcddfa0c705a3c0d3deee3063162796ecb40c5a97bc6129270"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-26",
+        "text": "I’d replace “irrelevant” with “not decisive on its own.” That preserves your central intuition without making every continuous physical transformation count as survival. A revised position might be:\n\nA ship can remain the same individual despite replacement of all its original material. Its identity depends primarily on the causal history through which it is maintained as an organised vessel, rather than on possession of particular planks. Nevertheless, material and structural changes matter when they turn maintenance or repair into destruction and replacement.\n\nThe key distinction is between retaining original matter and preserving an object through changes in matter. Repair can do the latter without doing the former. Burning the ship preserves a causal connection to its remains but not, ordinarily, the ship. And retaining every plank in a pile doesn’t by itself preserve an assembled vessel.\n\nThis also leaves room for temporary loss of function: a ship in dry dock needn’t stop existing because it cannot currently sail. So neither original material nor uninterrupted seaworthiness is the sole test of numerical identity.\n\nI’d present this as a better starting principle, not a complete solution. We still need to explain the boundary between repair and destruction, especially in dismantling and reconstruction cases. But the useful shift is clear: material replacement is compatible with identity; material change is not automatically irrelevant to it.",
+        "sourceSpans": [
+          {
+            "record": "symposium:27",
+            "blockGuid": "007e0eb4-c22c-47a7-8400-1cc0e47410a6",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:52e352e7-2b91-4749-b4b3-06bcd9d082ce"
+            ],
+            "contribution": {
+              "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+              "ordinal": 12,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 198,
+            "runStart": 0,
+            "runEnd": 198,
+            "chunkStart": 0,
+            "chunkEnd": 198,
+            "textHash": "4b5ef952cc8320a9fc1f06b8a0e4449b8c9e6a857aaecf4904692240bb054572"
+          },
+          {
+            "record": "symposium:28",
+            "blockGuid": "bf442543-a1d9-4409-bebe-62128a2a94d3",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:3c59b77b-0f9e-406f-b268-4a97392d1f8c"
+            ],
+            "contribution": {
+              "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+              "ordinal": 12,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 367,
+            "runStart": 0,
+            "runEnd": 367,
+            "chunkStart": 200,
+            "chunkEnd": 567,
+            "textHash": "c5c2e3b2f9560a14d6ce3a9c144c0a6316fd1bc862a791a0f96f2de22a5afefe"
+          },
+          {
+            "record": "symposium:29",
+            "blockGuid": "0a768b76-c0dd-414c-ad50-3f907c48fe2a",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:fa31cf24-783b-4cf5-b280-1649f2ff3944"
+            ],
+            "contribution": {
+              "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+              "ordinal": 12,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 336,
+            "runStart": 0,
+            "runEnd": 336,
+            "chunkStart": 569,
+            "chunkEnd": 905,
+            "textHash": "f954488e1cdfbb32ee693af2beda591230bf7b9f6284e41fe34d1d9d27a5b1ce"
+          },
+          {
+            "record": "symposium:30",
+            "blockGuid": "9aaf4cde-1349-4956-8b71-d392f8f66849",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:cb74f586-b652-4634-b920-6bb1eb1a1a11"
+            ],
+            "contribution": {
+              "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+              "ordinal": 12,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 229,
+            "runStart": 0,
+            "runEnd": 229,
+            "chunkStart": 907,
+            "chunkEnd": 1136,
+            "textHash": "25bd280873a6eee6470328bb0f736b4834fcf155b35f8ceba4112dfa6d770089"
+          },
+          {
+            "record": "symposium:31",
+            "blockGuid": "389ed953-f560-4ce5-bdf8-a6e6cc08596d",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:924e4810-40b2-494b-8ab5-47c61ef89f87"
+            ],
+            "contribution": {
+              "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+              "ordinal": 12,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 331,
+            "runStart": 0,
+            "runEnd": 331,
+            "chunkStart": 1138,
+            "chunkEnd": 1469,
+            "textHash": "bc46cd75be19a283d25bb65558a2545c4a9ff9c29d7df50e2c1e494a78ad77b9"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-28",
+        "text": "Yes—the reasoning carries over, but it doesn’t settle which continuity matters. Personal identity shares the ship’s central puzzle: how can one individual persist while its constituents and qualities change? What people add is a potentially competing basis for persistence: a connected mental life.\n\nBiological accounts locate our persistence in the continuing life of the same human organism. Cell turnover is part of that organism’s self-maintenance, not necessarily its replacement. Many cells change, though some—including many neurons—can persist for decades.\n\nPsychological accounts emphasise appropriately caused connections among memories, intentions, dispositions and other mental states. Continuity needn’t mean an unchanged personality or remembering every earlier experience: overlapping connections can link childhood to adulthood without any single memory spanning the whole period.\n\nOrdinarily, these continuities travel together, so your experience fits both accounts. Changing your opinions or temperament is qualitative change; it doesn’t by itself establish a loss of numerical identity. The theories diverge in harder cases, such as profound memory loss or a hypothetical brain transplant.\n\nSo I wouldn’t assume personal identity is fundamentally different, but neither would I simply import our criterion for ships. Persons are living organisms and subjects of experience; artefacts are not. That introduces additional candidate criteria, while questions of responsibility, relationships and concern for our future make the stakes distinctive. Those practical concerns may also depend on more than strict identity.\n\nA revealing test is: if your memories, dispositions and conscious life continued through your brain being transplanted into another body, would you think you had moved—or that someone else had acquired your psychology? That tests which continuity you regard as central, rather than assuming the answer.",
+        "sourceSpans": [
+          {
+            "record": "symposium:33",
+            "blockGuid": "87b4fabb-f628-49fa-abe4-9c2232bd9f65",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9bcce951-56be-4216-aa94-5101f5ef521d"
+            ],
+            "contribution": {
+              "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+              "ordinal": 14,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 298,
+            "runStart": 0,
+            "runEnd": 298,
+            "chunkStart": 0,
+            "chunkEnd": 298,
+            "textHash": "52b77e470dc5f16cfa55e31ab75e6ad11f918b598223725adc30f3bfbb20d359"
+          },
+          {
+            "record": "symposium:34",
+            "blockGuid": "a566664f-4636-430b-8ad9-56a2fb94b104",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d8a349c9-5061-48dd-84a1-60f3e7e3f101",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1518e0c1-70c6-46ec-8cbd-a7050d93081f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:3b6ef369-bccc-4c40-8b59-d8c3eea96b3c"
+            ],
+            "contribution": {
+              "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+              "ordinal": 14,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 264,
+            "runStart": 0,
+            "runEnd": 264,
+            "chunkStart": 300,
+            "chunkEnd": 564,
+            "textHash": "d18bbe1187e8c87d9edd8580b8be07799bcae8d04b7d81a8930e5e9526032f13"
+          },
+          {
+            "record": "symposium:35",
+            "blockGuid": "b06ae8c1-ca67-4f3d-8d47-dabd05d2a8c3",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d8a349c9-5061-48dd-84a1-60f3e7e3f101",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c7ea74c4-1b1d-4d2a-81d4-05b375fcbd49",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6dfaba2-bb61-4e24-94fb-28bf0725a711"
+            ],
+            "contribution": {
+              "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+              "ordinal": 14,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 330,
+            "runStart": 0,
+            "runEnd": 330,
+            "chunkStart": 566,
+            "chunkEnd": 896,
+            "textHash": "424dea4708cace2533661935256cb06f9c7a8b9025cc3d7ee102fa9532f4b636"
+          },
+          {
+            "record": "symposium:36",
+            "blockGuid": "e71bfcef-9642-4f4c-9962-eeb09fbc37f3",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:df9c7d64-0a22-43a5-b1a6-80f91c754af6"
+            ],
+            "contribution": {
+              "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+              "ordinal": 14,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 311,
+            "runStart": 0,
+            "runEnd": 311,
+            "chunkStart": 898,
+            "chunkEnd": 1209,
+            "textHash": "6edd5ac9849b0f43f62b1e8d86ae405e4287f635c8d996e38a3bd4b84eb44439"
+          },
+          {
+            "record": "symposium:37",
+            "blockGuid": "48b38695-ce9e-4095-95e1-1a7a1ef2976e",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f8982de4-0fd3-4baa-81c1-0f0bc47decdb"
+            ],
+            "contribution": {
+              "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+              "ordinal": 14,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 424,
+            "runStart": 0,
+            "runEnd": 424,
+            "chunkStart": 1211,
+            "chunkEnd": 1635,
+            "textHash": "fbcccd37ff42e9eb1b5c4c0e35a015daaa11d43a38b6f2078c9367a4a37a0de7"
+          },
+          {
+            "record": "symposium:38",
+            "blockGuid": "fe91f2a5-2de9-4eba-af54-d4b872f7525c",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:7722619f-ee33-403d-a7c5-2b34e2bc668f"
+            ],
+            "contribution": {
+              "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+              "ordinal": 14,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 302,
+            "runStart": 0,
+            "runEnd": 302,
+            "chunkStart": 1637,
+            "chunkEnd": 1939,
+            "textHash": "57665cd0442dd911ca0469f4fddae909a5c6383f6370bbc2f33bed0241bf0f6c"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "P1",
+    "variant": "structure",
+    "mode": "vector",
+    "allContextFacetsAt5": false,
+    "allContextFacetsAt768": false,
+    "boundedTokens": 735,
+    "hits": [
+      {
+        "chunk": "structure-0",
+        "distance": 0.49528685212135315,
+        "text": "The Masque of the Red Death\r\n\nThe red death had long devastated the country. No pestilence had ever been so fatal, or so hideous. Blood was its Avatar and its seal - the madness and the horror of blood. There were sharp pains, and sudden dizziness, and then profuse bleeding at the pores, with dissolution. The scarlet stains upon the body and especially upon the face of the victim, were the pest ban which shut him out from the aid and from the sympathy of his fellow-men. And the whole seizure, progress, and termination of the disease, were incidents of half an hour.\r\n\nBut Prince Prospero was happy and dauntless and sagacious. When his dominions were half depopulated, he summoned to his presence a thousand hale and light-hearted friends from among the knights and dames of his court, and with these retired to the deep seclusion of one of his crenellated abbeys. This was an extensive and magnificent structure, the creation of the prince's own eccentric yet august taste. A strong and lofty wall girdled it in. This wall had gates of iron. The courtiers, having entered, brought furnaces and massy hammers and welded the bolts.\r\n\nThey resolved to leave means neither of ingress nor egress to the sudden impulses of despair or of frenzy from within. The abbey was amply provisioned. With such precautions the courtiers might bid defiance to contagion. The external world could take care of itself. In the meantime it was folly to grieve or to think. The prince had provided all the appliances of pleasure. There were buffoons, there were improvisatori, there were ballet-dancers, there were musicians, there was Beauty, there was wine. All these and security were within. Without was the \"Red Death.\"\r",
+        "sourceSpans": [
+          {
+            "record": "poe:0",
+            "blockGuid": "53b35322-db68-4273-90dd-5db527fec3a3",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:ad4dfdb4-b77e-41ce-a25e-87d452f58a0f"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 28,
+            "runStart": 0,
+            "runEnd": 28,
+            "chunkStart": 0,
+            "chunkEnd": 28,
+            "textHash": "255d9ed2df0790daf69a1571a696347f79ef19fe86798b24459a593e0bd00603"
+          },
+          {
+            "record": "poe:1",
+            "blockGuid": "b28cbb8b-6945-42b9-b86f-eab820a5f99e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:4a52cbd0-5af8-488e-b261-cfeebf06baaa"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 542,
+            "runStart": 0,
+            "runEnd": 542,
+            "chunkStart": 30,
+            "chunkEnd": 572,
+            "textHash": "add7c92bc749e305e36ecc137a6b19df6380d3dc8b38022212231de7bcf43596"
+          },
+          {
+            "record": "poe:2",
+            "blockGuid": "7d81ed11-fa71-49d1-9bcc-c44888ed7dbc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e5d9e04e-c30d-48d8-8270-88da41880b37"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 563,
+            "runStart": 0,
+            "runEnd": 563,
+            "chunkStart": 574,
+            "chunkEnd": 1137,
+            "textHash": "567447ea2e39a43e56ffa40464d0a05b0729bd2819f84d8d75c0e2ae5c622bdf"
+          },
+          {
+            "record": "poe:3",
+            "blockGuid": "7c879a5d-937d-40c7-bcbf-fd8266680d98",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:919f414b-7dec-45b0-b73e-f47c34b7f6a8"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 570,
+            "runStart": 0,
+            "runEnd": 570,
+            "chunkStart": 1139,
+            "chunkEnd": 1709,
+            "textHash": "f02395ddee22e1161b28a829162610398d5c087b015f9a8155eb7449ac519a84"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-10",
+        "distance": 0.4974711537361145,
+        "text": "It was in the blue room where stood the prince, with a group of pale courtiers by his side. At first, as he spoke, there was a slight rushing movement of this group in the direction of the intruder, who, at the moment was also near at hand, and now, with deliberate and stately step, made closer approach to the speaker. But from a certain nameless awe with which the mad assumptions of the mummer had inspired the whole party, there were found none who put forth a hand to seize him; so that, unimpeded, he passed within a yard of the prince's person; and while the vast assembly, as with one impulse, shrank from the centers of the rooms to the walls, he made his way uninterruptedly, but with the same solemn and measured step which had distinguished him from the first, through the blue chamber to the purple — to the purple to the green — through the green to the orange — through this again to the white — and even thence to the violet, ere a decided movement had been made to arrest him. It was then, however, that the Prince Prospero, maddened with rage and the shame of his own momentary cowardice, rushed hurriedly through the six chambers, while none followed him on account of a deadly terror that had seized upon all. He bore aloft a drawn dagger, and had approached, in rapid impetuosity, to within three or four feet of the retreating figure, when the latter, having attained the extremity of the velvet apartment, turned suddenly and confronted his pursuer. There was a sharp cry — and the dagger dropped gleaming upon the sable carpet, upon which most instantly afterward, fell prostrate in death the Prince Prospero. ",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1635,
+            "runStart": 0,
+            "runEnd": 1635,
+            "chunkStart": 0,
+            "chunkEnd": 1635,
+            "textHash": "32b2acac9baa2e89897c19bd7182d18d271a5e63474ccc58756be6453c1d7609"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-1",
+        "distance": 0.5175537467002869,
+        "text": "It was toward the close of the fifth or sixth month of his seclusion that the Prince Prospero entertained his thousand friends at a masked ball of the most unusual magnificence.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:4",
+            "blockGuid": "d08e16ea-478e-4137-9068-189d7b75330b",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:0740ac5a-6122-4147-bcf9-05310afd4e72"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 178,
+            "runStart": 0,
+            "runEnd": 178,
+            "chunkStart": 0,
+            "chunkEnd": 178,
+            "textHash": "e7ac005e4c88ac027c3bfe89904be19a09f615b021744dd8f411b4fd62429652"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-8",
+        "distance": 0.5250148773193359,
+        "text": "In an assembly of phantasms such as I have painted, it may well be supposed that no ordinary appearance could have excited such sensation. In truth the masquerade license of the night was nearly unlimited; but the figure in question had out-Heroded Herod, and gone beyond the bounds of even the prince's indefinite decorum. There are chords in the hearts of the most reckless which cannot be touched without emotion. Even with the utterly lost, to whom life and death are equally jests, there are matters of which no jest can be made. The whole company, indeed, seemed now deeply to feel that in the costume and bearing of the stranger neither wit nor propriety existed. The figure was tall and gaunt, and shrouded from head to foot in the habiliments of the grave. The mask which concealed the visage was made so nearly to resemble the countenance of a stiffened corpse that the closest scrutiny must have difficulty in detecting the cheat. And yet all this might have been endured, if not approved, by the mad revellers around. But the mummer had gone so far as to assume the type of the Red Death. His vesture was dabbled in blood — and his broad brow, with all the features of his face, was besprinkled with the scarlet horror.\r\n\nWhen the eyes of Prince Prospero fell on this spectral image (which, with a slow and solemn movement, as if more fully to sustain its role, stalked to and fro among the waltzers) he was seen to be convulsed, in the first moment with a strong shudder either of terror or distaste; but in the next, his brow reddened with rage.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:10",
+            "blockGuid": "8a8baef6-569d-42e4-b8d9-ea20c298a748",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:997e7ecb-69b4-4b28-914e-bd3f874d06a3"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1232,
+            "runStart": 0,
+            "runEnd": 1232,
+            "chunkStart": 0,
+            "chunkEnd": 1232,
+            "textHash": "b04f72542cadf99ca06a195256ae3726a2629cd40ac648acbc910b4439b688a9"
+          },
+          {
+            "record": "poe:11",
+            "blockGuid": "de356f7e-88c0-414a-9e40-96f5245c03bc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:842941e9-aeea-411c-ae95-5b6a100a0823"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 326,
+            "runStart": 0,
+            "runEnd": 326,
+            "chunkStart": 1234,
+            "chunkEnd": 1560,
+            "textHash": "0b409627ca0b3286898ed64f4f5b9b5822f86bf911e8f01f856384a14786e6e0"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-9",
+        "distance": 0.5273218750953674,
+        "text": "\"Who dares\" — he demanded hoarsely of the courtiers who stood near him — \"who dares insult us with this blasphemous mockery? Seize him and unmask him — that we may know whom we have to hang, at sunrise, from the battlements!\"\r\n\nIt was in the eastern or blue chamber in which stood Prince Prospero as he uttered these words. They rang throughout the seven rooms loudly and clearly, for the prince was a bold and robust man, and the music had become hushed at the waving of his hand.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:12",
+            "blockGuid": "7a31c55d-247a-4faf-ba43-7682a927d984",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:f5332ff5-a6e3-41c8-9239-08ba6074509c"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 226,
+            "runStart": 0,
+            "runEnd": 226,
+            "chunkStart": 0,
+            "chunkEnd": 226,
+            "textHash": "6db63bc08c7ce6b5b3b8321a508a85ca04eca341ff7a74e639bb9a512b088122"
+          },
+          {
+            "record": "poe:13",
+            "blockGuid": "16d69382-d846-427b-9be9-5d749b7f58af",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a0d8e2de-08f3-4c08-9b43-c0ed1fe5106f"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 254,
+            "runStart": 0,
+            "runEnd": 254,
+            "chunkStart": 228,
+            "chunkEnd": 482,
+            "textHash": "f6f2923744c066e708228ede5e71edbc8453ec1bdced059b3ecbdeb35c764aec"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "P5",
+    "variant": "structure",
+    "mode": "vector",
+    "allContextFacetsAt5": true,
+    "allContextFacetsAt768": false,
+    "boundedTokens": 677,
+    "hits": [
+      {
+        "chunk": "structure-8",
+        "distance": 0.4710685908794403,
+        "text": "In an assembly of phantasms such as I have painted, it may well be supposed that no ordinary appearance could have excited such sensation. In truth the masquerade license of the night was nearly unlimited; but the figure in question had out-Heroded Herod, and gone beyond the bounds of even the prince's indefinite decorum. There are chords in the hearts of the most reckless which cannot be touched without emotion. Even with the utterly lost, to whom life and death are equally jests, there are matters of which no jest can be made. The whole company, indeed, seemed now deeply to feel that in the costume and bearing of the stranger neither wit nor propriety existed. The figure was tall and gaunt, and shrouded from head to foot in the habiliments of the grave. The mask which concealed the visage was made so nearly to resemble the countenance of a stiffened corpse that the closest scrutiny must have difficulty in detecting the cheat. And yet all this might have been endured, if not approved, by the mad revellers around. But the mummer had gone so far as to assume the type of the Red Death. His vesture was dabbled in blood — and his broad brow, with all the features of his face, was besprinkled with the scarlet horror.\r\n\nWhen the eyes of Prince Prospero fell on this spectral image (which, with a slow and solemn movement, as if more fully to sustain its role, stalked to and fro among the waltzers) he was seen to be convulsed, in the first moment with a strong shudder either of terror or distaste; but in the next, his brow reddened with rage.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:10",
+            "blockGuid": "8a8baef6-569d-42e4-b8d9-ea20c298a748",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:997e7ecb-69b4-4b28-914e-bd3f874d06a3"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1232,
+            "runStart": 0,
+            "runEnd": 1232,
+            "chunkStart": 0,
+            "chunkEnd": 1232,
+            "textHash": "b04f72542cadf99ca06a195256ae3726a2629cd40ac648acbc910b4439b688a9"
+          },
+          {
+            "record": "poe:11",
+            "blockGuid": "de356f7e-88c0-414a-9e40-96f5245c03bc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:842941e9-aeea-411c-ae95-5b6a100a0823"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 326,
+            "runStart": 0,
+            "runEnd": 326,
+            "chunkStart": 1234,
+            "chunkEnd": 1560,
+            "textHash": "0b409627ca0b3286898ed64f4f5b9b5822f86bf911e8f01f856384a14786e6e0"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-7",
+        "distance": 0.5255482196807861,
+        "text": "But to the chamber which lies most westwardly of the seven there are now none of the maskers who venture, for the night is waning away; and there flows a ruddier light through the blood-colored panes; and the blackness of the sable drapery appalls; and to him whose foot falls on the sable carpet, there comes from the near clock of ebony a muffled peal more solemnly emphatic than any which reaches their ears who indulge in the more remote gaieties of the other apartments.\r\n\nBut these other apartments were densely crowded, and in them beat feverishly the heart of life. And the revel went whirlingly on, until at length there commenced the sounding of midnight upon the clock. And then the music ceased, as I have told; and the evolutions of the waltzers were quieted; and there was an uneasy cessation of all things as before. But now there were twelve strokes to be sounded by the bell of the clock; and thus it happened, perhaps that more of thought crept, with more of time into the meditations of the thoughtful among those who revelled. And thus too, it happened, that before the last echoes of the last chime had utterly sunk into silence, there were many individuals in the crowd who had found leisure to become aware of the presence of a masked figure which had arrested the attention of no single individual before. And the rumor of this new presence having spread itself whisperingly around, there arose at length from the whole company a buzz, or murmur, of horror, and of disgust.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:8",
+            "blockGuid": "022574ae-3283-4b37-a3e0-7b4a193d202e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:675dd646-9527-4f21-b57f-46cc8e81252b"
+            ],
+            "contribution": null,
+            "start": 1370,
+            "end": 1846,
+            "runStart": 1370,
+            "runEnd": 1846,
+            "chunkStart": 0,
+            "chunkEnd": 476,
+            "textHash": "6272400800ded520cd99942867d700449560ac15b9bb686974f3d6b88155723c"
+          },
+          {
+            "record": "poe:9",
+            "blockGuid": "73a1bd69-9546-4eb9-a7b9-a906551890bc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:f3d6acb6-840a-49b5-a6ee-c780162b0414"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1020,
+            "runStart": 0,
+            "runEnd": 1020,
+            "chunkStart": 478,
+            "chunkEnd": 1498,
+            "textHash": "68673beb36cd758b11818a5fcdc1558e576973f1370a2092ee87ab832a8534cc"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-11",
+        "distance": 0.5746316313743591,
+        "text": "Then summoning the wild courage of despair, a throng of the revellers at once threw themselves into the black apartment, and seizing the mummer whose tall figure stood erect and motionless within the shadow of the ebony clock, gasped in unutterable horror at finding the grave cerements and corpse-like mask, which they handled with so violent a rudeness, untenanted by any tangible form.\r\n\nAnd now was acknowledged the presence of the Red Death. He had come like a thief in the night. And one by one dropped the revellers in the blood-bedewed halls of their revel, and died each in the despairing posture of his fall. And the life of the ebony clock went out with that of the last of the gay. And the flames of the tripods expired. And Darkness and Decay and the Red Death held illimitable dominion over all.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 1635,
+            "end": 2024,
+            "runStart": 1635,
+            "runEnd": 2024,
+            "chunkStart": 0,
+            "chunkEnd": 389,
+            "textHash": "84de4f18c507a9f1e1b6d40b46b74a38b4b018e177b6aa793a117095d061042b"
+          },
+          {
+            "record": "poe:15",
+            "blockGuid": "a3e823e6-47cd-43d3-99e8-af223ba7f42a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e84a94ce-3e40-4a52-92c2-412b623a533e"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 419,
+            "runStart": 0,
+            "runEnd": 419,
+            "chunkStart": 391,
+            "chunkEnd": 810,
+            "textHash": "02761ca251c8abd9563be9feb555b2d0290d5ca75d9fca9295f1a3ec0f379726"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-10",
+        "distance": 0.5902760028839111,
+        "text": "It was in the blue room where stood the prince, with a group of pale courtiers by his side. At first, as he spoke, there was a slight rushing movement of this group in the direction of the intruder, who, at the moment was also near at hand, and now, with deliberate and stately step, made closer approach to the speaker. But from a certain nameless awe with which the mad assumptions of the mummer had inspired the whole party, there were found none who put forth a hand to seize him; so that, unimpeded, he passed within a yard of the prince's person; and while the vast assembly, as with one impulse, shrank from the centers of the rooms to the walls, he made his way uninterruptedly, but with the same solemn and measured step which had distinguished him from the first, through the blue chamber to the purple — to the purple to the green — through the green to the orange — through this again to the white — and even thence to the violet, ere a decided movement had been made to arrest him. It was then, however, that the Prince Prospero, maddened with rage and the shame of his own momentary cowardice, rushed hurriedly through the six chambers, while none followed him on account of a deadly terror that had seized upon all. He bore aloft a drawn dagger, and had approached, in rapid impetuosity, to within three or four feet of the retreating figure, when the latter, having attained the extremity of the velvet apartment, turned suddenly and confronted his pursuer. There was a sharp cry — and the dagger dropped gleaming upon the sable carpet, upon which most instantly afterward, fell prostrate in death the Prince Prospero. ",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1635,
+            "runStart": 0,
+            "runEnd": 1635,
+            "chunkStart": 0,
+            "chunkEnd": 1635,
+            "textHash": "32b2acac9baa2e89897c19bd7182d18d271a5e63474ccc58756be6453c1d7609"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-12",
+        "distance": 0.6005878448486328,
+        "text": "\"The Masque of the Red Death\" (originally published as \"The Mask of the Red Death: A Fantasy\") is a short story by American writer Edgar Allan Poe, first published in 1842. The story follows Prince Prospero's attempts to avoid a dangerous plague, known as the Red Death, by hiding in his abbey. He, along with many other wealthy nobles, hosts a masquerade ball in seven rooms of the abbey, each decorated with a different color. In the midst of their revelry, a mysterious figure disguised as a Red Death victim enters and makes his way through each of the rooms. Prospero dies after confronting this stranger, whose \"costume\" proves to contain nothing tangible inside it. The guests also die in turn.\r\n\nPoe's story follows many traditions of Gothic fiction and is often analyzed as an allegory about the inevitability of death, though some critics advise against an allegorical reading. Many different interpretations have been presented, as well as attempts to identify the true nature of the eponymous disease. The story was first published in May 1842 in Graham's Magazine and has since been adapted in many different forms, including a 1964 film starring Vincent Price. Poe's short story has also been alluded to by other works in many types of media.\r\n\nAnalysis\r",
+        "sourceSpans": [
+          {
+            "record": "poe:16",
+            "blockGuid": "34ca1e40-9d82-4683-9f7b-62a49d632a57",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:1e961ec6-4b6c-46a9-a541-5688780ac93b"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 702,
+            "runStart": 0,
+            "runEnd": 702,
+            "chunkStart": 0,
+            "chunkEnd": 702,
+            "textHash": "b095cd21ffd13d03cf156553e32f4905194dacf507f1349b31cf6d6dce201402"
+          },
+          {
+            "record": "poe:17",
+            "blockGuid": "c7efb0e1-f1de-401d-b6ca-cc9a2d97600a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e2d6fe82-1c05-4380-8b48-f3f58fbb37a9"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 553,
+            "runStart": 0,
+            "runEnd": 553,
+            "chunkStart": 704,
+            "chunkEnd": 1257,
+            "textHash": "d032135e9e6fd856e20c923850bca5439213646fa0465d645b3c57ae1543dac1"
+          },
+          {
+            "record": "poe:18",
+            "blockGuid": "09e0fe09-a956-407d-a25c-70f99294ae79",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:186ce0fe-d761-4281-be6f-bab2199e983d"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 9,
+            "runStart": 0,
+            "runEnd": 9,
+            "chunkStart": 1259,
+            "chunkEnd": 1268,
+            "textHash": "661c2dd3b2e135cacfb506151b82b6d8f436b41c096ec7fa6ef9aa0d930793af"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "N1",
+    "variant": "structure",
+    "mode": "vector",
+    "allContextFacetsAt5": null,
+    "allContextFacetsAt768": null,
+    "boundedTokens": 735,
+    "hits": [
+      {
+        "chunk": "structure-0",
+        "distance": 0.6126433610916138,
+        "text": "The Masque of the Red Death\r\n\nThe red death had long devastated the country. No pestilence had ever been so fatal, or so hideous. Blood was its Avatar and its seal - the madness and the horror of blood. There were sharp pains, and sudden dizziness, and then profuse bleeding at the pores, with dissolution. The scarlet stains upon the body and especially upon the face of the victim, were the pest ban which shut him out from the aid and from the sympathy of his fellow-men. And the whole seizure, progress, and termination of the disease, were incidents of half an hour.\r\n\nBut Prince Prospero was happy and dauntless and sagacious. When his dominions were half depopulated, he summoned to his presence a thousand hale and light-hearted friends from among the knights and dames of his court, and with these retired to the deep seclusion of one of his crenellated abbeys. This was an extensive and magnificent structure, the creation of the prince's own eccentric yet august taste. A strong and lofty wall girdled it in. This wall had gates of iron. The courtiers, having entered, brought furnaces and massy hammers and welded the bolts.\r\n\nThey resolved to leave means neither of ingress nor egress to the sudden impulses of despair or of frenzy from within. The abbey was amply provisioned. With such precautions the courtiers might bid defiance to contagion. The external world could take care of itself. In the meantime it was folly to grieve or to think. The prince had provided all the appliances of pleasure. There were buffoons, there were improvisatori, there were ballet-dancers, there were musicians, there was Beauty, there was wine. All these and security were within. Without was the \"Red Death.\"\r",
+        "sourceSpans": [
+          {
+            "record": "poe:0",
+            "blockGuid": "53b35322-db68-4273-90dd-5db527fec3a3",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:ad4dfdb4-b77e-41ce-a25e-87d452f58a0f"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 28,
+            "runStart": 0,
+            "runEnd": 28,
+            "chunkStart": 0,
+            "chunkEnd": 28,
+            "textHash": "255d9ed2df0790daf69a1571a696347f79ef19fe86798b24459a593e0bd00603"
+          },
+          {
+            "record": "poe:1",
+            "blockGuid": "b28cbb8b-6945-42b9-b86f-eab820a5f99e",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:4a52cbd0-5af8-488e-b261-cfeebf06baaa"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 542,
+            "runStart": 0,
+            "runEnd": 542,
+            "chunkStart": 30,
+            "chunkEnd": 572,
+            "textHash": "add7c92bc749e305e36ecc137a6b19df6380d3dc8b38022212231de7bcf43596"
+          },
+          {
+            "record": "poe:2",
+            "blockGuid": "7d81ed11-fa71-49d1-9bcc-c44888ed7dbc",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e5d9e04e-c30d-48d8-8270-88da41880b37"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 563,
+            "runStart": 0,
+            "runEnd": 563,
+            "chunkStart": 574,
+            "chunkEnd": 1137,
+            "textHash": "567447ea2e39a43e56ffa40464d0a05b0729bd2819f84d8d75c0e2ae5c622bdf"
+          },
+          {
+            "record": "poe:3",
+            "blockGuid": "7c879a5d-937d-40c7-bcbf-fd8266680d98",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:919f414b-7dec-45b0-b73e-f47c34b7f6a8"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 570,
+            "runStart": 0,
+            "runEnd": 570,
+            "chunkStart": 1139,
+            "chunkEnd": 1709,
+            "textHash": "f02395ddee22e1161b28a829162610398d5c087b015f9a8155eb7449ac519a84"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-10",
+        "distance": 0.6488960385322571,
+        "text": "It was in the blue room where stood the prince, with a group of pale courtiers by his side. At first, as he spoke, there was a slight rushing movement of this group in the direction of the intruder, who, at the moment was also near at hand, and now, with deliberate and stately step, made closer approach to the speaker. But from a certain nameless awe with which the mad assumptions of the mummer had inspired the whole party, there were found none who put forth a hand to seize him; so that, unimpeded, he passed within a yard of the prince's person; and while the vast assembly, as with one impulse, shrank from the centers of the rooms to the walls, he made his way uninterruptedly, but with the same solemn and measured step which had distinguished him from the first, through the blue chamber to the purple — to the purple to the green — through the green to the orange — through this again to the white — and even thence to the violet, ere a decided movement had been made to arrest him. It was then, however, that the Prince Prospero, maddened with rage and the shame of his own momentary cowardice, rushed hurriedly through the six chambers, while none followed him on account of a deadly terror that had seized upon all. He bore aloft a drawn dagger, and had approached, in rapid impetuosity, to within three or four feet of the retreating figure, when the latter, having attained the extremity of the velvet apartment, turned suddenly and confronted his pursuer. There was a sharp cry — and the dagger dropped gleaming upon the sable carpet, upon which most instantly afterward, fell prostrate in death the Prince Prospero. ",
+        "sourceSpans": [
+          {
+            "record": "poe:14",
+            "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 1635,
+            "runStart": 0,
+            "runEnd": 1635,
+            "chunkStart": 0,
+            "chunkEnd": 1635,
+            "textHash": "32b2acac9baa2e89897c19bd7182d18d271a5e63474ccc58756be6453c1d7609"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-9",
+        "distance": 0.655352771282196,
+        "text": "\"Who dares\" — he demanded hoarsely of the courtiers who stood near him — \"who dares insult us with this blasphemous mockery? Seize him and unmask him — that we may know whom we have to hang, at sunrise, from the battlements!\"\r\n\nIt was in the eastern or blue chamber in which stood Prince Prospero as he uttered these words. They rang throughout the seven rooms loudly and clearly, for the prince was a bold and robust man, and the music had become hushed at the waving of his hand.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:12",
+            "blockGuid": "7a31c55d-247a-4faf-ba43-7682a927d984",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:f5332ff5-a6e3-41c8-9239-08ba6074509c"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 226,
+            "runStart": 0,
+            "runEnd": 226,
+            "chunkStart": 0,
+            "chunkEnd": 226,
+            "textHash": "6db63bc08c7ce6b5b3b8321a508a85ca04eca341ff7a74e639bb9a512b088122"
+          },
+          {
+            "record": "poe:13",
+            "blockGuid": "16d69382-d846-427b-9be9-5d749b7f58af",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a0d8e2de-08f3-4c08-9b43-c0ed1fe5106f"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 254,
+            "runStart": 0,
+            "runEnd": 254,
+            "chunkStart": 228,
+            "chunkEnd": 482,
+            "textHash": "f6f2923744c066e708228ede5e71edbc8453ec1bdced059b3ecbdeb35c764aec"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-1",
+        "distance": 0.6725176572799683,
+        "text": "It was toward the close of the fifth or sixth month of his seclusion that the Prince Prospero entertained his thousand friends at a masked ball of the most unusual magnificence.\r",
+        "sourceSpans": [
+          {
+            "record": "poe:4",
+            "blockGuid": "d08e16ea-478e-4137-9068-189d7b75330b",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:0740ac5a-6122-4147-bcf9-05310afd4e72"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 178,
+            "runStart": 0,
+            "runEnd": 178,
+            "chunkStart": 0,
+            "chunkEnd": 178,
+            "textHash": "e7ac005e4c88ac027c3bfe89904be19a09f615b021744dd8f411b4fd62429652"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-12",
+        "distance": 0.6775248050689697,
+        "text": "\"The Masque of the Red Death\" (originally published as \"The Mask of the Red Death: A Fantasy\") is a short story by American writer Edgar Allan Poe, first published in 1842. The story follows Prince Prospero's attempts to avoid a dangerous plague, known as the Red Death, by hiding in his abbey. He, along with many other wealthy nobles, hosts a masquerade ball in seven rooms of the abbey, each decorated with a different color. In the midst of their revelry, a mysterious figure disguised as a Red Death victim enters and makes his way through each of the rooms. Prospero dies after confronting this stranger, whose \"costume\" proves to contain nothing tangible inside it. The guests also die in turn.\r\n\nPoe's story follows many traditions of Gothic fiction and is often analyzed as an allegory about the inevitability of death, though some critics advise against an allegorical reading. Many different interpretations have been presented, as well as attempts to identify the true nature of the eponymous disease. The story was first published in May 1842 in Graham's Magazine and has since been adapted in many different forms, including a 1964 film starring Vincent Price. Poe's short story has also been alluded to by other works in many types of media.\r\n\nAnalysis\r",
+        "sourceSpans": [
+          {
+            "record": "poe:16",
+            "blockGuid": "34ca1e40-9d82-4683-9f7b-62a49d632a57",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:1e961ec6-4b6c-46a9-a541-5688780ac93b"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 702,
+            "runStart": 0,
+            "runEnd": 702,
+            "chunkStart": 0,
+            "chunkEnd": 702,
+            "textHash": "b095cd21ffd13d03cf156553e32f4905194dacf507f1349b31cf6d6dce201402"
+          },
+          {
+            "record": "poe:17",
+            "blockGuid": "c7efb0e1-f1de-401d-b6ca-cc9a2d97600a",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e2d6fe82-1c05-4380-8b48-f3f58fbb37a9"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 553,
+            "runStart": 0,
+            "runEnd": 553,
+            "chunkStart": 704,
+            "chunkEnd": 1257,
+            "textHash": "d032135e9e6fd856e20c923850bca5439213646fa0465d645b3c57ae1543dac1"
+          },
+          {
+            "record": "poe:18",
+            "blockGuid": "09e0fe09-a956-407d-a25c-70f99294ae79",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+              "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:186ce0fe-d761-4281-be6f-bab2199e983d"
+            ],
+            "contribution": null,
+            "start": 0,
+            "end": 9,
+            "runStart": 0,
+            "runEnd": 9,
+            "chunkStart": 1259,
+            "chunkEnd": 1268,
+            "textHash": "661c2dd3b2e135cacfb506151b82b6d8f436b41c096ec7fa6ef9aa0d930793af"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": "N2",
+    "variant": "structure",
+    "mode": "vector",
+    "allContextFacetsAt5": null,
+    "allContextFacetsAt768": null,
+    "boundedTokens": 561,
+    "hits": [
+      {
+        "chunk": "structure-24",
+        "distance": 0.6195554733276367,
+        "text": "On your earlier continuity criterion, the continuously repaired ship is the original; the reconstructed vessel contains its original material but is a different ship. I’d favour that answer too, though it depends on what counts as identity-preserving continuity.\n\nThe strongest reason is that rebuilding the discarded planks shouldn’t retrospectively change which ship survived the repairs. Immediately before reconstruction, the maintained vessel has a plausible claim to being Theseus’s ship. Why should assembling another vessel elsewhere take that identity away? On this account, removing a plank transfers material, not the identity of the whole ship.\n\nThe reconstructed vessel nevertheless has a genuine competing claim based on material continuity. Calling it “a reconstruction made from the original timbers” recognises that connection without settling numerical identity in its favour.\n\nSo my answer is: the maintained ship preserves the individual; the reconstructed ship recovers its original components. That’s a defensible position, not a universally accepted solution. The remaining challenge for our preferred view is explaining why ongoing repair preserves a ship while other causally connected processes—like destruction—do not.",
+        "sourceSpans": [
+          {
+            "record": "symposium:22",
+            "blockGuid": "b312ed64-54f1-4323-a638-c7b1875b8c88",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:47c9d8bf-5c5e-4ab2-8c1b-cd0e006e7c5e",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:98d9c860-df6e-4dcb-be82-35e88588e11b"
+            ],
+            "contribution": {
+              "blockGuid": "2cfb147b-93ef-4cc8-bc3e-4e6f07d30c3a",
+              "ordinal": 10,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 262,
+            "runStart": 0,
+            "runEnd": 262,
+            "chunkStart": 0,
+            "chunkEnd": 262,
+            "textHash": "2ab489acb2a69ab8cb6031cd27d1e6d6f30740a419ea0de4f290b0250b3118e9"
+          },
+          {
+            "record": "symposium:23",
+            "blockGuid": "7f3884f2-0396-4bac-8e1f-147d3a9871e1",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:47c9d8bf-5c5e-4ab2-8c1b-cd0e006e7c5e",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:790557cd-75bd-4dbb-84f4-f6d1198a608b"
+            ],
+            "contribution": {
+              "blockGuid": "2cfb147b-93ef-4cc8-bc3e-4e6f07d30c3a",
+              "ordinal": 10,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 392,
+            "runStart": 0,
+            "runEnd": 392,
+            "chunkStart": 264,
+            "chunkEnd": 656,
+            "textHash": "1e035e033b3bd1b2284d88d70e0a2bbc312214f5643a7009603224e32d392b48"
+          },
+          {
+            "record": "symposium:24",
+            "blockGuid": "ae964e03-a6d7-4268-a95f-7d6c0a3a2eb4",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:47c9d8bf-5c5e-4ab2-8c1b-cd0e006e7c5e",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:2d8f1dc9-7770-420b-81b1-8c0db2fd4b80"
+            ],
+            "contribution": {
+              "blockGuid": "2cfb147b-93ef-4cc8-bc3e-4e6f07d30c3a",
+              "ordinal": 10,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 236,
+            "runStart": 0,
+            "runEnd": 236,
+            "chunkStart": 658,
+            "chunkEnd": 894,
+            "textHash": "44d1bc8eb133465339a82e021c2cd1cd59536faace3e591ead3f2a0bd888b239"
+          },
+          {
+            "record": "symposium:25",
+            "blockGuid": "26436d26-f894-4b35-9634-6da604a7b22d",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:47c9d8bf-5c5e-4ab2-8c1b-cd0e006e7c5e",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:a60045bf-6418-45a3-b16a-0e373dec4059"
+            ],
+            "contribution": {
+              "blockGuid": "2cfb147b-93ef-4cc8-bc3e-4e6f07d30c3a",
+              "ordinal": 10,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 349,
+            "runStart": 0,
+            "runEnd": 349,
+            "chunkStart": 896,
+            "chunkEnd": 1245,
+            "textHash": "72f488f322e8cde52c51d61e0c4767937b3f44ac17bb271be4d75c73f6b064d0"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-23",
+        "distance": 0.619559645652771,
+        "text": "But suppose someone collects all the discarded planks and reconstructs the original ship. Now there are two ships: one with an uninterrupted history and another containing the original material. Which one is the Ship of Theseus?",
+        "sourceSpans": [
+          {
+            "record": "symposium:21",
+            "blockGuid": "a14d0942-deff-4d9b-a7f3-c0704798f0b0",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1559e162-1eaf-477f-9e32-5b81e9d73ad4",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:3105c163-e637-4b36-9612-fe5931a8cc50"
+            ],
+            "contribution": {
+              "blockGuid": "037997e6-cb43-41d1-abc7-6cc9e636896c",
+              "ordinal": 9,
+              "author": "human",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                "kind": "human",
+                "name": "Local author"
+              }
+            },
+            "start": 0,
+            "end": 228,
+            "runStart": 0,
+            "runEnd": 228,
+            "chunkStart": 0,
+            "chunkEnd": 228,
+            "textHash": "7a60a00a89e8f3c9dd73a5df18d0490cba572a357dbdb74b04961e8e0741de87"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-32",
+        "distance": 0.6768872737884521,
+        "text": "Yes—it has sharpened the distinction rather than overturned it. The main lesson from personal identity is that “continuity” names several relationships that ordinarily coincide but can come apart. We shouldn’t treat historical continuity as a single, self-explanatory alternative to matter.\n\nMaterial continuity tracks the persistence of constituent matter. Historical continuity, in the sense we’ve favoured, tracks how an organised object develops through maintenance, repair and change. But the original planks have histories too. So the contrast isn’t really matter versus history; it’s the history of the components versus the continuing history of the vessel as a whole.\n\nThe personal case makes that clearer. Continuing as an organism and retaining psychological connections are both historical processes, not simply competing amounts of original material. Memory loss can separate them without automatically settling which constitutes the person’s persistence. Likewise, the two ships separate continuity of the maintained vessel from the provenance of its timber.\n\nThat develops our earlier proposal: the question is not merely whether there is a continuous history, but what that history preserves. For the ship, I still favour continuity through repair of the organised vessel. Yet we owe an explanation of why that relationship preserves the individual while the timber’s separate history does not; simply calling one history “the ship’s history” would assume the answer.\n\nSo the analogy strengthens a method, not a universal criterion: distinguish the continuities first, then argue which matters for the kind of thing under discussion. It doesn’t establish that persons and ships must persist in the same way.",
+        "sourceSpans": [
+          {
+            "record": "symposium:47",
+            "blockGuid": "863fdc20-43da-4e60-ae4d-86495742fde8",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d51d32a1-e043-48f4-bde2-4bd223671093"
+            ],
+            "contribution": {
+              "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+              "ordinal": 18,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 290,
+            "runStart": 0,
+            "runEnd": 290,
+            "chunkStart": 0,
+            "chunkEnd": 290,
+            "textHash": "9d4582359dd62857edc55e61ff2812575dd796aa6d393721bb6c3d87ce877781"
+          },
+          {
+            "record": "symposium:48",
+            "blockGuid": "9aa5f689-8b02-4db5-8208-a06264c69a57",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f82987c1-645c-47ce-ad8a-44435fc36ab5"
+            ],
+            "contribution": {
+              "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+              "ordinal": 18,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 384,
+            "runStart": 0,
+            "runEnd": 384,
+            "chunkStart": 292,
+            "chunkEnd": 676,
+            "textHash": "64cef9cb72e54061e142a0d46fdf368e6fbafd528951014a17d79ca7189367f5"
+          },
+          {
+            "record": "symposium:49",
+            "blockGuid": "5a3bc2e5-827d-4d4a-8de6-6d38201113f7",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:989d6e64-b7ae-4056-bce7-10ab731043a2"
+            ],
+            "contribution": {
+              "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+              "ordinal": 18,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 394,
+            "runStart": 0,
+            "runEnd": 394,
+            "chunkStart": 678,
+            "chunkEnd": 1072,
+            "textHash": "e191e4d4a2162c1900661beffeb6479d28e65cd580e56b802c9c1f4ba566f627"
+          },
+          {
+            "record": "symposium:50",
+            "blockGuid": "3dc2312b-945e-4b91-80d9-cabbe1caf343",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d98c908f-44fe-4eb8-a88c-af4d49edaa32"
+            ],
+            "contribution": {
+              "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+              "ordinal": 18,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 409,
+            "runStart": 0,
+            "runEnd": 409,
+            "chunkStart": 1074,
+            "chunkEnd": 1483,
+            "textHash": "7e3f47f4df34bf8c47cc5ea79c09d2e128b1e197dfc6158a0f3f2ce3c1a4bf86"
+          },
+          {
+            "record": "symposium:51",
+            "blockGuid": "bd679ae9-9eef-4ebc-9f1d-0e8fd49b1e18",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d9da5633-40fb-4955-bc89-ccf783678188"
+            ],
+            "contribution": {
+              "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+              "ordinal": 18,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 238,
+            "runStart": 0,
+            "runEnd": 238,
+            "chunkStart": 1485,
+            "chunkEnd": 1723,
+            "textHash": "af401580280345565cfb2e46df58f140ade897dd3832d9c3abcc277d59833750"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-18",
+        "distance": 0.6996034383773804,
+        "text": "For keeping a ship in service, I’d give functional continuity more weight. Replacing rotten timber preserves what the ship enables people to do. For conserving a historical artifact, material continuity may matter more: original timber provides evidence of its construction and past. So “matters more” partly depends on what we’re trying to preserve.\n\nBut usefulness and identity are different questions. A ship that becomes unseaworthy can still be that very ship—just damaged or retired. Conversely, a newly built vessel can perform exactly the same function without being the same individual ship. Function alone is therefore neither necessary nor sufficient for identity.\n\nFor the identity question, I’d put causal-historical continuity ahead of either criterion alone: does the later vessel arise through the repair and transformation of this particular earlier vessel? That allows both replacement of material and interruptions in use, without treating every seaworthy replica as the original.\n\nA useful test is a ship converted into a permanently moored museum. Its sailing function is gone, but would you say the ship itself has ceased to exist—or that the same ship now serves a different purpose?",
+        "sourceSpans": [
+          {
+            "record": "symposium:6",
+            "blockGuid": "b1ca452f-d9f4-4a42-bd0d-5425d5f689b0",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:6f87490b-bcee-483f-a48f-ee9ca72c6a48"
+            ],
+            "contribution": {
+              "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+              "ordinal": 4,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 350,
+            "runStart": 0,
+            "runEnd": 350,
+            "chunkStart": 0,
+            "chunkEnd": 350,
+            "textHash": "aebe3141ec2a13c2493104e700338f75cd436e39aa6c8e1037a939e74308681f"
+          },
+          {
+            "record": "symposium:7",
+            "blockGuid": "c6185760-934e-45d3-92f9-de287ab26c87",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:5c54c3f3-6387-4dff-b489-dc4861ef7f17"
+            ],
+            "contribution": {
+              "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+              "ordinal": 4,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 323,
+            "runStart": 0,
+            "runEnd": 323,
+            "chunkStart": 352,
+            "chunkEnd": 675,
+            "textHash": "05f884c75f0e7e9a9487c0fe5535d162925266120f87cc8f658d962efbcd4d5a"
+          },
+          {
+            "record": "symposium:8",
+            "blockGuid": "3e63945b-b0f7-4faa-b4a5-c7d0248c39fb",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:2b71f658-c69c-45cc-bc86-d8254f2cb9af"
+            ],
+            "contribution": {
+              "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+              "ordinal": 4,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 322,
+            "runStart": 0,
+            "runEnd": 322,
+            "chunkStart": 677,
+            "chunkEnd": 999,
+            "textHash": "4a5b077a6c6597bc7cf0878fd6b4c850a990db62d28121233c011d587f5027c1"
+          },
+          {
+            "record": "symposium:9",
+            "blockGuid": "c3ccf189-8c94-4d3c-a518-40aa53fa0d10",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:8f2d0689-2326-4cc7-b751-58e5e7c703dc"
+            ],
+            "contribution": {
+              "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+              "ordinal": 4,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 205,
+            "runStart": 0,
+            "runEnd": 205,
+            "chunkStart": 1001,
+            "chunkEnd": 1206,
+            "textHash": "d01d5cd7ea69326f16ab3cb3b15c6f3f8b9b28e4c4c4ce76f552bbcdf3c81aea"
+          }
+        ]
+      },
+      {
+        "chunk": "structure-22",
+        "distance": 0.7050188779830933,
+        "text": "I’m sympathetic to giving historical continuity priority, but I’d separate two claims: original material need not survive, and physical composition is irrelevant. The first doesn’t establish the second. Material and structural changes might affect whether an object survives, even if no particular plank is indispensable.\n\nConsider a ship gradually consumed by fire. There’s an uninterrupted causal history connecting the vessel to the resulting ash, but we ordinarily say the ship was destroyed—not that it became a ship made of ash. That puts pressure on continuity alone as a sufficient condition for numerical identity: causal succession can connect an object to its remains without preserving the object.\n\nYour view could distinguish identity-preserving continuity from mere causal succession. But then it needs an independent account of that distinction; otherwise “its history remains continuous” risks meaning “it continues to be the same object.” Preserving an organised whole through repairs is one possible answer, though that gives physical organisation a role again.\n\nWhat, on your account, distinguishes replacing the ship’s planks from burning it—without already assuming which process preserves the ship?",
+        "sourceSpans": [
+          {
+            "record": "symposium:17",
+            "blockGuid": "607cfdad-9607-4379-b0f2-fa8413aa6f32",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:73a2cbf0-968c-4159-bd5a-2e7007496f8f"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 321,
+            "runStart": 0,
+            "runEnd": 321,
+            "chunkStart": 0,
+            "chunkEnd": 321,
+            "textHash": "71408f03e74b814c7c6083f956c1ebc81486e5dfd80282c160c97b670f2ba1cf"
+          },
+          {
+            "record": "symposium:18",
+            "blockGuid": "a255bc30-d869-40d6-a652-f33562e76633",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc68af9b-6c72-402c-8438-6361c831c646"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 386,
+            "runStart": 0,
+            "runEnd": 386,
+            "chunkStart": 323,
+            "chunkEnd": 709,
+            "textHash": "b319a5e765705c148f31f6fa27ac21e3702b15ed8fc7402d9733a8b32942ab66"
+          },
+          {
+            "record": "symposium:19",
+            "blockGuid": "bd6fb13f-442d-4dd8-a4fc-39736994d3bc",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c8d71a11-770b-4d94-989b-431b511ef3e0"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 368,
+            "runStart": 0,
+            "runEnd": 368,
+            "chunkStart": 711,
+            "chunkEnd": 1079,
+            "textHash": "ef3b82c59f941bb25dc08bc2c021b91e61f11e4c11af3738e9e419127db33829"
+          },
+          {
+            "record": "symposium:20",
+            "blockGuid": "46b8d4a1-978d-453f-a507-cbdc2be79749",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "coordinate": "cell",
+            "occurrence": [
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+              "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:6118982b-81c4-4732-9750-82bbd6025e6a"
+            ],
+            "contribution": {
+              "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+              "ordinal": 8,
+              "author": "ai",
+              "participant": {
+                "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                "kind": "ai",
+                "name": "AI participant"
+              }
+            },
+            "start": 0,
+            "end": 139,
+            "runStart": 0,
+            "runEnd": 139,
+            "chunkStart": 1081,
+            "chunkEnd": 1220,
+            "textHash": "731b36ec643646fcddfa0c705a3c0d3deee3063162796ecb40c5a97bc6129270"
+          }
+        ]
+      }
+    ]
+  }
+]

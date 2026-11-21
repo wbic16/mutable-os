@@ -27,6 +27,10 @@ describe("feature and Block runtime adapters", () => {
     const dispose = render(() => <ReactiveTreeView editor={editor} projection={view} />, host);
     try {
       expect(runtime.nodeKey).toBe(key);
+      expect(runtime.authoredStateProtected()).toBe(false);
+      const releaseProtection=editor.textProtection.protect(editor.node(key)!.contentKey);
+      expect(runtime.authoredStateProtected()).toBe(true);expect(()=>runtime.setField('setting',{count:8},'Protected')).toThrow(/protected/);
+      releaseProtection();expect(runtime.authoredStateProtected()).toBe(false);
       const read = runtime.field("setting") as { count: number }; read.count = 100;
       expect(runtime.field("setting")).toEqual({ count: 1 });
       runtime.setField("setting", { count: 2 }, "Update");

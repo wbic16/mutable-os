@@ -1,0 +1,42 @@
+{
+  "exchange": "067f4542-8c98-4856-92aa-477df2eacbf3",
+  "bindings": {
+    "@b1": {
+      "handle": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+      "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7"
+    }
+  },
+  "local": {
+    "b1": "new:b1",
+    "b2": "new:b2",
+    "e1": "new:e1",
+    "e4": "new:e4",
+    "b3": "new:b3",
+    "e2": "new:e2",
+    "b4": "new:b4",
+    "e3": "new:e3",
+    "e5": "new:e5",
+    "b5": "new:b5",
+    "s1": "new:s1",
+    "e6": "new:e6",
+    "r1": "new:r1",
+    "r2": "new:r2",
+    "m1": "new:m1",
+    "m2": "new:m2",
+    "m3": "new:m3",
+    "m4": "new:m4",
+    "m5": "new:m5",
+    "m6": "new:m6",
+    "m7": "new:m7",
+    "m8": "new:m8",
+    "m9": "new:m9",
+    "m10": "new:m10",
+    "m11": "new:m11",
+    "m12": "new:m12",
+    "m13": "new:m13",
+    "rel1": "new:rel1",
+    "rel2": "new:rel2",
+    "rel3": "new:rel3"
+  },
+  "comment": "Offline historical bindings, never usable as live authority. Current occurrence and revision must be reissued."
+}

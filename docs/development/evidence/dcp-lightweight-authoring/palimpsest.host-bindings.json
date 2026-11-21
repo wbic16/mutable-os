@@ -1,0 +1,16 @@
+{
+  "exchange": "70aab8f4-e193-4367-8c99-0e93b9974b56",
+  "bindings": {
+    "@b1": {
+      "handle": "src:wuovteDd72WuvYSRrpo29A:b2",
+      "revision": "118d6f4c-2fbb-43d0-9eb9-0c16c39cd3c3"
+    }
+  },
+  "local": {
+    "b1": "new:b1",
+    "e1": "new:e1",
+    "r1": "new:r1",
+    "m1": "new:m1"
+  },
+  "comment": "Offline historical bindings, never usable as live authority. Current occurrence and revision must be reissued."
+}

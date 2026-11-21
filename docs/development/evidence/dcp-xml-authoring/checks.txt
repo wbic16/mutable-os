@@ -1,0 +1,50 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ server/dialectic/providers.test.ts (44 tests) 851ms
+(node:72470) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ server/dialectic/broker.test.ts (14 tests) 2951ms
+   ✓ accepts the real Vite development proxy while rejecting foreign Origins 2337ms
+ ✓ server/dialectic/conversations.test.ts (6 tests) 8503ms
+   ✓ reuses durable memory after reload, sends only deltas and isolates participant and connection 2789ms
+   ✓ quarantines failed/duplicate exchanges and reconciles a saved native receipt without another generation 2500ms
+   ✓ rebuilds after a repaired native commit with a lost ACK, and rejects content hidden in manifest stamps 1098ms
+   ✓ initialises a high-priority contract once and rebuilds only when that contract changes 2081ms
+ ✓ src/features/dialectic/dcp/proactive.test.ts (5 tests) 675ms
+ ✓ src/features/dialectic/dcp/efficiency.test.ts (5 tests) 807ms
+ ✓ src/features/dialectic/dcp/workspace.test.ts (6 tests) 1172ms
+   ✓ creates in N, reuses fresh authority in N+1 across agents, authors a Gloss and reconstructs in N+2 711ms
+ ✓ src/features/dialectic/dcp/xml-authoring.test.ts (17 tests) 1116ms
+ ✓ src/features/dialectic/dialectic.test.tsx (107 tests) 27697ms
+   ✓ registers a real Desktop/Textual application and leaves Flint launch ownership intact 371ms
+   ✓ makes one undoable mock composition and rejects stale, cancelled and missing context 368ms
+   ✓ keeps unrelated annotated Documents outside typing and submission work 1014ms
+   ✓ rejects oversized supplied context before reading its complete text 1322ms
+   ✓ materialises DCP atomically with independent reply/discursive references and AI provenance 402ms
+   ✓ keeps retrieval authorized, bounded, cancellable and absent from typing 1749ms
+   ✓ retains the accepted mock fallback when DCP is disabled 398ms
+   ✓ 4B commits distinct semantic identities atomically and resolves live/unresolved passages without rebuilding inventories 479ms
+   ✓ 4B reuses older argument handles without conflating classifications, and preserves unresolved incident edges 1165ms
+   ✓ 4B cancellation during asynchronous global-reference validation leaves no local semantic records 592ms
+   ✓ commits ordinary live replies with no semantic records, distinct provider provenance and one Undo 975ms
+   ✓ native authoring sends selected hierarchy and participant context, materialises multiple addresses and inspected semantics with Undo and persistence 321ms
+   ✓ bounds the selected structural manifest without fetching unselected history or unrelated Documents 982ms
+   ✓ bounds inventory previews and layout traversal, excludes drafts and foreign Documents, and rejects stale/foreign cursors 1218ms
+   ✓ repairs Test5 expired capabilities through bounded discovery and an exact 55-Cell annotation; retains terminal diagnostics 331ms
+   ✓ opens a saved conversation from the modal chooser, retaining the previous unsaved editor and reopening without remounts 397ms
+   ✓ resends text as new native identities, preserving the original and an unfinished draft 354ms
+   ✓ retrieves an unselected AI-authored passage and anchors three quoted commentaries without replacing the source 578ms
+   ✓ qualifies native authoring Stage 1 with shared human operations, immutable annotations, history and persistence 336ms
+   ✓ bounds Stage 1 inspection work and generated grid descendants without increasing exchange budgets 328ms
+   ✓ qualifies Stage 2B native lists/tasks/layouts with protected state, inspection and persistence 685ms
+   ✓ qualifies Stage 2C compound ownership, read-only navigation, discovery, annotations and native reload 519ms
+   ✓ gates Stage 2C features and counts compound shells and owned relations against existing budgets 376ms
+   ✓ qualifies Stage 3B external media without native source handles, nested ownership, inspection and persistence 484ms
+   ✓ qualifies Stage 3C retained PDF native equivalence, mixed admission, identity, history, persistence and bounded work 328ms
+
+ Test Files  8 passed (8)
+      Tests  204 passed (204)
+   Start at  20:53:02
+   Duration  45.83s (transform 17.50s, setup 0ms, collect 75.82s, tests 43.77s, environment 6.60s, prepare 1.68s)
+

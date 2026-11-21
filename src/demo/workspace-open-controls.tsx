@@ -31,6 +31,12 @@ export function createWorkspaceOpenControls(session: WorkspaceSession, available
     setDialog(undefined); setError("");
     queueMicrotask(() => { if (!lifetime.signal.aborted) actions.focus(placement); });
   };
+  const canOpenTei = () => enabled() && session.editor.features.documentInterchange && session.editor.features.teiImport && !session.editor.interchange.busy();
+  const openTei = () => {
+    if (!canOpenTei()) return;
+    session.editor.interchange.pickTei({ current: () => !lifetime.signal.aborted && available(), open: id => finish(actions.importedDocument(id)) });
+  };
+  onCleanup(session.editor.commandRegistry.register({ id: 'document.openTeiXml', label: 'Open TEI XML…', canExecute: canOpenTei, execute: openTei }, 'workspace-open'));
   const create = (format: DocumentFormat = "page") => {
     if (!enabled()) return;
     try { finish(actions.newDocument(format)); } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
@@ -102,6 +108,7 @@ export function createWorkspaceOpenControls(session: WorkspaceSession, available
         </Show>
       </Show>
       <button type="button" role={props.menu ? "menuitem" : undefined} disabled={!available() || busy()} onClick={() => open("document")}>Open Document from Server…</button>
+      <Show when={session.editor.features.documentInterchange && session.editor.features.teiImport}><button type="button" role={props.menu ? "menuitem" : undefined} disabled={!available() || busy() || session.editor.interchange.busy()} onClick={openTei}>Open TEI XML…</button></Show>
       <button type="button" role={props.menu ? "menuitem" : undefined} disabled={!available() || busy()} onClick={() => open("image")}>Open Image…</button>
     </>,
     Dialogs: () => <>

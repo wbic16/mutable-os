@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-11",
+  "scope": "Investigation only; no production changes, provider calls, or user Document writes",
+  "retainedLog": "vaults/imported/.mutable/dcp-test-phase/2026-11-11T10-59-37-662Z-a5103d17-4321-4021-987d-3382028a01bf.jsonl",
+  "fixture": "vaults/imported/Conversation on November 11, 2026 (7).ink",
+  "fixtureBytes": 612920,
+  "method": [
+    "Existing log timestamps establish observed exchange intervals, not isolated CPU durations.",
+    "replay.mjs reuses the existing typing benchmark CDP harness, with a separate headless Chrome profile and blank page served through interception.",
+    "Actual native source modules load through the existing Vite dev server. API and external fetch calls are blocked; no service calls were attempted.",
+    "The eight-contribution Document is read from disk, copied into memory, and its latest saved XML response is replayed with freshly issued source aliases. Replay inserts a ninth contribution; it does not reconstruct the original pre-eighth-contribution state.",
+    "Mounted replay uses ReactiveTreeView, not the complete Dialectic application. These are isolated CPU measurements, not guaranteed user-visible latency or a Flint typing benchmark.",
+    "loadEditorMs and mountMs are fixture setup costs, excluded from exchange costs.",
+    "saveCaptureMs plus saveEncodeMs measures one native capture and encoding. fullSaveWithInMemoryAdapterMs measures ResourcePair.save with an immediately successful in-memory adapter, including its second capture/encoding for dirty comparison. It excludes filesystem/network persistence.",
+    "browser.json is the initial replay. browser-save.json adds the focused full-save measurement. The script reproduces the latter on the locally available fixture; it contains no copied conversation text.",
+    "continuity-store.json measures the existing compiled store using a temporary directory, which was removed afterward. No current session journal was changed.",
+    "storage-size.json uses compact JSON bytes for the existing native Document and summed embedded contribution diagnostic records; this is size evidence, not a measurement of their individual CPU cost.",
+    "No production performance correction has been implemented. No before/after improvement is claimed."
+  ],
+  "observedExchanges": [
+    {"exchangeId":"90cccc49-38c8-4445-8e1e-8985b1d799bf","finalProviderBodyCompleteUtc":"2026-11-11T11:00:44.660Z","materialisedDiagnosticUtc":"2026-11-11T11:00:44.959Z","outcomeResponseUtc":"2026-11-11T11:00:45.378Z","bodyToMaterialisedMs":299,"bodyToOutcomeMs":718},
+    {"exchangeId":"9d58623e-6976-4c8e-9a88-5599e9ac3f6b","finalProviderBodyCompleteUtc":"2026-11-11T11:01:31.509Z","materialisedDiagnosticUtc":"2026-11-11T11:01:31.871Z","outcomeResponseUtc":"2026-11-11T11:01:32.574Z","bodyToMaterialisedMs":362,"bodyToOutcomeMs":1065},
+    {"exchangeId":"b9c46fd9-2939-4146-b284-c767e4a1aa10","finalProviderBodyCompleteUtc":"2026-11-11T11:06:05.828Z","materialisedDiagnosticUtc":"2026-11-11T11:06:06.275Z","outcomeResponseUtc":"2026-11-11T11:06:07.168Z","bodyToMaterialisedMs":447,"bodyToOutcomeMs":1340},
+    {"exchangeId":"893eccd8-356d-4e12-8f5b-aee192095cd7","finalProviderBodyCompleteUtc":"2026-11-11T11:16:55.876Z","materialisedDiagnosticUtc":"2026-11-11T11:16:56.222Z","outcomeResponseUtc":"2026-11-11T11:16:57.271Z","bodyToMaterialisedMs":346,"bodyToOutcomeMs":1395}
+  ],
+  "limits": [
+    "Logs do not timestamp the final XML character becoming visible in the browser.",
+    "Body-to-outcome intervals include server/client work and scheduling; they are not XML conversion times.",
+    "Isolated replay costs and live log intervals must not be added together or treated as the same exchange."
+  ]
+}

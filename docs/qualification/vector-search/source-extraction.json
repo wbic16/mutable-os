@@ -1,0 +1,64 @@
+{
+  "note": "Read-only saved codec extraction; no chunking, embeddings, model tokens, writes to Documents or SQL, or UI measurement.",
+  "results": [
+    {
+      "file": "vaults/imported/documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+      "bytes": 166147,
+      "sha256": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+      "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+      "blocks": 51,
+      "textBlocks": 40,
+      "searchRuns": 40,
+      "searchCharacters": 15772,
+      "words": 2763,
+      "projectionMs": [
+        {
+          "decodeValidationMs": 473.51029100000005,
+          "projectionMs": 65.47804200000002,
+          "totalMs": 539.546125
+        },
+        {
+          "decodeValidationMs": 1664.976542,
+          "projectionMs": 79.59941600000002,
+          "totalMs": 1744.6167920000003
+        },
+        {
+          "decodeValidationMs": 918.5634999999997,
+          "projectionMs": 22.208166000000347,
+          "totalMs": 940.7846249999998
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "file": "vaults/imported/Conversation on November 11, 2026 (3).ink",
+      "bytes": 1195272,
+      "sha256": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+      "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+      "blocks": 85,
+      "textBlocks": 54,
+      "searchRuns": 54,
+      "searchCharacters": 15290,
+      "words": 2262,
+      "projectionMs": [
+        {
+          "decodeValidationMs": 393.04429200000004,
+          "projectionMs": 208.12354199999982,
+          "totalMs": 601.1795419999999
+        },
+        {
+          "decodeValidationMs": 434.569833,
+          "projectionMs": 178.26583300000038,
+          "totalMs": 612.8477500000004
+        },
+        {
+          "decodeValidationMs": 368.57116700000006,
+          "projectionMs": 202.98262499999964,
+          "totalMs": 571.565791
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "observedDate": "2026-11-13"
+}

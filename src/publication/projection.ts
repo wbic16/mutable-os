@@ -66,6 +66,7 @@ export function publicProjection(native:Uint8Array,profile:PublicationProfile,ca
    b.inline={atoms:[],properties:[]};const atoms=original.inline?.atoms??[{kind:'text' as const,text:String(original.data.text??'')}];
    for(const atom of atoms){
     if(atom.kind==='text'){b.inline.atoms.push({kind:'text',text:atom.text});continue;}
+    if(atom.kind==='alternative')throw Error('Publishing native inline alternatives requires an explicit reading projection; nothing was published.');
     const embed=input.embeds.find(v=>v.localId===atom.embed),ref=managedAsset(embed?.data.asset);
     if(profile.images&&ref){
      if(ref.cavernId!==cavernId)throw Error('A published image belongs to another Cavern');

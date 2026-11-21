@@ -1,0 +1,40 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ server/dialectic/providers.test.ts (42 tests) 706ms
+(node:60794) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ server/dialectic/broker.test.ts (13 tests) 2025ms
+   ✓ accepts the real Vite development proxy while rejecting foreign Origins 1603ms
+ ✓ src/features/dialectic/dcp/proactive.test.ts (5 tests) 750ms
+ ✓ src/features/dialectic/dcp/efficiency.test.ts (5 tests) 906ms
+   ✓ anthropic omits only invariant/disabled collections in the negotiated strict schema 323ms
+ ✓ src/features/dialectic/dcp/editorial.test.ts (10 tests) 1092ms
+ ✓ src/features/dialectic/dcp/workspace.test.ts (6 tests) 1277ms
+   ✓ creates in N, reuses fresh authority in N+1 across agents, authors a Gloss and reconstructs in N+2 716ms
+ ✓ src/features/dialectic/dcp/vocabulary.test.ts (9 tests) 1277ms
+ ✓ src/features/dialectic/dialectic.test.tsx (106 tests) 22592ms
+   ✓ registers a real Desktop/Textual application and leaves Flint launch ownership intact 415ms
+   ✓ makes one undoable mock composition and rejects stale, cancelled and missing context 365ms
+   ✓ keeps unrelated annotated Documents outside typing and submission work 1093ms
+   ✓ rejects oversized supplied context before reading its complete text 1391ms
+   ✓ keeps retrieval authorized, bounded, cancellable and absent from typing 1213ms
+   ✓ bounds the selected structural manifest without fetching unselected history or unrelated Documents 988ms
+   ✓ bounds inventory previews and layout traversal, excludes drafts and foreign Documents, and rejects stale/foreign cursors 1062ms
+   ✓ opens a saved conversation from the modal chooser, retaining the previous unsaved editor and reopening without remounts 371ms
+   ✓ resends text as new native identities, preserving the original and an unfinished draft 329ms
+   ✓ retrieves an unselected AI-authored passage and anchors three quoted commentaries without replacing the source 603ms
+   ✓ bounds Stage 1 inspection work and generated grid descendants without increasing exchange budgets 314ms
+   ✓ qualifies Stage 2 text appearance, literal code/source and curated annotations through native admission 313ms
+   ✓ qualifies Stage 2B native lists/tasks/layouts with protected state, inspection and persistence 677ms
+   ✓ qualifies Stage 2C compound ownership, read-only navigation, discovery, annotations and native reload 535ms
+   ✓ gates Stage 2C features and counts compound shells and owned relations against existing budgets 384ms
+   ✓ qualifies Stage 3B external media without native source handles, nested ownership, inspection and persistence 327ms
+   ✓ qualifies Stage 3C retained PDF native equivalence, mixed admission, identity, history, persistence and bounded work 315ms
+   ✓ selects retained PDF binding independently of general Surface authoring and preserves atomic rollback 399ms
+
+ Test Files  8 passed (8)
+      Tests  196 passed (196)
+   Start at  15:52:49
+   Duration  39.21s (transform 17.29s, setup 0ms, collect 81.09s, tests 30.62s, environment 8.16s, prepare 1.46s)
+

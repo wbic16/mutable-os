@@ -275,7 +275,7 @@ export function applyManagedDesktop(root: any): any {
     const anchors = new Map(shellWindows(result).map(b => [b.id, b]));
     const closed: string[] = [], order = [...d.layout.normalOrder, ...d.layout.pinnedOrder];
     for (const v of d.views) {
-        if (d.version < 4 && (v.descriptorVersion !== 1 || !['ink', 'flint', 'thesis', 'phosphor', 'viewer'].includes(v.appId)))
+        if (d.version < 4 && (v.descriptorVersion !== 1 || !['ink', 'flint', 'quill', 'thesis', 'phosphor', 'viewer'].includes(v.appId)))
             fail('Unsupported application descriptor; the Workspace was not opened.');
         const b = anchors.get(v.anchorBlockId), w = d.windows.find(w => w.view === v.restoreKey)!;
         if (!b)
@@ -292,7 +292,7 @@ export function applyManagedDesktop(root: any): any {
 }
 export function appForAnchor(block: any): string {
     const type = block.children?.[0]?.type;
-    return type === 'thesis-application-block' ? 'thesis' : type === 'flint-application-block' ? 'flint' : type === 'phosphor-screen-block' ? 'phosphor' : block.type === 'document-window-block' ? 'ink' : 'viewer';
+    return type === 'quill-application-block' ? 'quill' : type === 'thesis-application-block' ? 'thesis' : type === 'flint-application-block' ? 'flint' : type === 'phosphor-screen-block' ? 'phosphor' : block.type === 'document-window-block' ? 'ink' : 'viewer';
 }
 /** Pure explicit upgrade. Allocation is supplied by the session; input is never mutated. */
 export function importLegacyDesktop(root: any, allocate: (block: any, index: number) => {

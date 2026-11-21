@@ -1,4 +1,7 @@
-/** G1 semantic codec candidate. No ordinary Save/Open routes import this module. */
+import {type InlineAlternativeProperties} from '../../block-tree/inline-alternative';
+import {compactPayloadReason} from "../../block-tree/inline-sequence";
+import { inlineLength, inlineSlice, inlineText, normalizeInline } from "../../block-tree/inline-sequence";
+/** Semantic native codec shared by production Save/Open and the G1 gates. */
 import { clone } from "../../block-tree/clone";
 import { freeze, type DeepReadonly } from "../../block-tree/commit-capture";
 import { createContentKey, createPlacementKey } from "../../block-tree/ids";
@@ -17,7 +20,7 @@ interface Block {
   id: string; type: string; properties: JsonObject;
   children?: Edge[] | null;
   relations?: { owned: Record<string, Edge>; opaque: JsonObject } | null;
-  inline?: Array<{ kind: "text"; text: string } | { kind: "image"; properties: JsonObject }>;
+  inline?: Array<{ kind: "text"; text: string } | { kind: "image" | "alternative"; properties: JsonObject }>;
 }
 export interface GateDocument {
   format: "codex-portable-resource-gate"; version: 1 | 2;
@@ -26,7 +29,7 @@ export interface GateDocument {
 const own = (v: object, k: string) => Object.prototype.hasOwnProperty.call(v, k);
 function requireValue(ok: unknown, reason: string): asserts ok { if (!ok) throw new Error(`G1 portable: ${reason}`); }
 const identifier = (v: unknown) => typeof v === "string" && v.trim().length > 0;
-const canonicalFields = new Set(["key", "definitionOwnerKey", "viewType", "payload", "children", "inlineContent", "inlineRevision", "inlineKind", "ownedRelations", "opaqueRelations", "wireChildren", "wireRelation", "revision"]);
+const canonicalFields = new Set(["key", "compactInline", "definitionOwnerKey", "viewType", "payload", "children", "inlineContent", "inlineRevision", "inlineKind", "ownedRelations", "opaqueRelations", "wireChildren", "wireRelation", "revision"]);
 
 /** Native profile preserves authored aliases and uses the declared value grammar.
  * The default retains the existing History/gate JSON writer contract. */
@@ -56,10 +59,10 @@ export function encodeGateDocument(state: DeepReadonly<ResourceSnapshot>, profil
       for (const property of properties.standoffProperties) {
         if (!property || typeof property !== 'object' || typeof property.text !== 'string' || property.isDeleted) continue;
         const { start, end } = property;
-        if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end >= c.inlineContent.length) continue;
-        if (property.isZeroWidth === true && end === start - 1 && start <= c.inlineContent.length) { property.text = ''; continue; }
+        if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end >= (c.compactInline ? inlineLength(c.compactInline.spans) : c.inlineContent.length)) continue;
+        if (property.isZeroWidth === true && end === start - 1 && start <= (c.compactInline ? inlineLength(c.compactInline.spans) : c.inlineContent.length)) { property.text = ''; continue; }
         if (end < start || property.isZeroWidth) continue;
-        property.text = c.inlineContent.slice(start, end + 1).map(key => {
+        property.text = c.compactInline ? inlineText(inlineSlice(c.compactInline.spans as any,start,end+1)) : c.inlineContent.slice(start, end + 1).map(key => {
           const target = state.placements[key].target;
           const cell = target.kind === 'local' ? state.contents[target.contentKey] : undefined;
           return cell?.viewType === 'text-cell' ? cell.payload.text : '\uFFFC';
@@ -77,7 +80,7 @@ export function encodeGateDocument(state: DeepReadonly<ResourceSnapshot>, profil
     } else if (c.wireRelation === "null") block.relations = null;
     if (c.inlineKind === "standoff") {
       requireValue(c.viewType === "standoff-editor-block" && !own(properties, "text"), "unsupported inline host");
-      block.inline = [];
+      block.inline = c.compactInline ? c.compactInline.spans.map(a=>a.kind==='text'?{kind:'text' as const,text:a.text}:{kind:a.kind,properties:value(a.properties)}) : [];
       for (const key of c.inlineContent) {
         const p = state.placements[key];
         requireValue(p.kind === "inline" && p.target.kind === "local", "invalid inline target");
@@ -112,7 +115,9 @@ export function validateNativeTextSpan(text: unknown): asserts text is string {
   requireValue(typeof text === "string" && text.length, "invalid text span");
 }
 
-export function decodeGateDocument(document: GateDocument, profile: "legacy" | "native" = "legacy"): DeepReadonly<ResourceSnapshot> {
+export function decodeGateDocument(document: GateDocument, profile: "legacy" | "native" = "legacy", timings?: Record<string, number>, compact = false): DeepReadonly<ResourceSnapshot> {
+  let last = timings ? performance.now() : 0;
+  const stage = (name: string) => { if (timings) { const now = performance.now(); timings[name] = now - last; last = now; } };
   assertPortableJson(document);
   const value = (data: JsonObject): JsonObject => {
     const result = profile === "native" ? decodeAuthoredValue(data) : clone(data);
@@ -120,6 +125,10 @@ export function decodeGateDocument(document: GateDocument, profile: "legacy" | "
     return result as JsonObject;
   };
   requireValue(document.format === "codex-portable-resource-gate" && (document.version === 1 || profile === "native" && document.version === 2) && identifier(document.resourceId), "unsupported envelope");
+  // Whole-document admission decision, before constructing any canonical atoms.
+  // No live fallback or representation conversion occurs after this boundary.
+  compact = compact && !document.blocks.some(b=>['phosphor-screen-block','thesis-application-block'].includes(b.type)) && document.blocks.every(b=>b.type!=='standoff-editor-block'||(!compactPayloadReason(value(b.properties),b.relations?.owned??{}) && !(b.inline??[]).some(a=>a.kind==='image'&&Array.isArray(value(a.properties).standoffProperties))));
+  requireValue(compact || !document.blocks.some(b => b.inline?.some(a => a.kind === 'alternative')), 'Inline alternatives require compact canonical text admission; readings were not flattened');
   const contents: Record<string, ContentRecord> = Object.create(null), placements: Record<string, ResourcePlacement> = Object.create(null);
   const keys = new Map<string, string>();
   for (const b of document.blocks) {
@@ -153,16 +162,24 @@ export function decodeGateDocument(document: GateDocument, profile: "legacy" | "
         placements[pk] = { key: pk, placementId: `private-cell:${pk}`, kind: "inline", target: { kind: "local", contentKey: ck } };
         c.inlineContent.push(pk);
       };
+      if(compact)c.compactInline={version:1,spans:[]};
       for (const span of b.inline!) {
         if (span.kind === "text") {
           validateNativeTextSpan(span.text);
-          for (const text of span.text) atom("text-cell", { text });
-        } else { requireValue(span.kind === "image", "unsupported inline span"); atom("image-cell", value(span.properties)); }
+          if(c.compactInline)c.compactInline.spans.push({kind:"text",text:span.text});
+          else for (const text of span.text) atom("text-cell", { text });
+        } else if (span.kind === "alternative") { requireValue(!!c.compactInline, "Inline alternatives require compact admission"); c.compactInline.spans.push({kind:"alternative",properties:value(span.properties) as InlineAlternativeProperties});
+        } else { requireValue(span.kind === "image", "unsupported inline span"); if(c.compactInline)c.compactInline.spans.push({kind:"image",properties:value(span.properties)});else atom("image-cell", value(span.properties)); }
       }
+      if(c.compactInline)c.compactInline.spans=normalizeInline(c.compactInline.spans);
     } else requireValue(b.inline === undefined, "unexpected inline content");
   }
   const state: ResourceSnapshot = { format: "codex-resource-gate", version: document.version, resourceId: document.resourceId,
     rootPlacementKey: edge(document.root), revision: 0, contents, placements };
+  stage('canonicalConstruction');
   validateResource(state);
-  return freeze(state);
+  stage('canonicalGraphValidation');
+  const result = freeze(state);
+  stage('canonicalFreeze');
+  return result;
 }

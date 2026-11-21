@@ -216,3 +216,28 @@ describe('open workspace content', () => {
     if (canvas) expect(session.canvasRoots()).toHaveLength(2);
   });
 });
+
+it.each([true, false])('Workspace Open TEI XML uses the native import workflow (enabled=%s)', async enabled => {
+  const { CodexSystemBar } = await import('../demo/codex-system-bar');
+  const session = new WorkspaceSession(materializeLocalWorkspace({ type: 'workspace-block', children: [] }), { features: { teiImport: enabled, nativeKnowledge: false, sqliteKnowledge: false } }); sessions.push(session);
+  const editor = session.editor, host = document.body.appendChild(document.createElement('div'));
+  const Host = () => { const controls = createWorkspaceOpenControls(session, () => true); return <><CodexSystemBar><controls.Buttons menu/></CodexSystemBar><ReactiveTreeView editor={editor} projection={session.projection}/><controls.Dialogs/></>; };
+  views.push(render(() => <Host/>, host)); views.push(editor.installGateway(document));
+  host.querySelector<HTMLButtonElement>('[data-system-menu-trigger="workspace"]')!.click(); await Promise.resolve();
+  const action = [...host.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].find(b => b.textContent === 'Open TEI XML…');
+  expect(!!action).toBe(enabled); if (!enabled) return;
+  action!.click(); await Promise.resolve();
+  const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-label="Open TEI XML"]')!;
+  expect(dialog).toBeTruthy(); expect(dialog.querySelector('select')?.value).toBe('tei'); expect(dialog.querySelector('select')?.disabled).toBe(true);
+  const input = dialog.querySelector<HTMLInputElement>('input[type=file]')!; expect(input.accept).toBe('.tei,.xml');
+  const source = '<TEI><text><body><p>Before <choice><orig>first</orig><reg>second</reg></choice> after.</p></body></text></TEI>', bytes = new TextEncoder().encode(source);
+  Object.defineProperty(input, 'files', { value: [{ name: 'letter.xml', size: bytes.length, type: 'application/xml', arrayBuffer: async () => bytes.buffer }] });
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+  await vi.waitFor(() => expect(editor.interchange.busy()).toBe(false));
+  const doc = Object.values(editor.repository.readState().contents).find(c => (c.payload.metadata as any)?.interchange?.provenance?.filename === 'letter.xml')!;
+  expect(doc, editor.interchange.message()).toBeTruthy(); const id = String(doc.payload.id), native = nativeDocumentSession(editor);
+  expect(native.isCandidate(id)).toBe(true); expect(native.isDirty(id)).toBe(true); expect(native.location(id)).toBeUndefined();
+  expect(host.textContent).toContain('Before'); expect(host.querySelector('.native-inline-alternative')).not.toBeNull();
+  const resource = captureNative(editor.repository.readState(), id); expect(Object.values(resource.contents).some(c => c.viewType === 'text-cell')).toBe(false);
+  expect(new TextDecoder().decode(bytes)).toBe(source);
+});

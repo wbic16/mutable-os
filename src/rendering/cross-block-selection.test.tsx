@@ -170,8 +170,8 @@ describe("experimental cross-Block text selection", () => {
     editor.crossText.enable(true);
     expect(() => editor.crossText.set(point("a", 0), point("b", 1))).toThrow("barriers");
     expect(() => editor.crossText.set(point("b", 0), point("nested", 1))).toThrow("boundaries");
-    flow("b").hidden = true;
-    expect(() => editor.crossText.set(point("b", 0), point("b", 1))).toThrow("barriers"); flow("b").hidden = false;
+    editor.viewVisibility.set(node("b").placementKey, true);
+    expect(() => editor.crossText.set(point("b", 0), point("b", 1))).toThrow("barriers"); editor.viewVisibility.set(node("b").placementKey, false);
     expect(() => editor.crossText.set({ ...point("b", 0), contentKey: "stale" }, point("b", 1))).toThrow("stale");
     const view = editor.createView("other"), other = Object.values(view.state.nodes).find(n => n.contentKey === node("b").contentKey)!;
     expect(() => editor.crossText.set(point("b", 0), editor.crossText.position(other.key, 1))).toThrow("different views");
@@ -225,10 +225,10 @@ describe("experimental cross-Block text selection", () => {
     document.getSelection()!.setBaseAndExtent(a.node, a.offset, b.node, b.offset);
     expect(editor.mounts.get(node("a").key)!.captureInlineSelection!()).toBeUndefined();
   });
-  it("invalidates before external text/structural changes and when a selected mount disappears", async () => {
+  it("invalidates before external text/structural changes and when a selected occurrence is closed", async () => {
     const { editor, point, node, flow } = setup(); editor.crossText.enable(true); editor.crossText.set(point("a", 1), point("b", 3));
     editor.commands.replaceInlineRange(node("a").key, 0, 1, "changed"); expect(editor.crossText.range()).toBeUndefined();
-    editor.crossText.set(point("a", 1), point("b", 3)); flow("b").hidden = true;
+    editor.crossText.set(point("a", 1), point("b", 3)); editor.viewVisibility.set(node("b").placementKey, true);
     await Promise.resolve(); expect(editor.crossText.range()).toBeUndefined();
   });
   it("retains inline atoms and semantic data, and transfers ownership to whole-Block selection", () => {
@@ -260,7 +260,7 @@ describe('two-stage Document Select All',()=>{
   };
   it.each(['metaKey','ctrlKey'])('selects the Block then visible nested Document text with %s, without enabling experimental gestures or editing',modifier=>{
     const f=setup([paragraph('a','Alpha'),{type:'container-block',children:[paragraph('b','Bravo')]},paragraph('hidden','Hidden'),paragraph('c','Charlie')]);
-    f.editor.mounts.get(f.node('hidden').key)!.root.setAttribute('hidden','');
+    f.editor.viewVisibility.set(f.node('hidden').placementKey, true);
     const mount=f.editor.mounts.get(f.node('b').key)!;mount.focus();mount.restoreInlineSelection!({anchor:1,head:1});
     const snapshot=vi.spyOn(f.editor.repository,'snapshot'),commit=vi.spyOn(f.editor.repository,'commit'),all=vi.spyOn(f.editor.crossText,'selectDocument');
     const revision=f.editor.repository.state.revision;
@@ -300,7 +300,7 @@ describe('two-stage Document Select All',()=>{
     const field=f.host.appendChild(document.createElement('input'));field.focus();expect(press(field).defaultPrevented).toBe(false);expect(f.editor.crossText.range()).toBeUndefined();
   });
   it('invalidates the selection when a selected Block becomes hidden',async()=>{
-    const f=setup();f.editor.crossText.selectDocument(f.node('a').key);f.editor.mounts.get(f.node('b').key)!.root.setAttribute('hidden','');
+    const f=setup();f.editor.crossText.selectDocument(f.node('a').key);f.editor.viewVisibility.set(f.node('b').placementKey, true);
     await Promise.resolve();expect(f.editor.crossText.range()).toBeUndefined();
   });
   it('releases Document selection on pointer placement even with experimental drag selection disabled',()=>{

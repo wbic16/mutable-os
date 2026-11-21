@@ -1,0 +1,1255 @@
+{
+  "date": "2026-11-10",
+  "configuration": {
+    "reasoning": "low",
+    "maxOutputTokens": 2048,
+    "strictSchema": true,
+    "vocabulary": "all-qualified",
+    "continuity": false,
+    "maxRounds": 4,
+    "singleRepair": true
+  },
+  "results": [
+    {
+      "requestedModel": "gpt-5.4",
+      "scenario": "A",
+      "prompt": "Explain in three short paragraphs why museum interpretations can change while remaining accountable to evidence.",
+      "nativeAdmitted": true,
+      "error": null,
+      "turns": [
+        {
+          "model": "gpt-5.4-2026-03-05",
+          "usage": {
+            "input_tokens": 12182,
+            "output_tokens": 374,
+            "total_tokens": 12556
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_A",
+            "intent": "reply",
+            "replyTargets": [
+              "src:2-3oEc9jcQEUAEVBfRzEQg:c1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "paragraph",
+                "markup": "Museum interpretations can change because new evidence appears, existing objects are studied with new methods, and historians ask different questions than earlier generations did. A label written fifty years ago may have reflected the best knowledge available then, yet later research can reveal new dates, makers, uses, or cultural meanings.",
+                "ranges": [],
+                "textStyle": null,
+                "margins": null
+              },
+              {
+                "id": "new:b2",
+                "kind": "paragraph",
+                "markup": "Interpretations also change because museums increasingly examine who produced earlier accounts and whose perspectives were left out. Revising an interpretation does not necessarily mean the earlier one was careless; it can mean the museum is widening the frame, comparing more sources, and recognizing that evidence can support a richer and more complex account than before.",
+                "ranges": [],
+                "textStyle": null,
+                "margins": null
+              },
+              {
+                "id": "new:b3",
+                "kind": "paragraph",
+                "markup": "They remain accountable to evidence by showing how conclusions are reached: grounding claims in objects, records, provenance, scientific analysis, and credible testimony. Responsible change is therefore not arbitrary revision but a transparent process in which interpretations are updated, qualified, and sometimes corrected in light of the strongest available evidence.",
+                "ranges": [],
+                "textStyle": null,
+                "margins": null
+              }
+            ],
+            "anchors": [],
+            "entities": [],
+            "interpretations": [],
+            "arguments": [],
+            "glosses": [],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          }
+        }
+      ],
+      "nativeSourceAnnotations": [],
+      "annotationCount": 0,
+      "tools": []
+    },
+    {
+      "requestedModel": "gpt-5.4",
+      "scenario": "B",
+      "prompt": "Compare handwritten notes, a spreadsheet, and a relational database in a table, with columns for best use and one limitation.",
+      "nativeAdmitted": true,
+      "error": null,
+      "turns": [
+        {
+          "model": "gpt-5.4-2026-03-05",
+          "usage": {
+            "input_tokens": 12190,
+            "output_tokens": 602,
+            "total_tokens": 12792
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_B",
+            "intent": "reply",
+            "replyTargets": [
+              "src:AjHiIt9gYvdjXZb8qngv_A:c1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "table",
+                "rows": [
+                  [
+                    [
+                      {
+                        "id": "new:b2",
+                        "kind": "paragraph",
+                        "markup": "Type",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b3",
+                        "kind": "paragraph",
+                        "markup": "Best use",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b4",
+                        "kind": "paragraph",
+                        "markup": "One limitation",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b5",
+                        "kind": "paragraph",
+                        "markup": "Handwritten notes",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b6",
+                        "kind": "paragraph",
+                        "markup": "Quick personal capture of ideas, reminders, or sketches",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b7",
+                        "kind": "paragraph",
+                        "markup": "Hard to search, sort, or share at scale",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b8",
+                        "kind": "paragraph",
+                        "markup": "Spreadsheet",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b9",
+                        "kind": "paragraph",
+                        "markup": "Tracking structured data, calculations, and simple comparisons",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b10",
+                        "kind": "paragraph",
+                        "markup": "Becomes error-prone and unwieldy with complex relationships",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b11",
+                        "kind": "paragraph",
+                        "markup": "Relational database",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b12",
+                        "kind": "paragraph",
+                        "markup": "Managing large structured datasets with linked records and reliable querying",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b13",
+                        "kind": "paragraph",
+                        "markup": "Requires more setup and technical knowledge",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ]
+                ],
+                "configuration": {
+                  "headers": [
+                    [
+                      true,
+                      true,
+                      true
+                    ],
+                    [
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      false,
+                      false,
+                      false
+                    ]
+                  ]
+                }
+              }
+            ],
+            "anchors": [],
+            "entities": [],
+            "interpretations": [],
+            "arguments": [],
+            "glosses": [],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          }
+        }
+      ],
+      "nativeSourceAnnotations": [],
+      "annotationCount": 0,
+      "tools": []
+    },
+    {
+      "requestedModel": "gpt-5.4",
+      "scenario": "C",
+      "prompt": "Create a short heading and a grouped bullet list with a nested bullet list comparing observation and interpretation. Bold the phrase \"material evidence\" in your new explanation. Highlight the exact phrase \"green patina\" in the earlier AI-authored passage and add a short explanatory gloss to that source passage. Keep the response concise.",
+      "nativeAdmitted": true,
+      "error": null,
+      "turns": [
+        {
+          "model": "gpt-5.4-2026-03-05",
+          "usage": {
+            "input_tokens": 12315,
+            "output_tokens": 64,
+            "total_tokens": 12379
+          },
+          "calls": [
+            "search_symposium"
+          ]
+        },
+        {
+          "model": "gpt-5.4-2026-03-05",
+          "usage": {
+            "input_tokens": 13230,
+            "output_tokens": 98,
+            "total_tokens": 13328
+          },
+          "calls": [
+            "read_source"
+          ]
+        },
+        {
+          "model": "gpt-5.4-2026-03-05",
+          "usage": {
+            "input_tokens": 13976,
+            "output_tokens": 1204,
+            "total_tokens": 15180
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_C",
+            "intent": "reply",
+            "replyTargets": [
+              "new:r1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "heading",
+                "markup": "Observation and Interpretation",
+                "ranges": [],
+                "level": 2,
+                "textStyle": null,
+                "margins": null
+              },
+              {
+                "id": "new:b2",
+                "kind": "group",
+                "children": [
+                  {
+                    "id": "new:b3",
+                    "kind": "list",
+                    "style": "bullet",
+                    "items": [
+                      [
+                        {
+                          "id": "new:b4",
+                          "kind": "paragraph",
+                          "markup": "Comparison",
+                          "ranges": [],
+                          "textStyle": null,
+                          "margins": null
+                        },
+                        {
+                          "id": "new:b5",
+                          "kind": "list",
+                          "style": "bullet",
+                          "items": [
+                            [
+                              {
+                                "id": "new:b6",
+                                "kind": "paragraph",
+                                "markup": "Observation: visible features such as colour and surface change.",
+                                "ranges": [],
+                                "textStyle": null,
+                                "margins": null
+                              }
+                            ],
+                            [
+                              {
+                                "id": "new:b7",
+                                "kind": "paragraph",
+                                "markup": "Interpretation: an inferred explanation of what those features may mean.",
+                                "ranges": [],
+                                "textStyle": null,
+                                "margins": null
+                              }
+                            ]
+                          ],
+                          "configuration": null
+                        }
+                      ],
+                      [
+                        {
+                          "id": "new:b8",
+                          "kind": "paragraph",
+                          "markup": "Here, <boundary id=\"new:pos1\"/>material evidence<boundary id=\"new:pos2\"/> helps separate what is seen from what is inferred.",
+                          "ranges": [
+                            {
+                              "id": "new:s1",
+                              "type": "style/bold",
+                              "from": "new:pos1",
+                              "to": "new:pos2",
+                              "ref": null,
+                              "attributes": []
+                            }
+                          ],
+                          "textStyle": null,
+                          "margins": null
+                        }
+                      ]
+                    ],
+                    "configuration": null
+                  }
+                ]
+              }
+            ],
+            "anchors": [
+              {
+                "id": "new:r1",
+                "source": "src:cU6wfJ-liHeKQ8PNT1UOCw:b3",
+                "revision": "83f93736-d03c-45c2-83a0-db18369d5cae",
+                "selector": {
+                  "exact": "green patina",
+                  "prefix": "The bronze vessel has a ",
+                  "suffix": ". Material evidence constrains interpretation, but later communities can give an object new meanings."
+                }
+              }
+            ],
+            "entities": [],
+            "interpretations": [
+              {
+                "id": "new:m1",
+                "target": "new:r1",
+                "type": "style/highlight",
+                "ref": null,
+                "attributes": []
+              }
+            ],
+            "arguments": [],
+            "glosses": [
+              {
+                "id": "new:g1",
+                "target": "new:r1",
+                "type": "explanation",
+                "text": "A green patina is a surface layer formed by oxidation on bronze or other copper alloys."
+              }
+            ],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          }
+        }
+      ],
+      "nativeSourceAnnotations": [
+        {
+          "blockId": "44444444-4444-4444-8444-444444444444",
+          "marks": [
+            {
+              "id": "ad92a3aa-cb85-449f-9506-3fc906341b7c",
+              "type": "dialectic/range-anchor",
+              "annotationId": "9c5880dd-e30a-46c6-9cef-a537a2e71b4f",
+              "start": 24,
+              "end": 35
+            },
+            {
+              "id": "d3c32ae4-368f-4deb-850e-6e72b90f98c3",
+              "type": "style/highlight",
+              "metadata": {
+                "dcp": {
+                  "version": 1,
+                  "actor": "ai",
+                  "exchangeId": "COMPLIANCE_C",
+                  "protocol": "dcp/1.0",
+                  "sourceResourceId": "11111111-1111-4111-8111-111111111111",
+                  "appliedTo": "existing-source",
+                  "sourceAuthor": "ai",
+                  "participantId": "11111111-1111-4111-8111-111111111111:ai"
+                }
+              },
+              "start": 24,
+              "end": 35
+            },
+            {
+              "id": "6e9e23c3-765e-4f29-9ac1-c094f1946d73",
+              "type": "mutable/gloss",
+              "annotationId": "f3b08f70-7819-4a6b-8e51-059bf4172066",
+              "metadata": {
+                "dcp": {
+                  "version": 1,
+                  "actor": "ai",
+                  "exchangeId": "COMPLIANCE_C",
+                  "protocol": "dcp/1.0",
+                  "sourceResourceId": "11111111-1111-4111-8111-111111111111",
+                  "appliedTo": "existing-source",
+                  "sourceAuthor": "ai",
+                  "participantId": "11111111-1111-4111-8111-111111111111:ai"
+                }
+              },
+              "start": 24,
+              "end": 35
+            }
+          ]
+        }
+      ],
+      "annotationCount": 3,
+      "tools": [
+        "search_symposium",
+        "read_source"
+      ]
+    },
+    {
+      "requestedModel": "gpt-5.4-mini",
+      "scenario": "A",
+      "prompt": "Explain in three short paragraphs why museum interpretations can change while remaining accountable to evidence.",
+      "nativeAdmitted": true,
+      "error": null,
+      "turns": [
+        {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "usage": {
+            "input_tokens": 12184,
+            "output_tokens": 386,
+            "total_tokens": 12570
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_A",
+            "intent": "reply",
+            "replyTargets": [
+              "src:-8K1xDeVKmlYxPnLtzXk7A:c1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "paragraph",
+                "markup": "Museum interpretations can change because new evidence appears, old evidence is reexamined, and curators develop better questions. A label that once seemed complete may look partial when archives, conservation, or archaeology add context.",
+                "ranges": [],
+                "textStyle": null,
+                "margins": null
+              },
+              {
+                "id": "new:b2",
+                "kind": "paragraph",
+                "markup": "That change does not mean anything goes. Responsible interpretation stays tied to objects, documents, provenance, and the limits of what can be supported. When claims shift, the reasons for the shift should be traceable.",
+                "ranges": [],
+                "textStyle": null,
+                "margins": null
+              },
+              {
+                "id": "new:b3",
+                "kind": "paragraph",
+                "markup": "So museums remain accountable by showing how conclusions were reached, what evidence was used, and where uncertainty remains. In that way, interpretation can evolve while still being answerable to the record.",
+                "ranges": [],
+                "textStyle": null,
+                "margins": null
+              }
+            ],
+            "anchors": [],
+            "entities": [],
+            "interpretations": [],
+            "arguments": [],
+            "glosses": [],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          }
+        }
+      ],
+      "nativeSourceAnnotations": [],
+      "annotationCount": 0,
+      "tools": []
+    },
+    {
+      "requestedModel": "gpt-5.4-mini",
+      "scenario": "B",
+      "prompt": "Compare handwritten notes, a spreadsheet, and a relational database in a table, with columns for best use and one limitation.",
+      "nativeAdmitted": false,
+      "error": "Error: Unsupported markup element",
+      "turns": [
+        {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "usage": {
+            "input_tokens": 12204,
+            "output_tokens": 654,
+            "total_tokens": 12858
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_B",
+            "intent": "reply",
+            "replyTargets": [
+              "src:ga8pmYH9gIqKcfv9sgaTww:c1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "table",
+                "rows": [
+                  [
+                    [
+                      {
+                        "id": "new:b1",
+                        "kind": "paragraph",
+                        "markup": "<b>Option</b>",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b2",
+                        "kind": "paragraph",
+                        "markup": "<b>Best use</b>",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b3",
+                        "kind": "paragraph",
+                        "markup": "<b>One limitation</b>",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b4",
+                        "kind": "paragraph",
+                        "markup": "Handwritten notes",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b5",
+                        "kind": "paragraph",
+                        "markup": "Quick, flexible capture of ideas, sketches, and informal reminders.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b6",
+                        "kind": "paragraph",
+                        "markup": "Hard to search, share, and keep consistent over time.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b7",
+                        "kind": "paragraph",
+                        "markup": "Spreadsheet",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b8",
+                        "kind": "paragraph",
+                        "markup": "Organizing structured data, simple calculations, and small-to-medium tracking tasks.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b9",
+                        "kind": "paragraph",
+                        "markup": "Less robust for complex relationships, multi-user integrity, and large datasets.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b10",
+                        "kind": "paragraph",
+                        "markup": "Relational database",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b11",
+                        "kind": "paragraph",
+                        "markup": "Managing large, connected datasets with reliable querying and data integrity.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b12",
+                        "kind": "paragraph",
+                        "markup": "More complex to design, maintain, and administer than a spreadsheet.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ]
+                ],
+                "configuration": {
+                  "headers": [
+                    [
+                      true,
+                      true,
+                      true
+                    ]
+                  ]
+                }
+              }
+            ],
+            "anchors": [],
+            "entities": [],
+            "interpretations": [],
+            "arguments": [],
+            "glosses": [],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          },
+          "error": "Error: Duplicate or invalid provisional ID",
+          "diagnostic": {
+            "code": "identity",
+            "path": "$.composition[0]",
+            "message": "Use unique response-local IDs of the declared role: new:b for composition, new:r for source anchors, new:s for generated passages. Existing src: handles are host-issued. Styling reproduced quotations needs no id. When renaming an ID, update every dependent reference; never give a source anchor and reproduced text the same declaration ID."
+          }
+        },
+        {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "usage": {
+            "input_tokens": 12969,
+            "output_tokens": 691,
+            "total_tokens": 13660
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_B",
+            "intent": "reply",
+            "replyTargets": [
+              "src:ga8pmYH9gIqKcfv9sgaTww:c1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "table",
+                "rows": [
+                  [
+                    [
+                      {
+                        "id": "new:b2",
+                        "kind": "paragraph",
+                        "markup": "<b>Option</b>",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b3",
+                        "kind": "paragraph",
+                        "markup": "<b>Best use</b>",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b4",
+                        "kind": "paragraph",
+                        "markup": "<b>One limitation</b>",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b5",
+                        "kind": "paragraph",
+                        "markup": "Handwritten notes",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b6",
+                        "kind": "paragraph",
+                        "markup": "Quick, flexible capture of ideas, sketches, and informal reminders.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b7",
+                        "kind": "paragraph",
+                        "markup": "Hard to search, share, and keep consistent over time.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b8",
+                        "kind": "paragraph",
+                        "markup": "Spreadsheet",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b9",
+                        "kind": "paragraph",
+                        "markup": "Organizing structured data, simple calculations, and small-to-medium tracking tasks.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b10",
+                        "kind": "paragraph",
+                        "markup": "Less robust for complex relationships, multi-user integrity, and large datasets.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ],
+                  [
+                    [
+                      {
+                        "id": "new:b11",
+                        "kind": "paragraph",
+                        "markup": "Relational database",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b12",
+                        "kind": "paragraph",
+                        "markup": "Managing large, connected datasets with reliable querying and data integrity.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ],
+                    [
+                      {
+                        "id": "new:b13",
+                        "kind": "paragraph",
+                        "markup": "More complex to design, maintain, and administer than a spreadsheet.",
+                        "ranges": [],
+                        "textStyle": null,
+                        "margins": null
+                      }
+                    ]
+                  ]
+                ],
+                "configuration": {
+                  "headers": [
+                    [
+                      true,
+                      true,
+                      true
+                    ]
+                  ]
+                }
+              }
+            ],
+            "anchors": [],
+            "entities": [],
+            "interpretations": [],
+            "arguments": [],
+            "glosses": [],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          },
+          "error": "Error: Unsupported markup element",
+          "diagnostic": {
+            "code": "markup",
+            "path": "$.composition[0]",
+            "message": "Use only annotation and self-closing boundary tags, valid XML escapes and nonempty spans. Check boundary IDs."
+          }
+        }
+      ],
+      "nativeSourceAnnotations": [],
+      "annotationCount": 0,
+      "tools": []
+    },
+    {
+      "requestedModel": "gpt-5.4-mini",
+      "scenario": "C",
+      "prompt": "Create a short heading and a grouped bullet list with a nested bullet list comparing observation and interpretation. Bold the phrase \"material evidence\" in your new explanation. Highlight the exact phrase \"green patina\" in the earlier AI-authored passage and add a short explanatory gloss to that source passage. Keep the response concise.",
+      "nativeAdmitted": false,
+      "error": "Error: Missing/reversed/empty range boundary",
+      "turns": [
+        {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "usage": {
+            "input_tokens": 12310,
+            "output_tokens": 148,
+            "total_tokens": 12458
+          },
+          "calls": [
+            "list_text_blocks"
+          ]
+        },
+        {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "usage": {
+            "input_tokens": 13031,
+            "output_tokens": 47,
+            "total_tokens": 13078
+          },
+          "calls": [
+            "read_source"
+          ]
+        },
+        {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "usage": {
+            "input_tokens": 13724,
+            "output_tokens": 912,
+            "total_tokens": 14636
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_C",
+            "intent": "reply",
+            "replyTargets": [
+              "new:r1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "heading",
+                "markup": "Observation and interpretation",
+                "ranges": [],
+                "level": 2,
+                "textStyle": null,
+                "margins": null
+              },
+              {
+                "id": "new:b2",
+                "kind": "group",
+                "children": [
+                  {
+                    "id": "new:b3",
+                    "kind": "list",
+                    "style": "bullet",
+                    "items": [
+                      [
+                        {
+                          "id": "new:b4",
+                          "kind": "paragraph",
+                          "markup": "Observation: the object shows a green patina.",
+                          "ranges": [
+                            {
+                              "id": "new:s1",
+                              "type": "style/highlight",
+                              "from": "31",
+                              "to": "43",
+                              "ref": null,
+                              "attributes": []
+                            }
+                          ],
+                          "textStyle": null,
+                          "margins": null
+                        }
+                      ],
+                      [
+                        {
+                          "id": "new:b5",
+                          "kind": "paragraph",
+                          "markup": "Interpretation: <b>material evidence</b> constrains what we can say, but context can still change meaning.",
+                          "ranges": [],
+                          "textStyle": null,
+                          "margins": null
+                        },
+                        {
+                          "id": "new:b6",
+                          "kind": "list",
+                          "style": "bullet",
+                          "items": [
+                            [
+                              {
+                                "id": "new:b7",
+                                "kind": "paragraph",
+                                "markup": "Observation records what is directly visible.",
+                                "ranges": [],
+                                "textStyle": null,
+                                "margins": null
+                              }
+                            ],
+                            [
+                              {
+                                "id": "new:b8",
+                                "kind": "paragraph",
+                                "markup": "Interpretation explains what that evidence may suggest.",
+                                "ranges": [],
+                                "textStyle": null,
+                                "margins": null
+                              }
+                            ]
+                          ],
+                          "configuration": null
+                        }
+                      ]
+                    ],
+                    "configuration": null
+                  }
+                ]
+              }
+            ],
+            "anchors": [
+              {
+                "id": "new:r1",
+                "source": "src:BUp-x5W3P6fByusJG5L0Lg:b3",
+                "revision": "45324313-dd99-4938-9f2c-0428db8695c9",
+                "selector": {
+                  "exact": "green patina",
+                  "prefix": "a ",
+                  "suffix": ". Material evidence constrains interpretation, but later communities can give an object new meanings."
+                }
+              }
+            ],
+            "entities": [],
+            "interpretations": [],
+            "arguments": [],
+            "glosses": [
+              {
+                "id": "new:g1",
+                "target": "new:r1",
+                "type": "explanatory",
+                "text": "The green surface layer is a sign of age and oxidation, which is why it matters for the object's material description."
+              }
+            ],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          },
+          "error": "Error: Missing/reversed/empty range boundary",
+          "diagnostic": {
+            "code": "markup",
+            "path": "$.composition[1]",
+            "message": "Use only annotation and self-closing boundary tags, valid XML escapes and nonempty spans. Check boundary IDs."
+          }
+        },
+        {
+          "model": "gpt-5.4-mini-2026-03-17",
+          "usage": {
+            "input_tokens": 14243,
+            "output_tokens": 1245,
+            "total_tokens": 15488
+          },
+          "calls": [],
+          "response": {
+            "protocol": "dcp/1.0",
+            "kind": "contribution",
+            "exchange": "COMPLIANCE_C",
+            "intent": "reply",
+            "replyTargets": [
+              "new:r1"
+            ],
+            "composition": [
+              {
+                "id": "new:b1",
+                "kind": "heading",
+                "markup": "Observation and interpretation",
+                "ranges": [],
+                "level": 2,
+                "textStyle": null,
+                "margins": null
+              },
+              {
+                "id": "new:b2",
+                "kind": "group",
+                "children": [
+                  {
+                    "id": "new:b3",
+                    "kind": "list",
+                    "style": "bullet",
+                    "items": [
+                      [
+                        {
+                          "id": "new:b4",
+                          "kind": "paragraph",
+                          "markup": "Observation: the object shows a green patina.",
+                          "ranges": [
+                            {
+                              "id": "new:s1",
+                              "type": "text/background-colour",
+                              "from": "31",
+                              "to": "43",
+                              "ref": null,
+                              "attributes": [
+                                {
+                                  "name": "value",
+                                  "value": "yellow"
+                                }
+                              ]
+                            }
+                          ],
+                          "textStyle": null,
+                          "margins": null
+                        }
+                      ],
+                      [
+                        {
+                          "id": "new:b5",
+                          "kind": "paragraph",
+                          "markup": "Interpretation: material evidence constrains what we can say, but context can still change meaning.",
+                          "ranges": [
+                            {
+                              "id": "new:s2",
+                              "type": "style/bold",
+                              "from": "15",
+                              "to": "32",
+                              "ref": null,
+                              "attributes": []
+                            }
+                          ],
+                          "textStyle": null,
+                          "margins": null
+                        },
+                        {
+                          "id": "new:b6",
+                          "kind": "list",
+                          "style": "bullet",
+                          "items": [
+                            [
+                              {
+                                "id": "new:b7",
+                                "kind": "paragraph",
+                                "markup": "Observation records what is directly visible.",
+                                "ranges": [],
+                                "textStyle": null,
+                                "margins": null
+                              }
+                            ],
+                            [
+                              {
+                                "id": "new:b8",
+                                "kind": "paragraph",
+                                "markup": "Interpretation explains what that evidence may suggest.",
+                                "ranges": [],
+                                "textStyle": null,
+                                "margins": null
+                              }
+                            ]
+                          ],
+                          "configuration": null
+                        }
+                      ]
+                    ],
+                    "configuration": null
+                  }
+                ]
+              }
+            ],
+            "anchors": [
+              {
+                "id": "new:r1",
+                "source": "src:BUp-x5W3P6fByusJG5L0Lg:b3",
+                "revision": "45324313-dd99-4938-9f2c-0428db8695c9",
+                "selector": {
+                  "exact": "green patina",
+                  "prefix": "a ",
+                  "suffix": ". Material evidence constrains interpretation, but later communities can give an object new meanings."
+                }
+              }
+            ],
+            "entities": [],
+            "interpretations": [
+              {
+                "id": "new:m1",
+                "target": "new:r1",
+                "type": "text/background-colour",
+                "ref": null,
+                "attributes": [
+                  {
+                    "name": "value",
+                    "value": "yellow"
+                  }
+                ]
+              }
+            ],
+            "arguments": [],
+            "glosses": [
+              {
+                "id": "new:g1",
+                "target": "new:r1",
+                "type": "explanatory",
+                "text": "The green surface layer is a sign of age and oxidation, which is why it matters for the object's material description."
+              }
+            ],
+            "relations": [],
+            "suggestions": [],
+            "promotionRecommendations": []
+          },
+          "error": "Error: Missing/reversed/empty range boundary",
+          "diagnostic": {
+            "code": "markup",
+            "path": "$.composition[1]",
+            "message": "Use only annotation and self-closing boundary tags, valid XML escapes and nonempty spans. Check boundary IDs."
+          }
+        }
+      ],
+      "nativeSourceAnnotations": [],
+      "annotationCount": 0,
+      "tools": [
+        "list_text_blocks",
+        "read_source"
+      ]
+    }
+  ]
+}

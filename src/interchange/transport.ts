@@ -9,14 +9,36 @@ export const NATIVE_MIME = 'application/x-mutable-fragment+json';
 export const MARKDOWN_MIMES = ['text/markdown', 'text/x-markdown'] as const;
 export type ClipboardRepresentations = Record<string, string>;
 const escape = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+class NativeAlternativeClipboardError extends Error {}
+const containsAlternatives = (json: string) => /"alternative"|mutable\/inline-alternatives|"requiredCapabilities"/.test(json);
 function encode(s: string) { const bytes = new TextEncoder().encode(s); let binary = ''; for (const b of bytes) binary += String.fromCharCode(b); return btoa(binary); }
 function decode(s: string) { return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(atob(s), c => c.charCodeAt(0))); }
+
+/** Safe visible clipboard projection. The carrier below remains the complete
+ * native representation; no generic HTML claims alternative fidelity. */
+function clipboardHtml(fragment:MutableFragment):string {
+  const blocks=new Map(fragment.blocks.map(b=>[b.localId,b])),edges=new Map(fragment.placements.map(p=>[p.localId,p])),embeds=new Map(fragment.embeds.map(e=>[e.localId,e])),defs=new Map(fragment.definitions.map(d=>[d.localId,d]));
+  const tags:Record<string,string>={'style/bold':'strong','style/italics':'em','style/underline':'u','style/strike':'s','style/strikethrough':'s','style/superscript':'sup','style/subscript':'sub'};
+  const visit=(edge:string):string=>{
+    const p=edges.get(edge)!;if(p.target.kind!=='local')return '[Unresolved Block]';const b=blocks.get(p.target.id)!;
+    let html=escape(String(b.data.text??''));
+    if(b.inline){
+      const tokens=b.inline.atoms.flatMap(a=>a.kind==='text'?[...a.text].map(escape):a.kind==='alternative'?[visit(b.relations[a.properties.readings[a.displayReading??0]])]:[escape(String(embeds.get(a.embed)?.data.alt??'\ufffc'))]);
+      const starts=new Map<number,string[]>(),ends=new Map<number,string[]>(),markTags=new Map<string,string>();
+      for(const prop of b.inline.properties){const type=prop.target?.kind==='local'&&prop.target.object==='definition'?defs.get(prop.target.id)?.type:prop.type,tag=type&&tags[type];if(!tag||prop.isZeroWidth)continue;markTags.set(prop.localId,tag);starts.set(prop.startIndex,[...starts.get(prop.startIndex)??[],prop.localId]);ends.set(prop.endIndex,[...ends.get(prop.endIndex)??[],prop.localId]);}
+      const active=new Set<string>();let opened:string[]=[];html='';
+      for(let i=0;i<=tokens.length;i++){ends.get(i)?.forEach(id=>active.delete(id));starts.get(i)?.forEach(id=>active.add(id));const next=[...active].map(id=>markTags.get(id)!);let common=0;while(common<opened.length&&common<next.length&&opened[common]===next[common])common++;for(let j=opened.length-1;j>=common;j--)html+=`</${opened[j]}>`;for(let j=common;j<next.length;j++)html+=`<${next[j]}>`;opened=next;if(i<tokens.length)html+=tokens[i];}
+    }
+    return [html,...b.children.map(visit)].filter((v,i)=>v||i>0).join('\n');
+  };
+  return fragment.roots.map(r=>visit(r.placement)).join('\n');
+}
 
 export function exportClipboard(fragment: MutableFragment): ClipboardRepresentations {
   validateFragment(fragment);
   const text = fragmentText(fragment), json = JSON.stringify(fragment);
   // Native fidelity lives in the carrier; the visible projection remains useful outside Mutable.
-  const representations = { 'text/plain': text, 'text/html': `<div data-mutable-fragment="${encode(json)}"><pre><span>${escape(text)}</span></pre></div>`, [NATIVE_MIME]: json };
+  const representations = { 'text/plain': text, 'text/html': `<div data-mutable-fragment="${encode(json)}"><pre><span>${clipboardHtml(fragment)}</span></pre></div>`, [NATIVE_MIME]: json };
   if (Object.values(representations).reduce((n, value) => n + new TextEncoder().encode(value).length, 0) > LIMITS.bytes) throw Error('Selection exceeds the clipboard transport limit. Copy a smaller selection; nothing was removed.');
   return representations;
 }
@@ -36,19 +58,22 @@ export function importClipboard(data: ClipboardRepresentations, plain = false, s
   }
   if (!plain && data[NATIVE_MIME]) {
     try { return { fragment: validateFragment(JSON.parse(data[NATIVE_MIME])) }; }
-    catch { warnings.push('Native clipboard data was invalid or unsupported; used a fallback.'); }
+    catch (error) { if(containsAlternatives(data[NATIVE_MIME]))throw new NativeAlternativeClipboardError(`Native alternatives could not be imported: ${error instanceof Error?error.message:String(error)} No lossy fallback was pasted.`); warnings.push('Native clipboard data was invalid or unsupported; used a fallback.'); }
   }
   let html: ReturnType<typeof parseClipboardHtml> | undefined;
   if (data['text/html'] && (!plain || data['text/plain'] === undefined)) {
     try {
       html = parseClipboardHtml(data['text/html']);
       if (!plain && html.carrier) {
-        const fragment = validateFragment(JSON.parse(decode(html.carrier)));
+        const json=decode(html.carrier);
+        let fragment:MutableFragment;
+        try {fragment = validateFragment(JSON.parse(json));} catch(error) {if(containsAlternatives(json))throw new NativeAlternativeClipboardError('Unsupported or malformed native alternative carrier; nothing was pasted.');throw error;}
         // Exact projection comparison detects carriers retained after external text edits.
         if (fragmentText(fragment) === html.text && (!data['text/plain'] || data['text/plain'] === html.text)) return { fragment };
+        if(containsAlternatives(json))throw new NativeAlternativeClipboardError('The alternative carrier no longer matches its visible text; nothing was pasted. Use explicit Paste as plain text for a lossy projection.');
         warnings.push('The HTML carrier no longer matches the visible content; used text.');
       }
-    } catch { warnings.push('Could not recover native formatting from HTML.'); }
+    } catch(error) {if(error instanceof NativeAlternativeClipboardError)throw error; warnings.push('Could not recover native formatting from HTML.'); }
   }
   if (!plain && data['application/json']) {
     try {

@@ -1,0 +1,14 @@
+<response intent="answer" reply="r1"><p id="b1"><mark id="s1" kind="qualification">Yes—if vulnerability means difficulty recovering from political upheaval. <e ref="@e1">Leonardo</e> could carry expertise and reputation elsewhere and seek another patron; <e ref="@e2">Ludovico</e> could not carry <e ref="@e3">Milan</e>’s territory, institutions and revenues away with <e ref="@e2">him</e>. But portability did not guarantee employment, payment or safety. <e ref="@e1">Leonardo</e> still depended on access to powerful sponsors, whereas <e ref="@e2">Ludovico</e>, while ruling, commanded resources <e ref="@e1">Leonardo</e> lacked. The distinction is therefore <b>greater adaptability, not freedom from dependence</b>: <e ref="@e1">Leonardo</e>’s livelihood was potentially more recoverable, while <e ref="@e2">Ludovico</e>’s power was more tightly bound to a particular political order.</mark></p>
+<definitions><passage id="r1" target="@b1" quote="Does that make Leonardo less vulnerable than Ludovico?"/>
+<classify id="m1" target="r1" kind="question"/>
+<classify id="m2" target="@b1" quote="Leonardo depended on Ludovico, but Leonardo's skills were portable." kind="claim"/>
+<mention id="m3" target="@b1" quote="Leonardo" prefix="Returning to " ref="@e1"/>
+<mention id="m4" target="@b1" quote="Ludovico" prefix="Returning to Leonardo and " ref="@e2"/>
+<mention id="m5" target="@b1" quote="Leonardo" prefix="Ludovico: " ref="@e1"/>
+<mention id="m6" target="@b1" quote="Ludovico" prefix="depended on " ref="@e2"/>
+<mention id="m7" target="@b1" quote="Leonardo" prefix="but " ref="@e1"/>
+<mention id="m8" target="@b1" quote="Ludovico" suffix=" lost Milan." ref="@e2"/>
+<mention id="m9" target="@b1" quote="Milan" ref="@e3"/>
+<mention id="m10" target="@b1" quote="Leonardo" prefix="Does that make " ref="@e1"/>
+<mention id="m11" target="@b1" quote="Ludovico" prefix="less vulnerable than " ref="@e2"/>
+<argument id="arg1" target="s1"/></definitions></response>

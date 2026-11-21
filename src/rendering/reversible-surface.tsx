@@ -13,7 +13,7 @@ export function ReverseInformation(props:{nodeKey:string;children:JSX.Element}) 
  return <Show when={editor.features.reversibleBlocks} fallback={props.children}><Show when={target()}>{mount=><Portal mount={mount()}>{props.children}</Portal>}</Show></Show>;
 }
 export function ResourceInformationView(props:BlockViewProps) {
- const {editor,projection}=useReactiveView();let root!:HTMLDivElement;
+ const {editor,projection,passive}=useReactiveView();let root!:HTMLDivElement;
  const surface=()=>editor.surfaces.nearest(props.nodeKey);
  const resource=()=>{const front=surface()?.children[0];const node=front?projection.state.nodes[front]:undefined;return node?.children[0]&&projection.state.nodes[node.children[0]];};
  const [resourceKey,setResourceKey]=createSignal<string>();
@@ -22,8 +22,8 @@ export function ResourceInformationView(props:BlockViewProps) {
  // Resolve the explicit source once per information occurrence, including an
  // eventual unwrap. Do not build an inventory on document edits.
  onMount(()=>{const node=projection.state.nodes[props.nodeKey],ref=(node?.payload.blockProperties as any[]??[]).find(p=>p.type==='codex/block-reference'&&!p.isDeleted)?.value;
-  if(ref)untrack(()=>setResourceKey(Object.values(editor.repository.readState().contents).find(c=>c.payload.id===ref)?.key));
-  const release=editor.mounts.register(props.nodeKey,{root,focusElement:root,inputPolicy:'container',focus:()=>root.focus()});onCleanup(release);});
+  if(ref&&!passive)untrack(()=>{const nativeResource=resource();setResourceKey(nativeResource&&nativeResource.payload.id===ref?nativeResource.contentKey:Object.values(editor.repository.readState().contents).find(c=>c.payload.id===ref)?.key);});
+  const release=editor.mounts.register(props.nodeKey,{root,focusElement:root,inputPolicy:passive?'opaque-widget':'container',focus:()=>root.focus()});onCleanup(release);});
  createEffect(()=>{const owner=surface();if(!owner)return;editor.surfaces.setInformationTarget(owner.key,root);onCleanup(()=>{if(editor.surfaces.informationTarget(owner.key)===root)editor.surfaces.setInformationTarget(owner.key,undefined);});});
  return <div ref={root} tabindex="-1" class="resource-reverse-information" data-runtime-key={props.nodeKey} data-client-id={props.nodeKey}>
   <Show when={source()}>{url=><p><a href={url()} target="_blank" rel="noopener noreferrer">Open original resource</a> <button onClick={()=>void navigator.clipboard.writeText(url()).catch(()=>editor.blockSelection.setMessage('Could not copy the URL.'))}>Copy URL</button></p>}</Show>
@@ -31,7 +31,7 @@ export function ResourceInformationView(props:BlockViewProps) {
  </div>;
 }
 export function ReversibleSurfaceView(props:BlockViewProps) {
- const {editor,projection}=useReactiveView(),node=()=>projection.state.nodes[props.nodeKey],children=()=>node()?.children??[];
+ const {editor,projection,passive}=useReactiveView(),node=()=>projection.state.nodes[props.nodeKey],children=()=>node()?.children??[];
  const active=()=>{const key=editor.viewChildren[props.nodeKey];return key&&children().includes(key)?key:children()[0];};
  let root!:HTMLDivElement;
  const scrolled=new Map<HTMLElement,[number,number]>(),lastFocused=new Map<string,string>(),focusTargets=new Map<string,HTMLElement>();
@@ -46,6 +46,7 @@ export function ReversibleSurfaceView(props:BlockViewProps) {
   editor.setViewChild(props.nodeKey,next);
   queueMicrotask(()=>{
    if(!root.isConnected||active()!==next)return;
+   if(passive)return;
    const memory=memories.get(next),face=Array.from(root.children).find(el=>(el as HTMLElement).dataset.faceKey===next) as HTMLElement|undefined;
    const mount=memory?.key&&editor.mounts.get(memory.key);
    if(mount&&face?.contains(mount.root)){if(memory?.focusTarget&&mount.root.contains(memory.focusTarget))memory.focusTarget.focus({preventScroll:true});else mount.focus();if(memory?.selection)mount.restoreInlineSelection?.(memory.selection);}
@@ -57,7 +58,7 @@ export function ReversibleSurfaceView(props:BlockViewProps) {
   const scroll=(event:Event)=>{const el=event.target;if(el instanceof HTMLElement)scrolled.set(el,[el.scrollTop,el.scrollLeft]);};
   const focus=(event:FocusEvent)=>{const mount=editor.mounts.resolveEvent(event);if(mount&&mount.nodeKey!==props.nodeKey){lastFocused.set(active(),mount.nodeKey);if(event.target instanceof HTMLElement)focusTargets.set(active(),event.target);}};
   root.addEventListener('scroll',scroll,true);root.addEventListener('focusin',focus);
-  const unregister=editor.mounts.register(props.nodeKey,{root,focusElement:root,inputPolicy:'container',focus:()=>root.focus()});
+  const unregister=editor.mounts.register(props.nodeKey,{root,focusElement:root,inputPolicy:passive?'opaque-widget':'container',focus:()=>root.focus()});
   const release=editor.surfaces.register(props.nodeKey,{reveal,flip:()=>{const list=children();if(list.length>1)reveal(list[(list.indexOf(active())+1)%list.length]);}});
   onCleanup(()=>{root.removeEventListener('scroll',scroll,true);root.removeEventListener('focusin',focus);scrolled.clear();unregister();release();});
  });
@@ -76,7 +77,7 @@ export function ReversibleSurfaceView(props:BlockViewProps) {
     on:dblclick={event=>{event.preventDefault();event.stopPropagation();}}
     on:click={event=>{
      event.stopPropagation();
-     if(editor.commandRegistry.permit?.(props.nodeKey,'surface.flip')===false||editor.completionInput?.beforeSave?.()===false)return;
+     if(editor.commandRegistry.permit?.(props.nodeKey,'surface.flip')===false||(!passive&&editor.completionInput?.beforeSave?.()===false))return;
      const button=event.currentTarget,keyboard=event.detail===0;
      // Use the same controller operation as menus, commands and navigation.
      // A corner always belongs to this surface, irrespective of Block selection.

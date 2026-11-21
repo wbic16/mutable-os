@@ -1,0 +1,304 @@
+[
+  {
+    "id": "baseline-A",
+    "continuity": false,
+    "maxOutputTokens": 4096,
+    "startedUtc": "2026-11-11T05:49:25.975Z",
+    "admitted": true,
+    "repaired": false,
+    "completedUtc": "2026-11-11T05:49:45.250Z",
+    "usage": [
+      {
+        "input_tokens": 12053,
+        "output_tokens": 31,
+        "total_tokens": 12084
+      },
+      {
+        "input_tokens": 12287,
+        "output_tokens": 32,
+        "total_tokens": 12319
+      },
+      {
+        "input_tokens": 12522,
+        "output_tokens": 609,
+        "total_tokens": 13131
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Historical continuity",
+        "typename": "Concept",
+        "description": "Persistence through a connected causal history of maintenance, organisation and use.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Material continuity",
+        "typename": "Concept",
+        "description": "Persistence understood in terms of retaining the original constituent material.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Numerical identity",
+        "typename": "Concept",
+        "description": "Being one and the same individual object, distinguished from similarity or shared material.",
+        "aliases": []
+      }
+    ],
+    "glosses": [],
+    "tools": [
+      "search_entities",
+      "search_entities"
+    ]
+  },
+  {
+    "id": "A",
+    "continuity": false,
+    "maxOutputTokens": 4096,
+    "startedUtc": "2026-11-11T05:49:45.301Z",
+    "admitted": true,
+    "repaired": false,
+    "completedUtc": "2026-11-11T05:50:08.274Z",
+    "usage": [
+      {
+        "input_tokens": 13236,
+        "output_tokens": 66,
+        "total_tokens": 13302
+      },
+      {
+        "input_tokens": 13506,
+        "output_tokens": 1050,
+        "total_tokens": 14556
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Historical continuity",
+        "typename": "Concept",
+        "description": "Continuity of a vessel’s organised history through use and repair.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Maintained ship",
+        "typename": "Hypothetical vessel",
+        "description": "The vessel that gradually receives replacement planks in the stipulated scenario.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Material continuity",
+        "typename": "Concept",
+        "description": "Persistence of original constituent material as a proposed criterion of vessel identity.",
+        "aliases": []
+      },
+      {
+        "id": "new:e4",
+        "name": "Reconstructed ship",
+        "typename": "Hypothetical vessel",
+        "description": "The vessel later assembled from the maintained vessel’s original planks.",
+        "aliases": []
+      },
+      {
+        "id": "new:e5",
+        "name": "Numerical identity",
+        "typename": "Concept",
+        "description": "Being one and the same individual, rather than merely similar or materially alike.",
+        "aliases": []
+      }
+    ],
+    "arguments": [
+      {
+        "id": "new:arg1",
+        "anchor": {
+          "block": "new:b5",
+          "revision": null,
+          "whole": true
+        }
+      }
+    ],
+    "relations": [],
+    "glosses": [],
+    "tools": [
+      "search_entities"
+    ]
+  },
+  {
+    "id": "B",
+    "continuity": false,
+    "maxOutputTokens": 4096,
+    "startedUtc": "2026-11-11T05:50:08.302Z",
+    "admitted": true,
+    "repaired": false,
+    "completedUtc": "2026-11-11T05:50:30.562Z",
+    "usage": [
+      {
+        "input_tokens": 14405,
+        "output_tokens": 1202,
+        "total_tokens": 15607
+      }
+    ],
+    "entities": [],
+    "arguments": [
+      {
+        "id": "new:arg1",
+        "anchor": "new:s1"
+      }
+    ],
+    "relations": [],
+    "glosses": [],
+    "tools": []
+  },
+  {
+    "id": "C",
+    "continuity": false,
+    "maxOutputTokens": 4096,
+    "startedUtc": "2026-11-11T05:50:30.620Z",
+    "admitted": true,
+    "repaired": false,
+    "completedUtc": "2026-11-11T05:50:57.729Z",
+    "usage": [
+      {
+        "input_tokens": 13293,
+        "output_tokens": 119,
+        "total_tokens": 13412
+      },
+      {
+        "input_tokens": 13620,
+        "output_tokens": 1352,
+        "total_tokens": 14972
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Marta",
+        "typename": "Person",
+        "description": "Invented bronze worker who carries the bell.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Council",
+        "typename": "Organisation",
+        "description": "Council ordering repairs in the invented passage.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Guild",
+        "typename": "Organisation",
+        "description": "Guild making payment conditional on assessment in the invented passage.",
+        "aliases": []
+      },
+      {
+        "id": "new:e4",
+        "name": "Cracked bell",
+        "typename": "Object",
+        "description": "Bell carried from chapel to workshop in the invented passage.",
+        "aliases": []
+      },
+      {
+        "id": "new:e5",
+        "name": "Riverside chapel",
+        "typename": "Place",
+        "description": "Starting location of the bell’s transfer.",
+        "aliases": []
+      },
+      {
+        "id": "new:e6",
+        "name": "Guild workshop",
+        "typename": "Place",
+        "description": "Destination of the bell’s transfer.",
+        "aliases": []
+      },
+      {
+        "id": "new:e7",
+        "name": "Bell transfer",
+        "typename": "Event",
+        "description": "Marta’s Monday transport of the cracked bell from chapel to workshop.",
+        "aliases": []
+      },
+      {
+        "id": "new:e8",
+        "name": "Ordered bell repairs",
+        "typename": "Planned activity",
+        "description": "Repairs ordered by the council, without confirmation of completion.",
+        "aliases": []
+      },
+      {
+        "id": "new:e9",
+        "name": "Autumn procession",
+        "typename": "Event",
+        "description": "Procession serving as the deadline reference for the ordered repairs.",
+        "aliases": []
+      },
+      {
+        "id": "new:e10",
+        "name": "Crack assessment",
+        "typename": "Conditional activity",
+        "description": "Assessment required before payment; completion is not established.",
+        "aliases": []
+      }
+    ],
+    "arguments": [],
+    "relations": [
+      {
+        "id": "new:rel1",
+        "type": "participates-in",
+        "from": "new:e1",
+        "to": "new:e7",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel2",
+        "type": "transported-object",
+        "from": "new:e7",
+        "to": "new:e4",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel3",
+        "type": "has-origin",
+        "from": "new:e7",
+        "to": "new:e5",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel4",
+        "type": "has-destination",
+        "from": "new:e7",
+        "to": "new:e6",
+        "kind": "entity"
+      }
+    ],
+    "glosses": [],
+    "tools": [
+      "search_entities"
+    ]
+  },
+  {
+    "id": "D",
+    "continuity": false,
+    "maxOutputTokens": 4096,
+    "startedUtc": "2026-11-11T05:50:57.752Z",
+    "admitted": true,
+    "repaired": false,
+    "completedUtc": "2026-11-11T05:51:00.565Z",
+    "usage": [
+      {
+        "input_tokens": 13192,
+        "output_tokens": 116,
+        "total_tokens": 13308
+      }
+    ],
+    "entities": [],
+    "arguments": [],
+    "relations": [],
+    "glosses": [],
+    "tools": []
+  }
+]

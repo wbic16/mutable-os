@@ -1,4 +1,6 @@
 export interface VisualFragment {
+  /** Optional local transform supplied by non-horizontal native text surfaces. */
+  matrix?: readonly number[];
   x: number;
   y: number;
   width: number;
@@ -151,3 +153,9 @@ export function spikyOutlineShapes(
     };
   });
 }
+
+/** Compound geometry keeps curved ranges within the standard SVG range renderer,
+ * with one reactive path per binding instead of a reactive path per glyph. */
+function fragmentPoint(f:VisualFragment,x:number,y:number){const m=f.matrix;return m?`${(m[0]*x+m[2]*y+m[4]).toFixed(3)},${(m[1]*x+m[3]*y+m[5]).toFixed(3)}`:`${x},${y}`;}
+export function transformedUnderlinePath(fragments:readonly VisualFragment[],offset:number){return fragments.map(f=>`M${fragmentPoint(f,f.x,f.y+f.height+offset)} L${fragmentPoint(f,f.x+f.width,f.y+f.height+offset)}`).join(' ');}
+export function transformedRegionPath(fragments:readonly VisualFragment[]){return fragments.map(f=>`M${fragmentPoint(f,f.x,f.y)} L${fragmentPoint(f,f.x+f.width,f.y)} L${fragmentPoint(f,f.x+f.width,f.y+f.height)} L${fragmentPoint(f,f.x,f.y+f.height)} Z`).join(' ');}

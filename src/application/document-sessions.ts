@@ -57,7 +57,7 @@ export interface RetainedDocumentSession {
  * No resources, domain edits, Save bindings or persistent records are allocated.
  */
 export class DocumentSessionStore {
-  private records = new Map<string, { session: RetainedDocumentSession; dispose: () => void }>();
+  private records = new Map<string, { session: RetainedDocumentSession; pins: number; released: boolean; unmount: () => void; dispose: () => void }>();
   private alive = true;
   private lifetime = new AbortController();
   readonly signal = this.lifetime.signal;
@@ -92,13 +92,13 @@ export class DocumentSessionStore {
     this.saveError[1](undefined); return native.save(id, location);
   }
   get size() { return this.records.size; }
-  sessions() { return [...this.records.values()].map(record => record.session); }
+  sessions() { return [...this.records.values()].filter(record=>!record.released).map(record => record.session); }
 
   mount(options: { ownerKey: string; slotKey: string; windowId: string; placement: string;
     coordinates: LocalCoordinates; shared?: { projection: BlockTreeProjection; rootKey: string } },
     render: (session: RetainedDocumentSession) => void, owner: Owner | null = getOwner()): RetainedDocumentSession {
     if (!this.alive) throw Error("Document session store is disposed");
-    if ([...this.records.values()].some(r => r.session.host.ownerKey === options.ownerKey && r.session.host.slotKey === options.slotKey))
+    if ([...this.records.values()].some(r => !r.released && r.session.host.ownerKey === options.ownerKey && r.session.host.slotKey === options.slotKey))
       throw Error("Document host slot already has a session");
     const projection = options.shared?.projection ?? this.editor.createView(undefined, options.placement);
     const controller = new AbortController(), element = document.createElement("div");
@@ -115,11 +115,12 @@ export class DocumentSessionStore {
     element.dataset.documentSession = session.id;
     if (session.ownsProjection) this.privateViews.set(projection.viewId, session);
     let disposeRoot = () => {};
-    const record = { session, dispose: () => {
+    let unmounted = false;
+    const unmount = () => { if(unmounted)return;unmounted=true;session.host.end();disposeRoot();element.remove(); };
+    const record = { session, pins: 0, released: false, unmount, dispose: () => {
       if (controller.signal.aborted) return;
-      controller.abort(); session.host.end();
-      try { disposeRoot(); } finally {
-        element.remove();
+      controller.abort();
+      try { unmount(); } finally {
         if (session.ownsProjection) this.editor.disposeView(projection);
       }
     } };
@@ -130,13 +131,26 @@ export class DocumentSessionStore {
       return session;
     } catch (error) { this.release(session); throw error; }
   }
+  /** Keep the native projection available to a Document-bound operation after its
+   * renderer unmounts. This neither creates a view nor keeps hidden DOM rendering. */
+  retainOperation(session: RetainedDocumentSession) {
+    const record=this.records.get(session.id);
+    if(!record||!session.current())throw Error('Document session unavailable');
+    record.pins++;let held=true;
+    return ()=>{if(!held)return;held=false;record.pins--;if(record.released&&!record.pins)this.finishRelease(session);};
+  }
+  private finishRelease(session: RetainedDocumentSession) {
+    const record=this.records.get(session.id);if(!record)return;
+    this.records.delete(session.id);this.privateViews.delete(session.projection.viewId);record.dispose();
+  }
   release(session: RetainedDocumentSession) {
     const record = this.records.get(session.id);
-    if (!record || record.session !== session) return;
+    if (!record || record.session !== session || record.released) return;
     this.presentations.forget(session);
-    this.records.delete(session.id);
-    this.transfers.releaseSession(session); this.privateViews.delete(session.projection.viewId);
-    record.dispose();
+    record.released=true;
+    this.transfers.releaseSession(session);
+    record.unmount();
+    if(!record.pins||!this.alive)this.finishRelease(session);
   }
   releaseOwner(ownerKey: string) {
     for (const { session } of [...this.records.values()]) if (session.host.ownerKey === ownerKey) this.release(session);
@@ -148,6 +162,6 @@ export class DocumentSessionStore {
     this.presentations.dispose();
     this.detachment?.dispose(); this.saveHandlers.clear();
     this.transfers.dispose();
-    for (const { session } of [...this.records.values()]) this.release(session);
+    for (const { session } of [...this.records.values()]) { this.release(session);this.finishRelease(session); }
   }
 }

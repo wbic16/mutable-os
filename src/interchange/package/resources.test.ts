@@ -8,6 +8,10 @@ import {pdfFixture} from '../../pdf/fixtures';
 import {hash,unpackZip,packZip,bytes} from './archive';
 import {resourceAssets} from './resources';
 const context=(snapshot:any)=>({data:{kind:'mutable-package-data',version:1,readOnly:true,encoding:'sqlite-storage-class-v1',tables:[{name:'SourceSnapshot',classification:'canonical',columns:['guid','attributes'],rows:[[['text',snapshot.snapshotId],['text',JSON.stringify(snapshot)]]]}],provenance:{},selection:{},unresolved:[],excluded:[]} as any,schema:{kind:'mutable-knowledge-schema',version:1,tables:[{name:'SourceSnapshot',columns:[{name:'guid'},{name:'attributes'}]}]}});
+it('reports the Vault boundary for contribution attachments instead of claiming a self-contained package',()=>{
+ const state=decodeBlockTree({id:'doc',type:'document-block',children:[{id:'contribution',type:'container-block',metadata:{dialectic:{kind:'contribution',attachments:[{asset:{kind:'managed',cavernId:'source',assetId:'sha256:'+'a'.repeat(64)}}]}}}]}).state;
+ expect(nativeInventory(captureNative(state,'doc')).unresolvedAssets).toEqual([{blockId:'contribution',reason:expect.stringContaining('Dialectic attachment references require the original Vault')}]);
+});
 it('preserves PDF/JSON original closure and exact source rows while imports allocate new occurrence identities and stay inactive',async()=>{
  const pdf=pdfFixture(),reference={kind:'managed' as const,cavernId:'source',assetId:'sha256:'+await hash(pdf)},snapshot={version:1,kind:'pdf',snapshotId:'snapshot',resourceId:'resource',entityId:'entity',asset:reference,inspection:{pages:2,label:'PDF',kind:'pdf-inspection'}};
  const state=decodeBlockTree({id:'doc',type:'document-block',children:[{id:'occurrence',type:'mutable/pdf-document-block',pdf:snapshot,blockProperties:[{id:'note',type:'mutable/resource-annotation',value:'Authored note',anchor:{kind:'pdf-page',snapshotId:'snapshot'}}]}]}).state;

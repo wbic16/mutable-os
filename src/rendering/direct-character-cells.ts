@@ -12,12 +12,14 @@ export interface CharacterCellPresentation {
   classes?: string;
   hiddenSource?: boolean;
   image?: { asset?: ManagedAssetReference; src: string; alt: string; label: string; width?: number; height?: number };
+  slot?: boolean;
   alternative?: { id: string; end: number; cells: CharacterCellPresentation[] };
 }
 
 type Entry = {
   element: HTMLSpanElement;
-  kind: "text" | "image" | "alternative";
+  kind: "text" | "image" | "alternative" | "slot";
+  releaseSlot?:()=>void;
   text?: string;
   style?: JSX.CSSProperties;
   alternative?: DirectCharacterCells;
@@ -39,6 +41,7 @@ export class DirectCharacterCells {
     private readonly flow: HTMLElement,
     private readonly imageStatus?: (key: string, status: "ready" | "failed") => void,
     private readonly bindAsset?: (image: HTMLImageElement, asset: ManagedAssetReference) => () => void,
+    private readonly mountSlot?: (element:HTMLElement,key:string)=>()=>void,
   ) {}
 
   update(cells: readonly CharacterCellPresentation[]): void {
@@ -46,12 +49,12 @@ export class DirectCharacterCells {
     const document = this.flow.ownerDocument;
     const keys = cells.map(cell => cell.key);
     const sequenceChanged = !this.keys || keys.length !== this.keys.length || keys.some((key, index) => key !== this.keys![index]);
-    const structureChanged = sequenceChanged || cells.some(cell => this.entries.get(cell.key)?.kind !== (cell.image ? "image" : cell.alternative ? "alternative" : "text"));
+    const structureChanged = sequenceChanged || cells.some(cell => this.entries.get(cell.key)?.kind !== (cell.slot ? "slot" : cell.image ? "image" : cell.alternative ? "alternative" : "text"));
     this.keys = keys;
     const retained = new Set(keys);
     for (const [key, entry] of this.entries) {
       if (retained.has(key)) continue;
-      entry.alternative?.dispose(); entry.releaseAsset?.();
+      entry.releaseSlot?.(); entry.alternative?.dispose(); entry.releaseAsset?.();
       entry.element.remove();
       this.entries.delete(key);
     }
@@ -63,11 +66,11 @@ export class DirectCharacterCells {
       fragment = undefined;
     };
     for (const cell of cells) {
-      const kind = cell.image ? "image" : cell.alternative ? "alternative" : "text";
+      const kind = cell.slot ? "slot" : cell.image ? "image" : cell.alternative ? "alternative" : "text";
       let entry = this.entries.get(cell.key);
       if (entry && entry.kind !== kind) {
         if (cursor === entry.element) cursor = cursor.nextSibling;
-        entry.alternative?.dispose(); entry.releaseAsset?.();
+        entry.releaseSlot?.(); entry.alternative?.dispose(); entry.releaseAsset?.();
         entry.element.remove();
         this.entries.delete(cell.key);
         entry = undefined;
@@ -78,7 +81,10 @@ export class DirectCharacterCells {
         this.entries.set(cell.key, entry);
         if (cell.index !== undefined && !cell.provisional) element.dataset.inlineKey = cell.key;
         if (cell.provisional) element.dataset.provisionalCell = cell.key;
-        if (kind === "image") {
+        if(kind === "slot") {
+          element.className="reactive-inline-alternative-cell";element.contentEditable="false";
+          entry.releaseSlot=this.mountSlot?.(element,cell.key);
+        } else if (kind === "image") {
           element.className = "reactive-inline-image";
           element.contentEditable = "false";
           element.setAttribute("role", "img");
@@ -101,7 +107,13 @@ export class DirectCharacterCells {
       }
       const element = entry.element;
       if (cell.index !== undefined) setAttribute(element, "data-inline-index", String(cell.index));
-      if (cell.image) {
+      if (cell.slot) {
+        if(entry.style!==cell.style){
+          for(const name of Object.keys(entry.style??{}))if(!(name in (cell.style??{})))element.style.removeProperty(name);
+          for(const [name,value] of Object.entries(cell.style??{}))element.style.setProperty(name,String(value??''));
+          entry.style=cell.style;
+        }
+      } else if (cell.image) {
         const image = element.firstChild as HTMLImageElement;
         // Inert clipboard descriptors must neither load the current page via an
         // empty src nor generate an image-status history entry on error.
@@ -137,7 +149,7 @@ export class DirectCharacterCells {
           entry.style = cell.style;
         }
       }
-      setAttribute(element, "class", [cell.image ? "reactive-inline-image" : cell.alternative ? "reactive-superposition-projection" : cell.hiddenSource ? "reactive-superposition-source-cell" : cell.concealed ? "reactive-standoff-cell--concealed" : "", cell.classes].filter(Boolean).join(" ") || undefined);
+      setAttribute(element, "class", [cell.slot ? "reactive-inline-alternative-cell" : cell.image ? "reactive-inline-image" : cell.alternative ? "reactive-superposition-projection" : cell.hiddenSource ? "reactive-superposition-source-cell" : cell.concealed ? "reactive-standoff-cell--concealed" : "", cell.classes].filter(Boolean).join(" ") || undefined);
       if (!structureChanged) continue;
       if (!element.parentNode) {
         (fragment ??= document.createDocumentFragment()).appendChild(element);
@@ -155,7 +167,7 @@ export class DirectCharacterCells {
   dispose(): void {
     this.disposed = true;
     for (const entry of this.entries.values()) {
-      entry.alternative?.dispose(); entry.releaseAsset?.();
+      entry.releaseSlot?.(); entry.alternative?.dispose(); entry.releaseAsset?.();
       if (entry.kind === "image") {
         const image = entry.element.firstChild as HTMLImageElement;
         image.onload = image.onerror = null;

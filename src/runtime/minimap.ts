@@ -195,20 +195,10 @@ export class MinimapService {
 }
 
 export function pageForNode(editor: ReactiveEditor, nodeKey: NodeKey): NodeKey | undefined {
-  const node = editor.node(nodeKey);
-  const projection = node && editor.projections.get(node.viewId);
-  if (!node || !projection) return;
-  const parents = new Map<NodeKey, NodeKey>();
-  for (const candidate of Object.values(projection.state.nodes)) {
-    candidate.children.forEach(child => parents.set(child, candidate.key));
-    Object.values(candidate.ownedRelations).forEach(child => parents.set(child, candidate.key));
-  }
-  let key: NodeKey | undefined = nodeKey;
-  while (key) {
-    const current = projection.state.nodes[key];
-    if (current && ["page-block", "fixed-size-page-block"].includes(current.viewType)) return current.key;
-    key = parents.get(key);
-  }
+  // The shared structural query includes children/owned relations, not inline
+  // Cells. Avoid creating proxies and a parent map for the entire Cell table.
+  return ancestorPath(editor, nodeKey).reverse().find(node =>
+    node.viewType === 'page-block' || node.viewType === 'fixed-size-page-block')?.key;
 }
 
 export function nodeKeysForPage(editor: ReactiveEditor, pageKey: NodeKey): ReadonlySet<NodeKey> {

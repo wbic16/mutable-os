@@ -16,6 +16,7 @@ export class MeasurementService {
   caretRect(nodeKey: NodeKey, index: number, frame: number): DOMRectReadOnly | undefined {
     const handle = this.mounts.get(nodeKey), flow = handle?.focusElement;
     if (!handle || !flow) return;
+    if(handle.inlineCaretRect)return handle.inlineCaretRect(index);
     const selection = flow.ownerDocument.getSelection();
     if (flow.ownerDocument.activeElement !== flow || !selection?.isCollapsed || !selection.rangeCount || !flow.contains(selection.anchorNode)) return;
     const cached = this.caretCache;
@@ -48,6 +49,7 @@ export class MeasurementService {
   /** Shared by the quick-input placement and its temporary range highlight. */
   rangeRects(nodeKey:NodeKey,start:number,end:number,frame:number):DOMRectReadOnly[] {
     const handle=this.mounts.get(nodeKey);if(!handle)return [];
+    if(handle.inlineRangeRects)return handle.inlineRangeRects(start,end);
     const a=handle.inlineBoundary?.(start),b=handle.inlineBoundary?.(end);if(!a||!b)return [];
     const key=`${nodeKey}:${handle.generation}:${start}:${end}:${frame}`;
     if(this.rangeCache?.key===key)return this.rangeCache.rects;

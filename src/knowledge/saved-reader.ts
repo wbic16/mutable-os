@@ -4,14 +4,14 @@ import {validateNativeTextSpan} from '../history/stage-c-gates/portable';
 import {collectFacts,type InlineFacts,type ObservationPolicy} from './collect-facts';
 import {resourceToRepository} from '../history/durable-core';
 import type {TextRun} from '../runtime/search-matching';
-type Span = {kind:'text';text:string}|{kind:'image';properties:unknown};
+type Span = {kind:'text';text:string}|{kind:'image'|'alternative';properties:unknown};
 
 /** Same code-point Cell grammar/boundaries as the decoder + canonicalSearchSource.
  * No per-character ContentRecord, PlacementRecord, UUID or ownership scan. */
 async function inlineFacts(spans:readonly Span[],signal?:AbortSignal):Promise<InlineFacts>{
  const runs:TextRun[]=[],cells:string[]=[];let parts:string[]=[],units=0,boundaries=[0],used=0;
  for(const span of spans){
-  if(span.kind==='image'){runs.push({text:parts.join(''),boundaries});cells.push('[inline object]');parts=[];units=0;boundaries=[cells.length];continue;}
+  if(span.kind!=='text'){runs.push({text:parts.join(''),boundaries});cells.push('[inline object]');parts=[];units=0;boundaries=[cells.length];continue;}
   for(const part of span.text){
    if(cells.length&&cells.length%2048===0){await new Promise(r=>setTimeout(r,0));signal?.throwIfAborted();}
    used+=part.length;if(used>2000000)throw Error('Native text exceeds the bounded search budget');
@@ -39,7 +39,7 @@ export function prepareLightweightFacts(bytes:Uint8Array,signal?:AbortSignal){
  // Image atoms MUST remain; their authored values may carry those semantics.
  // Re-encoding this private witness is intentional on this read-only path:
  // it avoids adding an unchecked semantic-decoder entry point to core.
- const witness=decodeNative(new TextEncoder().encode(JSON.stringify({...envelope,document})));
+ const witness=decodeNative(new TextEncoder().encode(JSON.stringify({...envelope,document})), undefined, true);
  const validationMs=performance.now()-start;signal?.throwIfAborted();
  // No partial ResourceSnapshot escapes: only validated identity and a facts closure.
  const target=witness.placements[witness.rootPlacementKey].target;

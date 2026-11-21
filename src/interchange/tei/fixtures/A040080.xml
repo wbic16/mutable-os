@@ -1,0 +1,133 @@
+<?xml-model href="https://raw.githubusercontent.com/Edirom/WeGA-ODD/v4.14.0/schema/de/wegaLetters.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="https://raw.githubusercontent.com/Edirom/WeGA-ODD/v4.14.0/schema/de/wegaLetters.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="A040080">
+
+
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title level="s">WeGA, Briefe, Digitale Edition</title>
+            <title level="a">Franz Anton von Weber (im Namen von Carl Maria von Weber) an Breitkopf und Härtel in Leipzig
+               <lb/>Salzburg, Montag, 3. September 1798
+            </title>
+            <author key="A002068">Weber, Carl Maria von</author>
+            <editor>Carl-Maria-von-Weber-Gesamtausgabe</editor>
+            <respStmt>
+               <resp>Übertragung</resp>
+               <name>Eveline Bartlitz</name>
+               <name>Joachim Veit</name>
+            </respStmt>
+         </titleStmt>
+			<editionStmt>
+				<p>Version 4.14.0 vom 29. Juni 2026</p>
+				<p>Download dieser Datei: 2026-11-19T12:24:39.671Z</p>
+			</editionStmt>
+         <publicationStmt>
+            <publisher>
+               <name>Carl-Maria-von-Weber-Gesamtausgabe</name>
+               <address>
+                  <street>Hornsche Str. 39</street>
+                  <postCode>32756</postCode>
+                  <placeName>
+                     <country>D</country>
+                     <settlement key="A130001">Detmold</settlement>
+                  </placeName>
+               </address>
+            </publisher>
+            <idno type="WeGA" n="74"/>
+            <availability>
+               <licence target="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International (CC BY 4.0)</licence>
+            </availability>
+         </publicationStmt>
+         <seriesStmt>
+            <p>Machine-Readable Transcriptions of Texts from the Carl Maria
+                                        von Weber Complete Edition (WeGA)</p>
+         </seriesStmt>
+         <notesStmt>
+            <note type="summary">fragt an, ob B&amp;H 100 Ex. seiner 6 Fughetten zum Verkauf übernehmen wollten</note>
+            <note type="incipit">Wollten Euer Hochedel: 100 Stük Exemplare von</note>
+         </notesStmt>
+         <sourceDesc>
+            <msDesc>
+               <msIdentifier>
+                  <country>D</country>
+                  <settlement key="A130015">Darmstadt</settlement>
+                  <repository n="D-DS">Universitäts- und Landesbibliothek Darmstadt</repository>
+               </msIdentifier>
+               <physDesc>
+                  <p n="extent">1 Bl. (2 b. S. einschl. Adr.)</p>
+                  <p>auf der Adressenseite Verlagsvermerke: <q>1798. | 3. <hi rend="latintype">Septbr.</hi> | <hi rend="latintype">Salzburg</hi> | <hi rend="latintype">v. Weber.</hi></q></p>
+                  <p>geschrieben (einschl. U.) von Franz Anton von Weber</p>
+               </physDesc>
+               <history>
+                  <provenance>Stargardt 498 (<date when="1951">1951</date>), Nr. 68, S. 76–78</provenance>
+               </history> 
+               <additional>
+                  <listBibl>
+                     <bibl n="firstPrint">Hase, Oskar von (Hg.): Breitkopf &amp; Härtel. Gedenkschrift u. Arbeitsbericht. Bd. 1: 1542–1827, 4. Aufl. Leipzig 1917, S. 187</bibl>
+                  </listBibl>
+               </additional>
+            </msDesc>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <projectDesc>
+            <p>Carl-Maria-von-Weber-Gesamtausgabe, Sämtliche Briefe</p>
+         </projectDesc>
+         <editorialDecl>
+            <p>Übertragung folgt den ER der WeGA</p>
+         </editorialDecl>
+      </encodingDesc>
+      <profileDesc>
+         <correspDesc>
+            <correspAction type="sent">
+               <persName key="A002068">Weber, Carl Maria von</persName>
+               <settlement key="A130023">Salzburg</settlement>
+               <date when="1798-09-03" n="01">3. September 1798</date>
+            </correspAction>
+            <correspAction type="received">
+               <orgName key="A080010">Breitkopf</orgName>
+               <settlement key="A130005">Leipzig</settlement>
+            </correspAction>
+         </correspDesc>
+         <langUsage>
+            <language ident="de">German</language>
+         </langUsage>
+      </profileDesc>
+      <revisionDesc status="approved">
+         <change who="PS" when="2023-05-02">Obsoletes Element tei:textClass entfernt</change>
+         <change who="EB" when="2020-11-08" status="approved">nach Durchsicht von Frank Ziegler status auf approved gesetzt</change>
+         <change who="CJ" when="2016-06-19">AuK-Einträge aus den Kommentaren in die history übertragen</change>
+         <change who="AS" when="2012-05-22">Korrekturen</change>
+         <change who="AF" when="2012-04-05" status="candidate">Brief eingefügt, Header angepasst, status changed zu candidate</change>
+         <change when="2012-03-25" who="RM">Faksimiles verlinkt</change>
+         <change when="2011-04-03" who="PS">ID und @keys gegen nicht-sprechende ersetzt.</change>
+         <change who="PS" when="2009-05-08" status="proposed">Initiale Transformation aus askSam DB Briefe1</change>
+      </revisionDesc>
+   </teiHeader>
+   
+   <text type="letter">
+      <body>
+         <div type="address">
+            <address>
+               <addrLine>An</addrLine>
+               <addrLine>die Berühmte BuchHandlung</addrLine>
+               <addrLine><orgName key="A080010"><hi rend="underline" n="1"><hi rend="latintype">Breitkopf</hi> und <hi rend="latintype">Härtel</hi></hi></orgName></addrLine>
+               <addrLine>in</addrLine>
+               <addrLine><settlement key="A130005"><hi rend="latintype"><hi rend="underline" n="1">Leipzig</hi></hi></settlement></addrLine>
+            </address>
+         </div>
+         <div type="writingSession" n="1">
+            <opener>
+ <dateline><settlement key="A130023"><hi rend="latintype">Salz</hi>burg</settlement> den 3<hi rend="superscript">t</hi> <hi rend="latintype">Sept:</hi> 1798.</dateline>
+               <salute><choice><abbr><hi rend="latintype">P. P.</hi></abbr><expan>praemissis praemittendis (nach Vorausschickung des Vorauszuschickenden / man nehme an, der gebührende Titel sei vorausgeschickt)</expan></choice></salute>
+            </opener>
+            <p>Wolten Euer Hochselben 100 Stük <hi rend="latintype">Exemplare</hi> von meinen so eben die Preße verlaßenen <workName key="A020327">Sechs <hi rend="underline" n="1"><hi rend="latintype">Fugetten</hi></hi></workName> gegen gewöhnliche pro Cente in Dero Verlag nehmen, so bitte mich mit umgehender Post geneigtest zu benachrichtigen, auch zugleich mir die Weisung zu machen, auf welche beste Art ich diese 100 Stük, so jedes nur in einem Bogen besteht, am füglichsten übermachen könnte<note xml:id="note01" type="commentary" resp="FZ">Breitkopf &amp; Härtel übernahm den Vertrieb der Fughetten (möglicherweise nach der lobenden <rs type="writing" key="A031539">Rezension</rs>) und verkaufte die Ausgabe für 3 Groschen; vgl. die Anzeige in: <hi rend="italic">Allgemeine musikalische Zeitung</hi>, Jg. 1, Intelligenz-Blatt Nr. X (März 1799), Sp. 56.</note>.</p> <closer rend="inline">In Erwartung habe die Ehre zu seyn<lb/>
+               <seg rend="right">Dero</seg>
+               <seg rend="right">ergebenster</seg>
+               <seg rend="right"><persName key="A002068">Karl Marie <hi rend="latintype">v. Weber</hi></persName></seg>
+            </closer>
+            <postscript><p>Von Hiesiger Mayerscher BuchHandlung habe<lb/>
+               dero Addresse erhalten.</p></postscript>
+         </div>
+      </body>
+   </text>
+</TEI>

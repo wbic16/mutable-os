@@ -1,0 +1,56 @@
+{
+  "method": "Local o200k_base estimates over captured mocked invocations. Not endpoint/billed token counts; no paid calls. Parts omit provider framing/history/reasoning and are not an exact provider accounting partition.",
+  "request": {
+    "json": {
+      "instructions": 8709,
+      "currentContent": 1014,
+      "responseFormat": 3570,
+      "tools": 612,
+      "componentSubtotal": 13905,
+      "serializedBodyTokens": 14616,
+      "bodyBytes": 67462
+    },
+    "xml": {
+      "instructions": 1250,
+      "currentContent": 516,
+      "responseFormat": 0,
+      "tools": 516,
+      "componentSubtotal": 2282,
+      "serializedBodyTokens": 2400,
+      "bodyBytes": 10915
+    }
+  },
+  "responses": {
+    "palimpsest": {
+      "json": 327,
+      "xml": 188,
+      "nativeTextAndRangesEquivalent": true,
+      "nativeDefinitionCounts": {
+        "mutable/entity": 1,
+        "dialectic/range-anchor": 1
+      }
+    },
+    "leonardo": {
+      "json": 2704,
+      "xml": 1622,
+      "nativeTextAndRangesEquivalent": true,
+      "nativeDefinitionCounts": {
+        "mutable/entity": 9,
+        "dialectic/range-anchor": 20,
+        "dialectic/argument": 1,
+        "mutable/entity-relation": 6,
+        "mutable/gloss": 1
+      }
+    },
+    "mercury": {
+      "json": 2002,
+      "xml": 1127,
+      "nativeTextAndRangesEquivalent": true,
+      "nativeDefinitionCounts": {
+        "mutable/entity": 6,
+        "dialectic/range-anchor": 14,
+        "mutable/entity-relation": 3
+      }
+    }
+  }
+}

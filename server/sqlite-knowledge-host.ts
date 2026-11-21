@@ -1,3 +1,4 @@
+import {SharedAuthorityCache} from './authority-cache';
 /** Vault worker lifetime, verified saved reads and source-scoped canonical Entity requests. */
 import { verifyDocumentSource, verifyEntityListingSource } from './recognized-source.mjs';
 import { RecognizedDocumentStore } from './recognized-document-store.mjs';
@@ -10,6 +11,7 @@ import { entityCommand } from '../src/knowledge-sqlite/entities.mjs';
 import { NativeVaultStore } from './native-vault-store.mjs';
 import { createSavedIndexer } from './sqlite-saved-indexer';
 import {SqliteSavedScopes} from './sqlite-saved-scope';
+import {featureFlags} from '../src/configuration';
 import { normalizePolicy, policyKey } from '../src/knowledge/policy';
 
 const inside = (a:string,b:string) => a===b || b.startsWith(a+path.sep);
@@ -18,11 +20,13 @@ export class SqliteKnowledgeHost {
   readonly session=randomUUID(); readonly store:any;
   private entries=new Map<string,any>(); private leases=new Map<string,any>();
   private control=Promise.resolve(); private running?:Promise<void>; private timer?:ReturnType<typeof setTimeout>;
+  private quietUntil=0;
+  pauseBackground(ms=5000){this.quietUntil=Date.now()+Math.min(10000,Math.max(0,ms));if(this.active){this.active.pending=true;this.controller?.abort(Error('Foreground presentation priority'));}for(const e of this.entries.values())e.retrieval?.pauseMaintenance?.(ms);this.schedule();}
   private foregrounds=0; private foregroundTail=Promise.resolve(); private closed=false;
   readonly metrics={sweeps:0,cancellations:0,foregroundWaitMs:0,maxForegroundWaitMs:0};
   private semanticLeases=new Set<string>();
   private readers=new Map<string,{opening:Promise<any>;identity:string;active:number;timer?:ReturnType<typeof setTimeout>}>();
-  constructor(private options:{root:string;readOnly?:boolean;entitiesEnabled?:boolean;semanticServicesEnabled?:boolean;thesisEnabled?:boolean;cardexEnabled?:boolean;verifyCardexImage?:(reference:any)=>Promise<void>;store?:any;open?:typeof openSqliteFoundation;indexer?:typeof createSavedIndexer;debounceMs?:number;leaseMs?:number}) {
+  constructor(private options:{root:string;readOnly?:boolean;entitiesEnabled?:boolean;semanticServicesEnabled?:boolean;pipelineManagerEnabled?:boolean;thesisEnabled?:boolean;cardexEnabled?:boolean;verifyCardexImage?:(reference:any)=>Promise<void>;store?:any;open?:typeof openSqliteFoundation;indexer?:typeof createSavedIndexer;debounceMs?:number;leaseMs?:number}) {
     this.store=options.store??new NativeVaultStore({root:options.root,readOnly:!!options.readOnly});
   }
   private serialize<T>(action:()=>Promise<T>):Promise<T> {
@@ -40,39 +44,48 @@ export class SqliteKnowledgeHost {
   async acquire(vault:string,policy=normalizePolicy()) {
     return this.acquireContext(vault,policy);
   }
-  private async acquireContext(vault:string,policy:ReturnType<typeof normalizePolicy>,establishment=false) {
+  private async acquireContext(vault:string,policy:ReturnType<typeof normalizePolicy>,establishment=false,cacheOnly=false) {
     return this.serialize(async()=>{
       if(this.closed)throw Error('SQLite knowledge host closed');
       if(this.leases.size>=64)throw Error('SQLite lease budget exceeded');
       const root=await this.store.resolve(vault);
       for(const other of this.entries.keys())if(other!==root&&(inside(other,root)||inside(root,other)))throw Error('Overlapping SQLite vault already open');
       let e=this.entries.get(root);
-      // Establishing persistence is policy-neutral. Reuse a warm context without
+      // Policy-neutral persistence/canonical access reuses a warm context without
       // asking it to replace an application's explicitly selected extraction policy.
       const normalized=normalizePolicy(establishment&&e?e.policy:policy),key=policyKey(normalized);
       if(e&&e.policyKey!==key)throw Error('SQLite vault extraction policy differs; no automatic profile replacement');
       if(!e){
         if(this.entries.size>=8)throw Error('SQLite vault budget exceeded');
-        e={root,vault,policy:normalized,policyKey:key,users:0,epoch:0,coverage:unknown('Current saved scope has not been verified'),pending:false,full:false};
+        e={cacheOnly,root,vault,policy:normalized,policyKey:key,users:0,epoch:0,coverage:unknown('Current saved scope has not been verified'),pending:false,full:false};
         // Failed/missing/corrupt/read-only databases remain unavailable, never repaired by replacement.
         try{e.client=await (this.options.open??openSqliteFoundation)({vault:root,initialize:!this.options.readOnly,readOnly:!!this.options.readOnly,semanticServicesEnabled:this.options.semanticServicesEnabled!==false,thesisEnabled:this.options.thesisEnabled!==false});
           e.vaultGuid=(await e.client.inspect()).mutable.vaultGuid;
           e.index=(this.options.indexer??createSavedIndexer)(e.client,{root:this.options.root,vault,store:this.store,policy:normalized,protect:this.protect});
         }catch(error){await e.client?.close().catch(()=>{});e.client=undefined;throw error;}
         this.entries.set(root,e);
-        if(e.client&&!this.options.readOnly)this.enqueue(e,false);
+        if(e.client&&!this.options.readOnly&&!cacheOnly)this.enqueue(e,false);
       }
+      if(e.cacheOnly&&!cacheOnly){e.cacheOnly=false;if(!this.options.readOnly)this.enqueue(e,false);}
       const lease=randomUUID(),l={entry:e,timer:undefined};e.users++;this.leases.set(lease,l);this.renew(lease,l);
       return {lease,...this.snapshot(e)};
     });
   }
+  async acquireRetrieval(vault:string){return this.acquireContext(vault,normalizePolicy(),true);}
   async establish(vault:string){const opened=await this.acquireContext(vault,normalizePolicy(),true);try{if(!opened.vaultGuid)throw Error('Mutable Vault infrastructure unavailable');return {vault:opened.vault,vaultGuid:opened.vaultGuid};}finally{await this.release(opened.lease);}}
   private renew(token:string,l:any){clearTimeout(l.timer);l.timer=setTimeout(()=>{void this.release(token).catch(()=>{});},this.options.leaseMs??600000);l.timer.unref?.();}
   private entry(token:string){if(this.closed)throw Error('SQLite knowledge host closed');const l=this.leases.get(token);if(!l)throw Error('SQLite lease expired');this.renew(token,l);return l.entry;}
   private snapshot(e:any){return {session:this.session,vault:e.vault,vaultGuid:e.vaultGuid,epoch:e.epoch,readOnly:!!this.options.readOnly,pending:!!e.pending||this.active===e,coverage:structuredClone(e.coverage)};}
-  private invalidate(e:any,message:string){e.epoch++;e.fence=undefined;e.coverage=unknown(message);}
+  private invalidate(e:any,message:string){
+    e.retrievalController?.abort();e.retrieval?.setAvailable(e.retrieval.verifiesSavedSources===true);
+    if(e.retrieval)e.retrievalStatus={complete:false,state:'waiting-for-saved-projection'};
+    e.epoch++;e.fence=undefined;e.coverage=unknown(message);
+    // Independently verified saved files remain usable when another file or the
+    // whole-scope sweep is pending. The worker still fences every source and epoch.
+    if(e.retrieval?.verifiesSavedSources)this.scheduleRetrieval(e);
+  }
   private enqueue(e:any,full:boolean){if(this.closed||!e.client||this.options.readOnly)return;this.invalidate(e,'Saved reconciliation pending');e.pending=true;e.full ||= full;this.schedule();}
-  private schedule(){if(this.closed||this.foregrounds||this.timer||this.running)return;this.timer=setTimeout(()=>{this.timer=undefined;void this.flush();},this.options.debounceMs??100);this.timer.unref?.();}
+  private schedule(){if(this.closed||this.foregrounds||this.timer||this.running)return;this.timer=setTimeout(()=>{this.timer=undefined;void this.flush();},Math.max(this.options.debounceMs??100,this.quietUntil-Date.now()));this.timer.unref?.();}
   // Only this short section, never the background CPU operation, blocks foreground storage.
   private critical?:Promise<any>;
   private protect=(action:()=>Promise<any>,signal?:AbortSignal):Promise<any>=>{
@@ -90,7 +103,7 @@ export class SqliteKnowledgeHost {
     if(this.closed)return;
     if(this.foregrounds){await this.foregroundTail;return this.flush();}
     const run=async()=>{
-      while(!this.closed&&!this.foregrounds){
+      while(!this.closed&&!this.foregrounds&&Date.now()>=this.quietUntil){
         const e=[...this.entries.values()].find(e=>e.pending&&e.users>0);if(!e)break;
         e.pending=false;const full=e.full;e.full=false;const epoch=e.epoch;
         this.active=e;const controller=this.controller=new AbortController();
@@ -103,12 +116,33 @@ export class SqliteKnowledgeHost {
           e.coverage={state:r.complete&&!status.incompleteResources&&!status.issueCount?'complete':'incomplete',complete:!!r.complete&&!status.incompleteResources&&!status.issueCount,
             resources:status.resources,incompleteResources:status.incompleteResources,issueCount:status.issueCount,
             diagnostics:[...r.issues.map((x:any)=>x.message),...status.issues.map((x:any)=>x.reason)].slice(0,32)};
+          if(e.coverage.complete||e.retrieval?.verifiesSavedSources)this.scheduleRetrieval(e);
         }catch(error){this.invalidate(e,String(error));if(controller.signal.aborted){this.metrics.cancellations++;e.full ||= full;}}
         finally{this.active=undefined;this.controller=undefined;}
       }
     };
     this.running=run();try{await this.running;}finally{this.running=undefined;if([...this.entries.values()].some(e=>e.pending))this.schedule();}
   }
+  /** Internal installation only. No browser route, automatic consent or foreground dependency. */
+  async attachRetrieval(token:string,service:any,consent?:any,options:any={}){
+    if(!featureFlags.derivedRetrieval)throw Error('Derived retrieval disabled');
+    const e=this.entry(token);if(service.vault!==e.root||service.vaultGuid!==e.vaultGuid)throw Error('Foreign retrieval service');
+    if(e.retrieval)throw Error('Retrieval service already attached');e.retrieval=service;e.retrievalConsent=consent;e.retrievalOptions=options;
+    if(e.coverage.complete||e.retrieval?.verifiesSavedSources)this.scheduleRetrieval(e);else service.setAvailable(false);
+  }
+  private scheduleRetrieval(e:any){
+    if(!e.retrieval)return;if(e.retrievalOptions?.indexing===false){e.retrieval.setAvailable(true);e.retrievalStatus={complete:false,state:'indexing-disabled'};return;}e.retrievalController?.abort();const controller=e.retrievalController=new AbortController();
+    e.retrieval.setAvailable(true);
+    // Starts outside source publication/foreground locks; the saved index never awaits it.
+    e.retrievalStatus={complete:false,state:'indexing'};
+    e.retrievalWork=new Promise<void>(resolve=>setTimeout(resolve,e.retrievalOptions?.delayMs??0)).then(()=>{
+      controller.signal.throwIfAborted();return e.retrieval.reconcile({consent:e.retrievalConsent,signal:controller.signal,delayMs:e.retrievalOptions?.delayMs??0,beforeDocument:e.retrievalOptions?.beforeDocument,onProgress:(progress:any)=>{if(e.retrievalController===controller)e.retrievalStatus={complete:false,state:'indexing',...progress};}});
+    }).then((r:any)=>{if(e.retrievalController===controller)e.retrievalStatus={...r,complete:r.complete&&e.coverage.complete,coverage:structuredClone(e.coverage)};},(error:any)=>{if(e.retrievalController===controller)e.retrievalStatus={complete:false,error:String(error)};});
+  }
+  async detachRetrieval(token:string){const e=this.entry(token);e.retrievalController?.abort();const service=e.retrieval;e.retrieval=undefined;await service?.close();e.retrievalStatus=undefined;}
+  configureRetrieval(token:string,consent:any,options:any){const e=this.entry(token);e.retrievalController?.abort();e.retrieval?.invalidate();e.retrievalConsent=consent;e.retrievalOptions=options;if(e.coverage.complete||e.retrieval?.verifiesSavedSources)this.scheduleRetrieval(e);}
+  async retrievalStatus(token:string){const e=this.entry(token);return e.retrievalStatus??{complete:false,state:'unavailable'};}
+  async flushRetrieval(token:string){await this.entry(token).retrievalWork;return this.retrievalStatus(token);}
   async status(token:string){
     const e=this.entry(token),epoch=e.epoch;
     if(e.fence){try{await e.client.indexStatus();if(await this.store.readScopeFence(e.vault)!==e.fence&&epoch===e.epoch)this.invalidate(e,'Saved scope changed; Refresh required');}
@@ -174,6 +208,15 @@ export class SqliteKnowledgeHost {
       throw error;
     }
   }
+  private authorityServices=new Map<string,SharedAuthorityCache>();
+  private authority(vault:string,url:unknown,refresh=false){if(typeof vault!=='string'||!featureFlags.authorityCache)throw Error('Authority cache unavailable');let service=this.authorityServices.get(vault);if(!service){if(this.authorityServices.size>=32)this.authorityServices.delete(this.authorityServices.keys().next().value!);service=new SharedAuthorityCache(request=>this.cache({vault,request}));this.authorityServices.set(vault,service);}return service.get(url,refresh);}
+  async cache(body:any,signal?:AbortSignal){
+    if(this.closed||!featureFlags.authorityCache)throw Error('Shared cache disabled');
+    if(typeof body.vault!=='string')throw Error('Select a cache Vault');
+    if(this.options.readOnly&&body.request?.op!=='get')throw Error('Cache is read-only');
+    const opened=await this.acquireContext(body.vault,normalizePolicy(body.policy),true,true);
+    try{signal?.throwIfAborted();return await this.entry(opened.lease).client!.cache(body.request,signal);}finally{await this.release(opened.lease);}
+  }
   async cardex(body:any,signal?:AbortSignal){
     if(this.closed||this.options.cardexEnabled===false||this.options.entitiesEnabled===false)throw Error('Cardex is unavailable');
     if(typeof body.vault!=='string')throw Error('Select a Vault');
@@ -218,7 +261,7 @@ export class SqliteKnowledgeHost {
    * read-only connection keeps them out of the writer's reconciliation queue. */
   async entityLookup(body:any,signal?:AbortSignal,archive=false){
     if(this.closed || this.options.entitiesEnabled===false)throw Error('Canonical Entity service is unavailable');
-    if(typeof body.vault!=='string' || !(archive || ['search','get','authority-lookup'].includes(body.request?.op)))throw Error('Invalid Entity lookup');
+    if(typeof body.vault!=='string' || !(archive || ['search','get','authority-lookup','document-association'].includes(body.request?.op)))throw Error('Invalid Entity lookup');
     signal?.throwIfAborted();
     const root=await this.store.resolve(body.vault);
     // Phext mode: derived rows (document Blocks/StandoffProperties) are
@@ -267,9 +310,10 @@ export class SqliteKnowledgeHost {
     this.enqueue(e,full);await this.flush();return this.status(token);
   }
   /** Selected-vault semantic authoring capability, independent of a Document UI source. */
-  async openSemantics(vault:string,policy=normalizePolicy()){
+  async openSemantics(vault:string,policy?:ReturnType<typeof normalizePolicy>){
     if(this.options.semanticServicesEnabled===false)throw Error('Semantic services are disabled');
-    const opened=await this.acquireContext(vault,policy);this.semanticLeases.add(opened.lease);return opened;
+    // Omission requests canonical access, not replacement of a Document's profile.
+    const opened=await this.acquireContext(vault,normalizePolicy(policy),policy===undefined);this.semanticLeases.add(opened.lease);return opened;
   }
   private semanticEntry(body:any){
     if(this.options.semanticServicesEnabled===false)throw Error('Semantic services are disabled');
@@ -278,12 +322,13 @@ export class SqliteKnowledgeHost {
   }
   async semantics(body:any,signal?:AbortSignal){
     const e=this.semanticEntry(body),request=body.request;
+    if(String(request?.op).startsWith('identity-')&&(!featureFlags.pipelineManager||this.options.pipelineManagerEnabled===false))throw Error('Pipeline Manager is disabled');
     if(request?.op==='resolve-evidence')return this.resolveEvidence(body,signal);
-    const mutation=['create','add','update','remove','batch','rename','alias-add','alias-update','alias-remove','relationship-create','relationship-update'].includes(request?.op);
+    const mutation=['identity-commit','create','add','update','remove','batch','rename','alias-add','alias-update','alias-remove','relationship-create','relationship-update'].includes(request?.op);
     if(mutation&&this.options.readOnly)throw Error('Canonical semantic storage is read-only');
     signal?.throwIfAborted();
     try{
-      const result=request?.recordType==='Entity'||request?.recordType==='Relationship'?
+      const result=!String(request?.op).startsWith('identity-')&&(request?.recordType==='Entity'||request?.recordType==='Relationship')?
         await e.client.entities(entityCommand(request),signal):await e.client.semantics(request,signal);
       return {...result,session:this.session,vaultGuid:e.vaultGuid};
     }finally{if(mutation)this.enqueue(e,false);}
@@ -320,17 +365,19 @@ export class SqliteKnowledgeHost {
   async release(token:string){
     this.semanticLeases.delete(token);
     return this.serialize(async()=>{const l=this.leases.get(token);if(!l)return {released:true};clearTimeout(l.timer);this.leases.delete(token);const e=l.entry;
-      if(--e.users===0){e.pending=false;if(this.active===e){this.controller?.abort(Error('Vault lease closed'));await this.running;}this.entries.delete(e.root);await e.client?.close();}
+      if(--e.users===0){e.pending=false;if(this.active===e){this.controller?.abort(Error('Vault lease closed'));await this.running;}this.entries.delete(e.root);e.retrievalController?.abort();await e.retrieval?.close();await e.client?.close();}
       return {released:true};});
   }
   async close(){this.closed=true;this.savedScopes?.close();clearTimeout(this.timer);this.controller?.abort(Error('Host shutdown'));await this.control;await this.foregroundTail;await this.running;
     for(const r of this.readers.values()){clearTimeout(r.timer);await r.opening.then(c=>c.close(),()=>{});}this.readers.clear();
-    for(const l of this.leases.values())clearTimeout(l.timer);this.leases.clear();for(const e of this.entries.values())await e.client?.close();this.entries.clear();}
+    for(const l of this.leases.values())clearTimeout(l.timer);this.leases.clear();for(const e of this.entries.values()){e.retrievalController?.abort();await e.retrieval?.close();await e.client?.close();}this.entries.clear();}
   router(){
     const router=Router();router.use(json({limit:'32kb'}));
     this.savedScopes??=new SqliteSavedScopes(this);router.use('/facts',this.savedScopes.router());
     for(const [name,action]of Object.entries({
       'semantic-open':(b:any,_s?:AbortSignal)=>this.openSemantics(b.vault,b.policy),
+      cache:(b:any,s?:AbortSignal)=>{if(b.request?.op!=='get'&&String(b.request?.key).startsWith('authority-'))throw Error('Authority cache entries are service-owned');return this.cache(b,s);},
+      authority:(b:any)=>{if(!featureFlags.authorityCache)throw Error('Authority cache disabled');return this.authority(b.vault??'.',b.url,b.refresh===true);},
       cardex:(b:any,s?:AbortSignal)=>this.cardex(b,s),
       propositions:(b:any,s?:AbortSignal)=>this.propositions(b,s),
       semantics:(b:any,s?:AbortSignal)=>this.semantics(b,s),

@@ -1,0 +1,331 @@
+{
+  "runtime": "v22.12.0",
+  "sqliteVec": "0.1.9",
+  "dimensions": 1536,
+  "results": [
+    {
+      "chunk": 32,
+      "page": 4096,
+      "count": 0,
+      "bytes": 32768,
+      "rawVectorBytes": 0,
+      "queryP50": null,
+      "insertAndTenQueryMs": 0.23199999999999932
+    },
+    {
+      "chunk": 32,
+      "page": 4096,
+      "count": 1,
+      "bytes": 229376,
+      "rawVectorBytes": 6144,
+      "queryP50": 0.06545800000000668,
+      "insertAndTenQueryMs": 3.168042
+    },
+    {
+      "chunk": 32,
+      "page": 4096,
+      "count": 34,
+      "bytes": 425984,
+      "rawVectorBytes": 208896,
+      "queryP50": 0.21716599999999175,
+      "insertAndTenQueryMs": 8.014042000000003
+    },
+    {
+      "chunk": 32,
+      "page": 4096,
+      "count": 128,
+      "bytes": 819200,
+      "rawVectorBytes": 786432,
+      "queryP50": 0.4837920000000082,
+      "insertAndTenQueryMs": 8.50375000000001
+    },
+    {
+      "chunk": 32,
+      "page": 4096,
+      "count": 1024,
+      "bytes": 6365184,
+      "rawVectorBytes": 6291456,
+      "queryP50": 3.496667000000002,
+      "insertAndTenQueryMs": 55.00916699999999
+    },
+    {
+      "chunk": 32,
+      "page": 4096,
+      "count": 10000,
+      "bytes": 61952000,
+      "rawVectorBytes": 61440000,
+      "queryP50": 34.60091700000004,
+      "insertAndTenQueryMs": 530.712667
+    },
+    {
+      "chunk": 32,
+      "page": 8192,
+      "count": 0,
+      "bytes": 65536,
+      "rawVectorBytes": 0,
+      "queryP50": null,
+      "insertAndTenQueryMs": 0.35808299999996507
+    },
+    {
+      "chunk": 32,
+      "page": 8192,
+      "count": 1,
+      "bytes": 262144,
+      "rawVectorBytes": 6144,
+      "queryP50": 0.20858399999997346,
+      "insertAndTenQueryMs": 7.592416999999955
+    },
+    {
+      "chunk": 32,
+      "page": 8192,
+      "count": 34,
+      "bytes": 458752,
+      "rawVectorBytes": 208896,
+      "queryP50": 0.2286669999999731,
+      "insertAndTenQueryMs": 4.978666999999973
+    },
+    {
+      "chunk": 32,
+      "page": 8192,
+      "count": 128,
+      "bytes": 851968,
+      "rawVectorBytes": 786432,
+      "queryP50": 0.44937500000003183,
+      "insertAndTenQueryMs": 11.226999999999975
+    },
+    {
+      "chunk": 32,
+      "page": 8192,
+      "count": 1024,
+      "bytes": 6422528,
+      "rawVectorBytes": 6291456,
+      "queryP50": 3.810333000000014,
+      "insertAndTenQueryMs": 70.30341699999997
+    },
+    {
+      "chunk": 32,
+      "page": 8192,
+      "count": 10000,
+      "bytes": 62152704,
+      "rawVectorBytes": 61440000,
+      "queryP50": 28.50025000000005,
+      "insertAndTenQueryMs": 464.71066700000006
+    },
+    {
+      "chunk": 128,
+      "page": 4096,
+      "count": 0,
+      "bytes": 32768,
+      "rawVectorBytes": 0,
+      "queryP50": null,
+      "insertAndTenQueryMs": 0.05466599999999744
+    },
+    {
+      "chunk": 128,
+      "page": 4096,
+      "count": 1,
+      "bytes": 819200,
+      "rawVectorBytes": 6144,
+      "queryP50": 0.128832999999986,
+      "insertAndTenQueryMs": 3.1337079999998423
+    },
+    {
+      "chunk": 128,
+      "page": 4096,
+      "count": 34,
+      "bytes": 819200,
+      "rawVectorBytes": 208896,
+      "queryP50": 0.5197080000000369,
+      "insertAndTenQueryMs": 6.637792000000218
+    },
+    {
+      "chunk": 128,
+      "page": 4096,
+      "count": 128,
+      "bytes": 819200,
+      "rawVectorBytes": 786432,
+      "queryP50": 0.3269169999998667,
+      "insertAndTenQueryMs": 6.821333999999979
+    },
+    {
+      "chunk": 128,
+      "page": 4096,
+      "count": 1024,
+      "bytes": 6356992,
+      "rawVectorBytes": 6291456,
+      "queryP50": 2.9931249999999636,
+      "insertAndTenQueryMs": 66.68487500000015
+    },
+    {
+      "chunk": 128,
+      "page": 4096,
+      "count": 10000,
+      "bytes": 62459904,
+      "rawVectorBytes": 61440000,
+      "queryP50": 30.666791999999987,
+      "insertAndTenQueryMs": 537.0958330000001
+    },
+    {
+      "chunk": 128,
+      "page": 8192,
+      "count": 0,
+      "bytes": 65536,
+      "rawVectorBytes": 0,
+      "queryP50": null,
+      "insertAndTenQueryMs": 0.06083400000011352
+    },
+    {
+      "chunk": 128,
+      "page": 8192,
+      "count": 1,
+      "bytes": 851968,
+      "rawVectorBytes": 6144,
+      "queryP50": 0.08929200000011406,
+      "insertAndTenQueryMs": 2.5354580000000624
+    },
+    {
+      "chunk": 128,
+      "page": 8192,
+      "count": 34,
+      "bytes": 851968,
+      "rawVectorBytes": 208896,
+      "queryP50": 0.14045800000008057,
+      "insertAndTenQueryMs": 2.4058330000000296
+    },
+    {
+      "chunk": 128,
+      "page": 8192,
+      "count": 128,
+      "bytes": 851968,
+      "rawVectorBytes": 786432,
+      "queryP50": 0.3447080000000824,
+      "insertAndTenQueryMs": 5.945124999999962
+    },
+    {
+      "chunk": 128,
+      "page": 8192,
+      "count": 1024,
+      "bytes": 6389760,
+      "rawVectorBytes": 6291456,
+      "queryP50": 2.5080829999999423,
+      "insertAndTenQueryMs": 39.25725000000011
+    },
+    {
+      "chunk": 128,
+      "page": 8192,
+      "count": 10000,
+      "bytes": 62496768,
+      "rawVectorBytes": 61440000,
+      "queryP50": 26.566749999999956,
+      "insertAndTenQueryMs": 441.4938750000001
+    },
+    {
+      "chunk": 1024,
+      "page": 4096,
+      "count": 0,
+      "bytes": 32768,
+      "rawVectorBytes": 0,
+      "queryP50": null,
+      "insertAndTenQueryMs": 0.04716599999983373
+    },
+    {
+      "chunk": 1024,
+      "page": 4096,
+      "count": 1,
+      "bytes": 6336512,
+      "rawVectorBytes": 6144,
+      "queryP50": 2.6352090000000317,
+      "insertAndTenQueryMs": 49.5732909999997
+    },
+    {
+      "chunk": 1024,
+      "page": 4096,
+      "count": 34,
+      "bytes": 6336512,
+      "rawVectorBytes": 208896,
+      "queryP50": 2.0996249999998327,
+      "insertAndTenQueryMs": 22.12183300000015
+    },
+    {
+      "chunk": 1024,
+      "page": 4096,
+      "count": 128,
+      "bytes": 6336512,
+      "rawVectorBytes": 786432,
+      "queryP50": 2.2110830000001442,
+      "insertAndTenQueryMs": 28.017166999999972
+    },
+    {
+      "chunk": 1024,
+      "page": 4096,
+      "count": 1024,
+      "bytes": 6348800,
+      "rawVectorBytes": 6291456,
+      "queryP50": 4.511667000000216,
+      "insertAndTenQueryMs": 100.67029100000036
+    },
+    {
+      "chunk": 1024,
+      "page": 4096,
+      "count": 10000,
+      "bytes": 63250432,
+      "rawVectorBytes": 61440000,
+      "queryP50": 35.98087499999974,
+      "insertAndTenQueryMs": 797.2549589999999
+    },
+    {
+      "chunk": 1024,
+      "page": 8192,
+      "count": 0,
+      "bytes": 65536,
+      "rawVectorBytes": 0,
+      "queryP50": null,
+      "insertAndTenQueryMs": 0.07779200000004494
+    },
+    {
+      "chunk": 1024,
+      "page": 8192,
+      "count": 1,
+      "bytes": 6365184,
+      "rawVectorBytes": 6144,
+      "queryP50": 2.040625000000091,
+      "insertAndTenQueryMs": 46.87779199999977
+    },
+    {
+      "chunk": 1024,
+      "page": 8192,
+      "count": 34,
+      "bytes": 6365184,
+      "rawVectorBytes": 208896,
+      "queryP50": 1.739415999999892,
+      "insertAndTenQueryMs": 19.74870800000008
+    },
+    {
+      "chunk": 1024,
+      "page": 8192,
+      "count": 128,
+      "bytes": 6365184,
+      "rawVectorBytes": 786432,
+      "queryP50": 1.9234999999998763,
+      "insertAndTenQueryMs": 23.062417000000096
+    },
+    {
+      "chunk": 1024,
+      "page": 8192,
+      "count": 1024,
+      "bytes": 6381568,
+      "rawVectorBytes": 6291456,
+      "queryP50": 3.182499999999891,
+      "insertAndTenQueryMs": 68.94295899999997
+    },
+    {
+      "chunk": 1024,
+      "page": 8192,
+      "count": 10000,
+      "bytes": 63250432,
+      "rawVectorBytes": 61440000,
+      "queryP50": 31.319542000000183,
+      "insertAndTenQueryMs": 592.9237500000004
+    }
+  ]
+}

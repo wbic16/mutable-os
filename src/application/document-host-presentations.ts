@@ -52,20 +52,36 @@ export class DocumentHostPresentations {
     }
     host.scrollTop=b.top;host.scrollLeft=b.left;
     if(b.anchor){
+      if (!this.editor.mounts.get(b.anchor.key)) {
+        const anchor = b.anchor, ticket = session.host.ticket();
+        void this.editor.focus.ensureRendered(anchor.key, () => session.current() && ticket() && b.anchor === anchor).then(found => {
+          if (found && session.current() && ticket() && b.anchor === anchor) this.restorePosition(session, focus);
+        });
+        return;
+      }
       const point=this.editor.mounts.get(b.anchor.key)?.inlineBoundary?.(b.anchor.index);
       if(point?.node.isConnected){try{const range=host.ownerDocument.createRange();range.setStart(point.node,point.offset);range.collapse(true);const r=range.getBoundingClientRect();if(r.height)host.scrollTop+=r.top-host.getBoundingClientRect().top-b.anchor.delta;}catch{/* Edited/removed anchor: retain bounded pixel fallback. */}}
     }
-    if(focus&&b.key){const mount=this.editor.mounts.get(b.key);if(mount?.root.isConnected){this.editor.focus.request(b.key,{reason:'document-presentation',caret:b.native});if(b.inline)mount.restoreInlineSelection?.(b.inline);}}
+    if(focus&&b.key){
+      const key = b.key, ticket = session.host.ticket();
+      const restore = () => { const mount = this.editor.mounts.get(key); if (mount?.root.isConnected && session.current() && ticket()) { this.editor.focus.request(key,{reason:'document-presentation',caret:b.native}); if(b.inline)mount.restoreInlineSelection?.(b.inline); } };
+      if (this.editor.mounts.get(key)) restore();
+      else void this.editor.focus.ensureRendered(key, () => session.current() && ticket()).then(restore);
+    }
   }
-  check(session:RetainedDocumentSession) {
+  /** In-place work shares interaction guards, but does not transfer the saved resource's host. */
+  checkInteraction(session:RetainedDocumentSession) {
     const source=session.host.port;
     if(!source||!session.current()||!this.editor.windowManager?.lifecycle.canTransfer(source.windowId)||this.editor.selectionGestures.owner())throw Error('Finish composition, gestures or the pending window operation first');
-    const root=session.projection.node(session.rootKey),id=(root?.payload.metadata as {documentId?:string}|undefined)?.documentId??root?.payload.id;
-    if(typeof id==='string'&&existingNativeDocumentSession(this.editor)?.knowledgeEvidence(id).pending)throw Error('Finish the Document Save or recovery before switching presentation');
     if(this.editor.interchange.busy()||this.editor.interchange.picker()||this.editor.interchange.question())throw Error('Finish the current import/export or resource picker before switching presentation');
     if(this.editor.viewCloseGuards.has(source.slotKey))throw Error('Finish the Document close operation first');
     const key=this.editor.focus.state.focusedKey??this.editor.focus.state.lastFocusedKey;
     if(key&&session.projection.node(key)&&this.editor.currentTextOperation.active()?.owns(key))throw Error('Finish the current text operation first');
+  }
+  check(session:RetainedDocumentSession) {
+    this.checkInteraction(session);
+    const root=session.projection.node(session.rootKey),id=(root?.payload.metadata as {documentId?:string}|undefined)?.documentId??root?.payload.id;
+    if(typeof id==='string'&&existingNativeDocumentSession(this.editor)?.knowledgeEvidence(id).pending)throw Error('Finish the Document Save or recovery before switching presentation');
   }
   present(session:RetainedDocumentSession,port:Pick<DocumentHostPort,'container'|'scrollport'|'activity'|'surfaceContainer'>) {
     const source=session.host.port;

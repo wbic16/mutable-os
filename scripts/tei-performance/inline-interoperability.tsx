@@ -1,0 +1,61 @@
+import { render } from 'solid-js/web';
+import { ReactiveEditor } from '../../src/reactive-editor/editor';
+import { registerApplicationViews } from '../../src/application/features';
+import { ReactiveTreeView } from '../../src/rendering/reactive-tree-view';
+import { materializeLocalWorkspace } from '../../src/reactive-editor/workspace-manifest';
+import { documentApplicationPorts } from '../../src/application/document-application-ports';
+import { nativeDocumentSession } from '../../src/persistence/native-session';
+import { convertTei } from '../../src/interchange/tei/convert';
+import { encodeTeiNative } from '../../src/interchange/tei/compact-native';
+import { admitNative,captureNative,nativeText,decodeNative } from '../../src/persistence/native-resource';
+import { serializeSelection } from '../../src/interchange/serializer';
+import { materializeFragment } from '../../src/interchange/materialize';
+import { contentLength } from '../../src/block-tree/inline-sequence';
+import { indexedResourceLookup } from '../../src/block-tree/resource-identity';
+import { alternativeSlots } from '../../src/block-tree/inline-alternative';
+import { showInlineReading } from '../../src/runtime/inline-alternatives';
+const frame=()=>new Promise<void>(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>r())));
+let cleanup=()=>{};
+(window as any).inlineInteropSetup=async(extra=0)=>{
+ cleanup();
+ const editor=new ReactiveEditor(materializeLocalWorkspace({id:'interop-workspace',type:'workspace-block',children:[]}),{features:{nativeKnowledge:false,sqliteKnowledge:false,managedAssetClipboard:false,automaticClipboardImages:false}});
+ registerApplicationViews(editor);const workspace=editor.createView('interop-workspace');editor.commandRegistry.execute('flint.open',{targetKey:workspace.state.rootKey,args:undefined});
+ const host=document.body.appendChild(document.createElement('div'));host.style.cssText='position:fixed;inset:0';host.className='workspace-demo workspace-demo--canonical';host.dataset.windowWorkArea='';
+ const stop=render(()=><ReactiveTreeView editor={editor} projection={workspace}/>,host);const gateway=editor.installGateway(document);await frame();
+ const app=documentApplicationPorts(editor).ports()[0].application,bank=Object.values(editor.repository.readState().contents).find(c=>c.viewType==='workspace-object-bank-block')!;
+ const existingCells=new Set(Object.values(editor.repository.readState().contents).filter(c=>c.viewType==='text-cell').map(c=>c.key));
+ const admit=(body:string)=>{const d=convertTei('<TEI><text><body>'+body+'</body></text></TEI>').document;admitNative(editor.repository,encodeTeiNative(d).bytes,bank.key);return d.id!;};
+ const source=admit('<p xml:id="source">A<choice><orig><hi rend="italic">first</hi></orig><reg>second</reg></choice>B<app><lem>nested <choice><sic>x</sic><corr>y</corr></choice></lem><rdg/></app>C</p><p xml:id="join">J<choice><orig>left</orig><reg>right</reg></choice>K</p>'+Array.from({length:extra},(_,i)=>`<p xml:id="extra-${i}">Unrelated ${i}</p>`).join(''));
+ const destination=admit('<p xml:id="destination">target</p><p xml:id="unrelated">Untouched paragraph</p>');
+ const native=nativeDocumentSession(editor);let saves=0,saved='';
+ for(const id of [source,destination]){const r=captureNative(editor.repository.readState(),id),b=(native as any).bind(id,{folder:'qualification',filename:id+'.mutable.json'},{nativeHash:'baseline',markdownHash:null,generation:null},Object.keys(r.contents));b.pair.acknowledgeOpen(nativeText(r));b.pair.adapter.save=async(g:any)=>{if(g.markdown!==undefined)throw Error('Unexpected sidecar');saved=g.native;saves++;return{phase:'saved',generation:g.generation};};}
+ const destinationRoot=Object.values(editor.repository.readState().contents).find(c=>c.payload.id===destination)!,destinationEdge=Object.values(editor.repository.readState().placements).find(p=>p.contentKey===destinationRoot.key)!;
+ const independent=editor.createView('interop-independent',destinationEdge.key),independentHost=host.appendChild(document.createElement('div'));independentHost.style.cssText='position:absolute;left:1600px;width:400px';const stopIndependent=render(()=><ReactiveTreeView editor={editor} projection={independent}/>,independentHost);
+ const open=async(id:string)=>{app.openDocument(id);await frame();};await open(destination);await open(source);
+ const cached=new Map<string,any>();
+ const docView=(id:string)=>[...editor.projections.values()].find(p=>p!==independent&&p.state.nodes[p.state.rootKey]?.payload.id===id)??(id===destination?independent:undefined);
+ const node=(name:string,id=source)=>{const view=docView(id),n=view&&Object.values(view.state.nodes).find(n=>(n.payload.metadata as any)?.sourceId===name);if(n)cached.set(id+name,n);return n??cached.get(id+name);};node('source');
+ const select=(name:string,start:number,end=start,id=source)=>{const n=node(name,id),m=editor.mounts.get(n.key)!;m.focus();m.restoreInlineSelection!({anchor:start,head:end});editor.selections.setPrimary(n.key,n.contentKey,n.viewId,start,end);return n;};
+ const save=(id=source)=>nativeText(captureNative(editor.repository.readState(),id));
+ let snapshots=0,commits=0,unrelatedMutations=0,unrelatedBuilds=0;const timings:any[]=[];
+ const snap=editor.repository.snapshot.bind(editor.repository);editor.repository.snapshot=()=>{snapshots++;return snap();};
+ const commit=editor.repository.commit.bind(editor.repository);editor.repository.commit=(label,ops,history,metadata)=>{const timing:Record<string,number>={};const t=performance.now();commit(label,ops,history,metadata,timing);timings.push({label,operations:ops.length,totalMs:performance.now()-t,...timing});commits++;};
+ const destinationView=independent,build=(destinationView as any).build.bind(destinationView);(destinationView as any).build=()=>{unrelatedBuilds++;return build();};
+ const untouched=Object.values(independent.state.nodes).find(n=>(n.payload.metadata as any)?.sourceId==='unrelated')!,observer=new MutationObserver(records=>unrelatedMutations+=records.length);observer.observe(editor.mounts.get(untouched.key)!.root,{subtree:true,childList:true,attributes:true,characterData:true});
+ const state=()=>({snapshots,commits,saves,unrelatedMutations:unrelatedMutations+=observer.takeRecords().length,unrelatedBuilds,dirty:[native.isDirty(source),native.isDirty(destination)],message:editor.clipboard.message(),sourceSlots:alternativeSlots(editor.repository.readState().contents[node('source').contentKey]).length,destinationSlots:alternativeSlots(editor.repository.readState().contents[node('destination',destination).contentKey]).length,canonicalCells:Object.values(editor.repository.readState().contents).filter(c=>c.viewType==='text-cell'&&!existingCells.has(c.key)).length});
+ const reset=()=>{snapshots=commits=unrelatedMutations=unrelatedBuilds=0;timings.length=0;observer.takeRecords();};
+ const manualSave=async()=>{await native.save(destination);return{equal:nativeText(decodeNative(new TextEncoder().encode(saved),undefined,true))===saved,saves,dirty:native.isDirty(destination)};};
+ const choose=()=>{const n=node('source'),slot=alternativeSlots(editor.repository.readState().contents[n.contentKey])[0];showInlineReading(editor,n,slot.properties,n.ownedRelations[slot.properties.readings[1]]);};
+ const profile=async()=>{
+  const samples:any[]=[];await open(source);
+  const measured=(name:string,action:()=>void)=>{reset();const start=performance.now();action();const ms=performance.now()-start;const undoStart=performance.now();editor.repository.undo();const undoMs=performance.now()-undoStart,redoStart=performance.now();editor.repository.redo();const redoMs=performance.now()-redoStart;const work=state();samples.push({name,ms,undoMs,redoMs,work,timings:[...timings]});editor.repository.undo();};
+  for(const [name,end]of [['one-slot',2],['several-nested',5]] as const){const n=node('source');const start=performance.now(),f=serializeSelection(editor.repository.readState(),[{placementKey:n.placementKey,start:0,end}],{resourceId:source},false,undefined,undefined,indexedResourceLookup(editor.repository)),serializationMs=performance.now()-start;const target=node('join');measured(name,()=>editor.commands.insertMutableText([{segments:[{placementKey:target.placementKey,start:1,end:1}],fragment:materializeFragment(f),slices:f.roots}]));samples.at(-1).serializationMs=serializationMs;samples.at(-1).fragmentBlocks=f.blocks.length;samples.at(-1).nativeBytes=JSON.stringify(f).length;
+   if(end===5){const target=node('destination',destination);measured('cross-document',()=>editor.commands.insertMutableText([{segments:[{placementKey:target.placementKey,start:0,end:0}],fragment:materializeFragment(f),slices:f.roots}]));}
+  }
+  measured('adjacent-join',()=>editor.commands.joinStandoff(node('source').key,node('join').key));
+  measured('cross-paragraph-replacement',()=>editor.commands.replaceAcrossBlocks([{placementKey:node('source').placementKey,start:1,end:5},{placementKey:node('join').placementKey,start:0,end:1}],'replacement'));
+  await frame();return{samples,retainedHeap:(performance as any).memory?.usedJSHeapSize,extra};
+ };
+ cleanup=()=>{observer.disconnect();gateway();stopIndependent();stop();editor.dispose();host.remove();};
+ (window as any).interop={editor,source,destination,open,node,select,choose,state,save,manualSave,frame,reset,profile,timings,cleanup};return state();
+};

@@ -1,0 +1,46 @@
+{
+  "typing": {
+    "observedMs": 43.59999996423721,
+    "snapshots": 0,
+    "rebuilds": 0
+  },
+  "submit": {
+    "observedMs": 66.40000003576279,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "mountRetained": true
+  },
+  "save": {
+    "nativeRequest": true,
+    "filename": "conversation.ink"
+  },
+  "roundTrip": {
+    "contributions": 3,
+    "ordinals": [
+      3,
+      1,
+      2
+    ],
+    "sameIds": true
+  },
+  "textualEditing": {
+    "selectionRetained": true,
+    "compositionCommitted": true,
+    "undo": true
+  },
+  "presentation": {
+    "sameSession": true,
+    "sameMount": true,
+    "restored": true,
+    "creates": 0,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "contextRetained": true
+  },
+  "reopened": {
+    "count": 3,
+    "text": true,
+    "replyPreserved": true
+  },
+  "result": "passed"
+}

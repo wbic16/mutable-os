@@ -126,7 +126,7 @@ export function FlintHost(props:{covered:boolean;openCardex():void;port:Document
     <Show when={port.prompt()} keyed>{prompt=><TextualSavePrompt prompt={prompt} grid={props.grid}/>}</Show>
   </div>;
 }
-function TextualSavePrompt(props:{prompt:SavePrompt;grid:TextualGrid}) {
+export function TextualSavePrompt(props:{prompt:SavePrompt;grid:TextualGrid}) {
   const prompt=props.prompt;
   const [folder,setFolder]=createSignal(prompt.kind==='destination'?prompt.root:''),[name,setName]=createSignal(prompt.kind==='destination'?prompt.filename:prompt.suggested),[error,setError]=createSignal('');
   let root!:HTMLDivElement;

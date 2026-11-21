@@ -1,3 +1,4 @@
+import {passiveNativeTypes} from '../runtime/passive-presentation';
 import { registerTabOrientationCommands } from '../runtime/tab-orientation';
 import { registerTableCommands } from '../runtime/table-commands';
 import { ReversibleSurfaceView, ResourceInformationView } from './reversible-surface';
@@ -49,7 +50,7 @@ import { StickyNoteBlockView } from "./sticky-note";
 import { registerTextSuperpositionCommands } from "../runtime/text-superposition";
 
 function many(editor: ReactiveEditor, types: string[], view: any, capabilities: string[]) {
-  for (const type of types) editor.registry.register({ type, view, capabilities });
+  for (const type of types) editor.registry.register({ type, view, capabilities: passiveNativeTypes.has(type)?[...capabilities,'native-passive']:capabilities });
 }
 
 export function registerCoreViews(editor: ReactiveEditor, documentView = ContainerBlockView): void {
@@ -72,10 +73,10 @@ export function registerCoreViews(editor: ReactiveEditor, documentView = Contain
   editor.registry.register({ type: "document-block", aliases: ["main-list-block", "membrane-block"], view: documentView, capabilities: ["container", "selectable"] });
   if (editor.features.documentInterchange) many(editor, [...sourceTypes], SourceBlockView, ["native-text", "container", "selectable"]);
   editor.registry.register({ type: "plain-text-block", view: PlainTextBlockView, capabilities: ["native-text", "container", "selectable"] });
-  editor.registry.register({ type: "standoff-editor-block", view: StandoffEditorView, capabilities: ["inline-editor", "container", "selectable", "annotations"] });
+  editor.registry.register({ type: "standoff-editor-block", view: StandoffEditorView, capabilities: ["native-passive", "inline-editor", "container", "selectable", "annotations"] });
   editor.registry.register({ type: 'standoff-code-block', view: StandoffCodeView, capabilities: ['container', 'selectable'] });
-  editor.registry.register({ type: 'horizontal-line-block', view: HorizontalLineView, capabilities: ['container', 'selectable'] });
-  editor.registry.register({ type: "checkbox-block", view: CheckboxView, capabilities: ["control", "container", "selectable"] });
+  editor.registry.register({ type: 'horizontal-line-block', view: HorizontalLineView, capabilities: ["native-passive", 'container', 'selectable'] });
+  editor.registry.register({ type: "checkbox-block", view: CheckboxView, capabilities: ["native-passive", "control", "container", "selectable"] });
   editor.registry.register({ type: "sticky-note-block", view: StickyNoteBlockView, capabilities: ["container", "selectable"] });
   editor.registry.register({ type: "code-mirror-block", view: CodeBlockView, capabilities: ["native-text", "container", "opaque-widget"] });
   editor.registry.register({ type: "cyclic-reference", view: UnknownBlockView, capabilities: ["reference-placeholder"] });

@@ -1,5 +1,7 @@
+import type {SemanticAuthoringDescriptor} from '../runtime/visual-effect-registry';
 import type { EffectDefinition } from "../runtime/effect-contributions";
 import type { JSX } from "solid-js";
+import {safeColor,safeUrl} from '../interchange/inline-values.mjs';
 
 export type StandoffAnnotation = Record<string, unknown> & {
   id?: string;
@@ -12,6 +14,9 @@ export type StandoffAnnotation = Record<string, unknown> & {
 
 type SvgStyle = { kind: "contribution"; definition: EffectDefinition } | { kind: "underline"; colour: string } | { kind: "rainbow" | "highlighter" | "rectangle" | "spiky" };
 export interface StandoffStyleSchema {
+  /** Curated authoring projection; independent of renderer availability. */
+  authoring?: {group:'core-formatting';stage?:'text';purpose:string;parameters:Record<string,unknown>;prepare(attributes:Record<string,unknown>,targetType:string):{value?:string}};
+  semantic?:SemanticAuthoringDescriptor;
   cell?: JSX.CSSProperties;
   valueStyle?: "color" | "background-color";
   svg?: SvgStyle;
@@ -22,10 +27,34 @@ export interface StandoffStyleSchema {
   deferred?: "range-wrapper" | "animation-plugin" | "embedded-document";
 }
 
-/** Current TS schemas; appearance only. Reference values are IDs, not colours. */
+const plainFormatting=(purpose:string):NonNullable<StandoffStyleSchema['authoring']>=>({
+ group:'core-formatting',stage:'text',purpose,parameters:{},
+ prepare(attributes,targetType){if(targetType!=='standoff-editor-block'||Object.keys(attributes).length)throw Error('Formatting requires a TextBlock and no attributes');return {};},
+});
+const backgroundFormatting:NonNullable<StandoffStyleSchema['authoring']>={
+ group:'core-formatting',stage:'text',purpose:'Highlight a passage with a specified background colour.',parameters:{value:{type:'string',minLength:1,maxLength:128,description:'Native safeColor CSS colour, with no inherited/reset values.'}},
+ prepare(attributes,targetType){if(targetType!=='standoff-editor-block'||Object.keys(attributes).length!==1||typeof attributes.value!=='string'||attributes.value.length>128||!safeColor(attributes.value))throw Error('Invalid native background colour or target');return {value:attributes.value};},
+};
+const hyperlinkFormatting:NonNullable<StandoffStyleSchema['authoring']>={
+ group:'core-formatting',stage:'text',purpose:'Attach a validated external hyperlink to a passage.',parameters:{value:{type:'string',minLength:1,maxLength:4096,description:'Valid HTTP(S) or mailto URL; no control characters or executable scheme.'}},
+ prepare(attributes,targetType){
+  if(targetType!=='standoff-editor-block'||Object.keys(attributes).length!==1||typeof attributes.value!=='string'||attributes.value.length>4096||!safeUrl(attributes.value))throw Error('Invalid native hyperlink or target');
+  const url=new URL(attributes.value);if(url.username||url.password||!['http:','https:','mailto:'].includes(url.protocol))throw Error('Invalid hyperlink scheme');
+  return {value:attributes.value};
+ },
+};
+
+/** Current TS style registrations; optional authoring descriptors. Reference values are IDs, not colours. */
 export const standoffStyleSchemas: Readonly<Record<string, StandoffStyleSchema>> = {
-  "text/background-colour": { valueStyle: "background-color" },
-  "text/colour": { valueStyle: "color" },
+  "text/background-colour": { valueStyle: "background-color", authoring:backgroundFormatting },
+  "text/colour": { valueStyle: "color", authoring:{
+    group:'core-formatting',purpose:'Give a selected passage an explicit text colour.',
+    parameters:{value:{type:'string',minLength:1,maxLength:128,description:'Native safeColor: CSS colour name, hex, rgb(a) or hsl(a); no inherited/reset values.'}},
+    prepare(attributes,targetType){
+      if(targetType!=='standoff-editor-block'||Object.keys(attributes).length!==1||typeof attributes.value!=='string'||attributes.value.length>128||!safeColor(attributes.value))throw Error('Invalid native text colour or target');
+      return {value:attributes.value};
+    },
+  } },
   "cell/micro-document": { deferred: "embedded-document" },
   "animation/clock": { deferred: "animation-plugin" },
   "style/blur": { regionEffect: true },
@@ -43,16 +72,16 @@ export const standoffStyleSchemas: Readonly<Record<string, StandoffStyleSchema>>
   "amber-crt": { cellEffect: true, noiseEffect: true },
   "style/flip": { deferred: "range-wrapper" },
   "style/mirror": { deferred: "range-wrapper" },
-  "style/superscript": { cell: { "vertical-align": "super", "font-size": "0.8rem" } },
-  "style/subscript": { cell: { "vertical-align": "sub", "font-size": "0.8rem" } },
+  "style/superscript": { authoring:plainFormatting("Raise text for an exponent or superscript notation."), cell: { "vertical-align": "super", "font-size": "0.8rem" } },
+  "style/subscript": { authoring:plainFormatting("Lower text for a subscript notation."), cell: { "vertical-align": "sub", "font-size": "0.8rem" } },
   "style/uppercase": { cell: { "text-transform": "uppercase" } },
-  "style/italics": { cell: { "font-style": "italic" } },
-  "style/strikethrough": { cell: { "text-decoration-line": "line-through" } },
-  "style/highlight": { cell: { "background-color": "pink" } },
+  "style/italics": { semantic: {purpose: "italics text styling", attributes: [], ai: "authorable", rendering: "native text styling", validation: "nonempty Cell range"}, cell: { "font-style": "italic" } },
+  "style/strikethrough": { authoring:plainFormatting("Mark text with a line through it."), cell: { "text-decoration-line": "line-through" } },
+  "style/highlight": { authoring:plainFormatting("Highlight a passage with the native fixed highlight."), cell: { "background-color": "pink" } },
   "style/show-hide": { projection: "show-hide" },
-  "style/bold": { cell: { "font-weight": "600" } },
-  "style/underline": { cell: { "text-decoration-line": "underline" } },
-  "reference/url": { cell: { "text-decoration-line": "underline", "text-decoration-color": "blue" } },
+  "style/bold": { semantic: {purpose: "bold text styling", attributes: [], ai: "authorable", rendering: "native text styling", validation: "nonempty Cell range"}, cell: { "font-weight": "600" } },
+  "style/underline": { semantic: {purpose: "underline text styling", attributes: [], ai: "authorable", rendering: "native text styling", validation: "nonempty Cell range"}, cell: { "text-decoration-line": "underline" } },
+  "reference/url": { authoring:hyperlinkFormatting, cell: { "text-decoration-line": "underline", "text-decoration-color": "blue" } },
   "codex/search/highlight": { cell: { "background-color": "pink" } },
   "codex/block-reference": { svg: { kind: "underline", colour: "green" } },
   "codex/trait-reference": { svg: { kind: "underline", colour: "blue" } },

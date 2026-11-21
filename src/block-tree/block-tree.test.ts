@@ -427,7 +427,7 @@ describe("tree commands", () => {
     expect((legacy.dto.children as any[])[0].text).toBe("A[diagram]B");
     expect(legacy.losses).toHaveLength(1);
     const extended = decodeExtendedRepository(encodeExtendedRepository(repository.snapshot()));
-    expect(extended.contents[extended.placements[imagePlacement].contentKey].viewType).toBe("image-cell");
+    expect(extended.contents[extended.placements[imagePlacement as string].contentKey].viewType).toBe("image-cell");
     commands.moveInline(standoff.key, 1, 2);
     repository.undo();
     const restoredHost = repository.state.contents[repository.state.placements[standoff.placementKey].contentKey];

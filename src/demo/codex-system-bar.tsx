@@ -1,3 +1,6 @@
+import {featureFlags} from '../configuration';
+import {useCurrentCavern} from '../application/cavern-startup';
+import {RetrievalControls} from '../application/retrieval-controls';
 import type { WorkspaceWindowManager } from "../application/window-manager";
 import { WindowList } from "../rendering/window-list";
 import { Show, createSignal, onCleanup, onMount, type JSX } from "solid-js";
@@ -49,6 +52,7 @@ export function formatSystemDateTime(date: Date, locales?: Intl.LocalesArgument)
 
 export function CodexSystemBar(props: { children: JSX.Element; manager?: WorkspaceWindowManager; workspaceLauncher?: (open: (() => void) | undefined) => void }) {
   const [open, setOpen] = createSignal<MenuName>();
+  const cavern=useCurrentCavern();let launchRetrieval:(()=>void)|undefined;
   const [now, setNow] = createSignal(new Date());
   const [battery, setBattery] = createSignal<{ level: number; charging: boolean }>();
   let root!: HTMLElement;
@@ -146,7 +150,8 @@ export function CodexSystemBar(props: { children: JSX.Element; manager?: Workspa
       </div>
     </Show>
     <Show when={open() === "workspace"}>
-      <div class="codex-system-menu codex-system-menu--workspace" data-system-menu="workspace" role="menu" aria-label="Workspace" onKeyDown={menuKeyDown} onClick={menuClick}>{props.children}<Show when={props.manager}>{manager=><WindowList manager={manager()} />}</Show></div>
+      <div class="codex-system-menu codex-system-menu--workspace" data-system-menu="workspace" role="menu" aria-label="Workspace" onKeyDown={menuKeyDown} onClick={menuClick}>{props.children}<Show when={featureFlags.semanticRetrieval&&cavern}><button role="menuitem" onClick={()=>launchRetrieval?.()}>Index Cavern…</button></Show><Show when={props.manager}>{manager=><WindowList manager={manager()} />}</Show></div>
     </Show>
+    <RetrievalControls launcher={open=>{launchRetrieval=open;}}/>
   </nav>;
 }

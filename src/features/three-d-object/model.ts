@@ -46,4 +46,13 @@ export function sizeProperties(properties: unknown, width: number) {
   if (!found) next.push({ type: "block/size", metadata: { width, height: width } });
   return next;
 }
-export const objectDto = () => ({ id: crypto.randomUUID(), type: "3d-object-block", object3D: defaults(), blockProperties: sizeProperties([], 280) });
+export const objectParameters={scene:{type:'string',enum:['coffee-cup']},view:{type:'object',properties:{azimuth:{type:'number',minimum:0,maximum:360},elevation:{type:'number',minimum:10,maximum:70}},required:['azimuth','elevation'],additionalProperties:false},lighting:{type:'string',enum:['neutral','warm','dramatic']},autoRotate:{type:'boolean'},steam:{type:'boolean'},coffeeStain:{type:'boolean'},size:{type:'number',minimum:160,maximum:640}} as const;
+export function objectConfiguration(value:unknown) {
+ const v=value as any;
+ if(!v||typeof v!=='object'||Array.isArray(v)||Object.keys(v).length!==Object.keys(objectParameters).length||Object.keys(v).some(k=>!Object.hasOwn(objectParameters,k))||v.scene!=='coffee-cup'||!v.view||Object.keys(v.view).length!==2||!Number.isFinite(v.view.azimuth)||v.view.azimuth<0||v.view.azimuth>360||!Number.isFinite(v.view.elevation)||v.view.elevation<10||v.view.elevation>70||!['neutral','warm','dramatic'].includes(v.lighting)||['autoRotate','steam','coffeeStain'].some(k=>typeof v[k]!=='boolean')||!Number.isFinite(v.size)||v.size<160||v.size>640)throw Error('Invalid native 3D object configuration');
+ return {state:readObject({version:1,scene:v.scene,view:v.view,lighting:v.lighting,autoRotate:v.autoRotate,settings:{steam:v.steam,coffeeStain:v.coffeeStain}})!,size:v.size as number};
+}
+export function objectDto(configuration:unknown=null) {
+ const prepared=configuration===null?{state:defaults(),size:280}:objectConfiguration(configuration);
+ return {id:crypto.randomUUID(),type:'3d-object-block',object3D:prepared.state,blockProperties:sizeProperties([],prepared.size)};
+}

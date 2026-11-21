@@ -1,0 +1,93 @@
+{
+  "all": [
+    {
+      "mounted": false,
+      "loadEditorMs": 145.5,
+      "contributions": 4,
+      "cells": 2709,
+      "xmlBytes": 1241,
+      "manifestMs": 4.700000047683716,
+      "requestBuildMs": 2.599999964237213,
+      "workspaceMs": 8,
+      "xmlProjectionMs": 1.600000023841858,
+      "historyColdMs": 6.899999976158142,
+      "historyWarmMs": 0.10000002384185791,
+      "xmlLowerMs": 4.099999964237213,
+      "nativePrepareMs": 7.900000035762787,
+      "definitions": 8,
+      "addedAnnotations": 9,
+      "admitMs": 87,
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [],
+      "responseRect": null,
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 0.5999999642372131,
+      "saveCaptureMs": 147.30000001192093,
+      "saveEncodeMs": 45.39999997615814,
+      "saveBytes": 414854,
+      "fullSaveWithInMemoryAdapterMs": 149,
+      "domNodes": 0
+    },
+    {
+      "mounted": true,
+      "loadEditorMs": 153.80000001192093,
+      "mountMs": 2761.800000011921,
+      "contributions": 4,
+      "cells": 2709,
+      "xmlBytes": 1241,
+      "manifestMs": 1.800000011920929,
+      "requestBuildMs": 0.40000003576278687,
+      "workspaceMs": 4.699999988079071,
+      "xmlProjectionMs": 1,
+      "historyColdMs": 1.5999999642372131,
+      "historyWarmMs": 0.10000002384185791,
+      "xmlLowerMs": 0.7999999523162842,
+      "nativePrepareMs": 2.300000011920929,
+      "definitions": 8,
+      "addedAnnotations": 9,
+      "controllerValidateMs": 4.599999964237213,
+      "autosaveMs": 272.5,
+      "controllerExchangeMs": 4236.300000011921,
+      "nextTwoFramesMs": 29.099999964237213,
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [
+        {
+          "ms": 239,
+          "key": "node:2b0da4b3-5adb-4571-8c27-7121b5f6158d"
+        }
+      ],
+      "responseRect": {
+        "x": 306,
+        "y": 369.5,
+        "width": 816,
+        "height": 267.5,
+        "top": 369.5,
+        "right": 1122,
+        "bottom": 637,
+        "left": 306
+      },
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 0.5,
+      "saveCaptureMs": 135.60000002384186,
+      "saveEncodeMs": 27.600000023841858,
+      "saveBytes": 447457,
+      "fullSaveWithInMemoryAdapterMs": 135.19999998807907,
+      "domNodes": 3956
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ]
+}

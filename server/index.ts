@@ -1,3 +1,4 @@
+import { createDialecticBroker } from "./dialectic/broker.js";
 import express, { type Request, type Response } from "express";
 import path from "path";
 import multer, { type FileFilterCallback } from 'multer';
@@ -244,6 +245,9 @@ const sso = createSsoAuth();
 app.use('/api/auth', sso.router);
 app.use(sso.middleware);
 console.log(sso.enabled ? 'SSO: enabled (edit.phext.io)' : 'SSO: disabled (no secrets configured)');
+const cavern = featureFlags.cavernStartup ? createCavernLifecycle() : undefined;
+// Must precede general body parsing, static routes and Cavern routing.
+if (featureFlags.dialecticProviders) app.use("/api/dialectic", createDialecticBroker({currentCavern:()=>cavern?.current(),attachmentsEnabled:featureFlags.dialecticAttachments,artifactsEnabled:featureFlags.dialecticArtifacts,imageGenerationEnabled:featureFlags.dialecticImageGeneration,attachmentContext:session=>cavern?.attachments(session),continuity:featureFlags.dialecticProviderContinuity,testLogging:featureFlags.dcpTestPhaseLogging}).router);
 // 1) Use an absolute path
 const assetsDir = path.resolve(__dirname, 'dist', 'assets');
 
@@ -269,8 +273,6 @@ app.use(express.urlencoded({limit: '50mb'}));
 // native one; with no Cavern lifecycle (standalone mounts, native
 // by definition) uploads are disk, relative to the working folder.
 const phextUploads = await import(pathToFileURL(path.resolve('server/phext-uploads.mjs')).href);
-
-const cavern = featureFlags.cavernStartup ? createCavernLifecycle() : undefined;
 if (cavern) {
   app.use('/api/cavern', cavern.router);
   app.use('/api', cavern.middleware, (_req, res) => { res.status(404).json({ Success: false, Error: 'This service is unavailable in the current Cavern.' }); });

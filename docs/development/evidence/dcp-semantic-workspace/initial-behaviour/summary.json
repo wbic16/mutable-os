@@ -1,0 +1,280 @@
+[
+  {
+    "exchange": 1,
+    "participant": "agent-A",
+    "prompt": "What makes a historical object authentic? I am especially interested in whether original material or continuity of history matters more. Keep your answer concise.",
+    "continuity": false,
+    "started": 1794359924273,
+    "identityMap": {},
+    "annotationRefs": [
+      {
+        "blockId": "346df318-95a9-4b3c-96a0-158110a136d4",
+        "propertyId": "fbf1eba4-e27e-4117-9ca9-58eddbf522b8"
+      },
+      {
+        "blockId": "346df318-95a9-4b3c-96a0-158110a136d4",
+        "propertyId": "d44df0eb-f802-4dd0-a807-f48bfd0fd2da"
+      },
+      {
+        "blockId": "346df318-95a9-4b3c-96a0-158110a136d4",
+        "propertyId": "38d45116-2c29-4b06-a000-c1472fc137aa"
+      },
+      {
+        "blockId": "3fc176c3-097f-4df1-af5d-d83163b9c41f",
+        "propertyId": "ca5cc7ce-c674-4a54-8b1d-93daa166144d"
+      }
+    ],
+    "admitted": true,
+    "elapsedMs": 7222,
+    "repaired": false,
+    "diagnostics": {
+      "visited": 0,
+      "characters": 0,
+      "reads": 0,
+      "searches": 0,
+      "inventories": 0,
+      "inventoryVisited": 0,
+      "inventoryPreviewCells": 0,
+      "entitySearches": 0,
+      "entityCandidates": 0,
+      "workspaceBytes": 514
+    },
+    "workspace": {
+      "version": 1,
+      "scope": "current-document",
+      "resourceId": "11111111-1111-4111-8111-111111111111",
+      "forParticipant": "agent-A",
+      "authority": "current-exchange-only",
+      "coverage": {
+        "status": "partial",
+        "completeRegistry": false,
+        "candidates": 0,
+        "projected": 0,
+        "unavailable": 0,
+        "bytes": 514,
+        "limit": 8192
+      },
+      "entities": [],
+      "arguments": [],
+      "relationships": [],
+      "glosses": [],
+      "classifications": [],
+      "sourceLocations": [],
+      "omissions": [
+        "Selected working set; discover additional identities with search_entities and passages with native source tools."
+      ]
+    },
+    "usage": [
+      {
+        "input_tokens": 15971,
+        "output_tokens": 302,
+        "total_tokens": 16273
+      }
+    ],
+    "entities": [],
+    "glosses": [],
+    "tools": []
+  },
+  {
+    "exchange": 2,
+    "participant": "agent-A",
+    "prompt": "Suppose a museum restores a damaged object using some modern material, but has an excellent record of where it came from. How would you assess that case?",
+    "continuity": false,
+    "started": 1794359931519,
+    "identityMap": {},
+    "annotationRefs": [
+      {
+        "blockId": "752cd52e-b660-4972-b9ed-79260afc1ea4",
+        "propertyId": "4a7fb5d4-937d-4afb-85ad-73bddb11d8da"
+      },
+      {
+        "blockId": "752cd52e-b660-4972-b9ed-79260afc1ea4",
+        "propertyId": "b6ebdbd8-c904-4418-8dea-e30385492106"
+      },
+      {
+        "blockId": "6672f390-d689-4928-963f-bdfc71225ee3",
+        "propertyId": "dd210204-c29e-4fc8-9fe0-9fb7ebca4461"
+      },
+      {
+        "blockId": "6672f390-d689-4928-963f-bdfc71225ee3",
+        "propertyId": "9de219ac-86cf-48c1-b28c-0e3c0baa3fcf"
+      },
+      {
+        "blockId": "6672f390-d689-4928-963f-bdfc71225ee3",
+        "propertyId": "fd359132-18ab-4e9f-8ef6-b143334c0354"
+      },
+      {
+        "blockId": "6672f390-d689-4928-963f-bdfc71225ee3",
+        "propertyId": "6f7a661e-08db-479b-adf2-d51662c52e90"
+      },
+      {
+        "blockId": "782674d3-c277-47e8-9f62-d1c2958889f0",
+        "propertyId": "a7d13173-08d0-4ed7-aee0-4551e3e39d60"
+      },
+      {
+        "blockId": "782674d3-c277-47e8-9f62-d1c2958889f0",
+        "propertyId": "71caac1e-1dcd-4c19-847f-6c783807c396"
+      }
+    ],
+    "admitted": true,
+    "elapsedMs": 11789,
+    "repaired": false,
+    "diagnostics": {
+      "visited": 0,
+      "characters": 0,
+      "reads": 0,
+      "searches": 0,
+      "inventories": 0,
+      "inventoryVisited": 0,
+      "inventoryPreviewCells": 0,
+      "entitySearches": 0,
+      "entityCandidates": 0,
+      "workspaceBytes": 514
+    },
+    "workspace": {
+      "version": 1,
+      "scope": "current-document",
+      "resourceId": "11111111-1111-4111-8111-111111111111",
+      "forParticipant": "agent-A",
+      "authority": "current-exchange-only",
+      "coverage": {
+        "status": "partial",
+        "completeRegistry": false,
+        "candidates": 0,
+        "projected": 0,
+        "unavailable": 0,
+        "bytes": 514,
+        "limit": 8192
+      },
+      "entities": [],
+      "arguments": [],
+      "relationships": [],
+      "glosses": [],
+      "classifications": [],
+      "sourceLocations": [],
+      "omissions": [
+        "Selected working set; discover additional identities with search_entities and passages with native source tools."
+      ]
+    },
+    "usage": [
+      {
+        "input_tokens": 15981,
+        "output_tokens": 611,
+        "total_tokens": 16592
+      }
+    ],
+    "entities": [],
+    "glosses": [],
+    "tools": []
+  },
+  {
+    "exchange": 3,
+    "participant": "agent-B",
+    "prompt": "Could a reconstruction ever preserve something important that the original material no longer does? Relate that to the criteria we have been discussing.",
+    "continuity": false,
+    "started": 1794359943318,
+    "identityMap": {
+      "new:s1": {
+        "kind": "range",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "anchorId": "c4d42d7a-d3de-4707-944a-94b502394d4f"
+      }
+    },
+    "annotationRefs": [
+      {
+        "blockId": "0ac928c2-e84d-4e50-9539-ab004db4d088",
+        "propertyId": "570a8ae3-0ee0-4759-a258-f31374040027"
+      },
+      {
+        "blockId": "0ac928c2-e84d-4e50-9539-ab004db4d088",
+        "propertyId": "6889cdd8-c662-402e-8c64-67d98748f2ee"
+      },
+      {
+        "blockId": "9227f5dd-04b1-4135-87e5-d84b41440c85",
+        "propertyId": "24273232-7fb1-4915-a286-22c79362d222"
+      },
+      {
+        "blockId": "9227f5dd-04b1-4135-87e5-d84b41440c85",
+        "propertyId": "58be6706-6bbb-437c-944d-862f0e3c0129"
+      },
+      {
+        "blockId": "9227f5dd-04b1-4135-87e5-d84b41440c85",
+        "propertyId": "957dbcf2-8739-4a87-bd21-366e3e4320eb"
+      },
+      {
+        "blockId": "2e364a08-ceba-4a43-87cf-e09d3d05d9a6",
+        "propertyId": "584f489f-e7ae-44a7-87e2-a69ccd936be8"
+      },
+      {
+        "blockId": "2ba36737-6ea0-4d0b-ae5b-39690c21119c",
+        "propertyId": "98e3afba-d594-4032-b725-78dcbf0fdfa1"
+      },
+      {
+        "blockId": "00807333-c0dc-4bc3-af67-80daaa2f05af",
+        "propertyId": "73c6442c-212f-4cbc-ada8-500254dfed2f"
+      },
+      {
+        "blockId": "bb88c316-87b3-4f58-ae72-699e581dde6d",
+        "propertyId": "a4f94d71-d428-4f5e-8298-72c4b860743d"
+      },
+      {
+        "blockId": "b33060fb-ad70-4af6-9b02-ce1b8084088f",
+        "propertyId": "4942b59d-8e5c-4b53-bb41-9fe55afdb817"
+      },
+      {
+        "blockId": "1c6630c8-6e01-4168-b572-201cce30caf1",
+        "propertyId": "924794e8-8174-4abe-9bd3-955d7403f5ea"
+      }
+    ],
+    "admitted": true,
+    "elapsedMs": 16209,
+    "repaired": false,
+    "diagnostics": {
+      "visited": 0,
+      "characters": 0,
+      "reads": 0,
+      "searches": 0,
+      "inventories": 0,
+      "inventoryVisited": 0,
+      "inventoryPreviewCells": 0,
+      "entitySearches": 0,
+      "entityCandidates": 0,
+      "workspaceBytes": 514
+    },
+    "workspace": {
+      "version": 1,
+      "scope": "current-document",
+      "resourceId": "11111111-1111-4111-8111-111111111111",
+      "forParticipant": "agent-B",
+      "authority": "current-exchange-only",
+      "coverage": {
+        "status": "partial",
+        "completeRegistry": false,
+        "candidates": 0,
+        "projected": 0,
+        "unavailable": 0,
+        "bytes": 514,
+        "limit": 8192
+      },
+      "entities": [],
+      "arguments": [],
+      "relationships": [],
+      "glosses": [],
+      "classifications": [],
+      "sourceLocations": [],
+      "omissions": [
+        "Selected working set; discover additional identities with search_entities and passages with native source tools."
+      ]
+    },
+    "usage": [
+      {
+        "input_tokens": 15976,
+        "output_tokens": 802,
+        "total_tokens": 16778
+      }
+    ],
+    "entities": [],
+    "glosses": [],
+    "tools": []
+  }
+]

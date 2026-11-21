@@ -44,6 +44,7 @@ import { canonicalPropositions, propositionMutation } from './propositions.mjs';
 import { canonicalEntities, entityMutation } from './entities.mjs';
 import { canonicalSemantics, semanticMutation } from './semantics.mjs';
 import { canonicalCardex } from './cardex.mjs';
+import { sharedCache } from './cache.mjs';
 import { canonicalTables } from './canonical-ledger.mjs';
 import * as indexing from './reconcile.mjs';
 import { PhextKnowledgeStore, recordToRow } from './phext-store.mjs';
@@ -143,6 +144,12 @@ export function openPhextFoundation(options = {}, context = {}) {
   } catch (e) { auditAvailable = false; auditError = e.message; }
 
   const { db: replica, dir: tempDir, file: replicaFile } = buildKnowledgeReplica(store, vaultGuid);
+  // Seed the replica's disposable Cache table (migration 0011) from
+  // its phext control file; cache mutations write through below.
+  {
+    const insert = replica.prepare('INSERT INTO Cache(key,value,createdAt,updatedAt,expiresAt) VALUES(?,?,?,?,?)');
+    for (const row of store.readCache()) insert.run(row.key, row.value, row.createdAt, row.updatedAt, row.expiresAt);
+  }
   let closed = false;
   const writable = () => { if (readOnly) throw Error('SQLite foundation is read-only'); };
   const active = () => { if (closed) throw Error('SQLite foundation is closed'); };
@@ -173,6 +180,15 @@ export function openPhextFoundation(options = {}, context = {}) {
   return {
     vaultGuid,
     entities(request, check) { active(); if (entityMutation(request.op)) writable(); return canonicalEntities(replica, request, check, ledger); },
+    cache(request, check) {
+      active(); check?.(); if (request.op !== 'get') writable();
+      const result = sharedCache(replica, request);
+      if (request.op !== 'get') {
+        store.writeCache(replica.prepare('SELECT key,value,createdAt,updatedAt,expiresAt FROM Cache').all());
+        store.flush();
+      }
+      return result;
+    },
     cardex(request, check) {
       active();
       if (request.op === 'semantic') semanticActive();

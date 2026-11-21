@@ -1,3 +1,4 @@
+import {youtubeId} from "../interchange/youtube-reference";
 import greenAuroraImageUrl from "../assets/hosted/backgrounds/images/green-aurora.jpg";
 import woodImageUrl from "../assets/hosted/backgrounds/images/wood.jpg";
 import cloudsImageUrl from "../assets/hosted/backgrounds/images/clouds.jpg";
@@ -21,31 +22,9 @@ export const defaultBackgroundUrls: Partial<Record<BackgroundType, string>> = {
   "youtube-video-background-block": "https://www.youtube.com/watch?v=Zsqep7_9_mw",
 };
 
-export function mediaUrl(value: unknown): string | undefined {
-  if (typeof value !== "string" || !value.trim()) return undefined;
-  const text = value.trim();
-  try {
-    const url = new URL(text, "https://local.invalid/");
-    return ["http:", "https:", "blob:"].includes(url.protocol) ? text : undefined;
-  } catch { return undefined; }
-}
+export {mediaUrl} from '../interchange/media-url';
 
-export function youtubeId(value: unknown): string | undefined {
-  if (typeof value !== "string") return undefined;
-  const text = value.trim();
-  if (/^[\w-]{11}$/.test(text)) return text;
-  try {
-    const url = new URL(text);
-    if (!["http:", "https:"].includes(url.protocol)) return undefined;
-    const host = url.hostname.replace(/^www\./, "");
-    let id: string | null | undefined;
-    if (host === "youtu.be") id = url.pathname.split("/")[1];
-    else if (["youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com"].includes(host)) {
-      id = url.pathname === "/watch" ? url.searchParams.get("v") : /^\/(embed|shorts|live)\//.test(url.pathname) ? url.pathname.split("/")[2] : undefined;
-    }
-    return id && /^[\w-]{11}$/.test(id) ? id : undefined;
-  } catch { return undefined; }
-}
+export {youtubeId} from "../interchange/youtube-reference";
 
 export function youtubeBackgroundUrl(value: unknown, paused = false, muted = true): string | undefined {
   const id = youtubeId(value);

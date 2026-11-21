@@ -183,8 +183,8 @@ export function createRangeRendering(options:{
     },
   };
 }
-export function RangeEffectLayer(props:{bindings:Binding[];class:string}) {
-  return <svg class={props.class} aria-hidden="true"><For each={props.bindings}>{binding=><g data-property-type={binding.source().type} data-effect-owner={binding.source().owner.key}>
+export function RangeEffectLayer(props:{bindings:Binding[];class:string;viewBox?:string}) {
+  return <svg class={props.class} viewBox={props.viewBox} aria-hidden="true"><For each={props.bindings}>{binding=><g data-property-type={binding.source().type} data-effect-owner={binding.source().owner.key}>
     {binding.renderer.target==='range-overlay'&&<Dynamic component={binding.renderer.View}
       tag={binding.source().type} identity={JSON.stringify([binding.source().key,binding.key])} owner={binding.source().owner} params={binding.params} geometry={binding.geometry} />}
   </g>}</For></svg>;

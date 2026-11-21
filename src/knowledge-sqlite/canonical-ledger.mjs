@@ -2,7 +2,7 @@ import {randomUUID,createHash} from 'node:crypto';
 import {sqlRevision} from './reconcile.mjs';
 export const guid = v => { if(typeof v!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v))throw Error('Supply a stable UUID');return v; };
 export const expected = v => {if(!Number.isSafeInteger(v)||v<0)throw Error('Expected revision required');return v;};
-export const canonicalTables = ['SourceClaimReview','ExternalIdentity','SourceSnapshot','Entity','EntityAlias','Relationship','Time','Claim','ClaimParticipant','ClaimQualifier','ClaimEvidence','DataSet','DataPoint','DataPointDimension','DataSetMembership'];
+export const canonicalTables = ['DocumentEntityAssociation','SourceClaimReview','ExternalIdentity','SourceSnapshot','Entity','EntityAlias','Relationship','Time','Claim','ClaimParticipant','ClaimQualifier','ClaimEvidence','DataSet','DataPoint','DataPointDimension','DataSetMembership'];
 const identity=t=>t==='Time'?'entityGuid':'guid';
 const fingerprint=s=>createHash('sha256').update(s).digest('hex');
 function state(db,table,id){

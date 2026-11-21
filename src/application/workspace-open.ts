@@ -153,6 +153,11 @@ export function workspaceOpen(session: WorkspaceSession) {
     return id;
   };
   return {
+    importedDocument(id: string) {
+      const doc = documents().find(c => c.payload.id === id);
+      if (!doc) throw new Error('The imported Document is no longer available.');
+      return presentDocument(doc.key, id, String((doc.payload.metadata as any)?.title ?? 'TEI Document'));
+    },
     canSaveDocument(key: string) { return !!boundDocument(key); },
     async saveDocument(key: string, save?: (id:string)=>Promise<boolean>) {
       const id = boundDocument(key); if (!id) throw new Error('Select an opened native Document to save.');

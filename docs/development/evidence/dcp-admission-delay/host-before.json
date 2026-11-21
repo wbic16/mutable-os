@@ -1,0 +1,65 @@
+{
+  "all": [
+    {
+      "mounted": false,
+      "loadEditorMs": 112.39999997615814,
+      "contributions": 2,
+      "cells": 1970,
+      "xmlBytes": 3220,
+      "manifestMs": 4,
+      "requestBuildMs": 2.199999988079071,
+      "workspaceMs": 5.5,
+      "xmlProjectionMs": 1,
+      "historyColdMs": 6.400000035762787,
+      "historyWarmMs": 0,
+      "xmlLowerMs": 4.100000023841858,
+      "nativePrepareMs": 8.800000011920929,
+      "definitions": 17,
+      "addedAnnotations": 4,
+      "admitMs": 199.5999999642372,
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "historyAfterMs": 1.2000000476837158,
+      "saveCaptureMs": 173,
+      "saveEncodeMs": 44.19999998807907,
+      "saveBytes": 286893,
+      "fullSaveWithInMemoryAdapterMs": 173,
+      "domNodes": 0
+    },
+    {
+      "mounted": true,
+      "loadEditorMs": 144.39999997615814,
+      "mountMs": 2919.399999976158,
+      "contributions": 2,
+      "cells": 1970,
+      "xmlBytes": 3220,
+      "manifestMs": 0.8999999761581421,
+      "requestBuildMs": 0.30000001192092896,
+      "workspaceMs": 2.800000011920929,
+      "xmlProjectionMs": 0.3999999761581421,
+      "historyColdMs": 0.800000011920929,
+      "historyWarmMs": 0,
+      "xmlLowerMs": 1,
+      "nativePrepareMs": 1.600000023841858,
+      "definitions": 17,
+      "addedAnnotations": 4,
+      "admitMs": 298.9000000357628,
+      "nextTwoFramesMs": 28.399999976158142,
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "historyAfterMs": 1.100000023841858,
+      "saveCaptureMs": 198.29999995231628,
+      "saveEncodeMs": 45.200000047683716,
+      "saveBytes": 286893,
+      "fullSaveWithInMemoryAdapterMs": 216,
+      "domNodes": 4448
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ]
+}

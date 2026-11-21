@@ -1,0 +1,4 @@
+
+> speedy-ts-reactive@0.0.0 typecheck
+> tsc --noEmit --project tsconfig.reactive.json && tsc --noEmit --project tsconfig.server.json
+

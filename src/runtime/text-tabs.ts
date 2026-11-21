@@ -1,3 +1,4 @@
+import {prepareTabs,tabPanel} from '../block-tree/compound-authoring';
 import { encodeBlock } from "../block-tree/codecs";
 import type { ExistingBlockDto, NodeKey } from "../block-tree/types";
 import type { ReactiveEditor } from "../reactive-editor/editor";
@@ -17,7 +18,6 @@ export function createTextTab(editor: ReactiveEditor, key: NodeKey, selection?: 
   const saved = editor.selections.sets[key], primary = saved?.items.find(item => item.id === saved.primaryId);
   const caret = selection ?? editor.mounts.get(key)?.captureInlineSelection?.() ?? (primary ? { anchor: primary.anchor.boundary.index, head: primary.head.boundary.index } : undefined);
   let targetPlacement = source.placementKey;
-  const container = (type: string, children: ExistingBlockDto[] = [], metadata: Record<string, unknown> = {}): ExistingBlockDto => ({ id: crypto.randomUUID(), type, metadata, children });
   if (row) {
     const copy = encodeBlock(editor.repository.readState(), source.placementKey);
     const renew = (dto: ExistingBlockDto) => {
@@ -36,12 +36,12 @@ export function createTextTab(editor: ReactiveEditor, key: NodeKey, selection?: 
         const metadata = JSON.parse(JSON.stringify(tab.payload.metadata ?? {}));
         editor.commands.setPayloadField(tabKey, "metadata", { ...metadata, active: false }, "Activate text tab");
       }
-      const placement = editor.commands.insert(container("tab-block", [copy], { name: String(row.children.length + 1), active: true }), { kind: "at", parentKey: row.key, index: row.children.length });
+      const placement = editor.commands.insert(tabPanel(String(row.children.length + 1),[copy]), { kind: "at", parentKey: row.key, index: row.children.length });
       targetPlacement = editor.commands.childrenOf(placement)[0];
     });
   } else {
     editor.commands.transaction("Convert text Block to tab", () => {
-      const placement = editor.commands.insert(container("tab-row-block", [container("tab-block", [], { name: "1", active: true })]), { kind: "before", anchorKey: key });
+      const placement = editor.commands.insert(prepareTabs([{label:'1',content:[]}]), { kind: "before", anchorKey: key });
       const tab = editor.commands.childrenOf(placement)[0];
       editor.commands.move(key, { kind: "at", parentKey: tab, index: 0 });
     });

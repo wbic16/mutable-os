@@ -1,3 +1,4 @@
+import {searchEntities,inspectEntity} from './read-only-search';
 import {Dynamic} from 'solid-js/web';
 import {useInstrumentPresentations} from '../../rendering/instrument-presentations';
 import {LerSession,type LerSource} from './ler-session';
@@ -89,7 +90,7 @@ function createLerModel(props:{api:AnnotationCapabilities;panel:PanelSession;com
   }finally{editing=false;}
  };
  const select=(id:string,replace=false,prepareOnly=false)=>void run(async()=>{
-  result()?.current();if(!service)throw Error('Canonical Entity service unavailable');const entity=await service.get(id);if(!entity)throw Error('Entity unresolved in this vault');if(!alive)return;
+  result()?.current();if(!service)throw Error('Canonical Entity service unavailable');const entity=await inspectEntity(service,id);if(!entity)throw Error('Entity unresolved in this vault');if(!alive)return;
   if(prepareOnly){session.prepare(entity);candidates().nominate(entity);return;}
   bind(entity,replace);
  });
@@ -138,7 +139,7 @@ function createLerModel(props:{api:AnnotationCapabilities;panel:PanelSession;com
   const localCandidates=[...(scope==='blend'?local.map(r=>({id:r.id,name:r.fallbackName??r.id,evidence:[{kind:'local',text:`${r.documentMentions} committed Document mentions`}]})):[]),...(['blend','session','day','week'].includes(scope)?recent.map(r=>({id:r.id,name:r.name,evidence:[{kind:'recent',text:scope==='day'?'Used in last 24 hours':scope==='week'?'Used in last 7 days':'Used this session'}]})):[])].filter(r=>matches(r.name));
   const controller=new AbortController();let active=true;setBusy(true);setResult(undefined);setCurrent(0);setPage(0);
   const publish=(r:EntityResolution)=>{if(active){const merged=new Map(localCandidates.map(c=>[c.id,c]));for(const c of r.candidates)merged.set(c.id,c);setResult({...r,candidates:[...merged.values()]});if(!attempt())setError('');}};
-  const timer=setTimeout(async()=>{try{if(['session','day','week'].includes(scope)||scope==='blend'&&!options.query.trim()){publish({candidates:[],complete:true,diagnostics:[],current:()=>controller.signal.throwIfAborted()});return;}if(!service)throw Error('Open a bound native Document in a Flint vault to use canonical Entities.');publish(await service.search(options,controller.signal,publish));}catch(e){if(active)setError(String(e));}finally{if(active)setBusy(false);}},200);
+  const timer=setTimeout(async()=>{try{if(['session','day','week'].includes(scope)||scope==='blend'&&!options.query.trim()){publish({candidates:[],complete:true,diagnostics:[],current:()=>controller.signal.throwIfAborted()});return;}if(!service)throw Error('Open a bound native Document in a Flint vault to use canonical Entities.');publish(await searchEntities(service,options,controller.signal,publish));}catch(e){if(active)setError(String(e));}finally{if(active)setBusy(false);}},200);
   onCleanup(()=>{active=false;clearTimeout(timer);controller.abort();});
  });
  onMount(()=>{

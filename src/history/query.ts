@@ -169,7 +169,7 @@ export class HistoryQueries {
     const authored = (result: DeepReadonly<SubtreeResult>) => new Map(Object.values(result.fragment?.contents ?? {}).filter(c => typeof c.payload.id === "string").map(c => [String(c.payload.id), c]));
     const a = authored(before), b = authored(after);
     const visible = (content: DeepReadonly<ContentRecord>, result: DeepReadonly<SubtreeResult>) => ({ viewType: content.viewType, payload: content.payload, opaqueRelations: content.opaqueRelations,
-      inline: content.inlineContent.map(key => result.fragment?.contents[result.fragment.placements[key]?.contentKey]?.payload) });
+      inline: content.compactInline ?? content.inlineContent.map(key => result.fragment?.contents[result.fragment.placements[key]?.contentKey]?.payload) });
     const children = (content: DeepReadonly<ContentRecord>, result: DeepReadonly<SubtreeResult>) => edges(content).filter(edge => edge.slot.kind !== "inline-content" &&
       (edge.slot.kind !== "relation" || request.before.ownedRelations !== false)).map(edge => {
       const placement = result.fragment?.placements[edge.key]; return [edge.slot, placement?.kind, placement && result.fragment?.contents[placement.contentKey]?.payload.id, edge.key];

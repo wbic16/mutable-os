@@ -1,3 +1,4 @@
+import {sanitiseSvg} from '../src/features/quill/svg-sanitize.mjs';
 import {validateStructuredOriginal} from './structured-original.mjs';
 import { Router } from 'express';
 import multer from 'multer';
@@ -51,6 +52,10 @@ export function createManagedAssetService(options) {
     const mediaType=req.file.mimetype;if(['application/xml','application/epub+zip','application/x-bibtex','application/x-research-info-systems'].includes(mediaType)){if(!options.deterministicEnabled||!options.inspectOriginal)throw Error('Academic original admission disabled');await options.inspectOriginal(new Uint8Array(req.file.buffer),mediaType,signal);signal.throwIfAborted();return store.stage(lease(req),req.file.buffer,{mediaType});}if(mediaType==='text/plain'){if(!options.structuredEnabled)throw Error('Read-only resources disabled');validateStructuredOriginal(req.file.buffer);return store.stage(lease(req),req.file.buffer,{mediaType});}
     if((mediaType==='application/json'?!options.crossResourceEnabled&&!options.deterministicEnabled&&!options.webEnabled:!options.crossResourceEnabled)||!options.inspectOriginal)throw Error('Resource original admission disabled');if(!['application/pdf','application/json'].includes(mediaType))throw Error('Use image admission for image originals');
     await options.inspectOriginal(new Uint8Array(req.file.buffer),mediaType,signal);signal.throwIfAborted();return store.stage(lease(req),req.file.buffer,{mediaType});
+  });
+  route('post','/:operation/images/svg',async(req,res,signal)=>{
+    if(!options.quillEnabled)throw Error('SVG composition asset admission disabled');await store.status(lease(req));await new Promise((resolve,reject)=>upload(req,res,e=>e?reject(e):resolve()));signal.throwIfAborted();if(!req.file)throw Error('No SVG supplied.');
+    const {svg}=sanitiseSvg(new TextDecoder('utf-8',{fatal:true}).decode(req.file.buffer));return store.stage(lease(req),Buffer.from(svg),{mediaType:'image/svg+xml'});
   });
   route('post','/:operation/images/remote',async(req,_res,signal)=>{
     const url=remoteAssetUrl(req.body.url).href;

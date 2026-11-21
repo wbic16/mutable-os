@@ -1,0 +1,156 @@
+{
+  "all": [
+    {
+      "mounted": true,
+      "loadEditorMs": 2623,
+      "mountMs": 2786.199999988079,
+      "contributions": 6,
+      "cells": 55376,
+      "xmlBytes": 2804,
+      "manifestMs": 4.300000011920929,
+      "requestBuildMs": 3.100000023841858,
+      "workspaceMs": 8,
+      "xmlProjectionMs": 1,
+      "historyColdMs": 9.300000011920929,
+      "historyWarmMs": 0.19999998807907104,
+      "xmlLowerMs": 3,
+      "nativePrepareMs": 6.600000023841858,
+      "definitions": 10,
+      "addedAnnotations": 8,
+      "controllerValidateMs": 4,
+      "lastProviderPanelMs": 3560.399999976158,
+      "controllerExchangeMs": 3560.899999976158,
+      "autosaveMs": 2871.900000035763,
+      "nextTwoFramesMs": 935.5999999642372,
+      "visibility": [
+        {
+          "ms": 3551.399999976158,
+          "key": "node:15d1a601-9ee8-4b3f-8d7c-a537710ff14c",
+          "intersecting": false,
+          "ratio": 0
+        },
+        {
+          "ms": 3551.399999976158,
+          "key": "node:15d1a601-9ee8-4b3f-8d7c-a537710ff14c",
+          "intersecting": true,
+          "ratio": 0.9609517455101013
+        }
+      ],
+      "longAnimationFrames": [
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 11826.100000023842,
+          "duration": 1505.8999999761581,
+          "navigationId": 1638,
+          "paintTime": 13332,
+          "presentationTime": 14364,
+          "renderStart": 13328.199999988079,
+          "styleAndLayoutStart": 13329.100000023842,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": []
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 14333.100000023842,
+          "duration": 686.7999999523163,
+          "navigationId": 1638,
+          "paintTime": 15019.899999976158,
+          "presentationTime": 15964,
+          "renderStart": 15011,
+          "styleAndLayoutStart": 15013.699999988079,
+          "firstUIEventTimestamp": 14340.199999988079,
+          "blockingDuration": 586.8,
+          "scripts": []
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 18301.899999976158,
+          "duration": 536.3000000119209,
+          "navigationId": 1638,
+          "paintTime": 18838.19999998808,
+          "presentationTime": 18840,
+          "renderStart": 18835.600000023842,
+          "styleAndLayoutStart": 18837.899999976158,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": [
+            {},
+            {}
+          ]
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 15033.899999976158,
+          "duration": 2846.600000023842,
+          "navigationId": 1638,
+          "paintTime": 17880.5,
+          "presentationTime": 19316,
+          "renderStart": 15038.5,
+          "styleAndLayoutStart": 17879.399999976158,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 2794.4,
+          "scripts": [
+            {}
+          ]
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 17885,
+          "duration": 409.60000002384186,
+          "navigationId": 1638,
+          "paintTime": 18294.600000023842,
+          "presentationTime": 20072,
+          "renderStart": 18279.899999976158,
+          "styleAndLayoutStart": 18287.30000001192,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": [
+            {}
+          ]
+        }
+      ],
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [
+        {
+          "ms": 700.5,
+          "key": "node:15d1a601-9ee8-4b3f-8d7c-a537710ff14c"
+        }
+      ],
+      "responseRect": {
+        "x": 170,
+        "y": 207.328125,
+        "width": 816,
+        "height": 549,
+        "top": 207.328125,
+        "right": 986,
+        "bottom": 756.328125,
+        "left": 170
+      },
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 5.399999976158142,
+      "saveCaptureMs": 1367.3999999761581,
+      "saveEncodeMs": 41.5,
+      "saveBytes": 559698,
+      "fullSaveWithInMemoryAdapterMs": 1380.7000000476837,
+      "domNodes": 7913
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ],
+  "fixtureSha256": "9f5655fe8c24dad1d084dde7acc1f525fedfcfd174bfeeaf37c0897293867820",
+  "diagnosticDelayMs": 0,
+  "unrelatedParagraphs": 500
+}

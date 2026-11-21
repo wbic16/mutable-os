@@ -1,3 +1,6 @@
+import {validateAlternativeReadings, validateReadingOwnership, isReadingRelation} from './inline-alternative';
+import { compactInlineOwnerFor } from "./compact-inline-plan";
+import { inlineLength, inlineSlice, normalizeInline, validateCompactInline } from "./inline-sequence";
 import { glossChangeFor } from "./gloss-plan";
 import { structuralChangeFor, type StructuralChange } from "./structural-plan";
 import { taskStateChangeFor } from './task-state-plan';
@@ -13,7 +16,7 @@ import { UndoStorage, type StoredHistoryEntry } from "./undo-storage";
 import { isOwnedResourceTarget, validateResourceRegistrations, resourceOwnership } from "./resource-registration";
 import { ReferenceBookkeeping } from "./reference-bookkeeping";
 import { ResourceBoundaryBookkeeping, preservesResourceOwnership, type BoundaryValidation, type CanonicalResourceBoundaryToken, type CanonicalResourceBoundaryResult, type CooperativeBoundaryOptions } from "./resource-boundary";
-import { resourceSource } from "./resource-identity";
+import { findResource, resourceSource } from "./resource-identity";
 import { validateTarget } from "./external-reference";
 import { createCommitId } from "./ids";
 import { BlockIdentityIndex, PlacementIdentityIndex, type PlacementIdentityDelta } from "./identity";
@@ -29,6 +32,11 @@ import type {
   RepositoryState,
 } from "./types";
 
+function compactEdits(operations: RepositoryOperation[]) {
+  const result = new Map<string, import('./inline-sequence').InlineSplice>();
+  for(const op of recordOperations(operations))if(op.kind==='put-content'&&op.inlineSplice)result.set(op.record.key,op.inlineSplice);
+  return result;
+}
 function annotationOrigins(operations: RepositoryOperation[]) {
   const hints = new Map<ContentKey, readonly (number | null)[]>();
   const touched=new Set<string>();
@@ -92,7 +100,7 @@ function inverseFor(state: RepositoryState, operation: RepositoryOperation): Rep
     case "put-content": {
       const previous = state.contents[operation.record.key];
       return previous
-        ? { kind: "put-content", record: clone(previous), ...(operation.annotationOrigins ? { annotationOrigins: (Array.isArray(previous.payload.standoffProperties) ? previous.payload.standoffProperties : []).map((_, i) => { const n = operation.annotationOrigins!.indexOf(i); return n < 0 ? null : n; }) } : {}) }
+        ? { kind: "put-content", record: clone(previous), ...(operation.inlineSplice && previous.compactInline ? {inlineSplice:{start:operation.inlineSplice.start,end:operation.inlineSplice.start+inlineLength(operation.inlineSplice.insert),insert:inlineSlice(previous.compactInline.spans,operation.inlineSplice.start,operation.inlineSplice.end)}} : {}), ...(operation.annotationOrigins ? { annotationOrigins: (Array.isArray(previous.payload.standoffProperties) ? previous.payload.standoffProperties : []).map((_, i) => { const n = operation.annotationOrigins!.indexOf(i); return n < 0 ? null : n; }) } : {}) }
         : { kind: "remove-content", key: operation.record.key };
     }
     case "remove-content": {
@@ -118,8 +126,11 @@ function inverseFor(state: RepositoryState, operation: RepositoryOperation): Rep
 
 export function deriveLocations(state: RepositoryState, observe?: (c: ContentRecord) => void): Map<PlacementKey, Location> {
   const locations = new Map<PlacementKey, Location>();
+  const readingTargets = new Set<string>();
 
   for (const content of Object.values(state.contents)) {
+    validateCompactInline(content);
+    validateAlternativeReadings(content,key=>{const p=state.placements[key];return p&&{owned:p.kind==='owned'&&!p.resolvedReference&&!p.externalReference,content:state.contents[p.contentKey]};});
     observe?.(content);
     content.children.forEach((childKey, index) => {
       if (locations.has(childKey)) {
@@ -144,6 +155,7 @@ export function deriveLocations(state: RepositoryState, observe?: (c: ContentRec
     });
 
     for (const [name, relationKey] of Object.entries(content.ownedRelations)) {
+      if (isReadingRelation(name)) readingTargets.add(state.placements[relationKey]?.contentKey);
       if (locations.has(relationKey)) {
         throw new ModelInvariantError(`Placement ${relationKey} has more than one owner`);
       }
@@ -154,6 +166,7 @@ export function deriveLocations(state: RepositoryState, observe?: (c: ContentRec
     }
   }
 
+  if (readingTargets.size) validateReadingOwnership(readingTargets, Object.values(state.placements));
   return locations;
 }
 
@@ -212,6 +225,9 @@ export function validateRepository(state: RepositoryState, boundary?: BoundaryVa
     if (ancestors.has(placement.contentKey)) return;
     const content = state.contents[placement.contentKey];
     if (!content) throw new ModelInvariantError(`Missing content ${placement.contentKey}`);
+    // All placement/target/cycle checks above still apply to leaves. A leaf has
+    // no descendants needing an ancestry copy (the common per-Cell case).
+    if (!content.children.length && !content.inlineContent.length && !Object.keys(content.ownedRelations).length) return;
     const next = new Set(ancestors).add(content.key);
     for (const childKey of content.children) visit(childKey, next);
     for (const inlineKey of content.inlineContent) visit(inlineKey, next);
@@ -247,14 +263,18 @@ export function planOperations(
 }
 
 /** Changed records are private; unchanged records remain read-only during validation. */
-function planChangedRecords(source: RepositoryState, operations: RepositoryOperation[], boundary?: BoundaryValidation) {
+function planChangedRecords(source: RepositoryState, operations: RepositoryOperation[], boundary?: BoundaryValidation, timings?: Record<string, number>) {
+  let started = timings ? performance.now() : 0;
   const next = {...source,contents:{...source.contents},placements:{...source.placements}};
+  if (timings) { timings["plan.tableCopy"] = performance.now() - started; started = performance.now(); }
   const inverse: RepositoryOperation[] = [];
   for (const operation of operations) {
     inverse.push(inverseFor(next, operation));
     applyOperation(next, operation);
   }
+  if (timings) { timings["plan.inverseAndApply"] = performance.now() - started; started = performance.now(); }
   validateRepository(next, boundary);
+  if (timings) timings["plan.validation"] = performance.now() - started;
   return { next, inverse: inverse.reverse() };
 }
 
@@ -271,6 +291,12 @@ type CaptureAttempt = {
 type HistorySubscriber = { listener: (event: DeepReadonly<HistoryChanges>) => void; onError: CommitSubscriber["onError"] };
 
 export interface RepositoryChange {
+  /** Persisted resource owners affected on either side of this commit. */
+  resourceIds?: readonly string[];
+  resourceProvenanceChanged?: boolean;
+  /** General validated commits expose affected edges to occurrence consumers. */
+  changedPlacements?: readonly string[];
+  compactEdits?: ReadonlyMap<string, import("./inline-sequence").InlineSplice>;
   /** Lightweight identity/cause for occurrence-local history restoration.
    * Does not enable exact-record capture on ordinary typing. */
   commit?: { id: string; cause: CommitMetadata['cause'] };
@@ -291,6 +317,40 @@ export interface RepositoryChange {
 }
 
 export class CanonicalRepository {
+  private activeUndoGroup?: {record:(operations:RepositoryOperation[],inverse:RepositoryOperation[])=>void};
+  /** Native edits publish normally; only their Undo record is accumulated. The
+   * caller explicitly scopes each synchronous insertion, never unrelated edits. */
+  /** Background receiving may allow history on disjoint records; the admission
+   * guard below still fences every record owned by this in-flight group. */
+  beginUndoGroup(label:string,options:{allowUnrelatedHistory?:boolean}={}) {
+    const forward=new Map<string,RepositoryOperation>(),backward=new Map<string,RepositoryOperation>();
+    let closed=false,running=false;
+    const release=options.allowUnrelatedHistory?()=>{}:this.suspendHistory();
+    const key=(op:RepositoryOperation)=>{
+      if(op.kind==='record-batch'||op.kind==='set-root')throw Error('Grouped insertion requires bounded record operations');
+      return (op.kind.includes('content')?'c:':'p:')+('record' in op?op.record.key:op.key);
+    };
+    // Per-commit splice hints describe intermediate preimages, not the final
+    // grouped Undo/Redo pair. Whole records remain the canonical authority.
+    const grouped=(op:RepositoryOperation)=>{const copy=clone(op);if(copy.kind==='put-content')delete copy.inlineSplice;return copy;};
+    const group={record:(operations:RepositoryOperation[],inverse:RepositoryOperation[])=>{
+      for(const op of inverse){const k=key(op);if(!backward.has(k))backward.set(k,grouped(op));}
+      for(const op of operations)forward.set(key(op),grouped(op));
+    }};
+    // Prevent an unrelated edit from changing records whose original values
+    // belong to this open Undo group. Other Documents and the draft stay usable.
+    const stop=this.beforeCommit(operations=>{if(running){operations.forEach(key);return;}for(const op of operations){if(op.kind==='record-batch'||op.kind==='set-root'){if(forward.size)throw Error('Finish the current native insertion first');}else if(forward.has(key(op)))throw Error('This content is still receiving an AI response');}});
+    return {
+      run:<T>(operation:()=>T):T=>{if(closed||this.activeUndoGroup)throw Error('Native insertion group unavailable');running=true;this.activeUndoGroup=group;try{return operation();}finally{this.activeUndoGroup=undefined;running=false;}},
+      finish:()=>{if(closed)return;closed=true;stop();release();if(forward.size){this.undoStack.push(this.historyStorage.store(createCommitId(),label,[...forward.values()],[...backward.values()]));this.redoStack=[];}},
+    };
+  }
+  private admission = new Set<(operations: readonly RepositoryOperation[], state: Readonly<RepositoryState>, metadata: CommitMetadata) => void>();
+  /** Synchronous, read-only veto before validation/publication. No snapshots. */
+  beforeCommit(guard: (operations: readonly RepositoryOperation[], state: Readonly<RepositoryState>, metadata: CommitMetadata) => void) {
+    this.admission.add(guard); return () => { this.admission.delete(guard); };
+  }
+  readonly compactCanonicalText: boolean;
   private historyGuards=createSignal(0);
   /** Shared Document history lease; does not modify either stack. */
   suspendHistory(){this.historyGuards[1](n=>n+1);let live=true;return()=>{if(live){live=false;this.historyGuards[1](n=>n-1);}};}
@@ -311,8 +371,73 @@ export class CanonicalRepository {
   private readonly commitSubscribers = new Set<CommitSubscriber>();
   private readonly historySubscribers = new Set<HistorySubscriber>();
   private deliveringCommit = false;
+  private resourceGenerations = new Map<string, number>();
+  private resourceProvenanceGeneration = 0;
+
+  /** Monotonic committed-content generation, independent of history position.
+   * No traversal, snapshot, reactive subscription or serialization on reads. */
+  resourceGeneration(id: string): number {
+    // Legacy repositories without incoming ownership evidence fail closed.
+    return this.references.enriched ? Math.max(this.resourceGenerations.get(id) ?? 0, this.resourceProvenanceGeneration) : this.readState().revision;
+  }
+
+  /** Follow existing incoming ownership/location evidence, not occurrences.
+   * Both sides of a commit are inspected, including placement-only mutations,
+   * retained definitions, named relations and record-batch imports/restores. */
+  private changedResources(operations: readonly RepositoryOperation[], ids = new Set<string>()) {
+    if (!this.references.enriched) return ids;
+    const state = this.readState(), visited = new Set<string>();
+    const visit = (key: string | undefined) => {
+      if (!key || visited.has(key)) return; visited.add(key);
+      const c = state.contents[key]; if (!c) return;
+      if (c.viewType === 'document-block') {
+        const id = (c.payload.metadata as any)?.documentId ?? c.payload.id;
+        if (typeof id === 'string') ids.add(id);
+        return; // Nested Documents persist independently.
+      }
+      visit(c.definitionOwnerKey);
+      for (const pk of this.references.ownedKeys(key)) {
+        const p = state.placements[pk];
+        if (p && !p.externalReference && !p.resolvedReference) visit(this.locations.get(pk)?.ownerContentKey);
+      }
+    };
+    const placement = (key: string) => {
+      visit(this.locations.get(key)?.ownerContentKey);
+      const p = state.placements[key];
+      if (p && !p.externalReference && !p.resolvedReference && (p.kind !== 'reference' || p.resourceRegistration)) visit(p.contentKey);
+    };
+    for (const op of recordOperations(operations)) {
+      if (op.kind === 'put-content' || op.kind === 'remove-content') visit(op.kind === 'put-content' ? op.record.key : op.key);
+      else if (op.kind === 'put-placement' || op.kind === 'remove-placement') placement(op.kind === 'put-placement' ? op.record.key : op.key);
+      else if (op.kind === 'set-root') { placement(state.rootPlacementKey); placement(op.key); }
+    }
+    return ids;
+  }
+
+  private changesResourceProvenance(operations: readonly RepositoryOperation[]) {
+    // Identity/definition ownership can affect persisted foreign-reference
+    // provenance without changing a referring record. These rare mutations
+    // conservatively invalidate every save baseline; ordinary edits do not.
+    const state = this.readState();
+    for (const op of recordOperations(operations)) {
+      if (op.kind !== 'put-content' && op.kind !== 'remove-content') continue;
+      const before = state.contents[op.kind === 'put-content' ? op.record.key : op.key];
+      const after = op.kind === 'put-content' ? op.record : undefined;
+      if (!before || before.viewType === 'text-cell' || before.viewType === 'image-cell') continue;
+      if (after && (before.payload.id !== after.payload.id || before.definitionOwnerKey !== after.definitionOwnerKey) ||
+          before.viewType === 'document-block' && (!after || after.viewType !== before.viewType ||
+          (before.payload.metadata as any)?.documentId !== (after.payload.metadata as any)?.documentId)) return true;
+    }
+    return false;
+  }
+
+  private advanceResourceGenerations(operations: readonly RepositoryOperation[], ids: Set<string>, provenance: boolean) {
+    for (const id of this.changedResources(operations, ids)) this.resourceGenerations.set(id, this.readState().revision);
+    if (provenance) this.resourceProvenanceGeneration = this.readState().revision;
+  }
 
   constructor(initial: RepositoryState, options: RepositoryOptions = {}) {
+    this.compactCanonicalText = options.compactCanonicalText === true;
     const validation: BoundaryValidation | undefined = options.resourceBoundaryEvidence !== false ? {} : undefined;
     validateRepository(initial, validation);
     this.references = new ReferenceBookkeeping(!!validation);
@@ -330,6 +455,10 @@ export class CanonicalRepository {
   hasSemanticPlacements(): boolean { return this.placementIdentity.enabled; }
 
   get hasValidStructuralEvidence(): boolean { return !!this.boundary && !this.boundary.validation.error; }
+  /** Read-only identity lookup, reusing the existing boundary index. */
+  findDocumentResource(id: string): ContentRecord | undefined {
+    return this.boundary ? this.boundary.findDocument(this.readState(), id) : findResource(this.readState(), { scope: 'document', resourceId: id });
+  }
   ownedPlacementKeys(key: string): Iterable<string> { return this.references.ownedKeys(key); }
 
   contentReferenceCount(key: ContentKey): number { return this.references.get(key) ?? 0; }
@@ -439,9 +568,23 @@ export class CanonicalRepository {
     if (this.deliveringCommit) throw new ModelInvariantError("Commit observers cannot mutate the repository synchronously");
   }
 
-  commit(label: string, operations: RepositoryOperation[], recordHistory = true, metadata: CommitMetadata = {}): void {
+  commit(label: string, operations: RepositoryOperation[], recordHistory = true, metadata: CommitMetadata = {}, timings?: Record<string, number>): void {
+    let last = timings ? performance.now() : 0;
+    const stage = (name: string) => { if (timings) { const now = performance.now(); timings[`commit.${name}`] = now - last; last = now; } };
     this.assertNotCaptureCallback();
     if (!operations.length) return;
+    for (const guard of this.admission) guard(operations, this.readState(), metadata);
+    for(const op of recordOperations(operations))if(op.kind==='put-content'){
+      const before=this.readState().contents[op.record.key];
+      if(before?.inlineKind==='standoff'&&op.record.inlineKind==='standoff'&&!!before.compactInline!==!!op.record.compactInline)throw new ModelInvariantError('Canonical representation is fixed at admission');
+      if(op.record.compactInline)validateCompactInline(op.record);
+    }
+    for(const op of recordOperations(operations))if(op.kind==='put-content'&&op.inlineSplice){
+      const before=this.readState().contents[op.record.key],d=op.inlineSplice;
+      if(!before?.compactInline||!op.record.compactInline||!Number.isInteger(d.start)||!Number.isInteger(d.end)||d.start<0||d.end<d.start||d.end>inlineLength(before.compactInline.spans))throw new ModelInvariantError('Invalid compact splice preimage');
+      const expected=normalizeInline([...inlineSlice(before.compactInline.spans,0,d.start),...d.insert,...inlineSlice(before.compactInline.spans,d.end,inlineLength(before.compactInline.spans))]);
+      if(JSON.stringify(expected)!==JSON.stringify(op.record.compactInline.spans))throw new ModelInvariantError('Compact splice does not match committed content');
+    }
     const placementDelta = this.placementIdentity.validateCommit(operations);
     const bulk = operations.some(op => op.kind === "record-batch");
     const gloss = !bulk && glossChangeFor(this.readState(), operations, {locationOf:key=>this.locationOf(key),ownedKeys:key=>this.ownedPlacementKeys(key)});
@@ -454,7 +597,7 @@ export class CanonicalRepository {
       this.commitInline(label, operations, undefined, recordHistory, metadata, undefined, undefined, placementDelta, undefined, undefined, taskStateOwner);
       return;
     }
-    const inlineOwner = !bulk && inlineOwnerFor(this.readState(), operations, this.references);
+    const inlineOwner = !bulk && (compactInlineOwnerFor(this.readState(), operations) ?? inlineOwnerFor(this.readState(), operations, this.references));
     if (inlineOwner) {
       this.commitInline(label, operations, inlineOwner, recordHistory, metadata, undefined, undefined, placementDelta);
       return;
@@ -482,14 +625,19 @@ export class CanonicalRepository {
       this.commitInline(label, operations, undefined, recordHistory, metadata, undefined, undefined, placementDelta, undefined, undefined, undefined, structural);
       return;
     }
+    if(metadata.requireBounded)throw Error('Operation cannot satisfy bounded canonical admission');
+    stage("classification");
     const current = this.readState();
     for (const subscriber of this.beforeChangeSubscribers) subscriber(label, metadata.cause);
     for (const subscriber of this.beforeSubscribers) subscriber(this.snapshot(), label);
     const validation: BoundaryValidation | undefined = this.boundary ? {} : undefined;
-    const { next, inverse } = planChangedRecords(current, operations, validation);
+    stage("beforeObservers");
+    const { next, inverse } = planChangedRecords(current, operations, validation, timings);
+    stage("planning");
     for (const [key, content] of Object.entries(next.contents)) {
       const previous = current.contents[key];
       if (!previous || content === previous) continue;
+      if(content.compactInline&&previous.compactInline)content.inlineRevision=previous.inlineRevision+(JSON.stringify(content.compactInline)!==JSON.stringify(previous.compactInline)?1:0);
       const previousValue = { ...previous, revision: 0 };
       const nextValue = { ...content, revision: 0 };
       if (JSON.stringify(previousValue) !== JSON.stringify(nextValue)) {
@@ -497,8 +645,12 @@ export class CanonicalRepository {
       }
     }
     next.revision = current.revision + 1;
+    stage("revisionComparison");
     const identityDelta = this.identity?.validateCommit(operations);
+    stage("blockIdentity");
     const capture = this.prepareCapture(current, operations, metadata, next);
+    const resources = this.changedResources(operations), provenance = this.changesResourceProvenance(operations);
+    stage("prepareCapture");
     const commitId = createCommitId();
     const previousContents = new Map<ContentKey, ContentRecord | undefined>();
     for (const operation of recordOperations(operations)) {
@@ -519,6 +671,18 @@ export class CanonicalRepository {
       parent.children.every((key,i) => updated.children[i] === key) &&
       (() => { for (const op of recordOperations(operations)) if (!(op.kind === 'put-content' || op.kind === 'put-placement' && !current.placements[op.record.key])) return false; return true; })()
       ? parent.key : undefined;
+    stage("changePreparation");
+    if (timings) {
+      timings["count.publications"] = 1;
+      timings["count.changeObservers"] = this.changeSubscribers.size;
+      timings["count.snapshotObservers"] = this.subscribers.size;
+      timings["count.captureObservers"] = this.commitSubscribers.size + this.historySubscribers.size;
+      timings["count.previousContents"] = previousContents.size;
+      timings["count.repositoryContentsBefore"] = Object.keys(current.contents).length;
+      timings["count.repositoryContentsAfter"] = Object.keys(next.contents).length;
+      timings["count.repositoryPlacementsAfter"] = Object.keys(next.placements).length;
+    }
+    stage("diagnosticCounts");
     batch(() => {
       // Publish only changed records. Reconciling the entire graph recursively
       // unwraps every existing Cell even when opening a tiny new Document.
@@ -531,21 +695,37 @@ export class CanonicalRepository {
       // walking every new Cell twice through Solid's recursive unwrap.
       for (const key of contents) this.setState('contents',key,next.contents[key] && current.contents[key] ? reconcile(next.contents[key]) : next.contents[key]);
       for (const key of placements) this.setState('placements',key,next.placements[key] && current.placements[key] ? reconcile(next.placements[key]) : next.placements[key]);
+      if (timings) timings['count.recordStoreWrites'] = contents.size + placements.size;
       this.setState('rootPlacementKey',next.rootPlacementKey);
       this.setState('revision',next.revision);
+      stage('publishRecords');
       this.rebuildReferences();
       if (this.boundary) this.boundary.validation = validation!;
       if (identityDelta) this.identity!.acceptCommit(identityDelta);
       this.placementIdentity.acceptCommit(placementDelta);
+      this.advanceResourceGenerations(operations, resources, provenance);
+      stage("indexes");
       if (recordHistory) {
-        this.undoStack.push(this.historyStorage.store(commitId, label, operations, inverse));
+        if(this.activeUndoGroup)this.activeUndoGroup.record(operations,inverse);
+        else this.undoStack.push(this.historyStorage.store(commitId, label, operations, inverse));
         this.redoStack = [];
       }
+      stage("history");
       this.deliverCapture(capture, commitId, label, recordHistory);
+      stage("captureDelivery");
       for (const subscriber of this.subscribers) subscriber(this.snapshot(), label);
+      stage("snapshotObservers");
       const origins = annotationOrigins(operations);
-      for (const subscriber of this.changeSubscribers) subscriber({ commit: { id: commitId, cause: metadata.cause }, label, previousContents, appendedChildrenOwner, annotationOrigins: origins });
+      stage("annotationOrigins");
+      let observer = 0;
+      for (const subscriber of this.changeSubscribers) {
+        const started = timings ? performance.now() : 0;
+        subscriber({ resourceIds: this.references.enriched ? [...resources] : undefined, resourceProvenanceChanged: provenance, changedPlacements:[...placements], compactEdits:compactEdits(operations), commit: { id: commitId, cause: metadata.cause }, label, previousContents, appendedChildrenOwner, annotationOrigins: origins });
+        if (timings) timings[`observer.${observer++}`] = performance.now() - started;
+      }
+      stage("changeObservers");
     });
+    stage("reactiveFlush");
   }
 
   private commitInline(label: string, operations: RepositoryOperation[], inlineOwner: ContentKey | undefined, recordHistory: boolean, metadata: CommitMetadata, split?: SplitChange, childrenOwner?: ContentKey, placementDelta?: PlacementIdentityDelta, emptyParagraph?: EmptyParagraphChange, listWrap?: ListWrapChange, taskStateOwner?: ContentKey, structural?: StructuralChange): void {
@@ -567,6 +747,7 @@ export class CanonicalRepository {
       const key = operation.kind === "put-content" ? operation.record.key : operation.key;
       const previous = current.contents[key];
       previousContents.set(key, previous ? clone(previous) : undefined);
+      if(operation.kind==='put-content'&&operation.record.compactInline&&previous?.compactInline)operation.record.inlineRevision=previous.inlineRevision+(JSON.stringify(operation.record.compactInline)!==JSON.stringify(previous.compactInline)?1:0);
       if (operation.kind === "put-content" && previous &&
         JSON.stringify({ ...previous, revision: 0 }) !== JSON.stringify({ ...operation.record, revision: 0 })) {
         operation.record.revision = previous.revision + 1;
@@ -576,6 +757,7 @@ export class CanonicalRepository {
     for (const subscriber of this.beforeSubscribers) subscriber(this.snapshot(), label);
     const identityDelta = this.identity?.validateCommit(prepared);
     const capture = this.prepareCapture(current, prepared, metadata);
+    const resources = this.changedResources(prepared), provenance = this.changesResourceProvenance(prepared);
     const commitId = createCommitId();
     batch(() => {
       // Remove old locations before installing new ones: a split transfers Cells
@@ -614,14 +796,16 @@ export class CanonicalRepository {
       if (this.boundary && !boundarySafe) this.boundary.validation = {error: "Unclassified fast mutation: resource ownership requires full admitted validation"};
       if (identityDelta) this.identity!.acceptCommit(identityDelta);
       if (placementDelta) this.placementIdentity.acceptCommit(placementDelta);
+      this.advanceResourceGenerations(prepared, resources, provenance);
       if (recordHistory) {
-        this.undoStack.push(this.historyStorage.store(commitId, label, operations, inverse));
+        if(this.activeUndoGroup)this.activeUndoGroup.record(operations,inverse);
+        else this.undoStack.push(this.historyStorage.store(commitId, label, operations, inverse));
         this.redoStack = [];
       }
       this.deliverCapture(capture, commitId, label, recordHistory);
       for (const subscriber of this.subscribers) subscriber(this.snapshot(), label);
       const origins = annotationOrigins(operations);
-      for (const subscriber of this.changeSubscribers) subscriber({ commit: { id: commitId, cause: metadata.cause }, label, previousContents, inlineOwner, split, childrenOwner, emptyParagraph, listWrap, taskStateOwner, structural, annotationOrigins: origins });
+      for (const subscriber of this.changeSubscribers) subscriber({ resourceIds: this.references.enriched ? [...resources] : undefined, resourceProvenanceChanged: provenance, compactEdits:compactEdits(operations), commit: { id: commitId, cause: metadata.cause }, label, previousContents, inlineOwner, split, childrenOwner, emptyParagraph, listWrap, taskStateOwner, structural, annotationOrigins: origins });
     });
   }
 

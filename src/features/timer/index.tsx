@@ -1,5 +1,6 @@
 import { chord, keyboard, type BlockApplicationDefinition, type BlockFeatureCapabilities, type CodexFeature, type FeatureScope } from "../../feature-api";
-import { createTimerBlock, timerBlockDto } from "./model";
+import {timerBlockDto} from "./model";
+import {createTimerBlock} from "./commands";
 import { TimerBlockView } from "./view";
 
 /** Dependencies are constructed for this activation's owner, not globally shared. */

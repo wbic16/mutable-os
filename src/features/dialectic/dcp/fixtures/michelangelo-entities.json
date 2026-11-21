@@ -1,0 +1,138 @@
+{
+  "@e87b2ba03a8_10": {
+    "name": "Ludovico di Leonardo Buonarroti Simoni",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_11": {
+    "name": "Lionardo Buonarroti (Michelangelo’s nephew)",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_12": {
+    "name": "Buonarroto Buonarroti",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_13": {
+    "name": "Domenico Ghirlandaio",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_14": {
+    "name": "Bertoldo di Giovanni",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_16": {
+    "name": "Francesco Granacci",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_17": {
+    "name": "Leonardo da Vinci",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_27": {
+    "name": "Lorenzo de’ Medici",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_28": {
+    "name": "Pope Julius II",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_29": {
+    "name": "Pope Leo X",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_3": {
+    "name": "Michelangelo Buonarroti",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_30": {
+    "name": "Pope Clement VII",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_31": {
+    "name": "Pope Paul III",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_32": {
+    "name": "Raffaele Riario",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_33": {
+    "name": "Jacopo Galli",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_34": {
+    "name": "Jean Bilhères de Lagraulas",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_35": {
+    "name": "Vittoria Colonna",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_36": {
+    "name": "Tommaso de’ Cavalieri",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_37": {
+    "name": "Francesco Amadori (Urbino)",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_38": {
+    "name": "Ascanio Condivi",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_39": {
+    "name": "Giorgio Vasari",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_40": {
+    "name": "Sebastiano del Piombo",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_41": {
+    "name": "Daniele da Volterra",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_42": {
+    "name": "Marcello Venusti",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_43": {
+    "name": "Jacopo Pontormo",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_44": {
+    "name": "Giovanni Angelo Montorsoli",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_45": {
+    "name": "Raffaello da Montelupo",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_46": {
+    "name": "Raphael",
+    "typename": "Person"
+  },
+  "@e87b2ba03a8_49": {
+    "name": "Basilica of San Lorenzo, Florence",
+    "typename": "Place"
+  },
+  "@e87b2ba03a8_5": {
+    "name": "Rome",
+    "typename": "Place"
+  },
+  "@e87b2ba03a8_51": {
+    "name": "Carrara",
+    "typename": "Place"
+  },
+  "@e87b2ba03a8_6": {
+    "name": "Sistine Chapel",
+    "typename": "Place"
+  },
+  "@e87b2ba03a8_7": {
+    "name": "Saint Peter’s Basilica",
+    "typename": "Place"
+  },
+  "@e87b2ba03a8_9": {
+    "name": "Francesca di Neri del Miniato del Sera",
+    "typename": "Person"
+  }
+}

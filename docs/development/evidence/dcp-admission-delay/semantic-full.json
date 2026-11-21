@@ -1,0 +1,122 @@
+{
+  "all": [
+    {
+      "mounted": true,
+      "loadEditorMs": 326.2000000476837,
+      "mountMs": 2487.800000011921,
+      "contributions": 6,
+      "cells": 5376,
+      "xmlBytes": 2804,
+      "manifestMs": 2.900000035762787,
+      "requestBuildMs": 3.199999988079071,
+      "workspaceMs": 6.800000011920929,
+      "xmlProjectionMs": 1.199999988079071,
+      "historyColdMs": 6,
+      "historyWarmMs": 0.20000004768371582,
+      "xmlLowerMs": 3.599999964237213,
+      "nativePrepareMs": 7,
+      "definitions": 10,
+      "addedAnnotations": 8,
+      "responseReadyMs": 27.600000023841858,
+      "controllerValidateMs": 4.599999964237213,
+      "admissionMs": 333.30000001192093,
+      "controllerExchangeMs": 388,
+      "lastProviderPanelMs": 390,
+      "nextTwoFramesMs": 382.4000000357628,
+      "visibility": [
+        {
+          "ms": 434.10000002384186,
+          "key": "node:a67047ad-dfd3-44ef-a92c-c8f03ada333c",
+          "intersecting": false,
+          "ratio": 0
+        },
+        {
+          "ms": 774.5,
+          "key": "node:a67047ad-dfd3-44ef-a92c-c8f03ada333c",
+          "intersecting": true,
+          "ratio": 0.9609375
+        }
+      ],
+      "longAnimationFrames": [
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 14054.300000011921,
+          "duration": 424.19999998807907,
+          "navigationId": 1485,
+          "paintTime": 14478.5,
+          "presentationTime": 14860,
+          "renderStart": 14444.800000011921,
+          "styleAndLayoutStart": 14472.199999988079,
+          "firstUIEventTimestamp": 14057,
+          "blockingDuration": 374.1,
+          "scripts": [
+            {
+              "duration": 6,
+              "forcedStyleAndLayoutDuration": 0,
+              "source": "http://localhost:3005/src/application/document-entity-changes.ts",
+              "function": ""
+            },
+            {
+              "duration": 26,
+              "forcedStyleAndLayoutDuration": 24.1,
+              "source": "http://localhost:3005/src/rendering/standoff-editor-view.tsx",
+              "function": "measure"
+            }
+          ]
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 14487.300000011921,
+          "duration": 341.30000001192093,
+          "navigationId": 1485,
+          "paintTime": 14828.600000023842,
+          "presentationTime": 14876,
+          "renderStart": 14826.5,
+          "styleAndLayoutStart": 14828.5,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": []
+        }
+      ],
+      "scans": {},
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [
+        {
+          "ms": 433.19999998807907,
+          "key": "node:a67047ad-dfd3-44ef-a92c-c8f03ada333c"
+        }
+      ],
+      "responseRect": {
+        "x": 170,
+        "y": 207.34375,
+        "width": 816,
+        "height": 549,
+        "top": 207.34375,
+        "right": 986,
+        "bottom": 756.34375,
+        "left": 170
+      },
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 1.800000011920929,
+      "saveCaptureMs": 323.60000002384186,
+      "saveEncodeMs": 89.5,
+      "saveBytes": 559712,
+      "fullSaveWithInMemoryAdapterMs": 288.60000002384186,
+      "domNodes": 7914
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ],
+  "fixtureSha256": "9f5655fe8c24dad1d084dde7acc1f525fedfcfd174bfeeaf37c0897293867820",
+  "diagnosticDelayMs": 0,
+  "unrelatedParagraphs": 0
+}

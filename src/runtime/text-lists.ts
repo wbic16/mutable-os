@@ -1,4 +1,5 @@
 import { taskOwner, taskState, setTaskState } from './tasks';
+import { hasBlockMode } from '../block-tree/mode-editing';
 import type { AutomaticListMetadata } from "../block-tree/list-wrap-plan";
 import type { BlockNode, ExistingBlockDto, NodeKey } from '../block-tree/types';
 import type { ReactiveEditor } from '../reactive-editor/editor';
@@ -39,7 +40,7 @@ export function listItemChildren(projection: BlockTreeProjection, key: NodeKey):
 
 export function setListItemCollapsed(editor: ReactiveEditor, key: NodeKey, collapsed: boolean) {
   const item = editor.node(key);
-  if (!item) return;
+  if (!item||!editor.canEditText(key)) return;
   editor.commands.setPayloadField(key, 'metadata', { ...JSON.parse(JSON.stringify(item.payload.metadata ?? {})), listCollapsed: collapsed }, collapsed ? 'Collapse list item' : 'Expand list item');
 }
 const listDto = (source?: BlockNode): ExistingBlockDto => ({
@@ -140,6 +141,10 @@ export function changeTextList(editor: ReactiveEditor, key: NodeKey, outdent: bo
   const item = (editor.features.taskLists ? taskOwner(editor, key) : undefined) ?? (isItemContainer(parent) && isList(parentOf(parent)) ? parent : source);
   const list = parentOf(item);
   const inside = isList(list);
+  if ((inside && hasBlockMode(list!.payload)) || (item !== source && hasBlockMode(item.payload))) {
+    editor.crossText.notice('This list operation could remove or duplicate a Block Mode; move the Block explicitly instead.');
+    return true;
+  }
   if (outdent && !inside) return false;
   const selection = editor.mounts.get(key)?.captureInlineSelection?.();
   const sourcePlacement = source.placementKey, viewId = source.viewId;

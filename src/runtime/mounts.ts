@@ -13,15 +13,26 @@ export interface MountHandle {
   focusElement: HTMLElement;
   inputPolicy: "native-text" | "standoff" | "control" | "container" | "opaque-widget";
   generation: number;
+  /** Alternate native text presentation may consume input before DOM editing. */
+  interceptInlineInput?(event: Event): boolean;
+  /** Preserve a single owned text source when accepting native rich paragraphs. */
+  prepareInlinePaste?(fragment: import("../interchange/fragment").MutableFragment): import("../interchange/fragment").MutableFragment;
   focus(): void;
+  /** Invalidate the existing reading geometry after enclosing inline reflow. */
+  invalidateInlineLayout?():void;
   captureSelection?(): NativeTextSelection;
   restoreSelection?(selection: NativeTextSelection): void;
   captureInlineSelection?(): { anchor: number; head: number } | undefined;
   restoreInlineSelection?(selection: { anchor: number; head: number }): void;
   inlinePoint?(node: Node, offset: number): number | undefined;
   inlineBoundary?(index: number): { node: Node; offset: number };
+  /** Alternate native presentations expose their shared cached geometry. */
+  inlineRangeRects?(start:number,end:number):DOMRectReadOnly[];
+  inlineCaretRect?(index:number):DOMRectReadOnly|undefined;
   inlinePointAt?(x: number, y: number): number;
   captureText?(): string;
+  /** Compact composition uses typed source coordinates in the existing gateway. */
+  compactComposition?(phase:'start'|'end',text:string):void;
   /** The existing character owner renders an occurrence-local Scry sequence. */
   presentProvisional?(draft:import('../features/autocomplete/provisional-cells').ProvisionalCells|undefined):void;
   finishProvisionalComposition?():void;
@@ -80,6 +91,7 @@ export class MountRegistry {
   selection(nodeKey: NodeKey): NativeTextSelection | undefined {
     return this.selections.get(nodeKey);
   }
+  rememberInlineSelection(nodeKey:NodeKey,selection:{anchor:number;head:number}) { this.inlineSelections.set(nodeKey,selection); }
   inlineSelection(nodeKey: NodeKey) { return this.inlineSelections.get(nodeKey); }
 
   /** Final occurrence disposal, unlike an ordinary unmount/remount. */

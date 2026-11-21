@@ -1,0 +1,2 @@
+.retrieval-controls {max-width:640px;width:calc(100vw - 64px);max-height:85vh;overflow:auto;border:1px solid #bbb;border-radius:12px;padding:24px;color:#222;background:#fafafa;font:14px/1.5 system-ui;z-index:100000;}
+.retrieval-controls::backdrop{background:#0004}.retrieval-controls label{display:block;margin:12px 0}.retrieval-controls input[type=number]{width:100px;margin-left:8px}.retrieval-controls footer{display:flex;gap:8px;flex-wrap:wrap}.retrieval-controls button{padding:6px 10px}

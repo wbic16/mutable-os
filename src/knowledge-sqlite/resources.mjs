@@ -5,7 +5,12 @@ import {encodeAuthoredValue} from '../history/preplan-spike/authored-values.mjs'
 const snapshot=(db,id)=>{const row=db.prepare('SELECT attributes FROM SourceSnapshot WHERE guid=?').get(guid(id));if(!row)throw Error('Resource snapshot unavailable');return JSON.parse(row.attributes);};
 export function resources(db,r,ledger,check=()=>{}){
  check();
- if(r.op==='pdf-snapshot'){const s=snapshot(db,r.snapshotId);if(s.kind!=='pdf')throw Error('Not a PDF snapshot');return {snapshot:s};}
+ if(r.op==='pdf-snapshot'){
+  const row=db.prepare('SELECT guid,identityGuid,captureKey,attributes FROM SourceSnapshot WHERE guid=?').get(guid(r.snapshotId));if(!row)throw Error('Resource snapshot unavailable');
+  const s=JSON.parse(row.attributes),identity=db.prepare('SELECT * FROM ExternalIdentity WHERE guid=?').get(row.identityGuid);
+  if(s.kind!=='pdf'||s.snapshotId!==row.guid||s.identityId!==row.identityGuid||!identity||identity.namespace!=='pdf-sha256'||identity.externalKey!==s.asset?.assetId||identity.entityGuid!==s.entityId||identity.resourceGuid!==s.resourceId||row.captureKey!==s.asset.assetId+'\n'+s.sourceUrl||!db.prepare('SELECT guid FROM Entity WHERE guid=?').get(s.entityId))throw Error('PDF snapshot identity or resource relationship mismatch');
+  return {snapshot:s};
+ }
  if(r.op==='resource-context'){
   const s=snapshot(db,r.snapshotId);return {snapshot:s,reviews:db.prepare('SELECT statementId,decision,claimGuid,attributes FROM SourceClaimReview WHERE snapshotGuid=? ORDER BY id LIMIT 101').all(s.snapshotId)};
  }

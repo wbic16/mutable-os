@@ -1,5 +1,7 @@
+import { passiveLimitation } from '../runtime/passive-presentation';
 import { Dynamic } from "solid-js/web";
-import { For, Show, onCleanup, onMount, getOwner } from "solid-js";
+import { For, Show, onCleanup, onMount, getOwner, createMemo, mapArray } from "solid-js";
+import { eligibleTextFlow, plainTextItem, VirtualTextFlow } from './virtual-text-flow';
 import type { NodeKey } from "../block-tree/types";
 import { useReactiveView } from "../reactive-editor/context";
 import { UnknownBlockView } from "./unknown-block-view";
@@ -19,28 +21,39 @@ export function BlockOutlet(props: { nodeKey: NodeKey }) {
 }
 
 function BlockContents(props: { nodeKey: NodeKey }) {
-  const { editor, projection, coordinates } = useReactiveView();
+  const { editor, projection, coordinates, passive, openSource } = useReactiveView();
   const registration = () => {
     const type = projection.state.nodes[props.nodeKey]?.viewType ?? "unknown-block";
     return editor.registry.resolve(type);
   };
-  const render = () => <><Dynamic component={registration()?.view ?? UnknownBlockView} nodeKey={props.nodeKey} /><BlockSelectionHandle editor={editor} nodeKey={props.nodeKey} /></>;
-  return <Show when={!editor.viewVisibility.isClosed(projection.state.nodes[props.nodeKey]?.placementKey ?? props.nodeKey)}><Show when={editor.blockPresentation.current()} fallback={render()}>{contribution =>
+  const limitation=()=>{
+    const node=projection.state.nodes[props.nodeKey];if(!passive||!node)return;
+    if(node.viewType==='surface-block'&&!editor.features.reversibleBlocks)return 'Legacy flip authoring is unavailable here. Open source.';
+    if(node.viewType==='resource-information-block'&&!editor.surfaces.nearest(props.nodeKey))return 'Detached resource information must be opened at source.';
+    return passiveLimitation(node)??(!registration()?.capabilities.includes('native-passive')?'This native view has not opted into passive presentation.':undefined);
+  };
+  const render = () => <Show when={!limitation()} fallback={<aside class="native-passive-unavailable" role="status"><strong>{projection.state.nodes[props.nodeKey]?.viewType}</strong><p>{limitation()}</p><button onClick={openSource}>Open source</button></aside>}><><Dynamic component={registration()?.view ?? UnknownBlockView} nodeKey={props.nodeKey} /><Show when={!passive}><BlockSelectionHandle editor={editor} nodeKey={props.nodeKey} /></Show></></Show>;
+  return <Show when={passive || !editor.viewVisibility.isClosed(projection.state.nodes[props.nodeKey]?.placementKey ?? props.nodeKey)}><Show when={!passive && editor.blockPresentation.current()} fallback={render()}>{contribution =>
     <Dynamic component={contribution().view} nodeKey={props.nodeKey} scale={() => coordinates?.scale() ?? 1} render={render} />
   }</Show></Show>;
 }
 
 export function ChildBlocks(props: { parentKey: NodeKey }) {
-  const { projection } = useReactiveView();
+  const context = useReactiveView(), { projection } = context;
   const children = () => projection.state.nodes[props.parentKey]?.children ?? [];
-  return <For each={children()}>{(key) => <BlockOutlet nodeKey={key} />}</For>;
+  const structural = createMemo(() => eligibleTextFlow(props.parentKey, children(), context));
+  const textItems = mapArray(() => structural() ? children() : [], key => createMemo(() => plainTextItem(key, context)));
+  const virtual = createMemo(() => structural() && textItems().every(eligible => eligible()));
+  return <Show when={virtual()} fallback={<For each={children()}>{(key) => <BlockOutlet nodeKey={key} />}</For>}>
+    <VirtualTextFlow parentKey={props.parentKey} keys={children()} />
+  </Show>;
 }
 
 export function RelationBlocks(props: { parentKey: NodeKey }) {
   const { projection } = useReactiveView();
   const relations = () =>
     Object.entries(projection.state.nodes[props.parentKey]?.ownedRelations ?? {})
-      .filter(([name]) => !name.startsWith("superposition:"));
+      .filter(([name]) => !name.startsWith("superposition:") && !name.startsWith("inline-reading:"));
   return (
     <For each={relations()}>
       {([name, key]) => <RelationBlock ownerKey={props.parentKey} name={name} nodeKey={key} />}

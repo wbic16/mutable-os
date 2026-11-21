@@ -135,3 +135,21 @@ test('everyday metadata retains UTF-8 originals and preserves protected endpoint
   await assert.rejects(acquireWebMetadata('https://example.org/file',format,undefined,dep([{status:429}])),/429/);
  }
 });
+
+test('image size inspection uses only HEAD across public redirects and never consumes the body',async()=>{
+ const {inspectImageReference}=await import('./asset-remote.mjs');const seen=[];let reads=0;
+ const responses=[{status:302,headers:{location:'https://upload.example.org/large.jpg'}},{status:200,headers:{'content-type':'image/jpeg','content-length':'107119245'}}];
+ const result=await inspectImageReference('https://commons.example.org/file',undefined,{lookup:async()=>answer,request:(url,options,callback)=>{
+  assert.equal(options.method,'HEAD');seen.push(url.hostname);options.lookup(url.hostname,{},(_,address)=>assert.equal(address,'8.8.8.8'));
+  const req=new EventEmitter();req.end=()=>{const r=responses.shift(),body=new Readable({read(){reads++;}});body.statusCode=r.status;body.headers=r.headers;callback(body);};return req;
+ }});
+ assert.deepEqual(result,{byteLength:107119245});assert.equal(reads,0);assert.deepEqual(seen,['commons.example.org','upload.example.org']);
+});
+test('image HEAD rejects private redirects, bounds redirects and cancels DNS; unknown length is not zero',async()=>{
+ const {inspectImageReference}=await import('./asset-remote.mjs');
+ for(const headers of [{},{'content-length':'bad'},{'content-length':'9007199254740993'},{'content-length':'-1'},{'content-length':'123','content-encoding':'gzip'}])assert.deepEqual(await inspectImageReference('https://example.org/a',undefined,{lookup:async()=>answer,request:transport([{headers:{'content-type':'image/png',...headers}}])}),{byteLength:null});
+ await assert.rejects(inspectImageReference('https://example.org/a',undefined,{lookup:async h=>h==='example.org'?answer:[{address:'127.0.0.1',family:4}],request:transport([{status:302,headers:{location:'http://internal.example/a'}}])}),/not public/);
+ await assert.rejects(inspectImageReference('https://example.org/a',undefined,{lookup:async()=>answer,request:transport(Array.from({length:4},()=>({status:302,headers:{location:'/again'}})))}),/redirect limit/);
+ await assert.rejects(inspectImageReference('https://example.org/a',undefined,{lookup:async()=>answer,request:transport([{status:405}])}),/405/);
+ const controller=new AbortController(),pending=inspectImageReference('https://example.org/a',controller.signal,{lookup:()=>new Promise(()=>{})});controller.abort();await assert.rejects(pending);
+});

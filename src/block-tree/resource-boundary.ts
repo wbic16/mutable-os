@@ -60,6 +60,13 @@ export class ResourceBoundaryBookkeeping {
     if (typeof id === 'string') remove(this.identities, id, c.key);
     if (c.definitionOwnerKey !== undefined) remove(this.retained, c.definitionOwnerKey, c.key);
   }
+  /** Identity-only lookup over maintained evidence; not a membership/audit token. */
+  findDocument(state: RepositoryState, id: string): ContentRecord | undefined {
+    const candidates = this.identities.get(id);
+    if (candidates && candidates.size > 1) throw Error('Ambiguous canonical resource identity');
+    const key = candidates?.values().next().value;
+    return key === undefined ? undefined : state.contents[key];
+  }
   private token(revision: number): CanonicalResourceBoundaryToken {
     const token = Object.freeze({ revision }) as CanonicalResourceBoundaryToken;
     this.tokens.add(token); return token;

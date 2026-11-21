@@ -36,6 +36,7 @@ import { createHash } from 'node:crypto';
 
 /** Canonical table → L3 directory. Actor is reserved (design D5). */
 export const RECORD_KINDS = Object.freeze({
+  DocumentEntityAssociation: 'document-entity-associations',
   SourceClaimReview: 'reviews',
   ExternalIdentity: 'identities',
   SourceSnapshot: 'snapshots',
@@ -62,6 +63,8 @@ export const AUTHORED_ALIAS_ORIGINS = Object.freeze(['curated', 'imported']);
 
 export const KNOWLEDGE_FORMAT = 'phext-knowledge-v1';
 export const CONTROL_PATH = '/.mutable/knowledge.json';
+export const CACHE_PATH = '/.mutable/cache.json';
+export const CACHE_FORMAT = 'phext-cache-v1';
 const L3_ROOT = '/.mutable';
 const L3_ROOT_COORDINATE = [3, 1, 1, 1, 1, 1, 1, 1, 1];
 
@@ -130,6 +133,28 @@ export class PhextKnowledgeStore {
 
   writeControl(control) {
     this.vfs.writeFile(CONTROL_PATH, JSON.stringify({ format: KNOWLEDGE_FORMAT, ...control }));
+  }
+
+  // ------------------------------------------------------------ cache
+
+  /** The shared cache (migration 0011) is disposable external
+   * metadata, deliberately outside the canonical ledger: in phext
+   * mode it persists as this control-style file beside knowledge.json
+   * — never as ledger records — and the foundation seeds its
+   * ephemeral replica from it at open. Rows are the SQL shape
+   * (value still JSON text). */
+  readCache() {
+    let text;
+    try { text = this.vfs.readTextFile(CACHE_PATH); } catch (e) { if (missing(e)) return []; throw e; }
+    const cache = JSON.parse(text);
+    if (cache?.format !== CACHE_FORMAT || !Array.isArray(cache.rows)) {
+      throw Error('Phext cache record is invalid; restore current knowledge explicitly');
+    }
+    return cache.rows;
+  }
+
+  writeCache(rows) {
+    this.vfs.writeFile(CACHE_PATH, JSON.stringify({ format: CACHE_FORMAT, rows }));
   }
 
   /** Mirror vaultGuid in the L3 root index scroll (one-lookup discovery). */

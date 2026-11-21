@@ -1,0 +1,4 @@
+/** Qualified read adapters, independent of creation permissions and stage flags.
+ * This is reading support, not a registry of authorable native operations. */
+const complete=new Set(['standoff-editor-block','container-block','table-block','table-row-block','table-cell-block','indented-list-block','grid-block','grid-row-block','grid-cell-block','tab-row-block','tab-block','document-tab-row-block','document-tab-block','surface-block','side-block','youtube-video-block','page-block','left-margin-block','right-margin-block','checkbox-block','standoff-code-block','mutable/markdown-source-block','mutable/html-source-block','sticky-note-block','timer-block','3d-object-block','canvas-block','image-block','mutable/video-block','youtube-player-block','vimeo-player-block','iframe-block','mutable/pdf-document-block']);
+export const hasNativeSourceReader=(type:string)=>complete.has(type);

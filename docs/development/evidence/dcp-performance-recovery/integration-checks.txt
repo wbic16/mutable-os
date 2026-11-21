@@ -1,0 +1,50 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+(node:66914) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ src/features/dialectic/provider-recovery.test.tsx (2 tests) 81ms
+ ✓ server/dialectic/broker.test.ts (14 tests) 1812ms
+   ✓ accepts the real Vite development proxy while rejecting foreign Origins 1479ms
+ ✓ src/features/dialectic/dialectic.test.tsx (106 tests) 45544ms
+   ✓ makes one undoable mock composition and rejects stale, cancelled and missing context 339ms
+   ✓ keeps unrelated annotated Documents outside typing and submission work 831ms
+   ✓ rejects oversized supplied context before reading its complete text 1814ms
+   ✓ materialises DCP atomically with independent reply/discursive references and AI provenance 846ms
+   ✓ keeps retrieval authorized, bounded, cancellable and absent from typing 1037ms
+   ✓ 4B reuses older argument handles without conflating classifications, and preserves unresolved incident edges 301ms
+   ✓ bounds the selected structural manifest without fetching unselected history or unrelated Documents 1310ms
+   ✓ bounds inventory previews and layout traversal, excludes drafts and foreign Documents, and rejects stale/foreign cursors 968ms
+   ✓ opens a saved conversation from the modal chooser, retaining the previous unsaved editor and reopening without remounts 396ms
+   ✓ resends text as new native identities, preserving the original and an unfinished draft 429ms
+   ✓ retrieves an unselected AI-authored passage and anchors three quoted commentaries without replacing the source 594ms
+   ✓ bounds Stage 1 inspection work and generated grid descendants without increasing exchange budgets 1044ms
+   ✓ qualifies Stage 2 text appearance, literal code/source and curated annotations through native admission 810ms
+   ✓ rejects invalid Stage 2 text declarations atomically and retains the existing source and output budgets 538ms
+   ✓ qualifies Stage 2B native lists/tasks/layouts with protected state, inspection and persistence 793ms
+   ✓ qualifies Stage 2C compound ownership, read-only navigation, discovery, annotations and native reload 528ms
+   ✓ retains prior native authoring families inside Stage 2C compounds 593ms
+   ✓ qualifies Stage 3B external media without native source handles, nested ownership, inspection and persistence 498ms
+   ✓ gates Stage 2D widgets and bounds generated note descendants 353ms
+   ✓ rejects Stage 3A nonmanaged and foreign originals, changed sources and late session changes 480ms
+   ✓ qualifies Stage 3C retained PDF native equivalence, mixed admission, identity, history, persistence and bounded work 933ms
+   ✓ fences Stage 3C changed sources and late sessions, and rolls annotations and fragments back atomically 721ms
+   ✓ preserves Stage 3C feature-disabled schemas and admission 679ms
+   ✓ rejects Stage 3C foreign, archived or malformed source captures without I/O and counts generated resource wrappers 1187ms
+   ✓ rejects independently disabled semantic operations and Entity mentions without committing partial work 316ms
+   ✓ supports reduced-profile mock exchanges and the legacy selection-disabled path 489ms
+   ✓ enforces vocabulary selection recursively and rejects disabled configuration before any commit 303ms
+   ✓ keeps activity summaries idle during source rebasing and unrelated work, with current ranges resolved on inspection 497ms
+   ✓ counts human references without fabricating annotation authorship and keeps historical notices separate 925ms
+   ✓ hides empty and disabled activity controls and rejects fabricated notification claims 8360ms
+   ✓ reveals hidden native source faces from contribution activity without editing authored content 2988ms
+   ✓ retains one activity bar and actionable controls across Desktop and Textual hosting 1091ms
+   ✓ records annotation and Gloss effects in native owned margins without counting their structural infrastructure 378ms
+   ✓ semantic workspace uses the selected AI participant in native provenance and retained request diagnostics 702ms
+   ✓ shows proactive Entity mentions and inspects them in place without canonical or per-keystroke background work 470ms
+
+ Test Files  3 passed (3)
+      Tests  122 passed (122)
+   Start at  19:03:55
+   Duration  56.47s (transform 9.02s, setup 0ms, collect 10.70s, tests 47.44s, environment 1.90s, prepare 368ms)
+

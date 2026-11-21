@@ -1,4 +1,6 @@
 import { markdownLiteralContext } from './markdown-input';
+import { selectedReading } from './inline-alternatives';
+import { contentLength } from '../block-tree/inline-sequence';
 import { resourceSurface } from '../interchange/resource-surface';
 import {webCandidate} from '../web-resources/registry';
 import {academicIdentifier,academicJob} from '../academic/identifiers';
@@ -16,8 +18,11 @@ import { captureFiles, imagesFragment, resolveClipboardImages, type ClipboardFil
 import { createSignal } from 'solid-js';
 import type { ReactiveEditor } from '../reactive-editor/editor';
 import type { Destination } from '../block-tree/types';
-import { resourceOwner, resourceSource } from '../block-tree/resource-identity';
-import { serializeSelection, plainFragment, type Slice } from '../interchange/serializer';
+import { resourceOwner, resourceSource, indexedResourceLookup } from '../block-tree/resource-identity';
+import { serializeSelection, selectionText, plainFragment, type Slice } from '../interchange/serializer';
+import {ScopedSemanticCopyError} from '../block-tree/scoped-semantic-copy';
+import {assertCopyableDialectic} from '../features/dialectic/anchors';
+import {contribution, isConversation} from '../features/dialectic/model';
 import { materializeFragment } from '../interchange/materialize';
 import { inlineMergePredicate } from '../interchange/insertion';
 import { fragmentGroup, validateFragment, type InterchangeScope, type MutableFragment } from '../interchange/fragment';
@@ -44,6 +49,8 @@ export class MutableClipboard {
   private context = () => this.editor.readAssetContext();
   private alive = true;
   private pending = false;
+  private readonly pasteSignal = createSignal<{nodeKey:string;viewId:string}>();
+  readonly pasting = this.pasteSignal[0];
   private cancelPreparation?: () => void;
   private markdownIntent?: { until: number; target: Element; bookmark: Bookmark };
   private markdownReadEpoch = 0;
@@ -126,7 +133,7 @@ export class MutableClipboard {
   }
   private scope(contentKey?: string): InterchangeScope {
     const state = this.editor.repository.readState();
-    const resource = contentKey && resourceOwner(state, contentKey);
+    const resource = contentKey && resourceOwner(state, contentKey,indexedResourceLookup(this.editor.repository));
     let resourceId: string | undefined;
     try { if (resource) resourceId = resourceSource(resource)?.resourceId; } catch { /* Legacy untitled documents have no portable identity. */ }
     return { ...(this.context().cavernId ? { cavernId: this.context().cavernId } : {}), ...(resourceId ? { resourceId } : {}) };
@@ -167,7 +174,21 @@ export class MutableClipboard {
     const mount = nodeKey ? this.editor.mounts.get(nodeKey) : undefined;
     const target = mount?.root ?? (event?.target instanceof Element ? event.target : undefined);
     if (target?.closest('[data-block-selection-handle], [data-block-selection-inspector], input, textarea, select, [role="dialog"]')) return;
-    const resolved = mount && nodeKey ? { nodeKey, handle: mount } : event ? this.editor.mounts.resolveEvent(event) : undefined;
+    let resolved = mount && nodeKey ? { nodeKey, handle: mount } : event ? this.editor.mounts.resolveEvent(event) : undefined;
+    if(event?.type==='copy'&&!nodeKey){
+      // Read-only prose may not take focus from the composer. Copy follows the
+      // actual browser selection, never a stale draft caret. Native multi-Block
+      // selections retain the browser's copy path; custom cross selections are
+      // handled above (including offscreen selections).
+      const selection=document.getSelection();
+      if(selection&&!selection.isCollapsed){
+        const element=(node:Node|null)=>node instanceof Element?node:node?.parentElement??null;
+        const anchor=this.editor.mounts.resolveElement(element(selection.anchorNode));
+        const head=this.editor.mounts.resolveElement(element(selection.focusNode));
+        if(!anchor||anchor.nodeKey!==head?.nodeKey)return;
+        resolved=anchor;
+      }
+    }
     if (!resolved || resolved.handle.inputPolicy !== 'standoff' || resolved.handle.composing) return;
     const node = this.editor.node(resolved.nodeKey); if (!node) return;
     if (event?.type === 'paste') this.ensureEmptyCaret(node.key, resolved.handle);
@@ -230,7 +251,7 @@ export class MutableClipboard {
         if (!this.valid(bookmark, undefined, cross)) throw Error('Destination changed; paste cancelled.');
         const notice = prepared.fragment ? this.insert(bookmark, prepared.fragment, false, prepared.natives) : undefined;
         this.notify(prepared.notice ?? notice ?? 'Pasted Markdown.');
-      });
+      }, bookmark);
     } catch (error) { this.error(error); }
   }
   handleText(event: ClipboardEvent, cross = false): boolean {
@@ -268,7 +289,7 @@ export class MutableClipboard {
           const imported = await this.prepareImport({ data, plain: false, scope: bookmark.scope, assets: [], blocks: [], selections: 1 }, files, bookmark);
           if (!this.valid(bookmark)) throw Error('Destination changed; paste cancelled.');
           const notice = imported.fragment ? this.insert(bookmark, imported.fragment, false, imported.natives) : undefined; this.notify(imported.notice ?? notice ?? 'Pasted Blocks.');
-        });
+        }, bookmark);
         else {
           if (!canWriteAsync()) throw Error('Use Command/Control-C or X with a selected Block in this browser.');
           this.write(bookmark, id === 'selection.cut');
@@ -278,13 +299,27 @@ export class MutableClipboard {
     return true;
   }
   private stop(event: Event) { if (event.cancelable) event.preventDefault(); event.stopImmediatePropagation(); }
+  /** Resolve the draft through occurrence ancestry only, once per paste. */
+  private plainTextDefault(b: Bookmark): boolean {
+    if(b.kind!=='text')return false;
+    const node=b.nodeKey?this.editor.node(b.nodeKey):this.editor.nodeForPlacementInView(b.slices[0]?.placementKey,b.viewId);
+    const projection=node&&this.editor.projections.get(node.viewId);
+    let draft=false;
+    for(let current=node;current;current=projection?.parentOf(current.key)){
+      const metadata=current.payload.metadata as any;
+      const authored=contribution(metadata?.dialectic);
+      if(authored)draft=authored.state==='draft'&&authored.author==='human';
+      if(current.viewType==='document-block')return draft&&isConversation(metadata?.dialectic);
+    }
+    return false;
+  }
   private consume(event: ClipboardEvent, b: Bookmark, cross = false) {
     this.stop(event);
     if (this.pending) throw Error('A clipboard operation is already in progress.');
     if (event.type === 'paste') {
-      const plain = !!b.nodeKey && markdownLiteralContext(this.editor, b.nodeKey, false);
       const intent = this.markdownIntent;
       const asMarkdown = !!intent && intent.until >= Date.now() && (intent.target === (this.editor.mounts.resolveEvent(event)?.handle.focusElement ?? event.target)) && this.valid(intent.bookmark, event, cross);
+      const plain = (!!b.nodeKey && markdownLiteralContext(this.editor, b.nodeKey, false)) || (!asMarkdown && this.plainTextDefault(b));
       this.clearIntent();
       const data = captureClipboard(event.clipboardData);
       const files = this.editor.features.managedAssetClipboard && !plain && !asMarkdown ? captureFiles(event.clipboardData) : [];
@@ -295,7 +330,7 @@ export class MutableClipboard {
           if (!this.valid(b, event, cross)) throw Error('Destination changed; paste cancelled.');
           const notice = prepared.fragment ? this.insert(b, prepared.fragment, false, prepared.natives) : undefined;
           this.notify(prepared.notice ?? notice ?? 'Pasted Mutable content.');
-        });
+        }, b);
         return;
       }
       const imported = importClipboard(data, plain, this.editor.features.externalHtmlClipboard, this.editor.features.markdownClipboard, asMarkdown);
@@ -334,7 +369,7 @@ export class MutableClipboard {
       const signal=this.importController!.signal;const check=()=>{signal.throwIfAborted();if(!this.valid(bookmark,event,cross))throw Error('Destination changed; PDF insertion cancelled. The original may have been retained.');};check();
       const api=new HttpApplicationServices(()=>{const c=this.context();if(!c?.cavernId||!c.session)throw Error('Open a Vault before importing a PDF');return {cavernId:c.cavernId,session:c.session};});
       const result=await api.call('pdf.import',{id:crypto.randomUUID(),source},signal);check();const prepared=pdfBlock(result.snapshot,source);this.insert(bookmark,prepared.fragment,false,[this.editor.features.reversibleBlocks ? resourceSurface(prepared.native) : prepared.native]);this.notify('Pasted retained PDF. Open its local viewer; save to retain this occurrence.');
-    });
+    }, bookmark);
   }
   private pasteIIIF(bookmark:Bookmark,source:string,event:Event,cross:boolean){
     if(bookmark.disjoint)throw Error('Paste an IIIF resource into one selection.');
@@ -342,7 +377,7 @@ export class MutableClipboard {
       const signal=this.importController!.signal;const check=()=>{signal.throwIfAborted();if(!this.valid(bookmark,event,cross))throw Error('Destination changed; IIIF insertion cancelled. Captured sources may have been retained.');};
       check();const api=new HttpApplicationServices(()=>{const c=this.context();if(!c?.cavernId||!c.session)throw Error('Open a Vault before importing IIIF');return {cavernId:c.cavernId,session:c.session};});
       const result=await api.call('iiif.import',{id:crypto.randomUUID(),source},signal);check();const prepared=iiifBlock(result.snapshot,source);this.insert(bookmark,prepared.fragment,false,[this.editor.features.reversibleBlocks ? resourceSurface(prepared.native) : prepared.native]);this.notify('Pasted IIIF source. Activate its viewer to load remote tiles. Save to retain this occurrence.');
-    });
+    }, bookmark);
   }
   private pasteWikipedia(bookmark:Bookmark,source:string,event:Event,cross:boolean){
     if(bookmark.disjoint)throw Error('Paste an article into one selection.');
@@ -350,7 +385,7 @@ export class MutableClipboard {
       const signal=this.importController!.signal;const check=()=>{signal.throwIfAborted();if(!this.valid(bookmark,event,cross))throw Error('Destination changed; article insertion cancelled. Captured knowledge may have been retained.');};
       check();const api=new HttpApplicationServices(()=>{const c=this.context();if(!c?.cavernId||!c.session)throw Error('Open a Vault before importing an article');return {cavernId:c.cavernId,session:c.session};});
       const result=await api.call('encyclopedia.import',{id:crypto.randomUUID(),source},signal);check();const prepared=webArticleBlock(result,source);check();this.insert(bookmark,prepared.fragment,false,[this.editor.features.reversibleBlocks ? resourceSurface(prepared.native) : prepared.native]);this.notify('Pasted captured article. Save the document to retain this occurrence.');
-    });
+    }, bookmark);
   }
   private pasteAcademic(bookmark:Bookmark,source:string,event:Event,cross:boolean){
     if(bookmark.disjoint)throw Error('Paste a citation into one selection.');
@@ -362,7 +397,7 @@ export class MutableClipboard {
       const result=await api.call('academic.import',{id,source},signal);check();
       const prepared=citationBlock(result.citation,source);check();this.insert(bookmark,prepared.fragment,false,[this.editor.features.reversibleBlocks ? resourceSurface(prepared.native) : prepared.native]);
       this.notify('Pasted citation. Save the document to retain this occurrence.');
-    });
+    }, bookmark);
   }
   private pasteResource(bookmark: Bookmark, resource: ResourceUrl, sourceUrl: string, event: Event, cross: boolean) {
     if (bookmark.disjoint) throw Error('Paste a resource Block into a single text selection.');
@@ -381,12 +416,26 @@ export class MutableClipboard {
       const prepared = resourceBlock(sourceUrl, image); check();
       this.insert(bookmark, prepared.fragment, false, [this.editor.features.reversibleBlocks ? resourceSurface(prepared.native) : prepared.native]);
       this.notify(`Pasted ${resource.video ? `${resource.video.provider === 'youtube' ? 'YouTube' : 'Vimeo'} player` : resource.kind === 'image' ? 'image' : 'web page'} Block.`);
-    });
+    }, bookmark);
   }
   private write(b: Bookmark, cut: boolean, event?: ClipboardEvent, cross = false) {
-    const fragment = serializeSelection(this.editor.repository.readState(), b.slices, b.scope);
+    let fragment:MutableFragment;
+    try { fragment=serializeSelection(this.editor.repository.readState(), b.slices, b.scope,false,undefined,(placement,slot)=>{
+      const node=this.editor.nodeForPlacementInView(placement,b.viewId);return node?slot.readings.indexOf(selectedReading(this.editor,node,slot)):0;
+    },indexedResourceLookup(this.editor.repository)); }
+    catch(error){
+      if(cut||b.kind!=='text'||!(error instanceof ScopedSemanticCopyError))throw error;
+      // Ordinary text copy must work for annotated prose. Do not export dangling
+      // identities, or silently turn Cut/native Block cloning into text copying.
+      const representations={'text/plain':selectionText(this.editor.repository.readState(),b.slices)};
+      if(event?.cancelable&&event.clipboardData){writeEventClipboard(event.clipboardData,representations);this.notify('Copied text.');}
+      else this.asyncTask(async()=>{await writeAsyncClipboard(representations);this.notify('Copied text.');});
+      return;
+    }
+    for(const block of fragment.blocks)assertCopyableDialectic(block.data); // reject before clipboard write or Cut
+    if(!this.editor.features.inlineAlternativeInteroperability&&fragment.requiredCapabilities?.length)throw Error('Inline alternative clipboard interoperability is disabled.');
     const representations = exportClipboard(fragment);
-    if (canWriteAsync() && (!event || event.isTrusted)) {
+    if (canWriteAsync() && !event?.clipboardData) {
       // Start the write within the activation callback; don't await a resolver first.
       this.asyncTask(async () => {
         await writeAsyncClipboard(representations);
@@ -403,20 +452,23 @@ export class MutableClipboard {
       this.notify(cut ? 'Cut content. Undo or Recover cut copy restores access if the clipboard fails.' : 'Copied Mutable content.');
     }
   }
-  private asyncTask(task: () => Promise<void>) {
+  private asyncTask(task: () => Promise<void>, destination?: Bookmark) {
     this.pending = true;
+    if(destination?.nodeKey)this.pasteSignal[1]({nodeKey:destination.nodeKey,viewId:destination.viewId});
     this.importController = new AbortController(); this.assetInserted = false;
     void task().catch(e => { if (this.alive) this.error(e); }).finally(async () => {
       const lease = this.assetLease, inserted = this.assetInserted; this.assetLease = undefined;
-      this.pending = false; this.importController = undefined;
+      this.pending = false; this.importController = undefined; this.pasteSignal[1](undefined);
       if (lease) { try { await this.assets.action(lease, inserted ? 'finish' : 'abort'); } catch { /* Durable ledger retains publication and recovers staging on next Cavern open. */ } }
     });
   }
   private async prepareImport(input: PastePreparation, files: ClipboardFile[], bookmark: Bookmark, event?: Event, cross = false): Promise<PreparedPaste> {
     if (!this.editor.features.managedAssetClipboard || input.plain || input.asMarkdown) return this.prepare(input);
     const parsed = await this.prepare({ ...input, parseOnly: true });
-    const fragment = parsed.fragment ?? (files.length ? imagesFragment(files) : undefined);
+    let fragment = parsed.fragment ?? (files.length ? imagesFragment(files) : undefined);
     if (!fragment) return parsed;
+    const adapt=bookmark.nodeKey && this.editor.mounts.get(bookmark.nodeKey)?.prepareInlinePaste;
+    if(adapt)fragment=adapt(fragment);
     const valid = () => this.valid(bookmark, event, cross);
     const choose = (urls: string[], error?: string) => new Promise<string[] | undefined>(resolve => {
       if (!valid()) { resolve(undefined); return; }
@@ -488,6 +540,11 @@ export class MutableClipboard {
     this.insert(b, plainFragment(''), true);
   }
   private insert(b: Bookmark, fragment: MutableFragment, cut = false, prepared?: BlockFragment[]): string | undefined {
+    const adapt=b.nodeKey && this.editor.mounts.get(b.nodeKey)?.prepareInlinePaste;
+    if(adapt){const next=adapt(fragment);if(next!==fragment){fragment=next;prepared=undefined;}}
+    const hasAlternatives=fragment.blocks.some(c=>c.inline?.atoms.some(a=>a.kind==='alternative'));
+    if(hasAlternatives&&!this.editor.features.inlineAlternativeInteroperability)throw Error('Inline alternative clipboard interoperability is disabled.');
+    if(hasAlternatives&&!this.editor.features.compactCanonicalText)throw Error('Inline alternatives require compact admission.');
     validateFragment(fragment);
     let assets = new Map<string, string>();
     // Only imports containing embeds need an availability check. No typing or
@@ -519,10 +576,11 @@ export class MutableClipboard {
       const root = e.fragment.state.contents[e.fragment.state.placements[e.fragment.roots[0]].contentKey];
       return !inlineMergePredicate(e.fragment, 'standoff-editor-block')(root);
     })) throw Error('Paste structured content into a single text selection.');
+    if(adapt && edits.some(e=>e.segments.length!==1 || e.fragment.roots.length!==1 || !inlineMergePredicate(e.fragment,'standoff-editor-block')(e.fragment.state.contents[e.fragment.state.placements[e.fragment.roots[0]].contentKey])))throw Error('This paste requires independent Blocks. Paste beside the composition to preserve its source.');
     const results = this.editor.commands.insertMutableText(edits, cut); this.assetInserted = true;
     const positions = results.map((r, i) => ({ ...r, caret: r.caret + edits.slice(i + 1).reduce((delta, e) => {
       const root = e.fragment.state.contents[e.fragment.state.placements[e.fragment.roots[0]].contentKey];
-      return delta + root.inlineContent.length - (e.segments[0].end - e.segments[0].start);
+      return delta + contentLength(root) - (e.segments[0].end - e.segments[0].start);
     }, 0) })).reverse();
     const result = b.disjoint ? positions[Math.min(b.primaryIndex ?? 0, positions.length - 1)] : results.at(-1)!;
     this.editor.crossText.clear();
@@ -544,5 +602,5 @@ export class MutableClipboard {
     this.asyncTask(async () => { await writeAsyncClipboard(exportClipboard(fragment)); this.notify('Recovered the cut content to the clipboard.'); });
   }
   private error(error: unknown) { this.notify(error instanceof Error ? error.message : String(error)); }
-  dispose() { this.alive = false; this.projectionIntent=undefined; this.cancel(); this.clearIntent(); this.recoverySignal[1](undefined); this.dismiss(); }
+  dispose() { this.pasteSignal[1](undefined); this.alive = false; this.projectionIntent=undefined; this.cancel(); this.clearIntent(); this.recoverySignal[1](undefined); this.dismiss(); }
 }

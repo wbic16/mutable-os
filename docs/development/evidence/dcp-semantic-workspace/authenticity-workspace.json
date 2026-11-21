@@ -1,0 +1,63 @@
+{
+  "source": "vaults/imported/Conversation on November 11, 2026.ink",
+  "sha256": "b1f60392e65bf912fc338355c6f7fc6ac0e8b3b04cc7a2a15fb0d1e0866166d3",
+  "workspace": {
+    "version": 1,
+    "scope": "current-document",
+    "resourceId": "1e567a77-495c-4a83-83d1-143a34a6b7f8",
+    "forParticipant": "qualification-agent",
+    "authority": "current-exchange-only",
+    "coverage": {
+      "status": "partial",
+      "completeRegistry": false,
+      "candidates": 1,
+      "indexedDefinitions": 0,
+      "selection": "focus-central-recent",
+      "projected": 0,
+      "unavailable": 0,
+      "bytes": 1037,
+      "limit": 8192
+    },
+    "entities": [],
+    "arguments": [],
+    "relationships": [],
+    "glosses": [],
+    "classifications": [
+      {
+        "propertyId": "a5b6d873-6606-4f7f-9627-cbe5ceec85a3",
+        "type": "dialectic/claim",
+        "source": "src:dHbU4AqRXS_RYmPrMhCiqA:b1",
+        "author": "1e567a77-495c-4a83-83d1-143a34a6b7f8:ai"
+      }
+    ],
+    "sourceLocations": [
+      {
+        "handle": "src:dHbU4AqRXS_RYmPrMhCiqA:b1",
+        "blockId": "076dbef2-3d1c-4964-9d61-1cbfe67f890e",
+        "contributionId": "c1e15a95-431c-4035-a549-7eeb66895dde",
+        "ordinal": 7,
+        "participant": {
+          "id": "1e567a77-495c-4a83-83d1-143a34a6b7f8:human",
+          "kind": "human",
+          "name": "Local author"
+        },
+        "readRequired": true
+      }
+    ],
+    "omissions": [
+      "Selected working set; discover additional identities with search_entities and passages with native source tools."
+    ]
+  },
+  "diagnostics": {
+    "visited": 0,
+    "characters": 0,
+    "reads": 0,
+    "searches": 0,
+    "inventories": 0,
+    "inventoryVisited": 0,
+    "inventoryPreviewCells": 0,
+    "entitySearches": 0,
+    "entityCandidates": 0,
+    "workspaceBytes": 1037
+  }
+}

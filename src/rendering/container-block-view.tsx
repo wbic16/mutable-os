@@ -5,7 +5,7 @@ import { ChildBlocks, RelationBlocks } from "./block-outlet";
 import { blockAppearance } from "./appearance";
 
 export function ContainerBlockView(props: BlockViewProps & { class?: string; contentClass?: string }) {
-  const { editor, projection } = useReactiveView();
+  const { editor, projection, passive } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
   const appearance = createMemo(() => blockAppearance(node()));
   let root!: HTMLDivElement;
@@ -15,7 +15,7 @@ export function ContainerBlockView(props: BlockViewProps & { class?: string; con
     disposeMount = editor.mounts.register(props.nodeKey, {
       root,
       focusElement: root,
-      inputPolicy: "container",
+      inputPolicy: passive ? "opaque-widget" : "container",
       focus: () => root.focus({ preventScroll: true }),
     });
   });

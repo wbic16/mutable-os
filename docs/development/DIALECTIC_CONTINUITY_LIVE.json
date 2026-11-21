@@ -1,0 +1,266 @@
+{
+  "draftIme": true,
+  "protectedTyping": true,
+  "selected": "Rain",
+  "copyStatus": "Copied Mutable content.",
+  "annotationAllowed": true,
+  "pasteStatus": "Preparing paste…",
+  "draftPaste": true,
+  "protectedPasteCutIme": true,
+  "firstReceipt": {
+    "version": 1,
+    "binding": "952964de323d2476baf35771c6605dc7d431ff727105d59fef47184cb7fc9023",
+    "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+    "generation": 1,
+    "conversationId": "conv_6aefaae775c481909826fa789f7c0245003073876b15cd31",
+    "exchangeId": "8a3a9ad3-7ddf-450d-aaab-b26be9905688"
+  },
+  "recall": {
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "ae838d49-e6b5-4528-a968-a5ccd40a7fa1",
+      "intent": "answer",
+      "replyTargets": [
+        "source-443cf89e-247c-4fbf-8542-65b2380af44d"
+      ],
+      "composition": [
+        {
+          "id": "p1",
+          "kind": "paragraph",
+          "markup": "The picnic code was cobalt cedar 42.",
+          "ranges": []
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "selected": [],
+    "receipt": {
+      "version": 1,
+      "binding": "952964de323d2476baf35771c6605dc7d431ff727105d59fef47184cb7fc9023",
+      "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+      "generation": 1,
+      "conversationId": "conv_6aefaae775c481909826fa789f7c0245003073876b15cd31",
+      "exchangeId": "ae838d49-e6b5-4528-a968-a5ccd40a7fa1"
+    },
+    "usage": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_003073876b15cd31006aefaaecacc8819083ebca01bf054505",
+        "startedUtc": "2026-11-07T22:49:16.401Z",
+        "completedUtc": "2026-11-07T22:49:18.420Z",
+        "usage": {
+          "input_tokens": 11383,
+          "output_tokens": 137,
+          "total_tokens": 11520
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "snapshots": 0,
+    "rebuilds": 0,
+    "commitMs": 6.5,
+    "elapsed": 3238.600000023842
+  },
+  "structural": {
+    "receipt": {
+      "version": 1,
+      "binding": "952964de323d2476baf35771c6605dc7d431ff727105d59fef47184cb7fc9023",
+      "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+      "generation": 1,
+      "conversationId": "conv_6aefaae775c481909826fa789f7c0245003073876b15cd31",
+      "exchangeId": "3f8435db-dfef-4c95-b065-bc24bdfb28f6"
+    },
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "3f8435db-dfef-4c95-b065-bc24bdfb28f6",
+      "intent": "reply",
+      "replyTargets": [
+        "source-bc9cc28f-477c-4f80-ae53-91b5fdd41289"
+      ],
+      "composition": [
+        {
+          "id": "p1",
+          "kind": "paragraph",
+          "markup": "<annotation type=\"dialectic/claim\" id=\"passage1\">Rain is forecast.</annotation> <annotation type=\"dialectic/suggestion\" id=\"passage2\">Let us meet indoors.</annotation>",
+          "ranges": []
+        }
+      ],
+      "anchors": [
+        {
+          "id": "a1",
+          "source": "source-bc9cc28f-477c-4f80-ae53-91b5fdd41289",
+          "revision": "e2e2bd89-8009-4b67-8151-a822064ea658",
+          "selector": {
+            "exact": "Rain is forecast.",
+            "prefix": "",
+            "suffix": " The picnic code is cobalt cedar 42. Please acknowledge briefly."
+          }
+        }
+      ],
+      "entities": [],
+      "interpretations": [
+        {
+          "id": "i1",
+          "target": "a1",
+          "type": "dialectic/claim",
+          "ref": null,
+          "attributes": []
+        }
+      ],
+      "arguments": [
+        {
+          "id": "arg1",
+          "anchor": "a1"
+        },
+        {
+          "id": "arg2",
+          "anchor": "passage2"
+        }
+      ],
+      "glosses": [],
+      "relations": [
+        {
+          "id": "r1",
+          "type": "supports",
+          "from": "arg1",
+          "to": "arg2",
+          "kind": "argument"
+        }
+      ],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "annotations": [
+      {
+        "blockId": "3ae0c9a4-3e95-493e-8716-dbc4bc001d15",
+        "propertyId": "2a633b10-c04c-48ec-af84-74ff9a0ea07e"
+      },
+      {
+        "blockId": "3ae0c9a4-3e95-493e-8716-dbc4bc001d15",
+        "propertyId": "64bc789d-cb46-4b65-96ac-40d518ed5817"
+      },
+      {
+        "blockId": "721fcf08-92cb-4129-965b-81276aa3aea9",
+        "propertyId": "655818cf-6c8d-49a1-938b-a64c381158af"
+      }
+    ],
+    "references": [
+      {
+        "kind": "block",
+        "resourceId": "eb82c5a8-6852-4281-95dc-7bdcee17e3e9",
+        "blockId": "721fcf08-92cb-4129-965b-81276aa3aea9"
+      }
+    ],
+    "tools": [
+      "search_symposium"
+    ],
+    "usage": [
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_003073876b15cd31006aefaaf0aa188190aa8ea7b4e2b90862",
+        "startedUtc": "2026-11-07T22:49:20.375Z",
+        "completedUtc": "2026-11-07T22:49:22.087Z",
+        "usage": {
+          "input_tokens": 15225,
+          "output_tokens": 31,
+          "total_tokens": 15256
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      },
+      {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_003073876b15cd31006aefaaf265508190b5989ae90d2f86bf",
+        "startedUtc": "2026-11-07T22:49:22.093Z",
+        "completedUtc": "2026-11-07T22:49:25.243Z",
+        "usage": {
+          "input_tokens": 16154,
+          "output_tokens": 333,
+          "total_tokens": 16487
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "repairs": 0,
+    "attempts": [
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_003073876b15cd31006aefaaf0aa188190aa8ea7b4e2b90862",
+          "startedUtc": "2026-11-07T22:49:20.375Z",
+          "completedUtc": "2026-11-07T22:49:22.087Z",
+          "usage": {
+            "input_tokens": 15225,
+            "output_tokens": 31,
+            "total_tokens": 15256
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [
+          {
+            "id": "call_2OOHv9jD34GwnAjwR3OlcZry",
+            "tool": "search_symposium",
+            "arguments": {
+              "query": "Rain is forecast. The picnic code",
+              "limit": 5
+            }
+          }
+        ],
+        "toolResultIds": [
+          "provider-1-0"
+        ]
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_003073876b15cd31006aefaaf265508190b5989ae90d2f86bf",
+          "startedUtc": "2026-11-07T22:49:22.093Z",
+          "completedUtc": "2026-11-07T22:49:25.243Z",
+          "usage": {
+            "input_tokens": 16154,
+            "output_tokens": 333,
+            "total_tokens": 16487
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": []
+      }
+    ],
+    "sourceAnnotation": true
+  },
+  "inspection": "dialectic/claimRain is forecast.Authored by ai · Source author: aiExchange 3f8435db-dfef-4c95-b065-bc24bdfb28f6. Current native annotation; inspection does not edit it.",
+  "undoRedo": true,
+  "desktopTextual": true,
+  "saveReload": true,
+  "liveProvider": true,
+  "wire": []
+}

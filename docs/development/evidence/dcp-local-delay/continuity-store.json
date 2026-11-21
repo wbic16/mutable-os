@@ -1,0 +1,26 @@
+{
+  "temporaryDirectory": true,
+  "providerCalls": 0,
+  "samples": [
+    {
+      "mode": "cold-write",
+      "ms": 334.1945
+    },
+    {
+      "mode": "warm-read",
+      "ms": 105.85750000000002
+    },
+    {
+      "mode": "warm-write",
+      "ms": 124.62125000000003
+    },
+    {
+      "mode": "warm-read",
+      "ms": 113.48249999999996
+    },
+    {
+      "mode": "warm-write",
+      "ms": 151.6574999999999
+    }
+  ]
+}

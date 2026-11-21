@@ -1,0 +1,11 @@
+{
+  "lexicalFirst": true,
+  "semanticLater": true,
+  "selectionPreserved": true,
+  "focusPreserved": true,
+  "calls": [
+    "lexical",
+    "hybrid"
+  ],
+  "status": "Partial saved-source coverage; unsaved Documents remain outside this index. Indexing and permissions: Workspace → Index Cavern."
+}

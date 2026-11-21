@@ -9,7 +9,11 @@ import "./view.css";
 
 export function ThreeDObjectView(props: { runtime: BlockRuntime }) {
   const runtime = props.runtime;
-  const state = createMemo(() => readObject(runtime.field("object3D")));
+  const protectedState=createMemo(()=>runtime.authoredStateProtected());
+  const authored = createMemo(() => readObject(runtime.field("object3D")));
+  const [presentation,setPresentation]=createSignal<Partial<ObjectState>>({});
+  createEffect(on(()=>[authored(),protectedState()] as const,()=>setPresentation({})));
+  const state = createMemo(() => {const saved=authored();return saved?{...saved,...(protectedState()?presentation():{})}:undefined;});
   const size = createMemo(() => objectSize(runtime.field("blockProperties")));
   const [error, setError] = createSignal("");
   const [ready, setReady] = createSignal(false);
@@ -22,14 +26,19 @@ export function ThreeDObjectView(props: { runtime: BlockRuntime }) {
   const valid = () => !disposed && root?.isConnected && !root.closest("[hidden], [inert]");
   const change = (patch: Partial<ObjectState>, label: string) => {
     if (!valid() || !state()) return;
+    if(protectedState()){
+      if(Object.keys(patch).some(key=>!['view','autoRotate'].includes(key)))return;
+      setPresentation(current=>({...current,...patch}));return;
+    }
     if (patch.view) scene?.view(patch.view);
     const before = runtime.field("object3D"), next = patchObject(before, patch);
     if (JSON.stringify(before) !== JSON.stringify(next)) runtime.setField("object3D", next, label);
   };
   const resize = createFloatingWindowResize({ element: () => root, size, minimum: { width: 160, height: 160 }, maximum: { width: 640, height: 640 },
-    aspectRatio: 1, scale: runtime.scale, constrainToViewport: false, enabled: () => !!valid(),
-    onCommit: next => runtime.setField("blockProperties", sizeProperties(runtime.field("blockProperties"), next.width), "Resize 3D Object"),
+    aspectRatio: 1, scale: runtime.scale, constrainToViewport: false, enabled: () => !!valid() && !protectedState(),
+    onCommit: next => {if(!protectedState())runtime.setField("blockProperties", sizeProperties(runtime.field("blockProperties"), next.width), "Resize 3D Object");},
   });
+  createEffect(()=>{if(protectedState())resize.cancel();});
   const activity = () => scene?.activity(visible && !!valid(), reduced, !!gesture || !!keys || runtime.contextMenuOpen());
   const cancel = () => {
     const saved = gesture?.start ?? keys?.start, id = gesture?.id;
@@ -108,7 +117,7 @@ export function ThreeDObjectView(props: { runtime: BlockRuntime }) {
   }));
   createEffect(() => { runtime.contextMenuOpen(); activity(); });
   onMount(() => {
-    runtime.mountWidget(root, { contextActions: () => objectMenu(state(), change, () => scene?.fit(), () => scene?.view() ?? state()!.view) });
+    runtime.mountWidget(root, { contextActions: () => objectMenu(state(), change, () => scene?.fit(), () => scene?.view() ?? state()!.view,protectedState()) });
     const media = window.matchMedia("(prefers-reduced-motion: reduce)"); reduced = media.matches;
     const measure = () => { width = root.clientWidth; height = root.clientHeight; scene?.size(width, height); void start(); };
     const observer = new ResizeObserver(measure); observer.observe(root);
@@ -134,7 +143,7 @@ export function ThreeDObjectView(props: { runtime: BlockRuntime }) {
     <Show when={canvasVersion()} keyed>{_version => <canvas ref={canvas} class="three-d-object__canvas" tabIndex={0} aria-label="3D object. Drag to orbit; arrows adjust the view; Home resets; Shift F10 opens the menu."
       onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={cancel} onLostPointerCapture={() => { if (gesture) cancel(); }} />}</Show>
     <button class="three-d-object__menu" type="button" aria-label="3D Object menu" onClick={menu}>•••</button>
-    <FloatingWindowResizeHandle controller={resize} label="Resize 3D Object" class="three-d-object__resize" />
+    <Show when={!protectedState()}><FloatingWindowResizeHandle controller={resize} label="Resize 3D Object" class="three-d-object__resize" /></Show>
     <Show when={!state() || error()}><div class="three-d-object__fallback" role="status"><span>{!state() ? "This 3D object type or version is unavailable. Its saved data is preserved." : error()}</span><Show when={state()}><button type="button" onClick={retry}>Retry graphics</button></Show></div></Show>
   </div>;
 }

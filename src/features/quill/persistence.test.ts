@@ -1,0 +1,75 @@
+import {quillExample} from './examples';
+import {render} from 'solid-js/web';
+import {createComponent} from 'solid-js';
+import {registerApplicationViews} from '../../application/features';
+import {ReactiveTreeView} from '../../rendering/reactive-tree-view';
+import {linkedWaves} from './geometry-session';
+// @vitest-environment jsdom
+import { expect, it, vi } from 'vitest';
+import express from 'express';
+import { mkdtemp, readFile, writeFile, readdir, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { createNativeDocumentStoreRouter } from '../../../server/native-document-store.mjs';
+import { ReactiveEditor } from '../../reactive-editor/editor';
+import { nativeDocumentSession } from '../../persistence/native-session';
+import { captureNative, nativeText } from '../../persistence/native-resource';
+import { convertQuill as convert, invokeQuill as invoke, quillRecord as record } from '../../application/quill-operations';
+import { QUILL_TYPE } from './model';
+import { fixture } from '../../qualification/quill/model';
+
+it('uses the real native coordinator to save in place only on request, including geometry, text and new annotations', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'quill-native-save-'));
+  const editors: ReactiveEditor[] = [];
+  const disposers:Array<()=>void>=[];
+  vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({font:'',measureText:(s:string)=>({width:s.length*10})} as any);
+  const initial = new ReactiveEditor(fixture()); editors.push(initial);
+  const filename = 'quill.ink', location = { folder: '.', filename };
+  const before = nativeText(captureNative(initial.repository.readState(), 'quill-document'));
+  await writeFile(path.join(root, filename), before);
+  const app = express(); app.use('/api/native', createNativeDocumentStoreRouter({ root }));
+  const server = await new Promise<ReturnType<typeof app.listen>>(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  const actualFetch = globalThis.fetch, address = server.address() as { port: number };
+  const requests = vi.fn((input: any, options: any) => actualFetch(typeof input === 'string' && input.startsWith('/') ? `http://127.0.0.1:${address.port}${input}` : input, options));
+  vi.stubGlobal('fetch', requests);
+  const make = () => { const editor = new ReactiveEditor({ type: 'workspace-block', children: [{ type: 'workspace-object-bank-block', children: [] }] }); editors.push(editor); return editor; };
+  try {
+    const editor = make(), service = nativeDocumentSession(editor), id = await service.open(location);
+    const view = editor.createView('save-proof'), source = Object.values(view.state.nodes).find(n => n.payload.id === 'quill-source')!;
+    expect(service.isDirty(id)).toBe(false); requests.mockClear();
+    const snapshot = vi.spyOn(editor.repository, 'snapshot');
+    const wrapper = convert(editor, invoke(editor, source.key));
+    registerApplicationViews(editor);
+    const doc=Object.values(view.state.nodes).find(n=>n.payload.id==='quill-document')!,mounted=editor.createView('mounted-document',doc.placementKey),host=document.body.appendChild(document.createElement('main'));
+    disposers.push(render(()=>createComponent(ReactiveTreeView,{editor,projection:mounted}),host),()=>host.remove());editor.installGateway(document);
+    const target=mounted.nodeForPlacement(source.placementKey)!,mount=editor.mounts.get(target.key)!;
+    expect(host.querySelector('.quill-canvas')).not.toBeNull();
+    const config = linkedWaves(record(editor, wrapper).payload.quill as any);
+    editor.commands.setPayloadField(wrapper, 'quill', { ...config, viewport: {width:800,height:300} });
+    mount.focus();mount.restoreInlineSelection!({anchor:0,head:0});mount.focusElement.dispatchEvent(new InputEvent('beforeinput',{data:'New ',inputType:'insertText',bubbles:true,cancelable:true}));
+    expect(mount.captureText!().startsWith('New ')).toBe(true);
+    const properties = record(editor, source.placementKey).payload.standoffProperties as any[];
+    editor.commands.setPayloadField(source.placementKey, 'standoffProperties', [...properties, { id: 'new-annotation', type: 'style/highlight', start: 0, end: 2 }], 'Annotate Quill text');
+    editor.commands.insert(quillExample(true),{kind:'at',parentKey:doc.key,index:doc.children.length});
+    expect(service.isDirty(id)).toBe(true);
+    expect(snapshot).not.toHaveBeenCalled(); snapshot.mockRestore();
+    expect(requests).not.toHaveBeenCalled();
+    expect(await readFile(path.join(root, filename), 'utf8')).toBe(before);
+    expect(await service.save(id)).toMatchObject({ phase: 'saved', dirty: false });
+    expect(service.location(id)).toEqual(location);
+    expect((await readdir(root)).filter(n => /\.(ink|json|md)$/.test(n))).toEqual([filename]);
+    const expected = nativeText(captureNative(editor.repository.readState(), id));
+    const fresh = make(); expect(await nativeDocumentSession(fresh).open(location)).toBe(id);
+    expect(nativeText(captureNative(fresh.repository.readState(), id))).toBe(expected);
+    const restored = Object.values(fresh.repository.readState().contents);
+    expect((restored.find(c=>c.payload.id===record(editor,wrapper).payload.id)!.payload.quill as any).paths).toHaveLength(3);
+    registerApplicationViews(fresh);const freshView=fresh.createView('reopened-svg'),freshDoc=Object.values(freshView.state.nodes).find(n=>n.payload.id==='quill-document')!,reopened=fresh.createView('reopened-document',freshDoc.placementKey),reopenedRoot=document.body.appendChild(document.createElement('main'));
+    disposers.push(render(()=>createComponent(ReactiveTreeView,{editor:fresh,projection:reopened}),reopenedRoot),()=>reopenedRoot.remove());expect(reopenedRoot.querySelector('.quill-canvas')).not.toBeNull();
+    expect((restored.find(c=>c.payload.id===record(editor,wrapper).payload.id)!.payload.quill as any).viewport).toEqual({width:800,height:300});
+    expect((restored.find(c => c.payload.id === 'quill-source')!.payload.standoffProperties as any[]).some(p => p.id === 'new-annotation')).toBe(true);
+  } finally {
+    disposers.reverse().forEach(f=>f());editors.forEach(e => e.dispose()); vi.unstubAllGlobals(); vi.restoreAllMocks();
+    await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+    await rm(root, { recursive: true, force: true });
+  }
+});

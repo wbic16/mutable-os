@@ -1,0 +1,99 @@
+{
+  "samplesPerRegime": 20,
+  "percentileMethod": "nearest-rank P95, sorted sample 19 of 20",
+  "stress": {
+    "characters": 5184,
+    "paths": 40,
+    "annotations": 90,
+    "otherCompositions": 3,
+    "unrelatedParagraphs": 200,
+    "decorativePaths": 1200,
+    "mountedOccurrences": 3
+  },
+  "regimes": {
+    "typingBefore": {
+      "handlerMedianMs": 1.7,
+      "handlerP95Ms": 5.3,
+      "trustedFirstFrameMedianMs": 15.25,
+      "trustedFirstFrameP95Ms": 17,
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 40,
+        "rangeRects": 20
+      }
+    },
+    "typingAfter": {
+      "handlerMedianMs": 2.9,
+      "handlerP95Ms": 3.2,
+      "trustedFirstFrameMedianMs": 18.8,
+      "trustedFirstFrameP95Ms": 20,
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 0,
+        "rangeRects": 0
+      }
+    },
+    "typingStressNative": {
+      "handlerMedianMs": 92.8,
+      "handlerP95Ms": 98.8,
+      "trustedFirstFrameMedianMs": 160.8,
+      "trustedFirstFrameP95Ms": 173.4,
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 1860,
+        "rangeRects": 1800
+      }
+    },
+    "typingStress": {
+      "handlerMedianMs": 76.85,
+      "handlerP95Ms": 78.7,
+      "trustedFirstFrameMedianMs": 113.85,
+      "trustedFirstFrameP95Ms": 116.2,
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 0,
+        "rangeRects": 0
+      }
+    }
+  }
+}

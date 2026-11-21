@@ -1,0 +1,450 @@
+{
+  "date": "2026-11-11",
+  "method": "Controlled offline assembly with retained request contexts. Before reconstructs the former user projection using the same current system/schema/settings. After adds qualified alias guidance and empty-field negotiation. o200k_base local text/JSON counts, not provider billing or measured latency.",
+  "values": [
+    {
+      "name": "editorial-general",
+      "provider": "openai",
+      "before": {
+        "wire": {
+          "bytes": 82627,
+          "tokens": 17881
+        },
+        "system": {
+          "bytes": 25640,
+          "tokens": 4647
+        },
+        "userText": {
+          "bytes": 35963,
+          "tokens": 7563
+        },
+        "schema": {
+          "bytes": 15725,
+          "tokens": 4311
+        }
+      },
+      "dedup": {
+        "wire": {
+          "bytes": 65843,
+          "tokens": 14562
+        },
+        "system": {
+          "bytes": 25640,
+          "tokens": 4647
+        },
+        "userText": {
+          "bytes": 19391,
+          "tokens": 4423
+        },
+        "schema": {
+          "bytes": 15725,
+          "tokens": 4311
+        }
+      },
+      "after": {
+        "wire": {
+          "bytes": 66430,
+          "tokens": 14689
+        },
+        "system": {
+          "bytes": 26364,
+          "tokens": 4798
+        },
+        "userText": {
+          "bytes": 19415,
+          "tokens": 4428
+        },
+        "schema": {
+          "bytes": 15557,
+          "tokens": 4277
+        }
+      },
+      "omitted": [
+        "suggestions",
+        "promotionRecommendations"
+      ],
+      "responseFieldOmission": {
+        "before": {
+          "bytes": 1522,
+          "tokens": 345
+        },
+        "after": {
+          "bytes": 1475,
+          "tokens": 337
+        }
+      }
+    },
+    {
+      "name": "editorial-general",
+      "provider": "anthropic",
+      "before": {
+        "wire": {
+          "bytes": 146480,
+          "tokens": 36570
+        },
+        "system": {
+          "bytes": 25640,
+          "tokens": 4647
+        },
+        "userText": {
+          "bytes": 35963,
+          "tokens": 7563
+        },
+        "schema": {
+          "bytes": 79762,
+          "tokens": 23041
+        }
+      },
+      "dedup": {
+        "wire": {
+          "bytes": 129696,
+          "tokens": 33251
+        },
+        "system": {
+          "bytes": 25640,
+          "tokens": 4647
+        },
+        "userText": {
+          "bytes": 19391,
+          "tokens": 4423
+        },
+        "schema": {
+          "bytes": 79762,
+          "tokens": 23041
+        }
+      },
+      "after": {
+        "wire": {
+          "bytes": 130283,
+          "tokens": 33378
+        },
+        "system": {
+          "bytes": 26364,
+          "tokens": 4798
+        },
+        "userText": {
+          "bytes": 19415,
+          "tokens": 4428
+        },
+        "schema": {
+          "bytes": 79594,
+          "tokens": 23007
+        }
+      },
+      "omitted": [
+        "suggestions",
+        "promotionRecommendations"
+      ],
+      "responseFieldOmission": {
+        "before": {
+          "bytes": 1522,
+          "tokens": 345
+        },
+        "after": {
+          "bytes": 1475,
+          "tokens": 337
+        }
+      }
+    },
+    {
+      "name": "editorial-core",
+      "provider": "openai",
+      "before": {
+        "wire": {
+          "bytes": 47281,
+          "tokens": 10069
+        },
+        "system": {
+          "bytes": 19891,
+          "tokens": 3635
+        },
+        "userText": {
+          "bytes": 17738,
+          "tokens": 3862
+        },
+        "schema": {
+          "bytes": 6033,
+          "tokens": 1614
+        }
+      },
+      "dedup": {
+        "wire": {
+          "bytes": 35839,
+          "tokens": 7830
+        },
+        "system": {
+          "bytes": 19891,
+          "tokens": 3635
+        },
+        "userText": {
+          "bytes": 6400,
+          "tokens": 1702
+        },
+        "schema": {
+          "bytes": 6033,
+          "tokens": 1614
+        }
+      },
+      "after": {
+        "wire": {
+          "bytes": 35873,
+          "tokens": 7794
+        },
+        "system": {
+          "bytes": 20610,
+          "tokens": 3781
+        },
+        "userText": {
+          "bytes": 6424,
+          "tokens": 1707
+        },
+        "schema": {
+          "bytes": 5319,
+          "tokens": 1422
+        }
+      },
+      "omitted": [
+        "suggestions",
+        "promotionRecommendations",
+        "anchors",
+        "entities",
+        "interpretations",
+        "arguments",
+        "glosses",
+        "relations"
+      ],
+      "responseFieldOmission": {
+        "before": {
+          "bytes": 459,
+          "tokens": 113
+        },
+        "after": {
+          "bytes": 321,
+          "tokens": 84
+        }
+      }
+    },
+    {
+      "name": "editorial-core",
+      "provider": "anthropic",
+      "before": {
+        "wire": {
+          "bytes": 52454,
+          "tokens": 11616
+        },
+        "system": {
+          "bytes": 19891,
+          "tokens": 3635
+        },
+        "userText": {
+          "bytes": 17738,
+          "tokens": 3862
+        },
+        "schema": {
+          "bytes": 11390,
+          "tokens": 3202
+        }
+      },
+      "dedup": {
+        "wire": {
+          "bytes": 41012,
+          "tokens": 9377
+        },
+        "system": {
+          "bytes": 19891,
+          "tokens": 3635
+        },
+        "userText": {
+          "bytes": 6400,
+          "tokens": 1702
+        },
+        "schema": {
+          "bytes": 11390,
+          "tokens": 3202
+        }
+      },
+      "after": {
+        "wire": {
+          "bytes": 41046,
+          "tokens": 9341
+        },
+        "system": {
+          "bytes": 20610,
+          "tokens": 3781
+        },
+        "userText": {
+          "bytes": 6424,
+          "tokens": 1707
+        },
+        "schema": {
+          "bytes": 10676,
+          "tokens": 3010
+        }
+      },
+      "omitted": [
+        "suggestions",
+        "promotionRecommendations",
+        "anchors",
+        "entities",
+        "interpretations",
+        "arguments",
+        "glosses",
+        "relations"
+      ],
+      "responseFieldOmission": {
+        "before": {
+          "bytes": 459,
+          "tokens": 113
+        },
+        "after": {
+          "bytes": 321,
+          "tokens": 84
+        }
+      }
+    },
+    {
+      "name": "workspace-3",
+      "provider": "openai",
+      "before": {
+        "wire": {
+          "bytes": 90099,
+          "tokens": 19587
+        },
+        "system": {
+          "bytes": 28410,
+          "tokens": 5157
+        },
+        "userText": {
+          "bytes": 40665,
+          "tokens": 8820
+        },
+        "schema": {
+          "bytes": 14690,
+          "tokens": 4038
+        }
+      },
+      "dedup": {
+        "wire": {
+          "bytes": 70524,
+          "tokens": 15750
+        },
+        "system": {
+          "bytes": 28410,
+          "tokens": 5157
+        },
+        "userText": {
+          "bytes": 21331,
+          "tokens": 5181
+        },
+        "schema": {
+          "bytes": 14690,
+          "tokens": 4038
+        }
+      },
+      "after": {
+        "wire": {
+          "bytes": 71111,
+          "tokens": 15877
+        },
+        "system": {
+          "bytes": 29134,
+          "tokens": 5308
+        },
+        "userText": {
+          "bytes": 21355,
+          "tokens": 5186
+        },
+        "schema": {
+          "bytes": 14522,
+          "tokens": 4004
+        }
+      },
+      "omitted": [
+        "suggestions",
+        "promotionRecommendations"
+      ],
+      "responseFieldOmission": {
+        "before": {
+          "bytes": 3368,
+          "tokens": 799
+        },
+        "after": {
+          "bytes": 3321,
+          "tokens": 791
+        }
+      }
+    },
+    {
+      "name": "workspace-3",
+      "provider": "anthropic",
+      "before": {
+        "wire": {
+          "bytes": 152904,
+          "tokens": 37926
+        },
+        "system": {
+          "bytes": 28410,
+          "tokens": 5157
+        },
+        "userText": {
+          "bytes": 40665,
+          "tokens": 8820
+        },
+        "schema": {
+          "bytes": 77695,
+          "tokens": 22421
+        }
+      },
+      "dedup": {
+        "wire": {
+          "bytes": 133329,
+          "tokens": 34089
+        },
+        "system": {
+          "bytes": 28410,
+          "tokens": 5157
+        },
+        "userText": {
+          "bytes": 21331,
+          "tokens": 5181
+        },
+        "schema": {
+          "bytes": 77695,
+          "tokens": 22421
+        }
+      },
+      "after": {
+        "wire": {
+          "bytes": 133916,
+          "tokens": 34216
+        },
+        "system": {
+          "bytes": 29134,
+          "tokens": 5308
+        },
+        "userText": {
+          "bytes": 21355,
+          "tokens": 5186
+        },
+        "schema": {
+          "bytes": 77527,
+          "tokens": 22387
+        }
+      },
+      "omitted": [
+        "suggestions",
+        "promotionRecommendations"
+      ],
+      "responseFieldOmission": {
+        "before": {
+          "bytes": 3368,
+          "tokens": 799
+        },
+        "after": {
+          "bytes": 3321,
+          "tokens": 791
+        }
+      }
+    }
+  ]
+}

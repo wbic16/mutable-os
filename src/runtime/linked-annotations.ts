@@ -1,3 +1,5 @@
+import { createSignal, untrack } from "solid-js";
+import { findResource } from "../block-tree/resource-identity";
 import { documentRootPlacements } from "../block-tree/resource-registration";
 import { clone } from "../block-tree/clone";
 import { linkedRegistry, resolveLinkedProperty, linkedDefinitionOwner, definitionProvenance } from "../block-tree/linked-annotations";
@@ -6,10 +8,58 @@ import type { JsonObject, RepositoryOperation } from "../block-tree/types";
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import { resourceOwner } from "../block-tree/resource-identity";
 import type { AnnotationAction, AnnotationPatch } from "../block-tree/annotation-commands";
+import {glossOwner} from '../block-tree/gloss-plan';
+import {RANGE_ANCHOR,rangeDefinition} from '../features/dialectic/anchors';
 
 export class LinkedAnnotations {
   constructor(private editor: ReactiveEditor) {}
-  resolve(property: JsonObject, contentKey?: string) { return property.type === "mutable/gloss" ? this.editor.gloss.resolveContent(property, contentKey) : resolveLinkedProperty(this.editor.repository.state, property, contentKey); }
+  private topology = createSignal(0);
+  private stop?: () => void;
+  private lookup = {
+    parents: (key: string) => {
+      const parents = new Set<string>();
+      for (const placement of untrack(() => [...this.editor.repository.ownedPlacementKeys(key)])) {
+        // Keep dependencies on these specific edges: a valid placement-only
+        // retarget can change ownership without changing any parent's arrays.
+        const edge = this.editor.repository.state.placements[placement];
+        const at = untrack(() => this.editor.repository.locationOf(placement));
+        if (edge?.contentKey === key && edge.kind !== 'reference' && at) parents.add(at.ownerContentKey);
+      }
+      return parents;
+    },
+    find: (source: Parameters<typeof findResource>[1]) => untrack(() => source.scope === 'document'
+      ? this.editor.repository.findDocumentResource(source.resourceId)
+      : findResource(this.editor.repository.readState(), source)),
+  };
+  resolve(property: JsonObject, contentKey?: string) {
+    if(property.type===RANGE_ANCHOR){
+      const state=this.editor.repository.readState();
+      const owner=contentKey&&!property.externalDefinition&&glossOwner(state,contentKey,{locationOf:k=>this.editor.repository.locationOf(k),ownedKeys:k=>this.editor.repository.ownedPlacementKeys(k)});
+      const definition=owner&&(state.contents[owner].payload.linkedAnnotations as any)?.[String(property.annotationId)];
+      return rangeDefinition(definition)?{...definition,...property,isDeleted:!!property.isDeleted||!!definition.isDeleted}:{...property,isDeleted:true};
+    }
+    if (property.type === 'mutable/gloss') return this.editor.gloss.resolveContent(property, contentKey);
+    if (typeof property.annotationId !== 'string') return property;
+    // Ordinary Cell edits cannot change canonical ancestry or resource identity.
+    // Actual shared values below remain reactive; they are never cached copies.
+    this.stop ??= this.editor.repository.subscribeChanges(change => {
+      if (change.inlineOwner) return;
+      const state = this.editor.repository.readState();
+      for (const [key, before] of change.previousContents) {
+        const after = state.contents[key];
+        const identity = (c: typeof before) => c && [c.viewType, c.payload.id, (c.payload.metadata as JsonObject | undefined)?.documentId, (c.payload.metadata as JsonObject | undefined)?.workspaceId, c.definitionOwnerKey];
+        if (!before || !after || JSON.stringify(identity(before)) !== JSON.stringify(identity(after)) ||
+          JSON.stringify([before.children, before.inlineContent, before.ownedRelations]) !== JSON.stringify([after.children, after.inlineContent, after.ownedRelations])) {
+          this.topology[1](n => n + 1); break;
+        }
+      }
+    });
+    this.topology[0]();
+    return resolveLinkedProperty(this.editor.repository.state, property, contentKey,
+      this.editor.repository.hasValidStructuralEvidence ? this.lookup : undefined);
+  }
+  dispose() { this.stop?.(); }
+
   private owner(id: string, property?: JsonObject, contentKey?: string) {
     const state = this.editor.repository.readState();
     if (property) return linkedDefinitionOwner(state, property, contentKey);

@@ -59,7 +59,7 @@ export class WorkspaceSession {
     if(this.documentSessions && this.editor.features.documentSessionHostTransfer && this.editor.features.documentDetachment) this.documentSessions.detachment=new DocumentDetachment(this.documentSessions,this.editor);
     this.presentation = new WorkspacePresentationState(root.payload, { textual: this.editor.features.textualWorkspace, canvas: this.editor.features.canvasWorkspace, spatial: this.editor.features.spatialWorkspace ? { supports: supportsSpatial } : undefined });
     this.editor.persistence.attachWorkspacePresentation({ capture: () => { this.interaction?.finish(); return this.presentation.capture(); }, markSaved: snapshot => this.presentation.markSaved(snapshot) });
-    registerApplicationViews(this.editor);
+    registerApplicationViews(this.editor, {active:()=>this.presentation.active(),select:name=>this.selectPresentation(name)});
     this.projection = this.editor.createView("loaded-workspace");
     this.cleanup.push(registerWorkspaceEntities(this.editor, this.projection.viewId));
     this.resolveObjects();

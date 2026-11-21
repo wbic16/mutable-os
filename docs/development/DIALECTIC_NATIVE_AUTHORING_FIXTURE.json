@@ -1,0 +1,117 @@
+{
+  "exchange": {
+    "observedMs": 659.3000000119209,
+    "commitMs": 17.900000035762787,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "sameMount": true,
+    "sameSession": true,
+    "unrelatedUnchanged": true,
+    "manifest": {
+      "sources": 6,
+      "characters": 599,
+      "bytes": 5799
+    },
+    "returned": {
+      "addresses": 2,
+      "anchors": 1,
+      "interpretations": [
+        {
+          "id": "classification",
+          "target": "passage",
+          "type": "dialectic/claim",
+          "ref": null,
+          "attributes": []
+        }
+      ],
+      "arguments": 2,
+      "relations": [
+        {
+          "id": "reason",
+          "kind": "argument",
+          "type": "supports",
+          "from": "forecast",
+          "to": "plan"
+        }
+      ]
+    },
+    "materialised": {
+      "addresses": [
+        {
+          "kind": "contribution",
+          "resourceId": "a24f28c2-13c6-46e0-9e9b-de50ffcdf9ed",
+          "blockId": "9504eee2-056d-4616-808e-9b12e6fcb986"
+        },
+        {
+          "kind": "contribution",
+          "resourceId": "a24f28c2-13c6-46e0-9e9b-de50ffcdf9ed",
+          "blockId": "bb2ae7e9-f406-46c3-a1de-d7236c9b030c"
+        }
+      ],
+      "annotations": [
+        {
+          "blockId": "804ed408-dea1-4894-9690-5e99dcef5379",
+          "propertyId": "1b277c3f-144a-4e4c-8ba5-6b545321ab00"
+        },
+        {
+          "blockId": "2fa7522b-3443-4a52-bf95-944a451b6727",
+          "propertyId": "b82a1d99-467d-4287-9aec-afa2f4b3a3b5"
+        }
+      ],
+      "arguments": 2,
+      "relations": [
+        {
+          "version": 1,
+          "relation": "supports",
+          "from": {
+            "resourceId": "a24f28c2-13c6-46e0-9e9b-de50ffcdf9ed",
+            "argumentId": "2821693f-b282-4ccf-a850-fe3674b0b3a7"
+          },
+          "to": {
+            "resourceId": "a24f28c2-13c6-46e0-9e9b-de50ffcdf9ed",
+            "argumentId": "5424cbcd-41d7-4740-b56c-a009e12b3ddb"
+          },
+          "provenance": {
+            "version": 1,
+            "actor": "ai",
+            "exchangeId": "3677c958-9102-4896-bf53-885c141f36d8",
+            "protocol": "dcp/1.0",
+            "sourceResourceId": "a24f28c2-13c6-46e0-9e9b-de50ffcdf9ed",
+            "appliedTo": "generated",
+            "sourceAuthor": "ai",
+            "participantId": "a24f28c2-13c6-46e0-9e9b-de50ffcdf9ed:ai"
+          }
+        }
+      ]
+    },
+    "receipts": [
+      {
+        "provider": "openai",
+        "model": "fixture-openai",
+        "responseId": "response-fixture",
+        "startedUtc": "2026-11-07T12:06:48.835Z",
+        "completedUtc": "2026-11-07T12:06:48.868Z",
+        "usage": {
+          "input_tokens": 50,
+          "output_tokens": 20,
+          "total_tokens": 70
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "repairs": 0,
+    "tools": 0
+  },
+  "visibleSummary": "Authored structures2 discursive addresses · 2 annotations · 1 relationshipsAddresses refer to sources without making them arguments. Select an annotation to inspect its current passage and authorship.dialectic/suggestion · Let us meet indoors.dialectic/claim · Rain is forecast.2821693f-b282-4ccf-a850-fe3674b0b3a7 → supports → 5424cbcd-41d7-4740-b56c-a009e12b3ddb",
+  "annotationInspection": "dialectic/claimRain is forecast.Authored by ai · Source author: humanExchange 3677c958-9102-4896-bf53-885c141f36d8. Current native annotation; inspection does not edit it.",
+  "nativeRangeHighlight": true,
+  "relationshipInspection": "Argument 2821693f → supports → Argument 5424cbcd",
+  "undoRedo": true,
+  "textual": true,
+  "saveReload": true,
+  "liveProvider": false,
+  "requested": "Please exercise native Dialectic structures: address both earlier contributions through discursive references without turning those contributions into arguments. Exactly annotate the earlier sentence \"Rain is forecast.\" as dialectic/claim. Explicitly identify an argument on that passage and a second argument on a new suggestion \"Let us meet indoors.\" in your response; create a directed supports relationship from the forecast argument to the suggestion argument. Produce the actual structures, not just a prose description. Keep the response concise."
+}

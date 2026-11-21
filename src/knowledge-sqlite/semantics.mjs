@@ -1,3 +1,4 @@
+import {resolveDocumentEntity} from './entity-resolution.mjs';
 import {guid,expected,canonicalTables} from './canonical-ledger.mjs';
 import {sqlRevision} from './reconcile.mjs';
 import {decodeAuthoredValue} from '../history/preplan-spike/authored-values.mjs';
@@ -189,10 +190,11 @@ function query(db,request,check){
  const rows=db.prepare(`SELECT r.* FROM ${t} ${alias}${clause} ORDER BY ${orderedParent?'r.ordinal,r.guid':`r.${identity(t)}`} LIMIT ?`).all(...args,limit+1),complete=rows.length<=limit;
  return {items:rows.slice(0,limit).map(wire),complete,nextAfter:complete?undefined:orderedParent?JSON.stringify([rows[limit-1].ordinal,rows[limit-1].guid]):rows[limit-1][identity(t)],diagnostics:[]};
 }
-export const semanticMutation=r=>r?.op==='batch'||['create','add','update','remove'].includes(r?.op);
+export const semanticMutation=r=>r?.op==='identity-commit'||r?.op==='batch'||['create','add','update','remove'].includes(r?.op);
 /** Typed canonical operations; shared transaction ledger owns audit and revisions. */
 export function canonicalSemantics(db,ledger,request,check=()=>{}){
  check();if(!request||typeof request!=='object'||Buffer.byteLength(JSON.stringify(request))>32768)throw Error('Semantic request budget exceeded');
+ if(['identity-preview','identity-commit'].includes(request.op))return resolveDocumentEntity(db,ledger,request,check);
  if(semanticMutation(request))return ledger.mutate(request,ctx=>{
   if(request.op==='batch'){
    if(!Array.isArray(request.commands)||!request.commands.length||request.commands.length>100)throw Error('Canonical batch budget exceeded');

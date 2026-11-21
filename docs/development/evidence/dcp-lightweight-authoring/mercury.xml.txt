@@ -1,0 +1,26 @@
+<response intent="answer"><ul id="b1"><li><p id="b2"><b><e ref="e1">Mercury, the god</e>:</b> a Roman deity associated with commerce, travellers and messages, identified with the Greek god <e ref="e4">Hermes</e>. This is a correspondence between religious traditions, not merely two spellings of one name.</p></li><li><p id="b3"><b><e ref="e2">Mercury, the planet</e>:</b> the innermost planet, named after <e ref="e1">the Roman god</e>. The naming connects them without making them the same entity.</p></li><li><p id="b4"><b><e ref="e3">Mercury, the element</e>:</b> the metal Hg, also called <e ref="e3">quicksilver</e>, liquid at room temperature. In <e ref="e5">alchemy</e>, <e ref="e3">it</e> was symbolically associated with <e ref="e2">the planet</e>.</p></li></ul>
+<p id="b5"><mark id="s1" kind="qualification">In “Mercury fascinated <e ref="e6">Alex</e>; it was dazzling”, <b>we cannot tell which meaning is intended</b>. “Dazzling” could describe a bright planet, a shiny metal or a splendid depiction of a god. “It” refers back to “Mercury” but does not resolve the name’s ambiguity; more context is needed.</mark></p>
+<definitions><passage id="r1" target="@b1" quote="The god was identified with Hermes; the planet was named after the god; the element was associated with the planet in alchemy."/>
+<passage id="r2" target="@b1" quote="In &quot;Mercury fascinated Alex; it was dazzling&quot;, can we tell which Mercury is meant?"/>
+<entity id="e1" name="Mercury (Roman god)" type="Deity"><description>Roman deity associated with commerce, travellers and messages, identified with Hermes; distinct from the planet and element.</description></entity>
+<entity id="e2" name="Mercury (planet)" type="Planet"><description>Innermost planet, named after the Roman god Mercury.</description></entity>
+<entity id="e3" name="Mercury (chemical element)" type="Chemical element"><description>Metallic element Hg, also called quicksilver; symbolically associated with the planet Mercury in alchemy.</description><alias>quicksilver</alias><alias>Hg</alias></entity>
+<entity id="e4" name="Hermes" type="Deity"><description>Greek god identified with the Roman god Mercury.</description></entity>
+<entity id="e5" name="Alchemy" type="Tradition"><description>Historical tradition in which metals and planets were linked through symbolic correspondences.</description></entity>
+<entity id="e6" name="Alex (example sentence)" type="Person"><description>Person mentioned in the illustrative sentence about an unresolved referent of Mercury; no further identity is supplied.</description></entity>
+<classify id="m1" target="r1" kind="claim"/>
+<classify id="m2" target="r2" kind="question"/>
+<mention id="m3" target="@b1" quote="the Roman god" ref="e1"/>
+<mention id="m4" target="@b1" quote="a planet" ref="e2"/>
+<mention id="m5" target="@b1" quote="a chemical element" ref="e3"/>
+<mention id="m6" target="@b1" quote="The god" ref="e1"/>
+<mention id="m7" target="@b1" quote="Hermes" ref="e4"/>
+<mention id="m8" target="@b1" quote="the planet" prefix="Hermes; " ref="e2"/>
+<mention id="m9" target="@b1" quote="the god" prefix="named after " ref="e1"/>
+<mention id="m10" target="@b1" quote="the element" ref="e3"/>
+<mention id="m11" target="@b1" quote="the planet" prefix="associated with " ref="e2"/>
+<mention id="m12" target="@b1" quote="alchemy" ref="e5"/>
+<mention id="m13" target="@b1" quote="Alex" ref="e6"/>
+<relation id="rel1" kind="entity" type="identified-with" from="e1" to="e4"/>
+<relation id="rel2" kind="entity" type="named-after" from="e2" to="e1"/>
+<relation id="rel3" kind="entity" type="symbolically-associated-in-alchemy-with" from="e3" to="e2"/></definitions></response>

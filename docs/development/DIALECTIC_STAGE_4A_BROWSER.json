@@ -1,0 +1,78 @@
+{
+  "cancelledWithoutCommit": true,
+  "exchange": {
+    "observedMs": 210.4000000357628,
+    "commitMs": 31.69999998807907,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "sameMount": true,
+    "sameSession": true,
+    "replies": [
+      {
+        "kind": "contribution",
+        "resourceId": "102d33bd-cba7-4c21-b5c9-ef5ec0e63d64",
+        "blockId": "9636009b-c958-4789-a0c2-764b8419c3cf"
+      }
+    ],
+    "discursiveReferences": [
+      {
+        "kind": "range",
+        "resourceId": "102d33bd-cba7-4c21-b5c9-ef5ec0e63d64",
+        "anchorId": "c805a7ac-278e-47c7-aedb-60bc4b6a12be"
+      }
+    ],
+    "tools": 2,
+    "sourceAnnotations": [
+      {
+        "id": "dc8e13b4-932f-449d-a159-45a0c7856d50",
+        "type": "dialectic/range-anchor",
+        "annotationId": "c805a7ac-278e-47c7-aedb-60bc4b6a12be",
+        "start": 0,
+        "end": 50
+      },
+      {
+        "id": "c3d34f57-9084-42d1-b7b6-20496eba6543",
+        "type": "dialectic/claim",
+        "metadata": {
+          "dcp": {
+            "version": 1,
+            "actor": "mock",
+            "exchangeId": "d077b503-c3fe-402f-be62-93804e4e2af1",
+            "protocol": "dcp/1.0",
+            "sourceResourceId": "102d33bd-cba7-4c21-b5c9-ef5ec0e63d64",
+            "appliedTo": "existing-source",
+            "sourceAuthor": "human"
+          }
+        },
+        "start": 0,
+        "end": 50
+      }
+    ],
+    "definitions": [
+      "dialectic/range-anchor"
+    ],
+    "dirty": true
+  },
+  "firstNativeInteractionMs": 224.9000000357628,
+  "undoRedo": true,
+  "editing": {
+    "text": "Form can carry an argument, not merely decorate it.Still editable. ",
+    "sameMount": true,
+    "snapshots": 0,
+    "rebuilds": 0
+  },
+  "unrelatedDocuments": {
+    "observedMs": 192,
+    "commitMs": 22.799999952316284,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "unchanged": true,
+    "paragraphs": 300
+  },
+  "presentationRoundTrip": true,
+  "persistence": {
+    "dcp": 2,
+    "anchors": 2,
+    "tools": 2
+  }
+}

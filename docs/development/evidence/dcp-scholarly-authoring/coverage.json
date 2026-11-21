@@ -1,0 +1,1292 @@
+[
+  {
+    "variant": "before",
+    "case": "A",
+    "newEntities": [
+      "Patronage",
+      "Leonardo da Vinci",
+      "Ludovico Sforza",
+      "The Last Supper"
+    ],
+    "mentions": [
+      {
+        "blockId": "ca1e008f-d23b-470d-a251-68b14bc20568",
+        "start": 18,
+        "end": 26,
+        "text": "patronage",
+        "entity": "Patronage",
+        "entityId": "704a8def-9d43-4f20-84da-f23e40c93fe1",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "ca1e008f-d23b-470d-a251-68b14bc20568",
+        "start": 69,
+        "end": 78,
+        "text": "Leonardo’s",
+        "entity": "Leonardo da Vinci",
+        "entityId": "0684505c-a2eb-46bb-8e91-e3cc9267d8be",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "ca1e008f-d23b-470d-a251-68b14bc20568",
+        "start": 157,
+        "end": 166,
+        "text": "Ludovico’s",
+        "entity": "Ludovico Sforza",
+        "entityId": "cb7993e6-15ba-4d2e-94b8-42e3bd417367",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "ca1e008f-d23b-470d-a251-68b14bc20568",
+        "start": 182,
+        "end": 196,
+        "text": "The Last Supper",
+        "entity": "The Last Supper",
+        "entityId": "b32aaba3-b5cc-4620-b039-cce1d55f04f9",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [
+      [
+        "Ludovico Sforza",
+        "commissioned",
+        "The Last Supper"
+      ]
+    ],
+    "argumentRelations": [],
+    "arguments": 1,
+    "classifications": {},
+    "sourceInterpretations": 0,
+    "glosses": [],
+    "lastOutputTokens": 871,
+    "repairs": false
+  },
+  {
+    "variant": "before",
+    "case": "B",
+    "newEntities": [
+      "Mercury (Roman god)",
+      "Mercury (planet)",
+      "Mercury (chemical element)",
+      "Hermes"
+    ],
+    "mentions": [
+      {
+        "blockId": "651fece4-b60f-4709-a5e7-7e23d03b8cd5",
+        "start": 0,
+        "end": 18,
+        "text": "Mercury, the planet",
+        "entity": "Mercury (planet)",
+        "entityId": "6d3ab47e-4233-4ce8-b3ff-9645b511a4c1",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "687bcc43-3267-4404-b7e5-9c39ceef8b0a",
+        "start": 0,
+        "end": 21,
+        "text": "Mercury, the Roman god",
+        "entity": "Mercury (Roman god)",
+        "entityId": "5ce18ae2-0582-4e5b-8615-32d6cd5cda94",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "687bcc43-3267-4404-b7e5-9c39ceef8b0a",
+        "start": 109,
+        "end": 114,
+        "text": "Hermes",
+        "entity": "Hermes",
+        "entityId": "a9d5c546-f364-4de6-b28f-227b5fad5fe1",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "a980078b-adaa-472a-894a-b84d0fc1a29f",
+        "start": 0,
+        "end": 28,
+        "text": "Mercury, the chemical element",
+        "entity": "Mercury (chemical element)",
+        "entityId": "77fdb6d5-d1ea-49ed-8763-7950fb38312c",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [
+      [
+        "Mercury (Roman god)",
+        "identified-with",
+        "Hermes"
+      ],
+      [
+        "Mercury (planet)",
+        "named-after",
+        "Mercury (Roman god)"
+      ],
+      [
+        "Mercury (chemical element)",
+        "alchemically-associated-with",
+        "Mercury (planet)"
+      ]
+    ],
+    "argumentRelations": [],
+    "arguments": 0,
+    "classifications": {
+      "dialectic/question": 1
+    },
+    "sourceInterpretations": 1,
+    "glosses": [],
+    "lastOutputTokens": 976,
+    "repairs": false
+  },
+  {
+    "variant": "before",
+    "case": "C",
+    "newEntities": [],
+    "mentions": [
+      {
+        "blockId": "3ad40e2a-bb27-404a-a673-488f3aeda3e1",
+        "start": 60,
+        "end": 67,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "0684505c-a2eb-46bb-8e91-e3cc9267d8be",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "3ad40e2a-bb27-404a-a673-488f3aeda3e1",
+        "start": 193,
+        "end": 200,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "cb7993e6-15ba-4d2e-94b8-42e3bd417367",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [],
+    "argumentRelations": [
+      {
+        "id": "new:rel1",
+        "type": "qualifies",
+        "from": "new:arg1",
+        "to": "src:RxGXbdW6kiglx0kMEVRSmw:arg20",
+        "kind": "argument"
+      }
+    ],
+    "arguments": 1,
+    "classifications": {
+      "dialectic/question": 1
+    },
+    "sourceInterpretations": 1,
+    "glosses": [],
+    "lastOutputTokens": 541,
+    "repairs": false
+  },
+  {
+    "variant": "before",
+    "case": "D",
+    "newEntities": [],
+    "mentions": [
+      {
+        "blockId": "bdbd7bee-56c0-4094-b809-43d1132c4daf",
+        "start": 220,
+        "end": 229,
+        "text": "Ludovico’s",
+        "entity": "Ludovico Sforza",
+        "entityId": "cb7993e6-15ba-4d2e-94b8-42e3bd417367",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "bdbd7bee-56c0-4094-b809-43d1132c4daf",
+        "start": 231,
+        "end": 239,
+        "text": "patronage",
+        "entity": "Patronage",
+        "entityId": "704a8def-9d43-4f20-84da-f23e40c93fe1",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "bdbd7bee-56c0-4094-b809-43d1132c4daf",
+        "start": 272,
+        "end": 279,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "0684505c-a2eb-46bb-8e91-e3cc9267d8be",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [],
+    "argumentRelations": [],
+    "arguments": 1,
+    "classifications": {
+      "dialectic/qualification": 1
+    },
+    "sourceInterpretations": 0,
+    "glosses": [],
+    "lastOutputTokens": 635,
+    "repairs": false
+  },
+  {
+    "variant": "before",
+    "case": "E",
+    "newEntities": [
+      "Sam",
+      "Queensland Art Gallery",
+      "Spirited Away"
+    ],
+    "mentions": [
+      {
+        "blockId": "51fe8bac-1682-4e44-bbc2-9d88d5ada4c5",
+        "start": 39,
+        "end": 51,
+        "text": "Spirited Away",
+        "entity": "Spirited Away",
+        "entityId": "cda09953-1faf-4983-a57e-b9ed3a210ba7",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "589d7652-53df-42eb-9411-df3b3f5c5cb4",
+        "start": 39,
+        "end": 41,
+        "text": "Sam",
+        "entity": "Sam",
+        "entityId": "838af613-e403-4cdd-9fdb-40b305297610",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "98f21394-b7e0-4783-b630-a770764da4f9",
+        "start": 21,
+        "end": 42,
+        "text": "Queensland Art Gallery",
+        "entity": "Queensland Art Gallery",
+        "entityId": "a058a7cf-c279-40b4-a04c-c5016cae2815",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [],
+    "argumentRelations": [],
+    "arguments": 0,
+    "classifications": {},
+    "sourceInterpretations": 0,
+    "glosses": [],
+    "lastOutputTokens": 673,
+    "repairs": false
+  },
+  {
+    "variant": "after",
+    "case": "A",
+    "newEntities": [
+      "Leonardo da Vinci",
+      "Florence",
+      "Milan",
+      "Ludovico Sforza",
+      "The Last Supper",
+      "Cecilia Gallerani",
+      "French forces under Louis XII",
+      "Louis XII",
+      "Artistic patronage"
+    ],
+    "mentions": [
+      {
+        "blockId": "45cb5adb-8e12-40c1-a9fc-b3aff9cff819",
+        "start": 17,
+        "end": 25,
+        "text": "patronage",
+        "entity": "Artistic patronage",
+        "entityId": "8e2440cf-576c-491b-8f94-908f019857a4",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "45cb5adb-8e12-40c1-a9fc-b3aff9cff819",
+        "start": 71,
+        "end": 80,
+        "text": "Leonardo’s",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "45cb5adb-8e12-40c1-a9fc-b3aff9cff819",
+        "start": 92,
+        "end": 99,
+        "text": "Florence",
+        "entity": "Florence",
+        "entityId": "852db963-2cc5-4914-94a1-2d2baf288a96",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "45cb5adb-8e12-40c1-a9fc-b3aff9cff819",
+        "start": 104,
+        "end": 108,
+        "text": "Milan",
+        "entity": "Milan",
+        "entityId": "79f953b2-1b09-4495-a0d4-f8181c412b47",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "45cb5adb-8e12-40c1-a9fc-b3aff9cff819",
+        "start": 163,
+        "end": 172,
+        "text": "Ludovico’s",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "45cb5adb-8e12-40c1-a9fc-b3aff9cff819",
+        "start": 188,
+        "end": 202,
+        "text": "The Last Supper",
+        "entity": "The Last Supper",
+        "entityId": "8a34358e-fc22-4f2c-9df2-3683080e6d74",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "45cb5adb-8e12-40c1-a9fc-b3aff9cff819",
+        "start": 284,
+        "end": 300,
+        "text": "Cecilia Gallerani",
+        "entity": "Cecilia Gallerani",
+        "entityId": "f5ebd7fe-16bc-4cde-9337-d44c22d4dc50",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "49a4f93b-ac38-4845-ac69-37eb1baeca79",
+        "start": 16,
+        "end": 20,
+        "text": "Milan",
+        "entity": "Milan",
+        "entityId": "79f953b2-1b09-4495-a0d4-f8181c412b47",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "49a4f93b-ac38-4845-ac69-37eb1baeca79",
+        "start": 25,
+        "end": 37,
+        "text": "French forces",
+        "entity": "French forces under Louis XII",
+        "entityId": "7770daa4-7986-43d9-a7a5-08cf531e6c2c",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "49a4f93b-ac38-4845-ac69-37eb1baeca79",
+        "start": 45,
+        "end": 53,
+        "text": "Louis XII",
+        "entity": "Louis XII",
+        "entityId": "189da48f-caa5-4967-8512-7bd795d11252",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "49a4f93b-ac38-4845-ac69-37eb1baeca79",
+        "start": 129,
+        "end": 138,
+        "text": "Ludovico’s",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "49a4f93b-ac38-4845-ac69-37eb1baeca79",
+        "start": 150,
+        "end": 159,
+        "text": "Leonardo’s",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "49a4f93b-ac38-4845-ac69-37eb1baeca79",
+        "start": 173,
+        "end": 181,
+        "text": "Patronage",
+        "entity": "Artistic patronage",
+        "entityId": "8e2440cf-576c-491b-8f94-908f019857a4",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 66,
+        "end": 82,
+        "text": "Leonardo da Vinci",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 95,
+        "end": 102,
+        "text": "Florence",
+        "entity": "Florence",
+        "entityId": "852db963-2cc5-4914-94a1-2d2baf288a96",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 107,
+        "end": 111,
+        "text": "Milan",
+        "entity": "Milan",
+        "entityId": "79f953b2-1b09-4495-a0d4-f8181c412b47",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 125,
+        "end": 139,
+        "text": "Ludovico Sforza",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 142,
+        "end": 149,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 164,
+        "end": 178,
+        "text": "The Last Supper",
+        "entity": "The Last Supper",
+        "entityId": "8a34358e-fc22-4f2c-9df2-3683080e6d74",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 185,
+        "end": 192,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 195,
+        "end": 202,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 212,
+        "end": 228,
+        "text": "Cecilia Gallerani",
+        "entity": "Cecilia Gallerani",
+        "entityId": "f5ebd7fe-16bc-4cde-9337-d44c22d4dc50",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 231,
+        "end": 243,
+        "text": "French forces",
+        "entity": "French forces under Louis XII",
+        "entityId": "7770daa4-7986-43d9-a7a5-08cf531e6c2c",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 251,
+        "end": 259,
+        "text": "Louis XII",
+        "entity": "Louis XII",
+        "entityId": "189da48f-caa5-4967-8512-7bd795d11252",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 271,
+        "end": 275,
+        "text": "Milan",
+        "entity": "Milan",
+        "entityId": "79f953b2-1b09-4495-a0d4-f8181c412b47",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 297,
+        "end": 306,
+        "text": "Ludovico's",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 318,
+        "end": 327,
+        "text": "Leonardo's",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "de78130b-8895-4a98-b421-42bb6b0f1b00",
+        "start": 368,
+        "end": 376,
+        "text": "patronage",
+        "entity": "Artistic patronage",
+        "entityId": "8e2440cf-576c-491b-8f94-908f019857a4",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [
+      [
+        "Leonardo da Vinci",
+        "employed-by",
+        "Ludovico Sforza"
+      ],
+      [
+        "Ludovico Sforza",
+        "commissioned",
+        "The Last Supper"
+      ],
+      [
+        "The Last Supper",
+        "commissioned-from",
+        "Leonardo da Vinci"
+      ],
+      [
+        "Leonardo da Vinci",
+        "painted",
+        "Cecilia Gallerani"
+      ],
+      [
+        "French forces under Louis XII",
+        "under-command-of",
+        "Louis XII"
+      ],
+      [
+        "French forces under Louis XII",
+        "conquered",
+        "Milan"
+      ]
+    ],
+    "argumentRelations": [],
+    "arguments": 1,
+    "classifications": {
+      "dialectic/claim": 5
+    },
+    "sourceInterpretations": 19,
+    "glosses": [
+      {
+        "target": "French forces under Louis XII conquered Milan in 1499, disrupting Ludovico's court and Leonardo's employment.",
+        "value": "scope: The relationships recorded here represent the supplied account, not independent historical verification. Its conquest is dated 1499; the interpretation concerns the dependence exposed by the stated disruption, not a claim that all patronage arrangements function identically.",
+        "sourceAuthor": "human"
+      }
+    ],
+    "lastOutputTokens": 3151,
+    "repairs": false
+  },
+  {
+    "variant": "after",
+    "case": "B",
+    "newEntities": [
+      "Mercury (Roman god)",
+      "Mercury (planet)",
+      "Mercury (chemical element)",
+      "Hermes",
+      "Alchemy",
+      "Alex (example sentence)"
+    ],
+    "mentions": [
+      {
+        "blockId": "05e0e984-5c97-44a2-b488-649f7439ab12",
+        "start": 23,
+        "end": 26,
+        "text": "Alex",
+        "entity": "Alex (example sentence)",
+        "entityId": "0409bb32-c906-4047-ba83-08e0bd48469f",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "8011cfa8-9723-4bab-8f44-7c4d41ea402d",
+        "start": 0,
+        "end": 19,
+        "text": "Mercury, the element",
+        "entity": "Mercury (chemical element)",
+        "entityId": "c11f6caa-8c9a-4a6f-b695-608491a2b3ac",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "8011cfa8-9723-4bab-8f44-7c4d41ea402d",
+        "start": 48,
+        "end": 58,
+        "text": "quicksilver",
+        "entity": "Mercury (chemical element)",
+        "entityId": "c11f6caa-8c9a-4a6f-b695-608491a2b3ac",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "8011cfa8-9723-4bab-8f44-7c4d41ea402d",
+        "start": 92,
+        "end": 98,
+        "text": "alchemy",
+        "entity": "Alchemy",
+        "entityId": "c425857a-e71e-4aa3-ab3b-0e69a34d9e93",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "8011cfa8-9723-4bab-8f44-7c4d41ea402d",
+        "start": 101,
+        "end": 102,
+        "text": "it",
+        "entity": "Mercury (chemical element)",
+        "entityId": "c11f6caa-8c9a-4a6f-b695-608491a2b3ac",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "8011cfa8-9723-4bab-8f44-7c4d41ea402d",
+        "start": 137,
+        "end": 146,
+        "text": "the planet",
+        "entity": "Mercury (planet)",
+        "entityId": "7728292e-e5b4-4ac4-ab31-95a3ff2ed543",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "98162ee7-6c3d-45be-a113-8f975109deb1",
+        "start": 0,
+        "end": 18,
+        "text": "Mercury, the planet",
+        "entity": "Mercury (planet)",
+        "entityId": "7728292e-e5b4-4ac4-ab31-95a3ff2ed543",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "98162ee7-6c3d-45be-a113-8f975109deb1",
+        "start": 55,
+        "end": 67,
+        "text": "the Roman god",
+        "entity": "Mercury (Roman god)",
+        "entityId": "34c57fc8-e33f-47ad-aad5-8e268f89e458",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 17,
+        "end": 29,
+        "text": "the Roman god",
+        "entity": "Mercury (Roman god)",
+        "entityId": "34c57fc8-e33f-47ad-aad5-8e268f89e458",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 32,
+        "end": 39,
+        "text": "a planet",
+        "entity": "Mercury (planet)",
+        "entityId": "7728292e-e5b4-4ac4-ab31-95a3ff2ed543",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 44,
+        "end": 61,
+        "text": "a chemical element",
+        "entity": "Mercury (chemical element)",
+        "entityId": "c11f6caa-8c9a-4a6f-b695-608491a2b3ac",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 64,
+        "end": 70,
+        "text": "The god",
+        "entity": "Mercury (Roman god)",
+        "entityId": "34c57fc8-e33f-47ad-aad5-8e268f89e458",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 92,
+        "end": 97,
+        "text": "Hermes",
+        "entity": "Hermes",
+        "entityId": "9992f1fe-ff5c-4f2f-8559-8b248d43acaf",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 100,
+        "end": 109,
+        "text": "the planet",
+        "entity": "Mercury (planet)",
+        "entityId": "7728292e-e5b4-4ac4-ab31-95a3ff2ed543",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 127,
+        "end": 133,
+        "text": "the god",
+        "entity": "Mercury (Roman god)",
+        "entityId": "34c57fc8-e33f-47ad-aad5-8e268f89e458",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 136,
+        "end": 146,
+        "text": "the element",
+        "entity": "Mercury (chemical element)",
+        "entityId": "c11f6caa-8c9a-4a6f-b695-608491a2b3ac",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 168,
+        "end": 177,
+        "text": "the planet",
+        "entity": "Mercury (planet)",
+        "entityId": "7728292e-e5b4-4ac4-ab31-95a3ff2ed543",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 182,
+        "end": 188,
+        "text": "alchemy",
+        "entity": "Alchemy",
+        "entityId": "c425857a-e71e-4aa3-ab3b-0e69a34d9e93",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "b28bab61-dd51-4bce-b49b-985ff9abe92c",
+        "start": 250,
+        "end": 253,
+        "text": "Alex",
+        "entity": "Alex (example sentence)",
+        "entityId": "0409bb32-c906-4047-ba83-08e0bd48469f",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "f8c8b293-d9e3-43f5-88dd-5b0700b2ba0c",
+        "start": 0,
+        "end": 15,
+        "text": "Mercury, the god",
+        "entity": "Mercury (Roman god)",
+        "entityId": "34c57fc8-e33f-47ad-aad5-8e268f89e458",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "f8c8b293-d9e3-43f5-88dd-5b0700b2ba0c",
+        "start": 113,
+        "end": 118,
+        "text": "Hermes",
+        "entity": "Hermes",
+        "entityId": "9992f1fe-ff5c-4f2f-8559-8b248d43acaf",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [
+      [
+        "Mercury (Roman god)",
+        "identified-with",
+        "Hermes"
+      ],
+      [
+        "Mercury (planet)",
+        "named-after",
+        "Mercury (Roman god)"
+      ],
+      [
+        "Mercury (chemical element)",
+        "symbolically-associated-in-alchemy-with",
+        "Mercury (planet)"
+      ]
+    ],
+    "argumentRelations": [],
+    "arguments": 0,
+    "classifications": {
+      "dialectic/qualification": 1,
+      "dialectic/claim": 1,
+      "dialectic/question": 1
+    },
+    "sourceInterpretations": 13,
+    "glosses": [],
+    "lastOutputTokens": 2217,
+    "repairs": false
+  },
+  {
+    "variant": "after",
+    "case": "C",
+    "newEntities": [],
+    "mentions": [
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 74,
+        "end": 81,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 155,
+        "end": 162,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 180,
+        "end": 184,
+        "text": "Milan",
+        "entity": "Milan",
+        "entityId": "79f953b2-1b09-4495-a0d4-f8181c412b47",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 235,
+        "end": 237,
+        "text": "him",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 305,
+        "end": 312,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 369,
+        "end": 376,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 413,
+        "end": 420,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 510,
+        "end": 517,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "5cf60774-96e5-4db8-9061-c83a2f9fc77e",
+        "start": 572,
+        "end": 579,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 13,
+        "end": 20,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 26,
+        "end": 33,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 36,
+        "end": 43,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 57,
+        "end": 64,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 71,
+        "end": 78,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 104,
+        "end": 111,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 118,
+        "end": 122,
+        "text": "Milan",
+        "entity": "Milan",
+        "entityId": "79f953b2-1b09-4495-a0d4-f8181c412b47",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 140,
+        "end": 147,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "666437a0-12bd-4d9e-b92e-ae322ca3a385",
+        "start": 170,
+        "end": 177,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [],
+    "argumentRelations": [],
+    "arguments": 1,
+    "classifications": {
+      "dialectic/qualification": 1,
+      "dialectic/question": 1,
+      "dialectic/claim": 1
+    },
+    "sourceInterpretations": 11,
+    "glosses": [],
+    "lastOutputTokens": 2318,
+    "repairs": false
+  },
+  {
+    "variant": "after",
+    "case": "D",
+    "newEntities": [
+      "Engineering work"
+    ],
+    "mentions": [
+      {
+        "blockId": "ab13d6b0-400a-474b-8725-4d373ae156db",
+        "start": 108,
+        "end": 115,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "ab13d6b0-400a-474b-8725-4d373ae156db",
+        "start": 146,
+        "end": 161,
+        "text": "engineering work",
+        "entity": "Engineering work",
+        "entityId": "aeec2151-e77d-4806-a193-13132bd1ef7c",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "b25d13b6-69eb-4483-8c4b-0f17ca192a74",
+        "start": 103,
+        "end": 110,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "b25d13b6-69eb-4483-8c4b-0f17ca192a74",
+        "start": 164,
+        "end": 171,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "c4093369-3bbf-4d0d-ad83-5b3a8cd08a82",
+        "start": 49,
+        "end": 56,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "c4093369-3bbf-4d0d-ad83-5b3a8cd08a82",
+        "start": 60,
+        "end": 68,
+        "text": "patronage",
+        "entity": "Artistic patronage",
+        "entityId": "8e2440cf-576c-491b-8f94-908f019857a4",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "c4093369-3bbf-4d0d-ad83-5b3a8cd08a82",
+        "start": 77,
+        "end": 84,
+        "text": "Leonardo",
+        "entity": "Leonardo da Vinci",
+        "entityId": "a3e4c256-3999-4d54-9f16-4dda4ee9e4f3",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "c4093369-3bbf-4d0d-ad83-5b3a8cd08a82",
+        "start": 118,
+        "end": 125,
+        "text": "Ludovico",
+        "entity": "Ludovico Sforza",
+        "entityId": "93630987-2b81-4aaa-af74-0d6b6e80b795",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "c4093369-3bbf-4d0d-ad83-5b3a8cd08a82",
+        "start": 204,
+        "end": 219,
+        "text": "engineering work",
+        "entity": "Engineering work",
+        "entityId": "aeec2151-e77d-4806-a193-13132bd1ef7c",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [],
+    "argumentRelations": [],
+    "arguments": 1,
+    "classifications": {
+      "dialectic/claim": 2,
+      "dialectic/qualification": 2
+    },
+    "sourceInterpretations": 7,
+    "glosses": [],
+    "lastOutputTokens": 1412,
+    "repairs": false
+  },
+  {
+    "variant": "after",
+    "case": "E",
+    "newEntities": [
+      "Brisbane",
+      "Sam",
+      "Queensland Art Gallery",
+      "Spirited Away"
+    ],
+    "mentions": [
+      {
+        "blockId": "72121380-c45a-47e4-b790-d30e985257ae",
+        "start": 26,
+        "end": 33,
+        "text": "Brisbane",
+        "entity": "Brisbane",
+        "entityId": "340c423e-9b52-4b9a-a0a3-18153349668d",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "72121380-c45a-47e4-b790-d30e985257ae",
+        "start": 40,
+        "end": 42,
+        "text": "Sam",
+        "entity": "Sam",
+        "entityId": "c5ba30e4-70e2-4594-ba74-f5397e2280e9",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "72121380-c45a-47e4-b790-d30e985257ae",
+        "start": 64,
+        "end": 85,
+        "text": "Queensland Art Gallery",
+        "entity": "Queensland Art Gallery",
+        "entityId": "21f4f7a6-e0d9-404f-80ae-2fc9c2d6ec57",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "72121380-c45a-47e4-b790-d30e985257ae",
+        "start": 109,
+        "end": 121,
+        "text": "Spirited Away",
+        "entity": "Spirited Away",
+        "entityId": "2ccfa709-758a-420c-acd6-630faa623536",
+        "sourceAuthor": "human",
+        "appliedTo": "existing-source"
+      },
+      {
+        "blockId": "8ddb3e30-6f45-49a3-88b4-8ebf96847e63",
+        "start": 42,
+        "end": 54,
+        "text": "Spirited Away",
+        "entity": "Spirited Away",
+        "entityId": "2ccfa709-758a-420c-acd6-630faa623536",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "e67de05f-7123-4955-9e73-8fd0b1b4ef39",
+        "start": 11,
+        "end": 13,
+        "text": "Sam",
+        "entity": "Sam",
+        "entityId": "c5ba30e4-70e2-4594-ba74-f5397e2280e9",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      },
+      {
+        "blockId": "e8ab130d-22e5-4a2b-a12b-860caf390df4",
+        "start": 36,
+        "end": 57,
+        "text": "Queensland Art Gallery",
+        "entity": "Queensland Art Gallery",
+        "entityId": "21f4f7a6-e0d9-404f-80ae-2fc9c2d6ec57",
+        "sourceAuthor": "ai",
+        "appliedTo": "generated"
+      }
+    ],
+    "allGeneratedMentionsPersisted": true,
+    "entityRelations": [],
+    "argumentRelations": [],
+    "arguments": 0,
+    "classifications": {},
+    "sourceInterpretations": 4,
+    "glosses": [],
+    "lastOutputTokens": 1047,
+    "repairs": false
+  }
+]

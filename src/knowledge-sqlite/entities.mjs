@@ -12,7 +12,7 @@ const key = s => s.normalize('NFKC').toLowerCase();
 const string = (v, max = 1000) => { if (typeof v !== 'string' || !v.trim() || v.length > max) throw Error('Invalid Entity value'); return v; };
 const guid = v => { string(v, 512); if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v)) throw Error('Supply a stable UUID'); return v; };
 const expected = v => { if (!Number.isSafeInteger(v) || v < 0) throw Error('Expected revision required'); return v; };
-const entity = (db, id) => { const row = db.prepare('SELECT guid AS id,name,revision,deletedUtc,description,typename,attributes FROM Entity WHERE guid=?').get(string(id,512)); if (!row) return; return {...row,displayName:displayEntityName(row.name,row.deletedUtc),attributes:row.attributes===null?null:JSON.parse(row.attributes), aliases: db.prepare("SELECT guid AS id,alias AS name,origin,revision FROM EntityAlias WHERE entityGuid=? AND origin IN ('curated','imported') ORDER BY aliasKey,guid LIMIT 201").all(id)}; };
+const entity = (db, id) => { const row = db.prepare('SELECT guid AS id,name,revision,deletedUtc,description,typename,attributes,imageRef FROM Entity WHERE guid=?').get(string(id,512)); if (!row) return; return {...row,imageRef:row.imageRef===null?null:JSON.parse(row.imageRef),displayName:displayEntityName(row.name,row.deletedUtc),attributes:row.attributes===null?null:JSON.parse(row.attributes), aliases: db.prepare("SELECT guid AS id,alias AS name,origin,revision FROM EntityAlias WHERE entityGuid=? AND origin IN ('curated','imported') ORDER BY aliasKey,guid LIMIT 201").all(id)}; };
 export const entityMutation = op => ['authority-import','deterministic-review','pdf-commit','resource-review','iiif-commit','wiki-commit','wiki-review','scholarly-commit','create','rename','update','alias-add','alias-update','alias-remove','relationship-create','relationship-update'].includes(op);
 /** Typed semantic dispatch keeps the existing Entity/Relationship operation names. */
 export function entityCommand(request){
@@ -35,7 +35,10 @@ export function canonicalEntities(db, request, check = () => {}, ledger = canoni
   if(op?.startsWith('scholarly-'))return scholarly(db,request,ledger,check);
   if (!entityMutation(op)) return db.transaction(() => {
     const revision = sqlRevision(db); let result;
-    if (op === 'current') result = {};
+    if (op === 'document-association') {
+      const association=db.prepare('SELECT guid,sourceResourceGuid,sourceEntityGuid,entityGuid,revision FROM DocumentEntityAssociation WHERE sourceResourceGuid=? AND sourceEntityGuid=?').get(string(request.resourceId,512),string(request.entityId,512));
+      result={vaultId:db.prepare("SELECT value FROM SchemaInfo WHERE key='vaultGuid'").get().value,association:association??null,entity:association?entity(db,association.entityGuid):undefined};
+    } else if (op === 'current') result = {};
     else if (op === 'names' || op === 'db-mentions') {
       if (!Array.isArray(request.ids) || request.ids.length > 500) throw Error('List at most 500 Entities per batch');
       const ids = [...new Set(request.ids.map(id => string(id,512)))];

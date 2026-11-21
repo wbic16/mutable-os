@@ -1,0 +1,195 @@
+{
+  "nativeFile": "vaults/imported/Conversation on November 11, 2026 (5).ink",
+  "nativeSha256": "0a93250bbc02a24b6910384a8e2a23969dd439393659ddc971fa6054a724146e",
+  "logFile": "vaults/imported/.mutable/dcp-test-phase/2026-11-11T06-09-07-890Z-1c5a129e-4073-4989-961f-03091f2c1bae.jsonl",
+  "exchanges": [
+    {
+      "ordinal": 2,
+      "exchange": "85e0a169-6084-440d-9435-e0c4f13f5be9",
+      "responseMatchesWire": true,
+      "allRequestedInlinePropertiesPersistedWithExactRangesAndIdentities": true,
+      "entities": [
+        "Ludovico Sforza",
+        "Leonardo da Vinci",
+        "French conquest of Milan in 1499"
+      ],
+      "nativeMentions": 3,
+      "inlineClassifications": 2,
+      "sourceInterpretations": 0,
+      "arguments": 0,
+      "relations": [
+        {
+          "id": "new:rel1",
+          "type": "patron-of",
+          "from": "new:e1",
+          "to": "new:e2",
+          "kind": "entity"
+        }
+      ],
+      "glosses": 0,
+      "responseBytes": 5981,
+      "maxOutputTokens": 2048,
+      "receipt": {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "responseId": "resp_03aa1509da22e776006af40ad6d81c81908c789488b06b7c2b",
+        "startedUtc": "2026-11-11T06:27:34.481Z",
+        "completedUtc": "2026-11-11T06:28:13.900Z",
+        "usage": {
+          "input_tokens": 15123,
+          "output_tokens": 1962,
+          "total_tokens": 17085
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    },
+    {
+      "ordinal": 4,
+      "exchange": "3f5d5c5a-90ff-4f0e-be01-470828e69c7e",
+      "responseMatchesWire": true,
+      "allRequestedInlinePropertiesPersistedWithExactRangesAndIdentities": true,
+      "entities": [
+        "Mercury (Roman god)",
+        "Mercury (planet)",
+        "Mercury (chemical element)"
+      ],
+      "nativeMentions": 3,
+      "inlineClassifications": 0,
+      "sourceInterpretations": 0,
+      "arguments": 0,
+      "relations": [
+        {
+          "id": "new:rel1",
+          "type": "named-after",
+          "from": "new:e2",
+          "to": "new:e1",
+          "kind": "entity"
+        },
+        {
+          "id": "new:rel2",
+          "type": "alchemically-associated-with",
+          "from": "new:e3",
+          "to": "new:e2",
+          "kind": "entity"
+        }
+      ],
+      "glosses": 0,
+      "responseBytes": 3407,
+      "maxOutputTokens": 2048,
+      "receipt": {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "responseId": "resp_03aa1509da22e776006af40b22d81c81908ed4f123c8ac2555",
+        "startedUtc": "2026-11-11T06:28:50.400Z",
+        "completedUtc": "2026-11-11T06:29:09.362Z",
+        "usage": {
+          "input_tokens": 22904,
+          "output_tokens": 1046,
+          "total_tokens": 23950
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    },
+    {
+      "ordinal": 6,
+      "exchange": "38941a30-4ca6-4b89-9f5e-a600cbdaef11",
+      "responseMatchesWire": true,
+      "allRequestedInlinePropertiesPersistedWithExactRangesAndIdentities": true,
+      "entities": [
+        "The Last Supper (Leonardo)",
+        "Sforza equestrian monument project"
+      ],
+      "nativeMentions": 4,
+      "inlineClassifications": 2,
+      "sourceInterpretations": 0,
+      "arguments": 2,
+      "relations": [
+        {
+          "id": "new:rel1",
+          "type": "qualifies",
+          "from": "new:arg2",
+          "to": "new:arg1",
+          "kind": "argument"
+        },
+        {
+          "id": "new:rel2",
+          "type": "created-by",
+          "from": "new:e1",
+          "to": "src:9mJUaphaWHBiYb4O-IhBxg:e5",
+          "kind": "entity"
+        },
+        {
+          "id": "new:rel3",
+          "type": "commissioned-by",
+          "from": "new:e1",
+          "to": "src:9mJUaphaWHBiYb4O-IhBxg:e3",
+          "kind": "entity"
+        },
+        {
+          "id": "new:rel4",
+          "type": "commissioned-by",
+          "from": "new:e2",
+          "to": "src:9mJUaphaWHBiYb4O-IhBxg:e3",
+          "kind": "entity"
+        }
+      ],
+      "glosses": 0,
+      "responseBytes": 4807,
+      "maxOutputTokens": 2048,
+      "receipt": {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "responseId": "resp_03aa1509da22e776006af40b96467081909a685c2817115ca2",
+        "startedUtc": "2026-11-11T06:30:45.966Z",
+        "completedUtc": "2026-11-11T06:31:09.141Z",
+        "usage": {
+          "input_tokens": 32759,
+          "output_tokens": 1188,
+          "total_tokens": 33947
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    }
+  ],
+  "errors": [
+    {
+      "exchange": "765e842d-01a5-4e54-92c2-3e86519057fc",
+      "error": "Error: Provider output was incomplete or reached its token limit. Nothing was committed."
+    }
+  ],
+  "incompleteProviderReceipts": [
+    {
+      "exchange": "765e842d-01a5-4e54-92c2-3e86519057fc",
+      "status": "incomplete",
+      "reason": {
+        "reason": "max_output_tokens"
+      },
+      "usage": {
+        "input_tokens": 42735,
+        "input_tokens_details": {
+          "cache_write_tokens": 42732,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2048,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 44783
+      }
+    }
+  ],
+  "totals": {
+    "entities": 8,
+    "mentions": 10,
+    "relations": 7
+  }
+}

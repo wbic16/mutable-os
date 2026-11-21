@@ -1,0 +1,353 @@
+{
+  "results": [
+    {
+      "query": "Prospero",
+      "firstRows": [
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:d08e16ea-478e-4137-9068-189d7b75330b:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:16d69382-d846-427b-9be9-5d749b7f58af:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:34ca1e40-9d82-4683-9f7b-62a49d632a57:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:de356f7e-88c0-414a-9e40-96f5245c03bc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7d81ed11-fa71-49d1-9bcc-c44888ed7dbc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:749983ba-bb85-49be-bb6c-01a0ee155db8:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        }
+      ],
+      "finalRows": [
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:d08e16ea-478e-4137-9068-189d7b75330b:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:16d69382-d846-427b-9be9-5d749b7f58af:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:34ca1e40-9d82-4683-9f7b-62a49d632a57:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:de356f7e-88c0-414a-9e40-96f5245c03bc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7d81ed11-fa71-49d1-9bcc-c44888ed7dbc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:749983ba-bb85-49be-bb6c-01a0ee155db8:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7a31c55d-247a-4faf-ba43-7682a927d984:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:8a8baef6-569d-42e4-b8d9-ea20c298a748:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:53b35322-db68-4273-90dd-5db527fec3a3:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:022574ae-3283-4b37-a3e0-7b4a193d202e:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:2a3c5217-b299-4bd2-8fb7-0a6b8e97c9aa:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:1228c86a-1908-43a9-826e-04279a36387e:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:749983ba-bb85-49be-bb6c-01a0ee155db8:1635",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:1228c86a-1908-43a9-826e-04279a36387e:1730",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:022574ae-3283-4b37-a3e0-7b4a193d202e:1370",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:d056f623-641e-426c-848e-7994ef8f0ed1:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:5880a556-613b-4da4-a874-cad1b1a2ceed:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:2949aabf-bf5f-4f0d-8edb-ba3c25fc5738:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        }
+      ],
+      "retrievalStatus": "Partial saved-source coverage; unsaved Documents remain outside this index. Indexing and permissions: Workspace → Index Cavern.",
+      "lexicalAt": 15842.5,
+      "navigationError": "",
+      "error": "",
+      "phase": "cancelled",
+      "alive": false,
+      "opened": true,
+      "mountedTarget": true,
+      "visible": true,
+      "selection": {
+        "anchor": 0,
+        "head": 178
+      },
+      "expected": {
+        "runOrdinal": 0,
+        "blockGuid": "d08e16ea-478e-4137-9068-189d7b75330b",
+        "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+        "coordinate": "cell",
+        "occurrence": [
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:0740ac5a-6122-4147-bcf9-05310afd4e72"
+        ],
+        "contribution": null,
+        "start": 0,
+        "end": 178,
+        "runStart": 0,
+        "runEnd": 178,
+        "chunkStart": 0,
+        "chunkEnd": 178,
+        "textHash": "e7ac005e4c88ac027c3bfe89904be19a09f615b021744dd8f411b4fd62429652"
+      },
+      "ms": 6250.899999976158
+    },
+    {
+      "query": "Where do the wealthy hide from the suffering of the outside world?",
+      "firstRows": [
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7c879a5d-937d-40c7-bcbf-fd8266680d98:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:34ca1e40-9d82-4683-9f7b-62a49d632a57:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:749983ba-bb85-49be-bb6c-01a0ee155db8:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:b28cbb8b-6945-42b9-b86f-eab820a5f99e:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7a31c55d-247a-4faf-ba43-7682a927d984:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7d81ed11-fa71-49d1-9bcc-c44888ed7dbc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:022574ae-3283-4b37-a3e0-7b4a193d202e:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:1228c86a-1908-43a9-826e-04279a36387e:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:73a1bd69-9546-4eb9-a7b9-a906551890bc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:8a8baef6-569d-42e4-b8d9-ea20c298a748:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:2949aabf-bf5f-4f0d-8edb-ba3c25fc5738:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:a3e823e6-47cd-43d3-99e8-af223ba7f42a:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:d08e16ea-478e-4137-9068-189d7b75330b:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:53b35322-db68-4273-90dd-5db527fec3a3:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:d056f623-641e-426c-848e-7994ef8f0ed1:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:c7efb0e1-f1de-401d-b6ca-cc9a2d97600a:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:2a3c5217-b299-4bd2-8fb7-0a6b8e97c9aa:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:de356f7e-88c0-414a-9e40-96f5245c03bc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:16d69382-d846-427b-9be9-5d749b7f58af:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        }
+      ],
+      "finalRows": [
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7c879a5d-937d-40c7-bcbf-fd8266680d98:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:34ca1e40-9d82-4683-9f7b-62a49d632a57:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:749983ba-bb85-49be-bb6c-01a0ee155db8:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:b28cbb8b-6945-42b9-b86f-eab820a5f99e:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7a31c55d-247a-4faf-ba43-7682a927d984:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:7d81ed11-fa71-49d1-9bcc-c44888ed7dbc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:022574ae-3283-4b37-a3e0-7b4a193d202e:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:1228c86a-1908-43a9-826e-04279a36387e:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:73a1bd69-9546-4eb9-a7b9-a906551890bc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:8a8baef6-569d-42e4-b8d9-ea20c298a748:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:2949aabf-bf5f-4f0d-8edb-ba3c25fc5738:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:a3e823e6-47cd-43d3-99e8-af223ba7f42a:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:d08e16ea-478e-4137-9068-189d7b75330b:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:53b35322-db68-4273-90dd-5db527fec3a3:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:d056f623-641e-426c-848e-7994ef8f0ed1:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:c7efb0e1-f1de-401d-b6ca-cc9a2d97600a:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:2a3c5217-b299-4bd2-8fb7-0a6b8e97c9aa:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:de356f7e-88c0-414a-9e40-96f5245c03bc:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:16d69382-d846-427b-9be9-5d749b7f58af:0",
+          "reason": "FTS5 · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:022574ae-3283-4b37-a3e0-7b4a193d202e:1370",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:1228c86a-1908-43a9-826e-04279a36387e:1730",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:749983ba-bb85-49be-bb6c-01a0ee155db8:1635",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        },
+        {
+          "id": "5de5c3e7-983d-4467-829e-46cbdbe52b53:5880a556-613b-4da4-a874-cad1b1a2ceed:0",
+          "reason": "Semantic · documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink · saved passage"
+        }
+      ],
+      "retrievalStatus": "Partial saved-source coverage; unsaved Documents remain outside this index. Indexing and permissions: Workspace → Index Cavern.",
+      "lexicalAt": 25569,
+      "navigationError": "",
+      "error": "",
+      "phase": "cancelled",
+      "alive": false,
+      "opened": true,
+      "mountedTarget": true,
+      "visible": true,
+      "selection": {
+        "anchor": 0,
+        "head": 570
+      },
+      "expected": {
+        "runOrdinal": 0,
+        "blockGuid": "7c879a5d-937d-40c7-bcbf-fd8266680d98",
+        "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+        "coordinate": "cell",
+        "occurrence": [
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:919f414b-7dec-45b0-b73e-f47c34b7f6a8"
+        ],
+        "contribution": null,
+        "start": 0,
+        "end": 570,
+        "runStart": 0,
+        "runEnd": 570,
+        "chunkStart": 0,
+        "chunkEnd": 570,
+        "textHash": "f02395ddee22e1161b28a829162610398d5c087b015f9a8155eb7449ac519a84"
+      },
+      "ms": 3150.600000023842
+    }
+  ],
+  "errors": []
+}

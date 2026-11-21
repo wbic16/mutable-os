@@ -1,0 +1,68 @@
+{
+  "tokenizer": "js-tiktoken o200k_base; workspace JSON only, separate from provider usage",
+  "exchanges": [
+    {
+      "exchange": 1,
+      "workspaceBytes": 514,
+      "workspaceTokensO200k": 123,
+      "providerUsage": [
+        {
+          "input_tokens": 16346,
+          "output_tokens": 239,
+          "total_tokens": 16585
+        }
+      ],
+      "toolCalls": 0,
+      "entitySearches": 0,
+      "elapsedMs": 5787,
+      "createdEntities": 0,
+      "createdArguments": 0,
+      "createdGlosses": 0,
+      "createdRelationships": 0,
+      "workspaceEntities": 0,
+      "workspaceRelationships": 0
+    },
+    {
+      "exchange": 2,
+      "workspaceBytes": 514,
+      "workspaceTokensO200k": 123,
+      "providerUsage": [
+        {
+          "input_tokens": 16323,
+          "output_tokens": 529,
+          "total_tokens": 16852
+        }
+      ],
+      "toolCalls": 0,
+      "entitySearches": 0,
+      "elapsedMs": 11707,
+      "createdEntities": 4,
+      "createdArguments": 0,
+      "createdGlosses": 0,
+      "createdRelationships": 3,
+      "workspaceEntities": 0,
+      "workspaceRelationships": 0
+    },
+    {
+      "exchange": 3,
+      "workspaceBytes": 2767,
+      "workspaceTokensO200k": 906,
+      "providerUsage": [
+        {
+          "input_tokens": 17090,
+          "output_tokens": 808,
+          "total_tokens": 17898
+        }
+      ],
+      "toolCalls": 0,
+      "entitySearches": 0,
+      "elapsedMs": 13512,
+      "createdEntities": 0,
+      "createdArguments": 1,
+      "createdGlosses": 0,
+      "createdRelationships": 0,
+      "workspaceEntities": 4,
+      "workspaceRelationships": 3
+    }
+  ]
+}

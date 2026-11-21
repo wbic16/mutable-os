@@ -1,6 +1,10 @@
 node_modules
 dist
 /public/*
+!/public/licences/
+/public/licences/*
+!/public/licences/quill-saxes-6.0.0.txt
+!/public/licences/quill-xmlchars-2.2.0.txt
 !/public/vendor/
 /public/vendor/*
 !/public/vendor/initialis/
@@ -24,3 +28,4 @@ writer.lock
 
 /public/mutable-mermaid.js
 /docs/development/scry-provisional-*
+*programme-evidence*

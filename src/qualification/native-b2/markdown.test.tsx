@@ -31,7 +31,7 @@ function host(text = "", extra: any = {}) {
 describe("B2 consumed Markdown", () => {
   it("reports rich table cells instead of silently flattening their semantics", () => {
     const dto = importMarkdown("| A | B |\n| --- | --- |\n| x | y |").document;
-    const paragraph = dto.children![0].children![0].children![0].children![0];
+    const paragraph = dto.children![0].children![0].children![0].children![0].children![0];
     paragraph.blockProperties = [{ id: "heading", type: "block/font/size", value: "h1" }];
     const resource = capture(dto), before = nativeText(resource), projection = exportMarkdown(resource);
     expect(projection.diagnostics.some(d => d.code === "table-fallback")).toBe(true);
@@ -43,19 +43,19 @@ describe("B2 consumed Markdown", () => {
     const imported = importMarkdown(source, targets), r = capture(imported.document), before = nativeText(r);
     expect(exportMarkdown(r, targets).text).toBe(source.replace("[[Poe]].", "[[Poe]]\\."));
     expect(nativeText(r)).toBe(before);
-    expect(imported.document.children![1].text).toBe("A bold word and Poe.");
-    expect((imported.document.children![1].standoffProperties as any[]).map(p => p.type)).toEqual(["style/bold", "codex/block-reference"]);
-    expect(imported.document.children![2]).toMatchObject({ type: "table-block", metadata: { headerRows: 1 } });
+    expect(imported.document.children![0].children![1].text).toBe("A bold word and Poe.");
+    expect((imported.document.children![0].children![1].standoffProperties as any[]).map(p => p.type)).toEqual(["style/bold", "codex/block-reference"]);
+    expect(imported.document.children![0].children![2]).toMatchObject({ type: "table-block", metadata: { headerRows: 1 } });
     const again = importMarkdown(exportMarkdown(r, targets).text, targets);
     expect(exportMarkdown(capture(again.document), targets).text).toBe(source.replace("[[Poe]].", "[[Poe]]\\."));
   });
   it("ambiguous/unresolved wiki and unsupported tables/code remain literal", () => {
     expect(resolveWiki("Poe", [...targets, { ...targets[0], documentId: "other" }])).toBeUndefined();
     const imported = importMarkdown("[[Missing]]\n\n```\n**code**\n```\n\n| a | b |\n| --- | --- |\n| uneven |", targets);
-    expect(imported.document.children!.some(c => c.type === "table-block")).toBe(false);
-    expect(imported.document.children!.find(c => c.text === "**code**")!.standoffProperties).toBeUndefined();
+    expect(imported.document.children![0].children!.some(c => c.type === "table-block")).toBe(false);
+    expect(imported.document.children![0].children!.find(c => c.text === "**code**")!.standoffProperties).toBeUndefined();
     expect(imported.diagnostics.map(d => d.code)).toContain("literal-table");
-    expect(importMarkdown("\\**literal**").document.children![0].text).toBe("**literal**");
+    expect(importMarkdown("\\**literal**").document.children![0].children![0].text).toBe("**literal**");
   });
   it("projects real rich native fixtures with diagnostics without changing any native bytes", () => {
     const r = decodeNative(new Uint8Array(readFileSync("artifacts/flint-b1.2/rich.mutable.json"))), before = nativeText(r);

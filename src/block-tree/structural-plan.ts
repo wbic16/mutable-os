@@ -1,8 +1,12 @@
+import {preferencesMetadataOwner} from './dialectic-preferences-plan';
+import {sequenceMetadataOwner} from './dialectic-sequence-plan';
+import { isReadingRelation } from './inline-alternative';
 import { tabOrientationRecordChange, tabMetadataRecordChange } from './tab-orientation';
+import {dialecticRangeRoot,dialecticRangePayloadOnly} from './dialectic-range-plan';
 import { inlineOwnerFor } from './inline-plan';
 import type { ContentRecord, Location, PlacementRecord, RepositoryOperation, RepositoryState } from './types';
 
-export interface StructuralChange { gloss?: import("./gloss-plan").GlossChange; tabOrientationOwner?: string; tabMetadata?: { owners: string[]; inlineOwner?: string }; membership?: { key:string; before?:string; after?:string }[]; contents: string[]; childrenOwners: string[]; inlineOwners: string[] }
+export interface StructuralChange { preferencesMetadataOwner?:string; definitionChanges?:{owner:string;ids:string[]}; sequenceMetadataOwner?:string; rangePayloadOwners?:string[]; gloss?: import("./gloss-plan").GlossChange; tabOrientationOwner?: string; tabMetadata?: { owners: string[]; inlineOwner?: string }; membership?: { key:string; before?:string; after?:string }[]; contents: string[]; childrenOwners: string[]; inlineOwners: string[] }
 export interface StructuralEvidence {
   locationOf(key: string): Location | undefined;
   referenceCount(key: string): number;
@@ -21,6 +25,12 @@ const edges = (c: ContentRecord, visit: (key: string, location: Location) => boo
  * ancestry without enumerating unrelated records or traversing unchanged text. */
 export function structuralChangeFor(state: RepositoryState, operations: RepositoryOperation[], evidence: StructuralEvidence): StructuralChange | undefined {
   if (!operations.length) return;
+  const preferencesOwner=preferencesMetadataOwner(state,operations);
+  if(preferencesOwner)return {preferencesMetadataOwner:preferencesOwner,contents:[preferencesOwner],childrenOwners:[],inlineOwners:[]};
+  const sequenceOwner=sequenceMetadataOwner(state,operations);
+  if(sequenceOwner)return {sequenceMetadataOwner:sequenceOwner,contents:[sequenceOwner],childrenOwners:[],inlineOwners:[]};
+  const definitionIds:string[]=[];
+  const rangeRoot=dialecticRangeRoot(state,operations,evidence,definitionIds);
   const contents = new Map<string, ContentRecord | undefined>(), placements = new Map<string, PlacementRecord | undefined>();
   for (const op of operations) {
     if (op.kind === 'set-root' || op.kind === 'record-batch') return;
@@ -33,9 +43,21 @@ export function structuralChangeFor(state: RepositoryState, operations: Reposito
       if (['document-block', 'workspace-block'].includes((old ?? next)!.viewType)) {
         if (!old || !next) return;
         const rest = ({ children, wireChildren, revision, ...c }: ContentRecord) => c;
-        if (!same(rest(old), rest(next))) return;
+        const candidate=rangeRoot?.key===next.key?rangeRoot:next;
+        // Absent fields must remain absent for the pre-existing structural proof.
+        if(rangeRoot?.key===next.key&&old.payload.linkedAnnotations===undefined)delete candidate.payload.linkedAnnotations;
+        if (!same(rest(old), rest(candidate))) return;
       }
       if (next?.definitionOwnerKey && ['text-cell', 'image-cell'].includes(next.viewType)) return;
+      if (old && next && (next.children.length || Object.keys(next.opaqueRelations).length)) {
+        // Reading shape is an invariant of its owning host, which may be absent
+        // from this batch. Use the existing incoming-edge index, then let the
+        // full graph validator reject unsupported structural reading edits.
+        for (const pk of evidence.ownedKeys(key)) {
+          const location = evidence.locationOf(pk);
+          if (location?.slot.kind === 'relation' && isReadingRelation(location.slot.name)) return;
+        }
+      }
       contents.set(key, next);
     } else {
       if (placements.has(key) || key === state.rootPlacementKey) return;
@@ -131,6 +153,8 @@ export function structuralChangeFor(state: RepositoryState, operations: Reposito
   const inlineOwner = metadata.length && other.filter(op => op.kind === 'put-content' && state.contents[op.record.key]?.inlineKind === 'standoff').length === 1
     ? inlineOwnerFor(state,other,{get:key=>evidence.referenceCount(key)}) : undefined;
   return {
+    definitionChanges:rangeRoot?{owner:rangeRoot.key,ids:definitionIds}:undefined,
+    rangePayloadOwners: [...contents].filter(([key,next])=>next&&dialecticRangePayloadOnly(state.contents[key],next)).map(([key])=>key),
     membership,
     tabMetadata: metadata.length && (!other.length || inlineOwner) ? {
       owners: metadata.map(op => (op as Extract<RepositoryOperation,{kind:'put-content'}>).record.key),

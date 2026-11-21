@@ -64,7 +64,7 @@ describe.each([true, false])("character renderer compatibility (direct=%s)", dir
   it("updates inline image attributes, handles load/failure, and ignores events after disposal", () => {
     const { editor, projection, owner, flow, dispose } = mount("AB", direct);
     const placement = editor.commands.insertInlineImage(owner.key, 1, { assetId: "example", src: "data:image/png;base64,", alt: "example", width: 12, height: 14, status: "pending" });
-    const imageKey = projection.nodeForPlacement(placement)!.key;
+    const imageKey = projection.nodeForPlacement(placement as string)!.key;
     const span = flow.children[1] as HTMLElement, image = span.firstChild as HTMLImageElement;
     expect(span.className).toBe("reactive-inline-image");
     expect(span.getAttribute("aria-label")).toBe("example");
@@ -94,7 +94,7 @@ describe.each([true, false])("character renderer compatibility (direct=%s)", dir
   it("keeps source-less image cells visible without adding authored text or fetching", () => {
     const { editor, projection, owner, flow } = mount("", direct);
     const placement = editor.commands.insertInlineImage(owner.key, 0, { assetId: "inert", src: "", alt: "", status: "failed" });
-    const key = projection.nodeForPlacement(placement)!.key;
+    const key = projection.nodeForPlacement(placement as string)!.key;
     const cell = flow.firstElementChild!;
     const image = cell.firstElementChild!;
     expect(cell.getAttribute('data-image-placeholder')).toBe('Image not loaded');

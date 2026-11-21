@@ -1,5 +1,5 @@
 import type {SavedProviderCoverage} from './backlinks';
-import type { Component } from "solid-js";
+import type { Component, JSX } from "solid-js";
 import type { DocumentFormat } from "../features/document-formats/model";
 import type { ExistingBlockDto } from "./index";
 
@@ -7,13 +7,18 @@ export interface ApplicationDocument { id: string; title: string }
 export interface RecentApplicationDocument extends ApplicationDocument { location?: {folder: string; filename: string} }
 /** The first composite Document application: core owns the rendered tabs/editors. */
 export interface DocumentApplicationInstance {
+  /** Stable application Block identity; contextual state stays outside its payload. */
+  id?: string;
+  createDocument?(title?: string): string;
+  /** Identity-only observation: library rows must not depend on dirty/save status. */
+  activeDocumentId?(): string | undefined;
   publish?:()=>void;
   documents(): readonly ApplicationDocument[];
   openDocument(id: string): void;
   recentDocuments?: { items(): readonly RecentApplicationDocument[]; open(id: string): Promise<void>; remove(id: string): void };
   renameDocument(id: string, title: string): void;
   closeActiveTab(): void;
-  tabs: Component;
+  tabs: Component<{ afterTabs?: JSX.Element }>;
   vault?: ApplicationVault;
   knowledge?: ApplicationKnowledge;
   /** Entity-reference inventory in the active Document occurrence. */
@@ -30,6 +35,7 @@ export interface DocumentApplicationInstance {
     importCollection():void;
     exportCollection():void;
     importFiles():void;
+    openTeiXml?():void;
     importPackage():void;
     exportPackage():void;
     exportPortable(format:'html'|'markdown',standalone?:boolean):void;
@@ -45,6 +51,8 @@ export interface DocumentApplicationInstance {
     open(location: {folder: string; filename: string}, importMarkdown?: boolean): Promise<void>;
     /** Omit location to use the current binding or a first-save filename in the active Vault. */
     save(location?: {folder: string; filename: string}): Promise<void>;
+    /** Explicit contribution commit only; targets the captured Document, never the active tab later. */
+    saveSubmitted?(documentId: string, defaultFilename: string): Promise<boolean>;
     recover(location: {folder: string; filename: string}): Promise<void>;
     compare(): Promise<{external: string; generated: string}>;
     keepMutable(): Promise<void>;
@@ -55,6 +63,13 @@ export interface DocumentApplicationInstance {
 export interface DocumentApplicationCapabilities {
   register(definition: {
     applicationId?: string;
+    /** Composite applications may provide their own launch/content creation command. */
+    launch?: false;
+    label?: string;
+    /** Activate the application’s supported presentation before creating a Window. */
+    beforeOpen?(): void;
+    /** Defaults to the existing Flint examples; an empty list starts an empty host. */
+    seedDocuments?(): ExistingBlockDto[];
     type: string;
     create(documents: readonly ApplicationDocument[]): ExistingBlockDto;
     view: Component<{ application: DocumentApplicationInstance; initialView?: "document" | "graph" }>;

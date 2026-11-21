@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-11",
+  "scope": "Focused post-generation persistence correction; provider setup unchanged",
+  "fixture": "Read-only eight-contribution Conversation on November 11, 2026 (7).ink; one additional response admitted in memory",
+  "comparison": {
+    "baseline": "Original ResourcePair and submission-save implementations loaded from git HEAD 72ebce52e18e737645ca4b134370f18d86986684; shared current native editor/preparation in both runs",
+    "after": "Working-tree generation tracking, capture and scheduling changes",
+    "mountedNativeView": true,
+    "durableAdapter": "Compiled existing native-document-store router with isolated temporary filesystem; requests relayed by Chrome DevTools; temporary store removed after run",
+    "providerCalls": 0,
+    "userDocumentWrites": 0
+  },
+  "mountedMilliseconds": {
+    "admitMs": {
+      "before": 341.1,
+      "after": 272.4
+    },
+    "saveCaptureMs": {
+      "before": 518,
+      "after": 526.7
+    },
+    "saveEncodeMs": {
+      "before": 130.1,
+      "after": 112.2
+    },
+    "fullSaveWithInMemoryAdapterMs": {
+      "before": 1445.6,
+      "after": 627.1
+    },
+    "firstPaintTraceMs": {
+      "before": 1094.89,
+      "after": 19.19
+    },
+    "admissionToDurableCompletionMs": {
+      "before": 3840.7,
+      "after": 2287.5
+    },
+    "snapshotCloneMs": {
+      "before": 111.7,
+      "after": 107.2
+    }
+  },
+  "longestObservedTaskMs": {
+    "before": 1527,
+    "after": 776,
+    "note": "Whole browser tasks overlapping admission-to-durable completion; the initial task also includes preceding preparation/admission. Not an isolated persistence-only task timer."
+  },
+  "paintEvidence": {
+    "beforeCapture": {
+      "before": 0,
+      "after": 2
+    },
+    "method": "Chrome devtools.timeline Paint events following dcp-admitted user-timing marks. The native view reveals the appended contribution before capture. This measures browser painting, not physical monitor presentation."
+  },
+  "mutationAudit": [
+    {
+      "path": "Text, structural, standoff and Block-property editing",
+      "boundary": "CanonicalRepository.commit / commitInline, including inline, split, list/task, structural and full-admission routes",
+      "tracking": "Existing incoming ownership/location evidence followed for touched records before and after publication; no repository enumeration or snapshot on ordinary edits"
+    },
+    {
+      "path": "DCP contribution admission, Entities, Relationships, Glosses and interpretations",
+      "boundary": "controller boundedStructuralTransaction -> shared repository commit; native semantic services and Gloss edits also commit native records",
+      "tracking": "Root linkedAnnotations, source standoff properties, contributed descendants and retained definition owners advance the owning Document generation"
+    },
+    {
+      "path": "Undo/Redo",
+      "boundary": "CanonicalRepository.undo/redo -> commit with inverse/forward operations",
+      "tracking": "Monotonic generation increases even when content returns to previously saved bytes; conservatively dirty until another Save"
+    },
+    {
+      "path": "Imports and programmatic mutation",
+      "boundary": "Native admission, command imports and record-batch operations converge on commit",
+      "tracking": "Record batches streamed through recordOperations; ownership inspected on both sides, including newly admitted and removed resources"
+    },
+    {
+      "path": "Placement-only changes, named relations and retained definitions",
+      "boundary": "Canonical placement/content records and definitionOwnerKey",
+      "tracking": "Both previous and new owners counted; unmounted retained content remains tracked. Reference occurrence changes do not dirty their source solely because it is referenced"
+    },
+    {
+      "path": "Identity/definition-ownership changes affecting foreign provenance",
+      "boundary": "Canonical content identity/owner mutation",
+      "tracking": "Rare conservative provenance generation invalidates all resource save baselines. Legacy repositories without enriched ownership evidence use repository revision conservatively"
+    },
+    {
+      "path": "Presentation and operational state",
+      "boundary": "Existing local session state",
+      "tracking": "No generation changes unless persisted native state is committed. ReadState remains a read-only-by-contract API; raw mutation bypasses are not supported"
+    },
+    {
+      "path": "Vault-only Entity records",
+      "boundary": "Existing SQLite/Vault services",
+      "tracking": "Separate persisted store, not serialized into native Document; Document definitions and mention/relationship records remain covered by native commits"
+    }
+  ],
+  "saveSemantics": [
+    "Capture and native encoding remain synchronous; the returned frozen snapshot is associated with generation N before any asynchronous I/O.",
+    "Successful receipts acknowledge only N. Current generation is compared with N without serialization. Pending bytes and N survive unknown-outcome recovery; stale receipts remain rejected.",
+    "Native session rechecks generation after awaiting the coordinator to avoid clearing an edit between promise continuations.",
+    "Commit-triggered Dialectic saves catch up newer edits, yielding before each capture. Already satisfied queued contribution saves skip recapture. Manual Save remains one generation per action.",
+    "Pending/unsaved status starts immediately. Durable success is only reported after persistence confirmation. Failures stop catch-up and retain recovery/error state.",
+    "Two animation-frame callbacks give foreground content a paint opportunity. Hidden tabs use a task; suspended frames have a bounded 250 ms fallback. Disposed queues do not start capture."
+  ],
+  "workerAssessment": "Not implemented. Snapshot structured cloning measured about 107 ms, versus about 112 ms for encoding. Off-thread encoding alone would retain the dominant ~527 ms main-thread capture and introduce a near-equivalent clone/transfer cost; no meaningful net improvement demonstrated.",
+  "limitations": [
+    "Single focused before/after samples, with mounted and unmounted controls; headless Chrome timings are not guarantees of user-visible latency.",
+    "Admission uses the same current canonical implementation for the paired comparison; no admission speedup is claimed.",
+    "Capture still walks/validates the full native resource and remains a ~0.5 second main-thread task on this fixture. Painting first does not eliminate that remaining cost.",
+    "Filesystem timings include the isolated native-store service and DevTools request relay, not the user's full application/Cavern workload.",
+    "Flint 25,000-character trusted-input benchmark checks regression, not a claim that generation tracking accelerates typing.",
+    "Serial provider-conversation setup remains a separate, unchanged ~2\u20133 second follow-up issue."
+  ],
+  "qualification": {
+    "focusedTestFiles": {
+      "src/persistence/native-session.test.ts": 17,
+      "src/persistence/resource-pair.test.ts": 5,
+      "src/qualification/native-b2/paired-save.test.mjs": 22,
+      "src/application/document-save.test.tsx": 5,
+      "src/features/dialectic/submission-save.test.ts": 6,
+      "src/features/dialectic/conversation-updates.test.tsx": 9,
+      "src/features/dialectic/dcp/xml-authoring.test.ts": 17,
+      "src/block-tree/inline-performance.test.ts": 14
+    },
+    "uniqueFocusedTestsPassed": 95,
+    "checks": [
+      "Exactly one capture/encoding per successful save; repeated dirty reads do neither",
+      "Text and structural mutations, placement-only changes, programmatic batches and detached retained definitions advance generation",
+      "DCP Entity/Relationship/Gloss/interpretation/source-mark admission, Undo/Redo and native round-trips",
+      "Edits during I/O and between acknowledgement/completion remain dirty; submission save catches up and avoids a third duplicate save",
+      "Unknown outcomes, preflight failures, stale completions, interrupted writes and recovery preserve the captured generation",
+      "Paint-before-save, suspended-frame fallback, pending state through durable completion, disposal and coalescing",
+      "Existing save destinations, collision handling, manual Save/Save As and Dialectic presentation protection",
+      "Real Flint typing, Backspace, Undo/Redo, split/Enter: zero typing snapshots and stable unrelated Cells"
+    ],
+    "typecheck": "Passed: tsconfig.reactive.json and tsconfig.server.json",
+    "diffWhitespaceCheck": "Passed"
+  }
+}

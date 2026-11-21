@@ -32,15 +32,24 @@ export type ResourceUrl = NonNullable<ReturnType<typeof resourceUrl>>;
 export function resourceBlock(value: string, image?: Omit<AssetManifest, 'kind'>) {
   const resource = resourceUrl(value);
   if (!resource) throw Error('Paste one absolute HTTP(S) resource URL.');
-  const type = resource.video ? `${resource.video.provider}-player-block` : resource.kind === 'image' ? 'image-block' : 'iframe-block';
+  if(resource.kind === 'image') {
+    if(!image) throw Error('The image must be downloaded and validated first.');
+    return managedImageBlock(image, decodeName(resource.url), value.trim());
+  }
+  const type = resource.video ? `${resource.video.provider}-player-block` : 'iframe-block';
   const body = resource.video ? { video: { ...resource.video } }
-    : resource.kind === 'image' ? (() => {
-      // Acquisition returns a manifest; `kind` belongs to the portable reference.
-      const asset = image && managedAsset({ kind: 'managed', cavernId: image.cavernId, assetId: image.assetId });
-      if (!asset || !['image/png','image/jpeg'].includes(image!.mediaType)) throw Error('The image must be downloaded and validated first.');
-      return { asset: { kind: asset.kind, cavernId: asset.cavernId, assetId: asset.assetId }, metadata: { alt: decodeName(resource.url) } };
-    })() : { metadata: { url: resource.url, height: 600, resourceEmbed: true, title: new URL(resource.url).hostname } };
-  const data = { ...body, sourceUrl: value.trim() };
+    : { metadata: { url: resource.url, height: 600, resourceEmbed: true, title: new URL(resource.url).hostname } };
+  return activeResourceBlock(type, { ...body, sourceUrl: value.trim() });
+}
+/** Shared host preparation for verified managed images. No new resource or
+ * source ownership is created; callers establish resource authority first. */
+export function managedImageBlock(image: Omit<AssetManifest,'kind'>, alt: string, sourceUrl?: string) {
+  const asset = managedAsset({kind:'managed',cavernId:image.cavernId,assetId:image.assetId});
+  if(!asset || !['image/png','image/jpeg'].includes(image.mediaType)) throw Error('The image must be downloaded and validated first.');
+  if(typeof alt !== 'string') throw Error('Invalid image alternative text.');
+  return activeResourceBlock('image-block', {asset,metadata:{alt},...(sourceUrl?{sourceUrl}:{})});
+}
+function activeResourceBlock(type: string, data: Record<string,any>) {
   const f = emptyFragment();
   f.blocks.push({ localId: 'resource', type, data, blockProperties: [], children: [], relations: {} });
   f.placements.push({ localId: 'resource-placement', kind: 'owned', target: { kind: 'local', object: 'block', id: 'resource' } });

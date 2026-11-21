@@ -1,0 +1,9 @@
+/** Original MIT-licensed vectors for Quill. No external image/font source. */
+export const ornaments={
+ flourish:{label:'Curlicue flourish',path:'M5 72C35 10 135 10 168 42C185 60 162 84 143 66C123 46 166 35 190 28M20 55C50 91 96 91 120 61M43 40C42 18 67 11 77 29M82 29C95 2 122 5 130 20',fill:false},
+ divider:{label:'Literary divider',path:'M0 50H72M128 50H200M79 50L100 32L121 50L100 68ZM93 50L100 43L107 50L100 57Z',fill:false},
+ border:{label:'Geometric border',path:'M6 6H194V94H6ZM12 12H188V88H12ZM6 22L22 6M178 6L194 22M6 78L22 94M178 94L194 78',fill:false},
+ leaf:{label:'Botanical spray',path:'M10 90Q80 40 190 10M42 70Q20 30 66 42Q68 60 42 70M78 49Q66 5 101 23Q103 40 78 49M107 37Q145 65 163 31Q140 20 107 37M147 21Q154 0 181 8Q170 20 147 21',fill:false},
+ raven:{label:'Raven silhouette',path:'M30 83L83 68L72 57L65 35L76 20L91 13L108 17L120 29L144 32L122 37L120 52L145 77L174 92L149 91L127 85L106 73L97 76L98 88L114 91L91 91L87 77L81 77L77 88L91 94L65 91L72 75Z',fill:true},
+ capital:{label:'Illuminated capital',path:'M8 10H192V90H8ZM15 18C40 8 60 16 40 33M185 82C160 92 140 84 160 67',fill:false},
+} as const;

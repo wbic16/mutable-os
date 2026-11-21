@@ -1,0 +1,10 @@
+.reactive-inline-alternative-cell, .native-inline-alternative { display: inline; position: relative; }
+.native-inline-alternative { text-decoration: underline dotted #8f8170; text-underline-offset: .16em; }
+.native-inline-alternative > .native-inline-alternative__selector { position: absolute; z-index: 5; left: 0; bottom: 100%; width: max-content; max-width: 12rem; font: 12px system-ui; opacity: 0; pointer-events: none; }
+.native-inline-alternative:hover > .native-inline-alternative__selector, .native-inline-alternative:focus-within > .native-inline-alternative__selector { opacity: 1; pointer-events: auto; }
+.reactive-standoff-block.native-inline-reading, .native-inline-reading > .reactive-standoff-surface, .native-inline-reading > .reactive-standoff-surface > .reactive-standoff-flow { display: inline; padding: 0; margin: 0; min-height: 0; }
+.native-inline-reading > .reactive-standoff-surface > .reactive-standoff-flow:empty::after { content: '\200B'; }
+
+.reactive-standoff-block.native-inline-reading, .native-inline-reading > .reactive-standoff-surface { border: 0; border-radius: 0; background: transparent; }
+
+.native-inline-reading > .reactive-standoff-surface > :not(.reactive-standoff-flow) { translate: var(--inline-overlay-x, 0px) var(--inline-overlay-y, 0px); }

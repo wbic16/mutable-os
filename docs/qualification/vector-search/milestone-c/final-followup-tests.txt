@@ -1,0 +1,15 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ src/features/autocomplete/retrieval.test.ts (2 tests) 14ms
+ ✓ src/application/retrieval-controls.test.tsx (1 test) 182ms
+ ✓ server/retrieval-host.test.ts (2 tests) 1949ms
+   ✓ persists refusal, explicit scope consent, automatic confirmed saves, reuse, revocation and restart 1291ms
+   ✓ distinct Caverns keep independent preferences, identity and upload scopes 657ms
+ ✓ src/features/dialectic/dcp/retrieval.test.ts (2 tests) 114ms
+
+ Test Files  4 passed (4)
+      Tests  7 passed (7)
+   Start at  12:53:43
+   Duration  10.03s (transform 7.89s, setup 0ms, collect 10.09s, tests 2.26s, environment 2.62s, prepare 471ms)
+

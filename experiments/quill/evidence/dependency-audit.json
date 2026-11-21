@@ -1,0 +1,1078 @@
+{
+  "inspectedOn": "2026-11-21",
+  "roots": {
+    "@chenglou/pretext": "1.0.0",
+    "@react-pdf/textkit": "7.0.1",
+    "@svgdotjs/svg.js": "3.2.8",
+    "charmingjs": "0.1.0"
+  },
+  "records": [
+    {
+      "key": "node_modules/@chenglou/pretext",
+      "name": "@chenglou/pretext",
+      "version": "1.0.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/chenglou/pretext.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/@chenglou/pretext/-/pretext-1.0.0.tgz",
+      "integrity": "sha512-BxKiDMxWJhyzL8asvcgg3T9YnUU7OUFsKO8oRaR2SYAPX4Sh2wM9gqTBjrBaZ4fnl84cEQ8czC0Q1M83z3chsA==",
+      "tarballBytes": 302420,
+      "unpackedBytes": 1032358,
+      "entry": "./dist/layout.js",
+      "entryBytes": 10187,
+      "entryGzipBytes": 3289,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "b0bc6870efb4e667f911d5f6b52fc9b321d634a0469a17464e35da244c28f128",
+          "heading": [
+            "MIT License",
+            "Copyright (c) 2026 Pretext contributors",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/@react-pdf/fns",
+      "name": "@react-pdf/fns",
+      "version": "3.1.3",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/diegomura/react-pdf.git",
+        "directory": "packages/fns"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/@react-pdf/fns/-/fns-3.1.3.tgz",
+      "integrity": "sha512-0I7pApDr1/RLAKbizuLy/IHTEa93LSPy/bEwYniboC3Xqnp6Od8xFJKbKEzGw2wh/5zKFFwl00g4t9RwgIMc3w==",
+      "tarballBytes": 5468,
+      "unpackedBytes": 24320,
+      "entry": "./lib/index.js",
+      "entryBytes": 9571,
+      "entryGzipBytes": 2758,
+      "licenseFiles": [],
+      "assets": []
+    },
+    {
+      "key": "node_modules/@react-pdf/hyphenate",
+      "name": "@react-pdf/hyphenate",
+      "version": "0.1.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/diegomura/react-pdf.git",
+        "directory": "packages/hyphenate"
+      },
+      "dependencies": {
+        "hyphen": "~1.6.4"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/@react-pdf/hyphenate/-/hyphenate-0.1.0.tgz",
+      "integrity": "sha512-CWulbuusHh2Lnos9ZffT3ZYfjCt332Yl8wjSyCKWbwhbTpe/VdFt53fM5elPp3HU3R6tzH6j3oYlLXDwC2WEHQ==",
+      "tarballBytes": 7621,
+      "unpackedBytes": 48586,
+      "entry": "./lib/index.js",
+      "entryBytes": 6856,
+      "entryGzipBytes": 2105,
+      "licenseFiles": [],
+      "assets": []
+    },
+    {
+      "key": "node_modules/@react-pdf/textkit",
+      "name": "@react-pdf/textkit",
+      "version": "7.0.1",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/diegomura/react-pdf.git",
+        "directory": "packages/textkit"
+      },
+      "dependencies": {
+        "@react-pdf/fns": "3.1.3",
+        "@react-pdf/hyphenate": "^0.1.0",
+        "bidi-js": "^1.0.2",
+        "unicode-properties": "^1.4.1"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/@react-pdf/textkit/-/textkit-7.0.1.tgz",
+      "integrity": "sha512-ljY/YoEETIOR/+zxWdLLmKlupz8/nBsbmxglM3mDRco62UEzEPnIeMEzYVVVraovCAJC2t+50gKFNSV17FYxbw==",
+      "tarballBytes": 27256,
+      "unpackedBytes": 115266,
+      "entry": "./lib/textkit.js",
+      "entryBytes": 100304,
+      "entryGzipBytes": 23312,
+      "licenseFiles": [],
+      "assets": []
+    },
+    {
+      "key": "node_modules/@svgdotjs/svg.js",
+      "name": "@svgdotjs/svg.js",
+      "version": "3.2.8",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/svgdotjs/svg.js.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/@svgdotjs/svg.js/-/svg.js-3.2.8.tgz",
+      "integrity": "sha512-NUdbI/7FDdqGpzKmqr09IQoy9MUcrAC/3bC8gLgXi6OfJuyri450zMLvJekFUhuq3iN5gpdPjoSoStNl9Eijfg==",
+      "tarballBytes": 529379,
+      "unpackedBytes": 2233545,
+      "entry": "dist/svg.esm.js",
+      "entryBytes": 180020,
+      "entryGzipBytes": 42458,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE.txt",
+          "sha256": "455113977c98c54dad8598e092b99aad6be0ed8c5c4a0722154acf4b21df4730",
+          "heading": [
+            "Copyright (c) 2012-2018 Wout Fierens",
+            "Permission is hereby granted, free of charge, to any person obtaining",
+            "distribute, sublicense, and/or sell copies of the Software, and to",
+            "The above copyright notice and this permission notice shall be"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/base64-js",
+      "name": "base64-js",
+      "version": "1.5.1",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git://github.com/beatgammit/base64-js.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz",
+      "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==",
+      "tarballBytes": 4109,
+      "unpackedBytes": 9624,
+      "entry": "index.js",
+      "entryBytes": 3932,
+      "entryGzipBytes": 1374,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1",
+          "heading": [
+            "The MIT License (MIT)",
+            "Copyright (c) 2014 Jameson Little",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/bidi-js",
+      "name": "bidi-js",
+      "version": "1.1.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/lojjic/bidi-js.git"
+      },
+      "dependencies": {
+        "require-from-string": "^2.0.2"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/bidi-js/-/bidi-js-1.1.0.tgz",
+      "integrity": "sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg==",
+      "tarballBytes": 47353,
+      "unpackedBytes": 171249,
+      "entry": "dist/bidi.mjs",
+      "entryBytes": 44792,
+      "entryGzipBytes": 12006,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE.txt",
+          "sha256": "49d4d143fed599deb502a0fe6e02f49832f87e9a3a4cd0502e469596d50faa6d",
+          "heading": [
+            "Copyright (c) 2021 Jason Johnston",
+            "MIT License",
+            "Permission is hereby granted, free of charge, to any person obtaining",
+            "distribute, sublicense, and/or sell copies of the Software, and to"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/charmingjs",
+      "name": "charmingjs",
+      "version": "0.1.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/charming-art/charming.git"
+      },
+      "dependencies": {
+        "@chenglou/pretext": "^0.0.4",
+        "d3-color": "^3.1.0",
+        "d3-path": "^3.1.0",
+        "figlet": "^1.12.0",
+        "hachure-fill": "^0.5.2",
+        "points-on-path": "^0.2.1"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/charmingjs/-/charmingjs-0.1.0.tgz",
+      "integrity": "sha512-j+smFEtwDGmEkpUqKvMY39UpR54CxCzMoO9ZLMIaZrx8DD/gHxHAZZeB/vkb6hG6yfJYgvHLpko0Aoqa2CMWpg==",
+      "tarballBytes": 208653,
+      "unpackedBytes": 695072,
+      "entry": "src/index.js",
+      "entryBytes": 275,
+      "entryGzipBytes": 105,
+      "licenseFiles": [
+        {
+          "path": "package/License",
+          "sha256": "da7f0edddae86191272bc74082bf388286d7d100cbed73d6e827b386781f4dcd",
+          "heading": [
+            "The MIT License (MIT)",
+            "Copyright (c) 2025-Present Bairui SU https://github.com/pearmini",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/charmingjs/node_modules/@chenglou/pretext",
+      "name": "@chenglou/pretext",
+      "version": "0.0.4",
+      "license": "MIT",
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/@chenglou/pretext/-/pretext-0.0.4.tgz",
+      "integrity": "sha512-FnPAFMid1/p1j2V2gRPUVBarGUIb2PhkkC9YNnTOfPtTDgHKh8siO8PP9pCxpFfYlcodWPJpE1UbSHGQqt8pQQ==",
+      "tarballBytes": 206261,
+      "unpackedBytes": 693392,
+      "entry": "./dist/layout.js",
+      "entryBytes": 19838,
+      "entryGzipBytes": 5015,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "e9355cb16457e81acd97dac2e50f2f8bbf2a9a464025f9c46db3680cf9598846",
+          "heading": [
+            "MIT License",
+            "Copyright (c) 2026 Pretext contributors",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/commander",
+      "name": "commander",
+      "version": "14.0.3",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/tj/commander.js.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/commander/-/commander-14.0.3.tgz",
+      "integrity": "sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==",
+      "tarballBytes": 53293,
+      "unpackedBytes": 208654,
+      "entry": "./index.js",
+      "entryBytes": 812,
+      "entryGzipBytes": 286,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b",
+          "heading": [
+            "(The MIT License)",
+            "Copyright (c) 2011 TJ Holowaychuk <tj@vision-media.ca>",
+            "Permission is hereby granted, free of charge, to any person obtaining",
+            "distribute, sublicense, and/or sell copies of the Software, and to"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/d3-color",
+      "name": "d3-color",
+      "version": "3.1.1",
+      "license": "ISC",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/d3/d3-color.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/d3-color/-/d3-color-3.1.1.tgz",
+      "integrity": "sha512-lfab8x0Bj0UO7SNsY8dZSbNIA6ipbkE3X0NG9nqjCu6CfCHZseuDnOSJY7hidKrjpP++i1M2qT+FlAdPKYRilA==",
+      "tarballBytes": 15774,
+      "unpackedBytes": 57072,
+      "entry": "dist/d3-color.mjs",
+      "entryBytes": 16557,
+      "entryGzipBytes": 4996,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "2a6d2d5f32ba0b755ddbc1c833f766e30cdbe6ebe9a6d4e3e24427721f0b63d3",
+          "heading": [
+            "Copyright 2010-2026 Mike Bostock",
+            "Permission to use, copy, modify, and/or distribute this software for any purpose",
+            "with or without fee is hereby granted, provided that the above copyright notice",
+            "and this permission notice appear in all copies."
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/d3-path",
+      "name": "d3-path",
+      "version": "3.1.1",
+      "license": "ISC",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/d3/d3-path.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/d3-path/-/d3-path-3.1.1.tgz",
+      "integrity": "sha512-jsbgV8zIT38ReB9O7X7gcLndTQRONSqNNd+oGIaTBdUug4r5jFmp0N6RY9R5GWbdUDucn0qoTGyfjapT4tDhcg==",
+      "tarballBytes": 4903,
+      "unpackedBytes": 18958,
+      "entry": "dist/d3-path.mjs",
+      "entryBytes": 5387,
+      "entryGzipBytes": 1782,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "f5dff44740d51a1849b4d16b657eccf60577fb5d28d8ee46d33dcc780a11f94a",
+          "heading": [
+            "Copyright 2015-2026 Mike Bostock",
+            "Permission to use, copy, modify, and/or distribute this software for any purpose",
+            "with or without fee is hereby granted, provided that the above copyright notice",
+            "and this permission notice appear in all copies."
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/figlet",
+      "name": "figlet",
+      "version": "1.12.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/patorjk/figlet.js.git"
+      },
+      "dependencies": {
+        "commander": "^14.0.0"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/figlet/-/figlet-1.12.0.tgz",
+      "integrity": "sha512-Ith3WsUi0N/EqGt+0/F6XnWhT04sohhH2tT0Dq7GdUmWbMTIoCbg2Jq9qKggmTO62ST5kRCfB311EmIMbizGyA==",
+      "tarballBytes": 2359952,
+      "unpackedBytes": 18929807,
+      "entry": "./dist/figlet.mjs",
+      "entryBytes": 82,
+      "entryGzipBytes": 88,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE.txt",
+          "sha256": "7176d13d6000cd46abd6a5bf39126b6adb51f3f4cb14b4311a236bf24b2f7dd2",
+          "heading": [
+            "The MIT License (MIT)",
+            "Copyright (C) 2014-present Patrick Gillespie and other contributors",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": [
+        "package/fonts/1Row.flf",
+        "package/fonts/3-D.flf",
+        "package/fonts/3D Diagonal.flf",
+        "package/fonts/3D-ASCII.flf",
+        "package/fonts/3x5.flf",
+        "package/fonts/4Max.flf",
+        "package/fonts/5 Line Oblique.flf",
+        "package/fonts/Acrobatic.flf",
+        "package/fonts/Alligator.flf",
+        "package/fonts/Alligator2.flf",
+        "package/fonts/Alpha.flf",
+        "package/fonts/Alphabet.flf",
+        "package/fonts/AMC 3 Line.flf",
+        "package/fonts/AMC 3 Liv1.flf",
+        "package/fonts/AMC AAA01.flf",
+        "package/fonts/AMC Neko.flf",
+        "package/fonts/AMC Razor.flf",
+        "package/fonts/AMC Razor2.flf",
+        "package/fonts/AMC Slash.flf",
+        "package/fonts/AMC Slider.flf",
+        "package/fonts/AMC Thin.flf",
+        "package/fonts/AMC Tubes.flf",
+        "package/fonts/AMC Untitled.flf",
+        "package/fonts/ANSI Compact.flf",
+        "package/fonts/ANSI Regular.flf",
+        "package/fonts/ANSI Shadow.flf",
+        "package/fonts/Arrows.flf",
+        "package/fonts/ASCII 12.flf",
+        "package/fonts/ASCII 9.flf",
+        "package/fonts/ASCII New Roman.flf",
+        "package/fonts/Avatar.flf",
+        "package/fonts/B1FF.flf",
+        "package/fonts/Babyface Lame.flf",
+        "package/fonts/Babyface Leet.flf",
+        "package/fonts/Banner.flf",
+        "package/fonts/Banner3-D.flf",
+        "package/fonts/Banner3.flf",
+        "package/fonts/Banner4.flf",
+        "package/fonts/Barbwire.flf",
+        "package/fonts/Basic.flf",
+        "package/fonts/Bear.flf",
+        "package/fonts/Bell.flf",
+        "package/fonts/Benjamin.flf",
+        "package/fonts/Big ASCII 12.flf",
+        "package/fonts/Big ASCII 9.flf",
+        "package/fonts/Big Chief.flf",
+        "package/fonts/Big Money-ne.flf",
+        "package/fonts/Big Money-nw.flf",
+        "package/fonts/Big Money-se.flf",
+        "package/fonts/Big Money-sw.flf",
+        "package/fonts/Big Mono 12.flf",
+        "package/fonts/Big Mono 9.flf",
+        "package/fonts/Big.flf",
+        "package/fonts/Bigfig.flf",
+        "package/fonts/Binary.flf",
+        "package/fonts/Block.flf",
+        "package/fonts/Blocks.flf",
+        "package/fonts/Bloody.flf",
+        "package/fonts/BlurVision ASCII.flf",
+        "package/fonts/Bolger.flf",
+        "package/fonts/Braced.flf",
+        "package/fonts/Bright.flf",
+        "package/fonts/Broadway KB.flf",
+        "package/fonts/Broadway.flf",
+        "package/fonts/Bubble.flf",
+        "package/fonts/Bulbhead.flf",
+        "package/fonts/Caligraphy.flf",
+        "package/fonts/Caligraphy2.flf",
+        "package/fonts/Calvin S.flf",
+        "package/fonts/Cards.flf",
+        "package/fonts/Catwalk.flf",
+        "package/fonts/Chiseled.flf",
+        "package/fonts/Chunky.flf",
+        "package/fonts/Circle.flf",
+        "package/fonts/Classy.flf",
+        "package/fonts/Coder Mini.flf",
+        "package/fonts/Coinstak.flf",
+        "package/fonts/Cola.flf",
+        "package/fonts/Colossal.flf",
+        "package/fonts/Computer.flf",
+        "package/fonts/Contessa.flf",
+        "package/fonts/Contrast.flf",
+        "package/fonts/Cosmike.flf",
+        "package/fonts/Cosmike2.flf",
+        "package/fonts/Crawford.flf",
+        "package/fonts/Crawford2.flf",
+        "package/fonts/Crazy.flf",
+        "package/fonts/Cricket.flf",
+        "package/fonts/Cursive.flf",
+        "package/fonts/Cyberlarge.flf",
+        "package/fonts/Cybermedium.flf",
+        "package/fonts/Cybersmall.flf",
+        "package/fonts/Cygnet.flf",
+        "package/fonts/DANC4.flf",
+        "package/fonts/Dancing Font.flf",
+        "package/fonts/Decimal.flf",
+        "package/fonts/Def Leppard.flf",
+        "package/fonts/Delta Corps Priest 1.flf",
+        "package/fonts/DiamFont.flf",
+        "package/fonts/Diamond.flf",
+        "package/fonts/Diet Cola.flf",
+        "package/fonts/Digital.flf",
+        "package/fonts/Doh.flf",
+        "package/fonts/Doom.flf",
+        "package/fonts/DOS Rebel.flf",
+        "package/fonts/Dot Matrix.flf",
+        "package/fonts/Double Shorts.flf",
+        "package/fonts/Double.flf",
+        "package/fonts/Dr Pepper.flf",
+        "package/fonts/DWhistled.flf",
+        "package/fonts/Efti Chess.flf",
+        "package/fonts/Efti Font.flf",
+        "package/fonts/Efti Italic.flf",
+        "package/fonts/Efti Piti.flf",
+        "package/fonts/Efti Robot.flf",
+        "package/fonts/Efti Wall.flf",
+        "package/fonts/Efti Water.flf",
+        "package/fonts/Electronic.flf",
+        "package/fonts/Elite.flf",
+        "package/fonts/Emboss 2.flf",
+        "package/fonts/Emboss.flf",
+        "package/fonts/Epic.flf",
+        "package/fonts/Fender.flf",
+        "package/fonts/Filter.flf",
+        "package/fonts/Fire Font-k.flf",
+        "package/fonts/Fire Font-s.flf",
+        "package/fonts/Flipped.flf",
+        "package/fonts/Flower Power.flf",
+        "package/fonts/Font Font.flf",
+        "package/fonts/Four Tops.flf",
+        "package/fonts/Fraktur.flf",
+        "package/fonts/Fun Face.flf",
+        "package/fonts/Fun Faces.flf",
+        "package/fonts/Future Smooth.flf",
+        "package/fonts/Future Thin.flf",
+        "package/fonts/Future.flf",
+        "package/fonts/Fuzzy.flf",
+        "package/fonts/Georgi16.flf",
+        "package/fonts/Georgia11.flf",
+        "package/fonts/Ghost.flf",
+        "package/fonts/Ghoulish.flf",
+        "package/fonts/Glenyn.flf",
+        "package/fonts/Goofy.flf",
+        "package/fonts/Gothic.flf",
+        "package/fonts/Graceful.flf",
+        "package/fonts/Gradient.flf",
+        "package/fonts/Graffiti.flf",
+        "package/fonts/Greek.flf",
+        "package/fonts/Heart Left.flf",
+        "package/fonts/Heart Right.flf",
+        "package/fonts/Henry 3D.flf",
+        "package/fonts/Hex.flf",
+        "package/fonts/Hieroglyphs.flf",
+        "package/fonts/Hollywood.flf",
+        "package/fonts/Horizontal Left.flf",
+        "package/fonts/Horizontal Right.flf",
+        "package/fonts/ICL-1900.flf",
+        "package/fonts/Impossible.flf",
+        "package/fonts/Invita.flf",
+        "package/fonts/Isometric1.flf",
+        "package/fonts/Isometric2.flf",
+        "package/fonts/Isometric3.flf",
+        "package/fonts/Isometric4.flf",
+        "package/fonts/Italic.flf",
+        "package/fonts/Ivrit.flf",
+        "package/fonts/Jacky.flf",
+        "package/fonts/Jazmine.flf",
+        "package/fonts/Jerusalem.flf",
+        "package/fonts/JS Block Letters.flf",
+        "package/fonts/JS Bracket Letters.flf",
+        "package/fonts/JS Capital Curves.flf",
+        "package/fonts/JS Cursive.flf",
+        "package/fonts/JS Stick Letters.flf",
+        "package/fonts/Katakana.flf",
+        "package/fonts/Kban.flf",
+        "package/fonts/Keyboard.flf",
+        "package/fonts/Knob.flf",
+        "package/fonts/Konto Slant.flf",
+        "package/fonts/Konto.flf",
+        "package/fonts/Larry 3D 2.flf",
+        "package/fonts/Larry 3D.flf",
+        "package/fonts/LCD.flf",
+        "package/fonts/Lean.flf",
+        "package/fonts/Letter.flf",
+        "package/fonts/Letters.flf",
+        "package/fonts/Lil Devil.flf",
+        "package/fonts/Line Blocks.flf",
+        "package/fonts/Linguaholic Mini Block.flf",
+        "package/fonts/Linguaholic Neon.flf",
+        "package/fonts/Linguaholic Rounded.flf",
+        "package/fonts/Linguaholic Shadow 3D.flf",
+        "package/fonts/Linux.flf",
+        "package/fonts/Lockergnome.flf",
+        "package/fonts/Madrid.flf",
+        "package/fonts/Marquee.flf",
+        "package/fonts/Maxfour.flf",
+        "package/fonts/Merlin1.flf",
+        "package/fonts/Merlin2.flf",
+        "package/fonts/Mike.flf",
+        "package/fonts/Mini.flf",
+        "package/fonts/miniwi.flf",
+        "package/fonts/Mirror.flf",
+        "package/fonts/Mnemonic.flf",
+        "package/fonts/Modular.flf",
+        "package/fonts/Mono 12.flf",
+        "package/fonts/Mono 9.flf",
+        "package/fonts/Morse.flf",
+        "package/fonts/Morse2.flf",
+        "package/fonts/Moscow.flf",
+        "package/fonts/Mshebrew210.flf",
+        "package/fonts/Muzzle.flf",
+        "package/fonts/Nancyj-Fancy.flf",
+        "package/fonts/Nancyj-Improved.flf",
+        "package/fonts/Nancyj-Underlined.flf",
+        "package/fonts/Nancyj.flf",
+        "package/fonts/Nipples.flf",
+        "package/fonts/NScript.flf",
+        "package/fonts/NT Greek.flf",
+        "package/fonts/NV Script.flf",
+        "package/fonts/O8.flf",
+        "package/fonts/Octal.flf",
+        "package/fonts/Ogre.flf",
+        "package/fonts/Old Banner.flf",
+        "package/fonts/OS2.flf",
+        "package/fonts/Pagga.flf",
+        "package/fonts/Patorjk-HeX.flf",
+        "package/fonts/Patorjk's Cheese.flf",
+        "package/fonts/Pawp.flf",
+        "package/fonts/Peaks Slant.flf",
+        "package/fonts/Peaks.flf",
+        "package/fonts/Pebbles.flf",
+        "package/fonts/Pepper.flf",
+        "package/fonts/Poison.flf",
+        "package/fonts/Puffy.flf",
+        "package/fonts/Puzzle.flf",
+        "package/fonts/Pyramid.flf",
+        "package/fonts/Rammstein.flf",
+        "package/fonts/Rebel.flf",
+        "package/fonts/Rectangles.flf",
+        "package/fonts/Red Phoenix.flf",
+        "package/fonts/Relief.flf",
+        "package/fonts/Relief2.flf",
+        "package/fonts/Reverse.flf",
+        "package/fonts/Roman.flf",
+        "package/fonts/Rot13.flf",
+        "package/fonts/Rotated.flf",
+        "package/fonts/Rounded.flf",
+        "package/fonts/Rowan Cap.flf",
+        "package/fonts/Rozzo.flf",
+        "package/fonts/RubiFont.flf",
+        "package/fonts/Runic.flf",
+        "package/fonts/Runyc.flf",
+        "package/fonts/S Blood.flf",
+        "package/fonts/Santa Clara.flf",
+        "package/fonts/Script.flf",
+        "package/fonts/Serifcap.flf",
+        "package/fonts/Shaded Blocky.flf",
+        "package/fonts/Shadow.flf",
+        "package/fonts/Shimrod.flf",
+        "package/fonts/Short.flf",
+        "package/fonts/SL Script.flf",
+        "package/fonts/Slant Relief.flf",
+        "package/fonts/Slant.flf",
+        "package/fonts/Slide.flf",
+        "package/fonts/Small ASCII 12.flf",
+        "package/fonts/Small ASCII 9.flf",
+        "package/fonts/Small Block.flf",
+        "package/fonts/Small Braille.flf",
+        "package/fonts/Small Caps.flf",
+        "package/fonts/Small Isometric1.flf",
+        "package/fonts/Small Keyboard.flf",
+        "package/fonts/Small Mono 12.flf",
+        "package/fonts/Small Mono 9.flf",
+        "package/fonts/Small Poison.flf",
+        "package/fonts/Small Script.flf",
+        "package/fonts/Small Shadow.flf",
+        "package/fonts/Small Slant.flf",
+        "package/fonts/Small Tengwar.flf",
+        "package/fonts/Small.flf",
+        "package/fonts/Soft.flf",
+        "package/fonts/Speed.flf",
+        "package/fonts/Spliff.flf",
+        "package/fonts/Stacey.flf",
+        "package/fonts/Stampate.flf",
+        "package/fonts/Stampatello.flf",
+        "package/fonts/Standard.flf",
+        "package/fonts/Star Strips.flf",
+        "package/fonts/Star Wars.flf",
+        "package/fonts/Stellar.flf",
+        "package/fonts/Stforek.flf",
+        "package/fonts/Stick Letters.flf",
+        "package/fonts/Stop.flf",
+        "package/fonts/Straight.flf",
+        "package/fonts/Stronger Than All.flf",
+        "package/fonts/Sub-Zero.flf",
+        "package/fonts/Swamp Land.flf",
+        "package/fonts/Swan.flf",
+        "package/fonts/Sweet.flf",
+        "package/fonts/Tanja.flf",
+        "package/fonts/Tengwar.flf",
+        "package/fonts/Term.flf",
+        "package/fonts/Terrace.flf",
+        "package/fonts/Test1.flf",
+        "package/fonts/The Edge.flf",
+        "package/fonts/Thick.flf",
+        "package/fonts/Thin.flf",
+        "package/fonts/THIS.flf",
+        "package/fonts/Thorned.flf",
+        "package/fonts/Three Point.flf",
+        "package/fonts/Ticks Slant.flf",
+        "package/fonts/Ticks.flf",
+        "package/fonts/Tiles.flf",
+        "package/fonts/Tinker-Toy.flf",
+        "package/fonts/Tmplr.flf",
+        "package/fonts/Tombstone.flf",
+        "package/fonts/Train.flf",
+        "package/fonts/Trek.flf",
+        "package/fonts/Tsalagi.flf",
+        "package/fonts/Tubular.flf",
+        "package/fonts/Twisted.flf",
+        "package/fonts/Two Point.flf",
+        "package/fonts/Univers.flf",
+        "package/fonts/Upside Down Text.flf",
+        "package/fonts/USA Flag.flf",
+        "package/fonts/Varsity.flf",
+        "package/fonts/Wavescape.flf",
+        "package/fonts/Wavy.flf",
+        "package/fonts/Weird.flf",
+        "package/fonts/Wet Letter.flf",
+        "package/fonts/Whimsy.flf",
+        "package/fonts/WideTerm.flf",
+        "package/fonts/Wow.flf"
+      ]
+    },
+    {
+      "key": "node_modules/hachure-fill",
+      "name": "hachure-fill",
+      "version": "0.5.2",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pshihn/hachure-fill.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/hachure-fill/-/hachure-fill-0.5.2.tgz",
+      "integrity": "sha512-3GKBOn+m2LX9iq+JC1064cSFprJY4jL1jCXTcpnfER5HYE2l/4EfWSGzkPa/ZDBmYI0ZOEj5VHV/eKnPGkHuOg==",
+      "tarballBytes": 3314,
+      "unpackedBytes": 8675,
+      "entry": "bin/hachure.js",
+      "entryBytes": 4762,
+      "entryGzipBytes": 1289,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "5e807b516a9be9229ed459880bf353a336e2d947867247290680d437017be391",
+          "heading": [
+            "MIT License",
+            "Copyright (c) 2023 Preet Shihn",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/hyphen",
+      "name": "hyphen",
+      "version": "1.6.6",
+      "license": "ISC",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ytiurin/hyphen"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/hyphen/-/hyphen-1.6.6.tgz",
+      "integrity": "sha512-XtqmnT+b9n5MX+MsqluFAVTIenbtC25iskW0Z+jLd+awfhA+ZbWKWQMIvLJccGoa2bM1R6juWJ27cZxIFOmkWw==",
+      "tarballBytes": 1305498,
+      "unpackedBytes": 5681029,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "70a8c81bba59f6341bff40e778b0fc90a45d2f7744e1a1b1824da75bb3d86509",
+          "heading": [
+            "ISC License (ISC)\r",
+            "Copyright (c) 2021, Yevhen Tiurin <yevhentiurin@gmail.com>\r",
+            "Permission to use, copy, modify, and/or distribute this software for any\r",
+            "copyright notice and this permission notice appear in all copies.\r"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/pako",
+      "name": "pako",
+      "version": "0.2.9",
+      "license": "MIT",
+      "repository": "nodeca/pako",
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/pako/-/pako-0.2.9.tgz",
+      "integrity": "sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==",
+      "tarballBytes": 194692,
+      "unpackedBytes": 741440,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "3bc404ffa7888053253eedcc5a667619aa08dc1be0bea400e5ff28c51602180f",
+          "heading": [
+            "(The MIT License)",
+            "Copyright (C) 2014-2016 by Vitaly Puzrin",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/path-data-parser",
+      "name": "path-data-parser",
+      "version": "0.1.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pshihn/path-data-parser.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/path-data-parser/-/path-data-parser-0.1.0.tgz",
+      "integrity": "sha512-NOnmBpt5Y2RWbuv0LMzsayp3lVylAHLPUTut412ZA3l+C4uw4ZVkQbjShYCQ8TCpUMdPapr4YjUqLYD6v68j+w==",
+      "tarballBytes": 7360,
+      "unpackedBytes": 33682,
+      "entry": "lib/index.js",
+      "entryBytes": 142,
+      "entryGzipBytes": 95,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "e9754a00aebde654e80f40bcf41dab667d6a41dfbbd2912bcf14fb07d468bf71",
+          "heading": [
+            "MIT License",
+            "Copyright (c) 2020 Preet Shihn",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/points-on-curve",
+      "name": "points-on-curve",
+      "version": "0.2.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pshihn/bezier-points.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/points-on-curve/-/points-on-curve-0.2.0.tgz",
+      "integrity": "sha512-0mYKnYYe9ZcqMCWhUjItv/oHjvgEsfKvnUTg8sAtnHr3GVy7rGkXCb6d5cSyqrWqL4k81b9CPg3urd+T7aop3A==",
+      "tarballBytes": 5522,
+      "unpackedBytes": 18400,
+      "entry": "lib/index.js",
+      "entryBytes": 3962,
+      "entryGzipBytes": 1217,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "e9754a00aebde654e80f40bcf41dab667d6a41dfbbd2912bcf14fb07d468bf71",
+          "heading": [
+            "MIT License",
+            "Copyright (c) 2020 Preet Shihn",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/points-on-path",
+      "name": "points-on-path",
+      "version": "0.2.1",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pshihn/points-on-path.git"
+      },
+      "dependencies": {
+        "path-data-parser": "0.1.0",
+        "points-on-curve": "0.2.0"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/points-on-path/-/points-on-path-0.2.1.tgz",
+      "integrity": "sha512-25ClnWWuw7JbWZcgqY/gJ4FQWadKxGWk+3kR/7kD0tCaDtPPMj7oHu2ToLaVhfpnHrZzYby2w6tUA0eOIuUg8g==",
+      "tarballBytes": 3429,
+      "unpackedBytes": 9657,
+      "entry": "lib/index.js",
+      "entryBytes": 2059,
+      "entryGzipBytes": 593,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "b6fc1f7f1d96a48bc97176f3dcef959e364c5c17ba44167511de421500a86c6c",
+          "heading": [
+            "MIT License",
+            "Copyright (c) 2020 Preet",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/require-from-string",
+      "name": "require-from-string",
+      "version": "2.0.2",
+      "license": "MIT",
+      "repository": "floatdrop/require-from-string",
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/require-from-string/-/require-from-string-2.0.2.tgz",
+      "integrity": "sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==",
+      "tarballBytes": 1816,
+      "unpackedBytes": 3422,
+      "licenseFiles": [
+        {
+          "path": "package/license",
+          "sha256": "6ee0feb1f6ef996ff5a68600f8cf98909cf412d39ef3cdceaefd87d636fa1b7f",
+          "heading": [
+            "The MIT License (MIT)",
+            "Copyright (c) Vsevolod Strukchinsky <floatdrop@gmail.com> (github.com/floatdrop)",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/tiny-inflate",
+      "name": "tiny-inflate",
+      "version": "1.0.3",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git://github.com/devongovett/tiny-inflate.git"
+      },
+      "dependencies": {},
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/tiny-inflate/-/tiny-inflate-1.0.3.tgz",
+      "integrity": "sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==",
+      "tarballBytes": 15562,
+      "unpackedBytes": 43000,
+      "entry": "index.js",
+      "entryBytes": 9183,
+      "entryGzipBytes": 2685,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "c0df7f551401f8f80197ff31bf69b8cd23727d127423403282514d242a3ab132",
+          "heading": [
+            "MIT License",
+            "Copyright (c) 2015-present Devon Govett",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy",
+            "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/unicode-properties",
+      "name": "unicode-properties",
+      "version": "1.4.1",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git://github.com/devongovett/unicode-properties.git"
+      },
+      "dependencies": {
+        "base64-js": "^1.3.0",
+        "unicode-trie": "^2.0.0"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/unicode-properties/-/unicode-properties-1.4.1.tgz",
+      "integrity": "sha512-CLjCCLQ6UuMxWnbIylkisbRj31qxHPAurvena/0iwSVbQ2G1VY5/HjV0IRabOEbDHlzZlRdCrD4NhB0JtU40Pg==",
+      "tarballBytes": 30825,
+      "unpackedBytes": 76299,
+      "entry": "./dist/module.mjs",
+      "entryBytes": 23458,
+      "entryGzipBytes": 12978,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "43439dbd4f43837aadab215cdbe5a422cc6323a50c4ea84d8d6bbc3671666a1d",
+          "heading": [
+            "Copyright 2018",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
+            "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
+            "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+          ]
+        }
+      ],
+      "assets": []
+    },
+    {
+      "key": "node_modules/unicode-trie",
+      "name": "unicode-trie",
+      "version": "2.0.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git://github.com/devongovett/unicode-trie.git"
+      },
+      "dependencies": {
+        "pako": "^0.2.5",
+        "tiny-inflate": "^1.0.0"
+      },
+      "peerDependencies": {},
+      "tarball": "https://registry.npmjs.org/unicode-trie/-/unicode-trie-2.0.0.tgz",
+      "integrity": "sha512-x7bc76x0bm4prf1VLg79uhAzKw8DVboClSN5VxJuQ+LKDOVEW9CdH+VY7SP+vX7xCYQqzzgQpFqz15zeLvAtZQ==",
+      "tarballBytes": 12320,
+      "unpackedBytes": 48887,
+      "licenseFiles": [
+        {
+          "path": "package/LICENSE",
+          "sha256": "43439dbd4f43837aadab215cdbe5a422cc6323a50c4ea84d8d6bbc3671666a1d",
+          "heading": [
+            "Copyright 2018",
+            "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
+            "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
+            "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+          ]
+        }
+      ],
+      "assets": []
+    }
+  ],
+  "bundles": [
+    {
+      "name": "@chenglou/pretext",
+      "bytes": 94425,
+      "gzipBytes": 39936
+    },
+    {
+      "name": "@react-pdf/textkit",
+      "bytes": 95424,
+      "gzipBytes": 47220
+    },
+    {
+      "name": "@svgdotjs/svg.js",
+      "bytes": 92986,
+      "gzipBytes": 30886
+    },
+    {
+      "name": "charmingjs",
+      "bytes": 198572,
+      "gzipBytes": 69444
+    }
+  ],
+  "limitation": "Published artifacts, distinct from pinned repository HEADs. License declarations and file digests are evidence, not full legal clearance. No library was adopted. Entry sizes are not browser bundles."
+}

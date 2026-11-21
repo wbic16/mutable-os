@@ -1,0 +1,267 @@
+<?xml-model href="https://raw.githubusercontent.com/Edirom/WeGA-ODD/v4.14.0/schema/de/wegaLetters.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="https://raw.githubusercontent.com/Edirom/WeGA-ODD/v4.14.0/schema/de/wegaLetters.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="A041209">
+
+
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title level="s">WeGA, Briefe, Digitale Edition</title>
+            <title level="a">Carl Maria von Weber an Caroline Brandt in Prag
+               <lb/>Dresden, Donnerstag, 19. Juni bis Freitag, 20. Juni 1817 (Nr. 58)
+            </title>
+            <author key="A002068">Weber, Carl Maria von</author>
+            <editor>Carl-Maria-von-Weber-Gesamtausgabe</editor>
+            <respStmt>
+               <resp>Übertragung</resp>
+               <name>Eveline Bartlitz</name>
+               <name>Joachim Veit</name>
+            </respStmt>
+         </titleStmt>
+			<editionStmt>
+				<p>Version 4.14.0 vom 29. Juni 2026</p>
+				<p>Download dieser Datei: 2026-11-19T12:24:41.358Z</p>
+			</editionStmt>
+         <publicationStmt>
+            <publisher>
+               <name>Carl-Maria-von-Weber-Gesamtausgabe</name>
+               <address>
+                  <street>Hornsche Str. 39</street>
+                  <postCode>32756</postCode>
+                  <placeName>
+                     <country>D</country>
+                     <settlement key="A130001">Detmold</settlement>
+                  </placeName>
+               </address>
+            </publisher>
+            <idno type="WeGA" n="988"/>
+            <availability>
+               <licence target="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International (CC BY 4.0)</licence>
+            </availability>
+         </publicationStmt>
+         <seriesStmt>
+            <p>Machine-Readable Transcriptions of Texts from the Carl Maria von Weber Complete Edition (WeGA)</p>
+         </seriesStmt>
+         <notesStmt>
+            <note type="summary">über Rückkehr der Grünbaums, eine alte Rechnung aus Breslau u. die fehlende frühere Buchführung; über Theaterangelegenheiten u. die kurzfristig angesetzte Auff. in Pillnitz; die geplante Hochzeitsreise; fehlende Firmung Carolines; die Auswahl ihres letzten Benefiz', gemeinsame Bekannte; Wohnungseinrichtung betr.; erbetene Stoffe gibt er Grünbaums mit, ebenso diesen Brief; beruhigt sie über ihre <q>Ahnungen</q>, freut sich, dass ihre Mutter auch mit seinem Reiseplan einverstanden ist</note>
+            <note type="incipit">Habe Dir allerley Gutes und Nichtgutes zu erzählen</note>
+            <note type="thematicCom" target="wega:A090007"/>
+        </notesStmt>
+         <sourceDesc>
+            
+            <msDesc>
+               <msIdentifier>
+                  <country>D</country>
+                  <settlement key="A130002">Berlin</settlement>
+                  <repository n="D-B">Staatsbibliothek zu Berlin – Preußischer Kulturbesitz, Musikabteilung</repository>
+                  <idno>Weberiana Cl. II A a 2, 12</idno>
+               </msIdentifier>
+               <physDesc>
+                  <p n="extent">2 Bl. (3 b. S. o. Adr.)</p>
+                  <p>Rötel- und Bleistiftmarkierungen von Max Maria von Weber</p>
+                  <p>am unteren Rand von Bl. 2r von F. W. Jähns mit Tinte: <quote rend="double-quotes"><hi rend="latintype">Carl Maria von Weber</hi> an seine Braut. Eigenhändig.</quote>, auf Bl. 1v zur Datumsangabe mit Bleistift: <quote rend="double-quotes"><hi rend="latintype">Dresden</hi>.</quote></p>
+               </physDesc>
+               <history>
+                  <provenance>vermutlich zu jenen 60 Weber-Briefen gehörig, die Max Maria von Weber Anfang 1854 an Friedrich Wilhelm Jähns verkaufte; vgl. Max Jähns, <hi rend="italic">Friedrich Wilhelm Jähns und Max Jähns. Ein Familiengemälde für die Freunde</hi>, hg. von Karl Koetschau, Dresden 1906, S. 403</provenance>
+               </history>
+            </msDesc>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <projectDesc>
+            <p>Carl-Maria-von-Weber-Gesamtausgabe, Sämtliche Briefe</p>
+         </projectDesc>
+         <editorialDecl>
+            <p>Übertragung folgt den ER der WeGA</p>
+         </editorialDecl>
+      </encodingDesc>
+      <profileDesc>
+         <correspDesc>
+            <correspAction type="sent">
+               <persName key="A002068">Weber, Carl Maria von</persName>
+               <settlement key="A130003">Dresden</settlement>
+               <date when="1817-06-19" n="01">19. Juni 1817</date>
+            </correspAction>
+            <correspAction type="received">
+               <persName key="A000213">Weber, Caroline</persName>
+               <settlement key="A130006">Prag</settlement>
+            </correspAction>
+         </correspDesc>
+         <langUsage>
+            <language ident="de">German</language>
+         </langUsage>
+      </profileDesc>
+      <revisionDesc status="approved">
+         <change who="PS" when="2023-05-02">Obsoletes Element tei:textClass entfernt</change>
+         <change who="IC" when="2011-05-03" status="approved">Status geändert</change>
+         <change when="2011-04-03" who="PS">ID und @keys gegen nicht-sprechende ersetzt.</change>
+         <change who="IC" when="2010-06-19">Kommentar ergänzt</change>
+         <change who="IC" when="2010-06-18">Fortsetzung</change>
+         <change who="IC" when="2010-06-18">Autopsie eingetragen</change>
+         <change who="DM" when="2010-01-19">Erste Korrektur</change>
+         <change who="JH" when="2009-08-31">Ersteinrichtung des Brieftextes und Auszeichnung der Personen.</change>
+         <change who="PS" when="2009-05-08" status="proposed">Initiale Transformation aus askSam DB Briefe1</change>
+         <change who="JH" when="2010-06-15">Faksimiles verlinkt.</change>
+      </revisionDesc>
+   </teiHeader>
+   <facsimile><graphic url="1817-06-19_01_AM_Weber_an_Caroline_D-B_1r.tif" xml:id="facs_1r"/>
+      <graphic url="1817-06-19_01_AM_Weber_an_Caroline_D-B_1v.tif" xml:id="facs_1v"/>
+      <graphic url="1817-06-19_01_AM_Weber_an_Caroline_D-B_2r.tif" xml:id="facs_2r"/>
+      <graphic url="1817-06-19_01_AM_Weber_an_Caroline_D-B_2v.tif" xml:id="facs_2v"/>
+   </facsimile>
+   <text type="letter">
+      <body><div type="writingSession" n="1" facs="#facs_1r">
+         <opener>
+            <dateline><hi rend="underline" n="2"><hi rend="latintype">No:</hi> 58</hi><space unit="chars" quantity="5"/>d: 19<hi rend="superscript">t</hi> <hi rend="latintype">Juny</hi> 1817.</dateline>
+            <salute>Mein vielgeliebter <rs type="person" key="A000213">Mukken könig</rs>.</salute>
+         </opener>
+               <p n="1">Habe dir allerley Gutes, und Nichtgutes zu erzählen, doch überwiegt
+               ersteres bei weitem das leztere. d: 16<hi rend="superscript">t</hi> Abends kamen <rs type="persons" key="A000691 A000692">Grünb:</rs> an. ganz
+               <hi rend="underline" n="1">trunken</hi> von <settlement key="A130002">Berlin</settlement>, und der Aufnahme besonders bey
+               <hi rend="latintype"><rs type="persons" key="A000114 A000111">Beers</rs></hi>, das wirst du alles oft und ausführlich von ihnen selbst
+               hören. d: 17<hi rend="superscript">t</hi> kam ein <persName key="A001680">H: Schik</persName> aus <settlement key="A130013">Breslau</settlement>, und präsentirte mir aufs höflichste eine
+               alte nur halb bezahlte MöbelRechnung, indem er sich den Rest mit 94 rh: 12 gr: ausbat.
+               ich war wie aus den Wolken gefallen. du wirst dich errinnern daß ich in <settlement key="A130006">Prag</settlement> schon einen
+                  <rs type="person" key="A008988">SilberArbeiter</rs> in <settlement key="A130013">Breslau</settlement> mit einer ähnlichen alten Foderung, bezahlte<note xml:id="note06" type="commentary" resp="FZ">Laut <rs type="diaryDay" key="A064198">Tagebuch</rs> am 6. Oktober 1816.</note>. Wer weis also
+               wie manches da noch stekken mag. daß sind die Folgen der Unordnung, und deß
+               leichtsinnigen blinden Vertrauens. hätte ich damals schon ordentlich Rechnungen
+               aufgehoben, Tagebuch geführt <hi rend="latintype">pp</hi>, so wüste ich jezt genau Bescheid,
+               so muß ich den Leuten auf ihr Wort glauben, und –
+               <hi rend="underline" n="1">bezahlen</hi> – was ich denn auch that. aber
+               freilich ohne sonderliche Lust, denn ich hatte mit dem Geld manch anderes vor, wollte
+               auch meiner <rs type="person" key="A000213">Mukkin</rs> was schikken durch <hi rend="latintype"><rs type="persons" key="A000691 A000692">Crinepans</rs></hi><note xml:id="c02" type="commentary" resp="IC">Hierbei dürfte es sich um eine der zahlreichen bei Weber beliebten Lautveränderungen von Namen, in diesem Fall Grünbaums, handeln.</note>, ist nitz
+               – armer <rs type="person" key="A000213">Muks</rs>; kann dir nitz schikken als die Lehre, durch Schaden wird man
+               klug und ordentlich. – Hatte auch damals die verruchte Theater Methode so
+               <hi rend="underline" n="1">monatlich</hi> etwas abzuzahlen, –
+               <hi rend="underline" n="1">jezt</hi> kaufe ich <hi rend="underline" n="1">nicht
+               eher</hi> als bis ich das Geld in der Hand habe. – Nun, ich will
+               aber auch sparen, daß mir die Rippen krachen. – doch nun Puntum von den Übeln,
+               und nun zum Guten. d: 17<hi rend="superscript">t</hi> verging mit Proben, Anstalten Laufereyen
+               <hi rend="latintype">pp</hi> Abends war das Trauerspiel
+                  <hi rend="underline" n="1"><workName key="A021239"><hi rend="latintype">Faust</hi></workName></hi> hier zum erstenmale. gefiel<note xml:id="note01" type="commentary" resp="FZ">Vgl. den <rs type="writing" key="A030140">Bericht</rs> in der <hi rend="italic">Abend-Zeitung</hi> vom 3. Juli 1817.</note>. Gestern früh kam auf
+               einmal und unerwartet der Beweiß daß der <rs type="person" key="A000537">König</rs> sowohl deutsche Kunst liebt, als auch die
+               <persName key="A000692">Grünbaum</persName> gerne hört, durch einen Befehl daß Abends in <settlement key="A130031">Pillnitz</settlement> das
+                  <hi rend="underline" n="1"><workName key="A020433">Lotterielos</workName></hi> und <hi rend="underline" n="1"><workName key="A021277">Pflicht um
+               Pflicht</workName></hi> sein sollte. nun giengs an ein Hezzen. erst
+                  <hi rend="underline" n="1">Probe</hi> dann um 2 Uhr hinaus. und um 6 Uhr giengs los<note xml:id="note09" type="commentary" resp="FZ">Im Pillnitzer Hoftagebuch (Sächsisches Hauptstaatsarchiv Dresden, 10006 Oberhofmarschallamt, O 05, Nr. 50, Bl. 11v/12r) heißt es dazu: <quote rend="double-quotes">Um 6. Uhr Abends wurde aufn hiesigen Hoftheater zum 1<hi rend="superscript">sten</hi> male als es existirt deutsches Schauspiel gegeben. | Vor Anfang deßen hielt die deutsche HofSchauspielerin <hi rend="italic">Madame <persName key="A001689">Schirmer</persName></hi> einen den Ereignis anpaßenden <hi rend="italic">Prologe</hi> dann gab man <hi rend="italic">Das Lotterie Loos</hi>, Singspiel in 1. Akt die Musick von Isouard, Hℓ: und <hi rend="italic">Mad<hi rend="superscript">e</hi> <rs type="persons" key="A000691 A000692">Grünbaum</rs></hi> spielten darinnen Gastrollen. Hierauf führte man auf <hi rend="italic">Pflicht um Pflicht</hi> Schauspiel in 1. Akt von Wolf.</quote></note>. So
+               wie <rs type="person" key="A000537">S: Majestät</rs> hinein kam, ging er gleich auf mich zu, und <rs type="person" key="A000537">Er</rs> und alle <rs type="persons" key="A000936 A008630 A000539">Prinzen</rs>
+               unterhielten sich aufs freundlichste und schmeichelhafteste den ganzen Abend mit mir,
+               und waren ganz entzükt von der <persName key="A000692">Grünb:</persName><note xml:id="note07" type="commentary" resp="FZ">Th. Grünbaum sang die Adele im <hi rend="italic">Lotterielos</hi>.</note> Die <rs type="person" key="A001251">Königin</rs> frug gleich nach dir, und trug mir auf
+               dich zu grüßen, indem sie mir sagte daß Sie dich sehr lieb hätte – Unsre
+               Herrschaften sind wirklich unendlich lieb und gut. </p><p>Es hat uns allen große Freude
+               gemacht, daß Wir und nicht die Italiener die ersten waren die er zu sich rief. das Ganze
+               war gar schön und die <persName key="A000692">Grünb:</persName> wird dir alles ausführlichst erzählen. Heute ist nun der
+                  <hi rend="underline" n="1"><workName key="A020422"><hi rend="latintype">Joh: v: Paris</hi>.</workName></hi> und Morgen spaziert der Brief fort
+               nebst einer Menge <rs type="letters" key="A041210 A041211 A041212">Beilagen</rs>, Paketen <hi rend="latintype">pp</hi>. ich erwarte jeden Augenblik
+               einen von <hi rend="underline" n="1">dir</hi>, und will mich unterdeßen zur Probe anthun.
+               <hi rend="latintype">ade</hi>, gieb mir geschwind einen Buß. so – nun gut.
+               – </p>
+                <p><hi rend="underline" n="2">Nachtische</hi><space unit="chars" quantity="5"/>
+               Nachdem ich deinen lieben <rs type="letter" key="A045474">Brief</rs> <hi rend="underline" n="2"><hi rend="latintype">No:</hi> 62</hi> durchgelesen
+               habe, muß ich dir vor allem andern sagen, daß du <del rend="strikethrough">dir</del> mit
+               Respekt, noch immer der <hi rend="underline" n="1">alte</hi> Esel bist, mit deinen dummen
+               Ahndungen. Wart nur ich werde dir schon nicht mehr schreiben wenn ich einmal ein bißel
+               zu viel gefreßt habe, oder dergl: wenn du immer gleich so ängstlich sein willst. ich
+               werde weder zu viel arbeiten, noch krank werden, zu dem allen habe ich gar keine Zeit.
+               nun noch Haue, und dann Puntum weiter zu dem Brief.<space unit="chars" quantity="5"/>Es freut mich herzlich daß dir mein
+                   Vorschlag gefällt<note xml:id="note05" type="commentary" resp="FZ">Zum Plan der Hochzeitsreise nach <settlement key="A130010">Mannheim</settlement>, <settlement key="A130028">Mainz</settlement> und zurück über <region>Thüringen</region> vgl. Webers <rs type="letter" key="A041204">Brief</rs> vom 11./13. Juni 1817.</note>, ja du legst mehr Werth in ihn als er verdient. wirst du immer meine
+               Handlungen<pb/> mit so liebevollen Augen betrachten, so werden wir gewiß glüklich unsern Weg
+               wandeln. Uebrigens muß ich es selbst sagen daß ich mir aus dieser Reise recht viel
+               Freude und gute Folgen für uns Alle verspreche. dem <rs type="person" key="A002020">H: Grafen</rs> habe ich schon vorläufig
+               von <del rend="overwritten">unser</del> meinem Urlaub gesprochen und ich zweifle nicht
+               an deßen Erfüllung. der Himmel gebe nur daß ich dann auch etwas verdiene. bedenke nur,
+               bei der lebenslänglichen Anstellung muß <supplied>ich</supplied> eine <hi rend="underline" n="1">3</hi>
+               Monatliche Gehalt Taxen bezahlen, also 3 Monate von eignem Fette zehren. Wenn ich dazu
+               die Reise und übrigen Ausgaben berechne, so stehen mir die Haare gen Berge, und das
+               bischen Ersparte könnte sich wohl empfehlen, ich mag ohnedieß gar nicht rechnen wie viel
+               schon davon weg ist. das schadt aber alles nitz. nur heiteren Sinn, und Zufriedenheit,
+               so wird das Alles bald wieder kommen, und wir froh leben, wenn auch die Teppiche
+               <hi rend="latintype">pp</hi> erst nach und nach kommen. </p><p>Die Firmung hast du also
+               versäumt? das ist Schade, wirst du aber heirathen können ohne gefirmt zu sein?<space unit="chars" quantity="5"/>Mit
+               Trauer sehe ich daß ich abermals Recht habe, und du in manchem Benehmen und Äußerungen
+               der <hi rend="latintype"><rs type="persons" key="A000946 A000947">Drs:</rs></hi> Leute, noch siehst, was vielleicht nicht darinn ist.<space unit="chars" quantity="5"/>
+               <hi rend="underline" n="1"><rs type="person" key="A000947">Sie</rs></hi> ist von jeher so gewesen, und <rs type="person" key="A000946">Er</rs> auch zum Theil,
+               aber dir fällt es jezt erst auf, weil du ihnen allenfalls einen Grund unterschieben
+               kannst. Auch ich habe oft davon gelitten, aber das gehört einmal zu den Eigenheiten
+               jedes Menschen, die man übersehen muß. Es ist gut und recht von dir, daß du nicht in
+               denselben Ton einstimmst, und – wenn’s wahr ist – dich
+               auch nicht ärgerst. Sey geduldig, und heiter! –. die <workName key="A021437">Agnese</workName> scheint also nicht
+                  gefallen zu haben<note xml:id="note02" type="commentary" resp="FZ">Laut <hi rend="italic">Tagebuch der deutschen Bühnen</hi> (1817, S. 343) fand die <settlement key="A130006">Prager</settlement> Premiere am 15. Juni statt; bis einschließlich Oktober 1817 gab es nur eine Wiederholung (19. Juni).</note>. ist Schade, ist doch viel Schönes in der Musik.<space unit="chars" quantity="5"/><persName key="A002149">Wilhelmi</persName> hat an mich
+               <rs type="letter" key="A047028">geschrieben</rs>, und ich werde ihm antworten was recht ist, und hier möglich.<space unit="chars" quantity="5"/>Ueber die alte
+               <hi rend="underline" n="1"><characterName>Nina</characterName></hi> habe ich herzlich lachen müßen. Wegen dem
+               Angriffe habe ich nichts dagegen, das ist hoffentlich vorüber, wenn ich aber aufrichtig
+               meine Meynung sagen soll, so kann ich mir nicht helfen, es ist keine Rolle für dich<note xml:id="note03" type="commentary" resp="FZ">Gemeint ist wohl <characterName>Nina</characterName>, Tochter der Baronin Wendheim, in <workName key="A021010"><hi rend="italic">Welche ist die Braut</hi></workName>; diese Rolle wurde am 24. Juni 1817 in <settlement key="A130006">Prag</settlement> dann allerdings von der jüngeren <persName key="A002911">Friederike Krickeberg</persName> gespielt (vgl. <hi rend="italic">Tagebuch der deutschen Bühnen</hi> 1817, S. 344). Vgl. dazu auch Webers <rs type="letter" key="A041217">Brief</rs> an Caroline Brandt vom 27. Juni 1817.</note>, du
+               wirst <hi rend="underline" n="1"><hi rend="underline" n="1">dich selbst</hi> unendlich</hi> rühren, und die Leute werden
+               auch applaudiren; die Vernünftigen werden aber abermals die alte Erfahrung bestätigt
+               sehen, daß alle Schauspieler immer nur nach dem am liebsten greiffen, was nicht ihr Fach
+               ist, und es erschreklich übel nehmen wenn mans ihnen sagt. das leztere wirst du nun wohl
+               bei mir nicht thun, und ich bitte dich übrigens wegen dieser Äußerungen dich gar nicht
+               zu <hi rend="latintype">geniren</hi>, und wenn dein Herz so sehr dran hängt, frisch drauf los
+               die <hi rend="latintype"><characterName>Nina</characterName></hi> loszulaßen. das gehört noch ganz für jezt in dein
+                  Departement. <workName key="A021085">Die Vaterliebe</workName> ist auch ein guter Gedanke. Hast du denn dein
+                  <hi rend="latintype">Benefiçe</hi> so bald daß du auf <persName key="A000324">Kostenobles</persName> Reiz zählst?<note xml:id="note04" type="commentary" resp="FZ">Graf <persName key="A008960">Pachta</persName> hatte sich während <persName key="A001172">Liebichs</persName> schwerer Krankheit bzw. nach dessen Tod mehrfach (23. November, 3. und 28. Dezember 1816) an <persName key="A000324">Costenoble</persName> mit der Bitte gewandt, dieser möge als Oberregisseur gemeinsam mit <persName key="A001173">Mad. Liebich</persName> die künstlerische Leitung des <settlement key="A130006">Prager</settlement> Ständetheaters übernehmen. In einem Brief der <persName key="A001173">Witwe Liebich</persName> vom Januar 1817 trug sie ihm förmlich die Mitdirektion an. <persName key="A000324">Costenoble</persName> hatte zugesagt, im Frühjahr nach <settlement key="A130006">Prag</settlement> zu kommen, um sich zu entscheiden; vgl. <hi rend="italic">Carl Ludwig Costenoble’s Tagebücher von seiner Jugend bis zur Übersiedlung nach Wien (1818)</hi>, Berlin 1912, Bd. 2, S. 165–167. Zu Caroline Brandts Benefiz am 17. September 1817 vgl. den Kommentar zu Webers <rs type="letter" key="A041291">Brief</rs> vom 18. August 1817.</note> </p><p>Ja,
+               mit Morgender Post <rs type="letters" key="A041213 A041214">schreib</rs> ich an <hi rend="latintype"><persName key="A000217">Louis</persName></hi> und <rs type="person" key="A000215">Vater</rs>. Ziel und Dauer
+               meiner Reise werde ich ihnen aus dem einfachen Grunde nicht sagen, weil ich ihn selber
+               nicht weis. warum aber sonst nicht? laß uns doch immer <hi rend="underline" n="1">grade
+               aus</hi> gehn, du weißt wie fatal mir selbst in den kleinsten Dingen das
+               umgehen des Wahren ist. Wenn Er die Seinigen nur einigermaßen liebt, muß er es einsehen
+               daß mein Plan der <hi rend="underline" n="1">freudigere</hi> und daher beßere ist.</p>
+      </div>
+         <div type="writingSession" n="2">
+            <p n="1">d: 20<hi rend="superscript">t</hi> So weit war ich Gestern als es Zeit war ins Theater zu gehen<note xml:id="c01" type="commentary" resp="IC">Am 19. Juni wurde <workName key="A020422">Johann von Paris</workName> gegeben mit Therese Grünbaum als <characterName>Prinzessin von Navarra</characterName>; vgl. den <rs type="writing" key="A030140">Bericht</rs> in der <hi rend="italic">Abend-Zeitung</hi> vom 3. Juli 1817.</note>. Es
+               war troz des herrlichen Wetters voll, und gieng!! – nun! so vollendet, daß ich
+               ganz außer mir war vor Vergnügen. die <hi rend="latintype">Overture</hi> wurde aplaudirt, die
+               <rs type="persons" key="A000692">Grünb:</rs> unmenschlich empfangen, und so weiter.<space unit="chars" quantity="5"/>Dann waren wir noch bei Ihnen. ich gieng
+               aber bald in Bett weil ich sehr müde war. Jezt muß ich diesen Brief vollenden, und noch
+               ein paar andere, denn um 10 Uhr reisen sie ab. du bekömst also mit der Post keinen, weil
+               die um 12 Uhr schon wieder geht. Was untersteht Err sich zu sagen, ich antworte ihm auf
+               das Zehnte <hi rend="underline" n="1">nicht</hi>? o du <rs type="person" key="A000213">abscheulicher Pumpernikkel</rs>, das
+               kann gar nicht wahr sein, denn ich hab immer deine Briefe neben mir liegen, und
+               beantworte <pb/>sie Punkt für Punkt. <space unit="chars" quantity="5"/>Der <persName key="A002042">Waldmüller</persName> habe ich unterdeßen <rs type="letter" key="A041208">geantwortet</rs>, was du
+               ihr sagtest war sehr wahr, gut, und heilsam.<space unit="chars" quantity="5"/>Die 3 ekkigten Schüßeln in der Auktion das
+               war ein ganzer Ser<hi rend="latintype">viçe</hi> den <persName key="A002170">Wohlbrük</persName> auf meinen Namen erstand.
+               Uebrigens hast du wohl recht daß es ein entsezliches Krähwinkel ist, und man sich wohl
+               in acht zu nehmen hat um nicht in der Leute Mäuler zu kommen, was doch am Ende bis auf
+               einen gewißen Grad auch nicht zu vermeiden ist. je nun, <hi rend="underline" n="1">thue Recht, und
+               scheue Niemand</hi>, muß der Wahlspruch sein. </p><p>Denen Herren
+               Spektaklern <del rend="strikethrough">muß</del> geschieht es schon recht wenn sie ein
+               bischen gezwifelt werden, so sind sie ein andermal vorsichtiger und nicht so roh.
+               </p><p>Nun zu meinen <hi rend="latintype">Comissionen</hi>. hier beiligend bekömst, Möbel
+               Muster aller wo die Breite und der Preiß <hi rend="underline" n="1">drauf</hi> stehn.
+               <hi rend="latintype">NB:</hi> die <hi rend="underline" n="1">Dresdner</hi> Elle, die etwas
+               kleiner ist als Eure. 
+               <space unit="chars" quantity="5"/>Sodann wird dir die <persName key="A000692">Grünb:</persName> übergeben </p><p> 6 Ellen
+               Silberstramin, der kostet 7 ƒ — <hi rend="latintype">Xr</hi>
+               <hi rend="latintype">conv: M: </hi></p><p>und 4 — Gold ——
+               <hi rend="underline" n="1">5 . 45 . </hi>— .</p><p> zusamen 12 <hi rend="latintype">f
+               </hi>45 <hi rend="latintype">Xr</hi>: <hi rend="latintype">conv</hi>: <hi rend="latintype">M</hi>: </p><p n="1">das kannst du nun an die Dame die die <rs type="person" key="A000947"><hi rend="latintype">Dr:</hi>in</rs>.
+               so sehr drum bat allein geben, oder es der <persName key="A001018">Kleinwächter</persName> halb<supplied>?</supplied> zutheilen, wie du
+               willst. das Geld habe ich mir gleich von <rs type="persons" key="A000692 A000691">Grünb:</rs> geben laßen. denen
+               <hi rend="underline" n="1">du</hi> es also zurükzuzahlen hast. </p><p>Das kleine
+               GürtelSchloß, und die englischen Nadeln mit <hi rend="underline" n="1">goldnen</hi> und
+               <hi rend="underline" n="1">silbernen</hi> ohren, nimmt meine <rs type="person" key="A000213">Mukkin</rs> als einen
+               <hi rend="underline" n="4">kleinen</hi> Beweiß an, daß ich die Gelegenheit nicht ganz
+               konnte vorbei gehen laßen, ohne ihr doch <hi rend="underline" n="1">etwas</hi> zu
+               schikken. Die Nadeln werden für sehr gut gehalten und sind eine neue Erfindung.
+               </p><p>ich bin jezt gar ein zu armer Hund, drum nimm vorlieb. Beiliegender <rs type="letter" key="A041212">Brief</rs> an die
+                  <rs type="person" key="A000947">Doktorin</rs>, gieb ihr erst zu ihrem Namenstag. </p><p>Jezt will ich die andern <rs type="letters" key="A041210 A041211 A041213 A041214">Briefe</rs>
+               schreiben, und bleibt noch ein Augenblik übrig ihn mit <rs type="person" key="A000213">Muks</rs> verpabsen. </p><p>So. der
+               <hi rend="latintype"><rs type="person" key="A000947">Doctorin</rs></hi> gieb am 25<hi rend="superscript">t</hi> einen recht herzlichen
+                  Kuß für mich<note xml:id="note08" type="commentary" resp="FZ">In der <rs type="diaryDay" key="A060171">Tagebuchnotiz</rs> zum <rs type="letter" key="A041212">Glückwunschbrief</rs> vom 20. Juni 1817 ist fälschlich angegeben zum Namenstag, laut Webers <rs type="letters" key="A041215 A041221">Briefen</rs> an C. Brandt vom 23. und (29./)30. Juni 1817 war es jedoch der Geburtstag.</note>. den 25<hi rend="superscript">t</hi> werdet ihr wohl wenn es so schönes Wetter ist, im
+               Freyen zubringen. ich will da fleißig an Euch denken. Wenn ich nicht bis dahin
+               zerschmolzen bin, denn die Hizze ist heute entsezlich, und die künftige Woche wird es
+               hart hergehen, weil so viele sich kreuzende Proben zusammen kommen.<space unit="chars" quantity="5"/>Jezt ziehe ich mich
+               an und gehe zu <rs type="persons" key="A000691 A000692">Grünb:</rs> so wie die weg sind, wieder nach Hause, und schreibe den ganzen
+               Tag. muß mir einmal wieder die vielen Rükstände vom Halse schaffen. </p><p>Meine gute
+               vielgeliebte <persName key="A000213">Lina</persName>, morgen Abends hast du schon den Brief, wenn ich mich doch so mit
+               einpakken könnte. nun, die Zeit vergeht auch so nach und nach. Gott erhalte dich gesund,
+               heiter, und <hi rend="underline" n="2">ohne</hi> Ahndungen. um die Zeit wo der aimable
+               Kranz geruhte herunter zu fallen, las ich in der <hi rend="underline" n="1">Stunde</hi>
+               eine itali: Komödie, schrieb dann an dich, und hatte dann Proben. das war alles Uebel
+               das mich betraf. o du! du! du! du!<space unit="chars" quantity="5"/>ich will nichts weiter sagen.</p>
+            <closer rend="inline"> Alles Schöne an die <rs type="person" key="A000214">Mutter</rs>. Es freut mich sehr, daß auch Sie mit meinem Plane zufrieden ist. Ich umarme dich
+               innigst mein theures Leben, Gott segne dich + + + und behalte recht lieb deinen dich
+               ewig unveränderlich liebenden <hi rend="latintype"><persName key="A002068">Carl</persName></hi>.<lb/><seg rend="inline">Millionen Bußen.</seg> 
+            </closer>
+         </div>
+      </body>
+   </text>
+</TEI>

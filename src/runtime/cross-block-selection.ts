@@ -2,6 +2,7 @@ import { batch, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import type { ViewPosition } from "../block-tree/types";
+import { presentationEligible } from './presentation-eligibility';
 
 export interface TextSegment { nodeKey: string; contentKey: string; start: number; end: number }
 export interface CrossTextRange { anchor: ViewPosition; head: ViewPosition; viewId: string }
@@ -45,14 +46,13 @@ export class CrossBlockSelection {
     return { occurrenceKey: key, contentKey: node.contentKey, boundary: { index, affinity: "after" } };
   }
   private visible(key: string) {
-    const root = this.editor.mounts.get(key)?.focusElement;
-    return !!root?.isConnected && !root.closest('[hidden], [inert], [aria-hidden="true"]');
+    return presentationEligible(this.editor, key);
   }
   siblings(key: string): string[] {
     const node = this.editor.node(key); if (!node) return [];
     if (this.stream?.revision === this.editor.repository.state.revision && this.stream.viewId === node.viewId && this.stream.indices.has(key)) return this.stream.keys;
     const projection = this.editor.projections.get(node.viewId);
-    const parent = Object.values(projection?.state.nodes ?? {}).find(n => n.children.includes(key));
+    const parent = projection?.parentOf(key);
     const keys = parent ? [...parent.children] : [];
     this.stream = { revision: this.editor.repository.state.revision, viewId: node.viewId, keys, indices: new Map(keys.map((key, index) => [key, index])) };
     return keys;
@@ -127,8 +127,8 @@ export class CrossBlockSelection {
   collapseToHead() {
     const head = this.range()?.head; if (!head) return;
     this.clear();
-    const node = this.editor.node(head.occurrenceKey), mount = this.editor.mounts.get(head.occurrenceKey);
-    mount?.focus(); mount?.restoreInlineSelection?.({ anchor: head.boundary.index, head: head.boundary.index });
+    const node = this.editor.node(head.occurrenceKey);
+    this.editor.focus.request(head.occurrenceKey, { caret: { start: head.boundary.index, end: head.boundary.index, direction: 'none' } });
     if (node) this.editor.selections.setPrimary(node.key, node.contentKey, node.viewId, head.boundary.index);
   }
   validate() {
@@ -146,8 +146,7 @@ export class CrossBlockSelection {
     this.clear();
     const focus = () => {
       const node = this.editor.nodeForPlacementInView(result.placementKey, range.viewId); if (!node) return;
-      const mount = this.editor.mounts.get(node.key); mount?.focus();
-      mount?.restoreInlineSelection?.({ anchor: result.caret, head: result.caret });
+      this.editor.focus.request(node.key, { caret: { start: result.caret, end: result.caret, direction: 'none' } });
       this.editor.selections.setPrimary(node.key, node.contentKey, node.viewId, result.caret);
     };
     focus(); queueMicrotask(focus);

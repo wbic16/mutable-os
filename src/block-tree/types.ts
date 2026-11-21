@@ -13,6 +13,8 @@ export type JsonObject = Record<string, unknown>;
 export interface ExistingBlockDto extends JsonObject {
   id?: string;
   type?: string;
+  /** Optional authored semantic identity; implementation remains in type. */
+  mode?: string;
   children?: ExistingBlockDto[] | null;
   relation?: Record<string, unknown> | null;
 }
@@ -30,6 +32,7 @@ export interface ContentRecord {
   inlineContent: PlacementKey[];
   inlineRevision: number;
   inlineKind?: "standoff";
+  compactInline?: import("./inline-sequence").CompactInline;
   ownedRelations: Record<string, PlacementKey>;
   opaqueRelations: Record<string, unknown>;
   wireChildren: WireCollectionState;
@@ -78,6 +81,8 @@ export interface BlockNode {
   contentKey: ContentKey;
   placementKey: PlacementKey;
   viewId: ViewId;
+  /** Derived editing atom; contentKey/placementKey identify its host, not a canonical Cell. */
+  editingInlineOwner?: NodeKey;
   viewType: string;
   payload: JsonObject;
   children: NodeKey[];
@@ -105,7 +110,7 @@ export interface RecordBatch {
 
 export type RepositoryOperation =
   | RecordBatch
-  | { kind: "put-content"; record: ContentRecord; /** Runtime continuity hint: next property index -> previous index; never document data. */ annotationOrigins?: (number | null)[] }
+  | { kind: "put-content"; record: ContentRecord; inlineSplice?: import("./inline-sequence").InlineSplice; /** Runtime continuity hint: next property index -> previous index; never document data. */ annotationOrigins?: (number | null)[] }
   | { kind: "remove-content"; key: ContentKey }
   | { kind: "put-placement"; record: PlacementRecord }
   | { kind: "remove-placement"; key: PlacementKey }
@@ -236,3 +241,6 @@ export interface CommandDefinition<TArgs = unknown> {
   canExecute(context: CommandContext<TArgs>): boolean;
   execute(context: CommandContext<TArgs>): void | Promise<void>;
 }
+
+/** An unmounted compact object has a logical address, never a Cell Placement. */
+export interface CompactInlineAddress {kind:'compact-inline';ownerPlacementKey:PlacementKey;index:number;inlineRevision:number}

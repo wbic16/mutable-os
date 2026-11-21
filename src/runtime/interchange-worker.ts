@@ -7,7 +7,7 @@ export async function runInterchange<R extends InterchangeRequest>(request:R,sig
   const worker=new Worker(new URL('../interchange/operations.worker.ts',import.meta.url),{type:'module'});
   const finish=(error?:string,result?:Prepared<R>)=>{clearTimeout(timer);signal.removeEventListener('abort',cancel);worker.terminate();error?reject(Error(error)):resolve(result!);};
   const cancel=()=>finish('Operation cancelled.');
-  const timer=setTimeout(()=>finish('Interchange preparation timed out. Try a smaller input.'),request.kind==='structured-preview'?3000:30000);
+  const timer=setTimeout(()=>finish('Interchange preparation timed out. Try a smaller input.'),request.kind==='tei-document'?(request.limits?.timeoutMs??120000):request.kind==='structured-preview'?3000:30000);
   signal.addEventListener('abort',cancel,{once:true});
   worker.onmessage=e=>finish(e.data.error,e.data.result);worker.onerror=()=>finish('Interchange worker failed.');
   try{worker.postMessage(request);}catch(e){finish(String(e));}

@@ -1,0 +1,805 @@
+{
+  "inventory": {
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "0133e67b-330f-4090-b632-53b7f1044f1d",
+      "intent": "answer",
+      "replyTargets": [
+        "source-13493229-8707-4274-8987-3a7d9cdd3921"
+      ],
+      "composition": [
+        {
+          "id": "p1",
+          "kind": "paragraph",
+          "markup": "I can see these text blocks:",
+          "ranges": []
+        },
+        {
+          "id": "l1",
+          "kind": "list",
+          "style": "bullet",
+          "items": [
+            [
+              {
+                "id": "i1",
+                "kind": "paragraph",
+                "markup": "7fb4c4d0-7b5b-479f-b0a9-c635706fdc48 — “Our first sample concerns a garden.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i2",
+                "kind": "paragraph",
+                "markup": "30d38538-5ce2-44bc-a919-3fc5ece277ff — “Sample 2: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i3",
+                "kind": "paragraph",
+                "markup": "a8da40a0-d765-4c01-8f71-047e7706db89 — “Sample 3: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i4",
+                "kind": "paragraph",
+                "markup": "44931f34-18ce-4321-938e-1d18604f5fce — “Sample 4: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i5",
+                "kind": "paragraph",
+                "markup": "4aaaacf2-0540-46f8-9b03-feeb99766667 — “Sample 5: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i6",
+                "kind": "paragraph",
+                "markup": "1b77abbc-d2eb-487e-92c2-bff2d35c1e65 — “Sample 6: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i7",
+                "kind": "paragraph",
+                "markup": "b9bdfd76-7bca-46ed-b5bc-f3ea6ab6dff8 — “Sample 7: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i8",
+                "kind": "paragraph",
+                "markup": "88d4b66a-5b4e-4400-a418-94f5392d0a37 — “Sample 8: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i9",
+                "kind": "paragraph",
+                "markup": "8a766b7d-ecfb-4332-945f-859e62b1969a — “Sample 9: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i10",
+                "kind": "paragraph",
+                "markup": "500aaef9-2cf8-47de-8995-972fa07cdd7a — “Sample 10: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i11",
+                "kind": "paragraph",
+                "markup": "a68c4199-5023-4634-9e34-86a8be535c8c — “Sample 11: reading.”",
+                "ranges": []
+              }
+            ],
+            [
+              {
+                "id": "i12",
+                "kind": "paragraph",
+                "markup": "735faad2-883e-4ce3-a6bc-f2143c80c6b0 — “Tell me what text blocks you can see. List the starting few words and block GUID.”",
+                "ranges": []
+              }
+            ]
+          ]
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "tools": [
+      {
+        "call": {
+          "id": "provider-1-0",
+          "tool": "list_text_blocks",
+          "arguments": {
+            "cursor": null,
+            "limit": 20,
+            "contributionId": null,
+            "participantId": null,
+            "fromOrdinal": null
+          }
+        },
+        "result": {
+          "status": "complete",
+          "items": [
+            {
+              "handle": "source-f2b9c6d0-2936-4d6c-a91a-d1fbda0ee8ba",
+              "blockId": "7fb4c4d0-7b5b-479f-b0a9-c635706fdc48",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Our first sample concerns a garden.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-f33b9c86-14e2-4d44-bf25-859173e99475",
+                "blockId": "b868f16c-18a6-40f8-9432-f31d1416fa9d",
+                "ordinal": 1,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-cf138380-254d-4898-b38f-427114d0136d",
+              "blockId": "30d38538-5ce2-44bc-a919-3fc5ece277ff",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 2: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-63cecc37-d33b-4bfe-af24-fa7c872db150",
+                "blockId": "823a4d1c-2173-420c-91eb-c7700c6de7dc",
+                "ordinal": 2,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-b628f359-d042-4447-b9bd-63197890b4d1",
+              "blockId": "a8da40a0-d765-4c01-8f71-047e7706db89",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 3: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-ae5c8d70-98b4-43aa-9653-727ec6a6f4b2",
+                "blockId": "e3843183-874d-44ad-a23d-d068d6ce9446",
+                "ordinal": 3,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-74450234-a58f-4ade-a789-01ee49cc6d2b",
+              "blockId": "44931f34-18ce-4321-938e-1d18604f5fce",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 4: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-c3184937-7844-4296-aac5-16485d3f099d",
+                "blockId": "4b9dda11-36dc-4506-b366-a452c3ce6cdc",
+                "ordinal": 4,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-9c97b51d-fb60-43f3-8830-ef512d4c7e17",
+              "blockId": "4aaaacf2-0540-46f8-9b03-feeb99766667",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 5: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-a149ed77-5cac-4571-8361-382c63a13da9",
+                "blockId": "5d37484a-4ad7-45e8-8ff7-d2e770fb8630",
+                "ordinal": 5,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-02e38e9a-18e0-4aee-b32c-c5c3913ab5ce",
+              "blockId": "1b77abbc-d2eb-487e-92c2-bff2d35c1e65",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 6: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-07c67ff6-7be5-42e8-924c-35295ea8b4a9",
+                "blockId": "ade51b8f-1a60-4d6f-a437-5f9a74a30578",
+                "ordinal": 6,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-4b5dd61b-c156-41a8-8d99-9bb9a8b26c37",
+              "blockId": "b9bdfd76-7bca-46ed-b5bc-f3ea6ab6dff8",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 7: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-fb818ed2-3c5f-49e7-aa6a-af95983c3778",
+                "blockId": "9cd34185-f203-4443-9969-17ff6ad686fe",
+                "ordinal": 7,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-6fce19d7-7be3-431e-b884-75682b89853e",
+              "blockId": "88d4b66a-5b4e-4400-a418-94f5392d0a37",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 8: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-c99347c0-1bf9-4dec-9940-43533bb348e6",
+                "blockId": "23eb45b6-7d84-41dd-b3cb-476091978e60",
+                "ordinal": 8,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-492b14f0-4627-4571-a354-990baa6901ee",
+              "blockId": "8a766b7d-ecfb-4332-945f-859e62b1969a",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 9: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-a6b217be-9538-4aaf-991a-71fa00624b23",
+                "blockId": "1eb707f0-84e6-41c3-87de-6e1c7bd3b42d",
+                "ordinal": 9,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-941c1b02-b7a7-47db-97a3-694361eff09c",
+              "blockId": "500aaef9-2cf8-47de-8995-972fa07cdd7a",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 10: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-58945938-a457-438e-9571-ac03cae2848e",
+                "blockId": "bbb5d1ba-e36a-45ad-836c-32e10e6474b7",
+                "ordinal": 10,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-1e346110-fe07-43fc-9a8e-495dd9669636",
+              "blockId": "a68c4199-5023-4634-9e34-86a8be535c8c",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Sample 11: reading.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-35055ead-ccd7-42d5-ab94-98501bf87e88",
+                "blockId": "c55c0569-d372-4069-9101-be004f15d58c",
+                "ordinal": 11,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            },
+            {
+              "handle": "source-68f7af92-8297-4236-a07b-761d3afe6d4a",
+              "blockId": "735faad2-883e-4ce3-a6bc-f2143c80c6b0",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Tell me what text blocks you can see. List the starting few words and block GUID.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-13493229-8707-4274-8987-3a7d9cdd3921",
+                "blockId": "505b9e40-a7ad-463a-9c91-50857bc79896",
+                "ordinal": 12,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            }
+          ],
+          "nextCursor": null,
+          "coverage": {
+            "visited": 24,
+            "previewCells": 298
+          },
+          "limits": {
+            "items": 20,
+            "previewCharacters": 160,
+            "pageVisits": 128,
+            "exchangeVisits": 512,
+            "depth": 32
+          },
+          "omissions": []
+        }
+      }
+    ],
+    "receipt": {
+      "version": 1,
+      "binding": "870acedbed916c63401c18bf5f8eaf295305940abe49825a360ace0f9d812856",
+      "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+      "generation": 1,
+      "conversationId": "conv_6aefbc3a45ec81908fb02629ec3d6e010715530c8666cfbc",
+      "exchangeId": "0133e67b-330f-4090-b632-53b7f1044f1d"
+    },
+    "attempts": [
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0715530c8666cfbc006aefbc3bf6008190bbb76ce4def22956",
+          "startedUtc": "2026-11-08T00:03:07.378Z",
+          "completedUtc": "2026-11-08T00:03:10.496Z",
+          "usage": {
+            "input_tokens": 9528,
+            "output_tokens": 39,
+            "total_tokens": 9567
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [
+          {
+            "id": "call_SHBxZB2PSrqu0S88u0Qkzhoy",
+            "tool": "list_text_blocks",
+            "arguments": {
+              "cursor": null,
+              "limit": 20,
+              "contributionId": null,
+              "participantId": null,
+              "fromOrdinal": null
+            }
+          }
+        ],
+        "toolResultIds": [
+          "provider-1-0"
+        ]
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0715530c8666cfbc006aefbc3ee2208190b0fd13aede82467c",
+          "startedUtc": "2026-11-08T00:03:10.507Z",
+          "completedUtc": "2026-11-08T00:03:16.163Z",
+          "usage": {
+            "input_tokens": 11997,
+            "output_tokens": 744,
+            "total_tokens": 12741
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": []
+      }
+    ]
+  },
+  "correctEarlierBlockIds": 11,
+  "remark": {
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "c10ea09a-f4ff-46db-acc8-a3f2bb6abf72",
+      "intent": "reply",
+      "replyTargets": [
+        "source-75e6493d-a073-46e9-a874-aacfbcd73258"
+      ],
+      "composition": [
+        {
+          "id": "p1",
+          "kind": "paragraph",
+          "markup": "Done.",
+          "ranges": []
+        }
+      ],
+      "anchors": [
+        {
+          "id": "a1",
+          "source": "source-75e6493d-a073-46e9-a874-aacfbcd73258",
+          "revision": "30a15501-96ef-443f-b9a2-f3d43463636f",
+          "selector": {
+            "exact": "Our first sample concerns a garden.",
+            "prefix": "",
+            "suffix": ""
+          }
+        }
+      ],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [
+        {
+          "id": "g1",
+          "target": "a1",
+          "type": "remark",
+          "text": "This is a test remark from OpenAI."
+        }
+      ],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "tools": [
+      {
+        "call": {
+          "id": "provider-1-0",
+          "tool": "list_text_blocks",
+          "arguments": {
+            "cursor": null,
+            "limit": 1,
+            "contributionId": null,
+            "participantId": null,
+            "fromOrdinal": 1
+          }
+        },
+        "result": {
+          "status": "partial",
+          "items": [
+            {
+              "handle": "source-75e6493d-a073-46e9-a874-aacfbcd73258",
+              "blockId": "7fb4c4d0-7b5b-479f-b0a9-c635706fdc48",
+              "nativeType": "standoff-editor-block",
+              "position": 1,
+              "preview": "Our first sample concerns a garden.",
+              "previewTruncated": false,
+              "readRequired": true,
+              "contribution": {
+                "handle": "source-ac625e32-8c06-4a75-8f43-f64de2d38ac6",
+                "blockId": "b868f16c-18a6-40f8-9432-f31d1416fa9d",
+                "ordinal": 1,
+                "author": "human",
+                "participant": {
+                  "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+                  "kind": "human",
+                  "name": "Local author"
+                }
+              }
+            }
+          ],
+          "nextCursor": "inventory-15016c36-0604-47c7-bf68-c5c284d23a7b",
+          "coverage": {
+            "visited": 2,
+            "previewCells": 35
+          },
+          "limits": {
+            "items": 20,
+            "previewCharacters": 160,
+            "pageVisits": 128,
+            "exchangeVisits": 512,
+            "depth": 32
+          },
+          "omissions": []
+        }
+      },
+      {
+        "call": {
+          "id": "provider-2-0",
+          "tool": "read_source",
+          "arguments": {
+            "handle": "source-75e6493d-a073-46e9-a874-aacfbcd73258"
+          }
+        },
+        "result": {
+          "handle": "source-75e6493d-a073-46e9-a874-aacfbcd73258",
+          "target": {
+            "kind": "block",
+            "resourceId": "eb830b75-443d-41ee-94f4-12d27d573571",
+            "blockId": "7fb4c4d0-7b5b-479f-b0a9-c635706fdc48"
+          },
+          "owner": "eb830b75-443d-41ee-94f4-12d27d573571",
+          "revision": "30a15501-96ef-443f-b9a2-f3d43463636f",
+          "kind": "block",
+          "sourceAuthor": "human",
+          "contribution": {
+            "handle": "source-ac625e32-8c06-4a75-8f43-f64de2d38ac6",
+            "blockId": "b868f16c-18a6-40f8-9432-f31d1416fa9d",
+            "author": "human",
+            "participant": {
+              "id": "eb830b75-443d-41ee-94f4-12d27d573571:human",
+              "kind": "human",
+              "name": "Local author"
+            },
+            "ordinal": 1,
+            "createdUtc": "2026-11-08T00:03:03.394Z",
+            "replies": [],
+            "discursiveReferences": []
+          },
+          "status": "complete",
+          "nativeType": "standoff-editor-block",
+          "text": "Our first sample concerns a garden.",
+          "children": [],
+          "annotations": [],
+          "semanticReferences": [],
+          "omissions": [],
+          "hasInlineObjects": false
+        }
+      }
+    ],
+    "receipt": {
+      "version": 1,
+      "binding": "870acedbed916c63401c18bf5f8eaf295305940abe49825a360ace0f9d812856",
+      "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+      "generation": 1,
+      "conversationId": "conv_6aefbc3a45ec81908fb02629ec3d6e010715530c8666cfbc",
+      "exchangeId": "c10ea09a-f4ff-46db-acc8-a3f2bb6abf72"
+    },
+    "attempts": [
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0715530c8666cfbc006aefbc480b6481908e5ec642e9bbc528",
+          "startedUtc": "2026-11-08T00:03:19.724Z",
+          "completedUtc": "2026-11-08T00:03:21.861Z",
+          "usage": {
+            "input_tokens": 16877,
+            "output_tokens": 39,
+            "total_tokens": 16916
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [
+          {
+            "id": "call_7IEcnBIeOkrrPeAHydeaFp5i",
+            "tool": "list_text_blocks",
+            "arguments": {
+              "cursor": null,
+              "limit": 1,
+              "contributionId": null,
+              "participantId": null,
+              "fromOrdinal": 1
+            }
+          }
+        ],
+        "toolResultIds": [
+          "provider-1-0"
+        ]
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0715530c8666cfbc006aefbc4a2c5481909b9789cb70edeff0",
+          "startedUtc": "2026-11-08T00:03:21.865Z",
+          "completedUtc": "2026-11-08T00:03:23.522Z",
+          "usage": {
+            "input_tokens": 17307,
+            "output_tokens": 38,
+            "total_tokens": 17345
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [
+          {
+            "id": "call_6YVVzX8UsCEE06GwQxIadNhj",
+            "tool": "read_source",
+            "arguments": {
+              "handle": "source-75e6493d-a073-46e9-a874-aacfbcd73258"
+            }
+          }
+        ],
+        "toolResultIds": [
+          "provider-2-0"
+        ]
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0715530c8666cfbc006aefbc4bdc8c81909b7ffc516d64487d",
+          "startedUtc": "2026-11-08T00:03:23.525Z",
+          "completedUtc": "2026-11-08T00:03:27.146Z",
+          "usage": {
+            "input_tokens": 17785,
+            "output_tokens": 227,
+            "total_tokens": 18012
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": []
+      }
+    ],
+    "sourceId": "7fb4c4d0-7b5b-479f-b0a9-c635706fdc48",
+    "sourceText": "Our first sample concerns a garden.",
+    "sourceProtected": true,
+    "definition": {
+      "id": "b7deb73c-7ab1-4284-b2c2-d5284a391da3",
+      "type": "mutable/gloss",
+      "value": "remark: This is a test remark from OpenAI.",
+      "metadata": {
+        "gloss": {
+          "version": 1,
+          "localId": "20524f11-4f24-4e53-baa9-350ae83583ef",
+          "links": {}
+        },
+        "dcp": {
+          "version": 1,
+          "actor": "ai",
+          "exchangeId": "c10ea09a-f4ff-46db-acc8-a3f2bb6abf72",
+          "protocol": "dcp/1.0",
+          "sourceResourceId": "eb830b75-443d-41ee-94f4-12d27d573571",
+          "appliedTo": "existing-source",
+          "sourceAuthor": "human",
+          "participantId": "eb830b75-443d-41ee-94f4-12d27d573571:ai"
+        }
+      }
+    },
+    "snapshots": 0,
+    "rebuilds": 0,
+    "elapsedMs": 9594.399999976158,
+    "commitMs": 22.5
+  },
+  "inspection": "mutable/glossOur first sample concerns a garden.Authored by ai · Source author: humanExchange c10ea09a-f4ff-46db-acc8-a3f2bb6abf72. Current native annotation; inspection does not edit it.",
+  "live": true,
+  "wire": [
+    {
+      "path": "/v1/conversations",
+      "bytes": 115
+    },
+    {
+      "path": "/v1/conversations/conv_6aefbc3a45ec81908fb02629ec3d6e010715530c8666cfbc/items",
+      "bytes": 7932
+    },
+    {
+      "path": "/v1/responses",
+      "bytes": 33456,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium"
+      ],
+      "inventoryInstructions": true
+    },
+    {
+      "path": "/v1/responses",
+      "bytes": 24212,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium"
+      ],
+      "inventoryInstructions": true
+    },
+    {
+      "path": "/v1/conversations/conv_6aefbc3a45ec81908fb02629ec3d6e010715530c8666cfbc",
+      "bytes": 0
+    },
+    {
+      "path": "/v1/conversations/conv_6aefbc3a45ec81908fb02629ec3d6e010715530c8666cfbc/items",
+      "bytes": 1005
+    },
+    {
+      "path": "/v1/responses",
+      "bytes": 34288,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium"
+      ],
+      "inventoryInstructions": true
+    },
+    {
+      "path": "/v1/responses",
+      "bytes": 18280,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium"
+      ],
+      "inventoryInstructions": true
+    },
+    {
+      "path": "/v1/responses",
+      "bytes": 19022,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium"
+      ],
+      "inventoryInstructions": true
+    }
+  ],
+  "outgoingBytes": 138310
+}

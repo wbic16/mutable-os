@@ -1,0 +1,517 @@
+{
+  "checks": [
+    {
+      "name": "Flint benchmark typing retains text and caret",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark has bounded canonical work",
+      "passed": true,
+      "details": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 40,
+        "rangeRects": 20
+      }
+    },
+    {
+      "name": "contextual opening preserves the source native Document",
+      "passed": true
+    },
+    {
+      "name": "Flint and Quill coexist with separate commands and managed windows",
+      "passed": true
+    },
+    {
+      "name": "confirmed conversion keeps native identity and annotations",
+      "passed": true
+    },
+    {
+      "name": "conversion uses bounded structural admission",
+      "passed": true,
+      "details": {
+        "fullValidation": 0,
+        "broadPlanning": 0
+      }
+    },
+    {
+      "name": "real application renders ordinary Blocks beside composition",
+      "passed": true
+    },
+    {
+      "name": "trusted click on curved text selects canonical boundary",
+      "passed": true,
+      "details": {
+        "anchor": 10,
+        "head": 10
+      }
+    },
+    {
+      "name": "trusted input inserts directly on curved SVG",
+      "passed": true
+    },
+    {
+      "name": "trusted deletion keeps canonical identity",
+      "passed": true
+    },
+    {
+      "name": "shift selection and replacement use the native range",
+      "passed": true
+    },
+    {
+      "name": "native keyboard Undo reverses SVG edit",
+      "passed": true
+    },
+    {
+      "name": "native keyboard Redo restores SVG edit",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/157.0.8103.80",
+    "revision": "@5cb0fce6746acfc926045c45b23d811d479c49b9",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+    "jsVersion": "15.7.112.43"
+  },
+  "typingBefore": {
+    "handlers": {
+      "samples": [
+        {
+          "handlerMs": 12.900000005960464,
+          "afterQueuedCaretMs": 27.100000001490116,
+          "caretExecutionMs": 14,
+          "firstFrameMs": 41
+        },
+        {
+          "handlerMs": 11.700000002980232,
+          "afterQueuedCaretMs": 23.30000000447035,
+          "caretExecutionMs": 11.600000001490116,
+          "firstFrameMs": 33.600000001490116
+        },
+        {
+          "handlerMs": 4.100000001490116,
+          "afterQueuedCaretMs": 13.200000002980232,
+          "caretExecutionMs": 9.100000001490116,
+          "firstFrameMs": 25.100000001490116
+        },
+        {
+          "handlerMs": 4.100000001490116,
+          "afterQueuedCaretMs": 14.399999998509884,
+          "caretExecutionMs": 10.199999995529652,
+          "firstFrameMs": 24.399999998509884
+        },
+        {
+          "handlerMs": 3.7000000029802322,
+          "afterQueuedCaretMs": 12.800000004470348,
+          "caretExecutionMs": 9.100000001490116,
+          "firstFrameMs": 22.700000002980232
+        },
+        {
+          "handlerMs": 3.7999999970197678,
+          "afterQueuedCaretMs": 14,
+          "caretExecutionMs": 10.200000002980232,
+          "firstFrameMs": 25.299999997019768
+        },
+        {
+          "handlerMs": 3.899999998509884,
+          "afterQueuedCaretMs": 13.399999998509884,
+          "caretExecutionMs": 9.399999998509884,
+          "firstFrameMs": 23.899999998509884
+        },
+        {
+          "handlerMs": 3.600000001490116,
+          "afterQueuedCaretMs": 13.800000004470348,
+          "caretExecutionMs": 10.200000002980232,
+          "firstFrameMs": 23.700000002980232
+        },
+        {
+          "handlerMs": 3.600000001490116,
+          "afterQueuedCaretMs": 12.5,
+          "caretExecutionMs": 8.899999998509884,
+          "firstFrameMs": 23.5
+        },
+        {
+          "handlerMs": 3.7000000029802322,
+          "afterQueuedCaretMs": 14.100000001490116,
+          "caretExecutionMs": 10.399999998509884,
+          "firstFrameMs": 24.5
+        },
+        {
+          "handlerMs": 3.2000000029802322,
+          "afterQueuedCaretMs": 12.200000002980232,
+          "caretExecutionMs": 8.900000005960464,
+          "firstFrameMs": 22.600000001490116
+        },
+        {
+          "handlerMs": 3.899999998509884,
+          "afterQueuedCaretMs": 14,
+          "caretExecutionMs": 10.100000001490116,
+          "firstFrameMs": 23.899999998509884
+        },
+        {
+          "handlerMs": 3.2000000029802322,
+          "afterQueuedCaretMs": 11.899999998509884,
+          "caretExecutionMs": 8.699999995529652,
+          "firstFrameMs": 22.600000001490116
+        },
+        {
+          "handlerMs": 3.5,
+          "afterQueuedCaretMs": 13.600000001490116,
+          "caretExecutionMs": 10.100000001490116,
+          "firstFrameMs": 24
+        },
+        {
+          "handlerMs": 3,
+          "afterQueuedCaretMs": 11.5,
+          "caretExecutionMs": 8.5,
+          "firstFrameMs": 19.799999997019768
+        },
+        {
+          "handlerMs": 2.7000000029802322,
+          "afterQueuedCaretMs": 11.300000004470348,
+          "caretExecutionMs": 8.399999998509884,
+          "firstFrameMs": 21
+        },
+        {
+          "handlerMs": 2.5,
+          "afterQueuedCaretMs": 11,
+          "caretExecutionMs": 8.399999998509884,
+          "firstFrameMs": 21
+        },
+        {
+          "handlerMs": 2.600000001490116,
+          "afterQueuedCaretMs": 11,
+          "caretExecutionMs": 8.399999998509884,
+          "firstFrameMs": 19.30000000447035
+        },
+        {
+          "handlerMs": 2.7999999970197678,
+          "afterQueuedCaretMs": 10.299999997019768,
+          "caretExecutionMs": 7.399999998509884,
+          "firstFrameMs": 18.5
+        },
+        {
+          "handlerMs": 2.899999998509884,
+          "afterQueuedCaretMs": 11.099999994039536,
+          "caretExecutionMs": 8.199999995529652,
+          "firstFrameMs": 19.299999997019768
+        }
+      ],
+      "restored": true
+    },
+    "trusted": {
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 40,
+        "rangeRects": 20
+      },
+      "marks": [
+        {
+          "start": 11504.10000000149,
+          "key": "x",
+          "firstFrameMs": 33.600000001490116,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11576.39999999851,
+          "key": "Backspace",
+          "firstFrameMs": 16.899999998509884,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11625,
+          "key": "x",
+          "firstFrameMs": 14.799999997019768,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11658.10000000149,
+          "key": "Backspace",
+          "firstFrameMs": 15.100000001490116,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11708.20000000298,
+          "key": "x",
+          "firstFrameMs": 14.599999994039536,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11741.70000000298,
+          "key": "Backspace",
+          "firstFrameMs": 14,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11791.70000000298,
+          "key": "x",
+          "firstFrameMs": 14.699999995529652,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11826,
+          "key": "Backspace",
+          "firstFrameMs": 14.100000001490116,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11878.79999999702,
+          "key": "x",
+          "firstFrameMs": 10.400000005960464,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11924.79999999702,
+          "key": "Backspace",
+          "firstFrameMs": 15.300000004470348,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11958.60000000149,
+          "key": "x",
+          "firstFrameMs": 14.699999995529652,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11991.29999999702,
+          "key": "Backspace",
+          "firstFrameMs": 15.300000004470348,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 12024.70000000298,
+          "key": "x",
+          "firstFrameMs": 14.799999997019768,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 12057.89999999851,
+          "key": "Backspace",
+          "firstFrameMs": 15.399999998509884,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 12091.70000000298,
+          "key": "x",
+          "firstFrameMs": 14.699999995529652,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 12124.79999999702,
+          "key": "Backspace",
+          "firstFrameMs": 14.900000005960464,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 12158.39999999851,
+          "key": "x",
+          "firstFrameMs": 14.899999998509884,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 12191.89999999851,
+          "key": "Backspace",
+          "firstFrameMs": 14.399999998509884,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 12224.70000000298,
+          "key": "x",
+          "firstFrameMs": 15.099999994039536,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 12258,
+          "key": "Backspace",
+          "firstFrameMs": 14.399999998509884,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        }
+      ],
+      "events": [
+        {
+          "start": 11504.10000000149,
+          "duration": 48,
+          "processing": 5.5
+        },
+        {
+          "start": 11576.39999999851,
+          "duration": 32,
+          "processing": 16.299999997019768
+        },
+        {
+          "start": 11625,
+          "duration": 32,
+          "processing": 0.3999999985098839
+        },
+        {
+          "start": 11658.10000000149,
+          "duration": 32,
+          "processing": 13.199999995529652
+        },
+        {
+          "start": 11708.20000000298,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 11741.70000000298,
+          "duration": 32,
+          "processing": 12
+        },
+        {
+          "start": 11791.70000000298,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 11826,
+          "duration": 32,
+          "processing": 11
+        },
+        {
+          "start": 11878.79999999702,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 11924.79999999702,
+          "duration": 32,
+          "processing": 10.899999998509884
+        },
+        {
+          "start": 11958.60000000149,
+          "duration": 32,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 11991.29999999702,
+          "duration": 32,
+          "processing": 10.299999997019768
+        },
+        {
+          "start": 12024.70000000298,
+          "duration": 32,
+          "processing": 0.3999999985098839
+        },
+        {
+          "start": 12057.89999999851,
+          "duration": 32,
+          "processing": 10.600000001490116
+        },
+        {
+          "start": 12091.70000000298,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 12124.79999999702,
+          "duration": 32,
+          "processing": 10.399999998509884
+        },
+        {
+          "start": 12158.39999999851,
+          "duration": 32,
+          "processing": 0.19999999552965164
+        },
+        {
+          "start": 12191.89999999851,
+          "duration": 32,
+          "processing": 10.5
+        },
+        {
+          "start": 12224.70000000298,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 12258,
+          "duration": 32,
+          "processing": 10.399999998509884
+        }
+      ],
+      "domRetained": true
+    }
+  },
+  "note": "Checkpoint 1: native direct SVG input. Geometry controls and full M1 qualification follow."
+}

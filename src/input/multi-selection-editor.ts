@@ -17,6 +17,7 @@ export class MultiSelectionEditor {
   ) {}
 
   replace(occurrenceKey: NodeKey, replacements: SelectionReplacement[]): void {
+    if(this.commands.isCompactText(occurrenceKey))throw Error('Multiple-caret editing is not yet qualified for compact text');
     const node = this.node(occurrenceKey);
     const current = this.selections.sets[occurrenceKey];
     if (!node || !current) throw new Error("The editing occurrence or selection no longer exists");

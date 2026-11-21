@@ -1,0 +1,41 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"before","id":"A","admitted":true,"entities":4,"arguments":1,"relations":1,"interpretations":0,"glosses":0,"usage":[{"input_tokens":13344,"output_tokens":287,"total_tokens":13631},{"input_tokens":13836,"output_tokens":36,"total_tokens":13872},{"input_tokens":14077,"output_tokens":32,"total_tokens":14109},{"input_tokens":14314,"output_tokens":871,"total_tokens":15185}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"before","id":"B","admitted":true,"entities":4,"arguments":0,"relations":3,"interpretations":1,"glosses":0,"usage":[{"input_tokens":14219,"output_tokens":31,"total_tokens":14250},{"input_tokens":14456,"output_tokens":44,"total_tokens":14500},{"input_tokens":14706,"output_tokens":976,"total_tokens":15682}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"before","id":"C","admitted":true,"entities":0,"arguments":1,"relations":1,"interpretations":1,"glosses":0,"usage":[{"input_tokens":15431,"output_tokens":132,"total_tokens":15563},{"input_tokens":16527,"output_tokens":541,"total_tokens":17068}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"before","id":"D","admitted":true,"entities":0,"arguments":1,"relations":0,"interpretations":0,"glosses":0,"usage":[{"input_tokens":16020,"output_tokens":39,"total_tokens":16059},{"input_tokens":18188,"output_tokens":36,"total_tokens":18224},{"input_tokens":19201,"output_tokens":635,"total_tokens":19836}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"before","id":"E","admitted":true,"entities":3,"arguments":0,"relations":0,"interpretations":0,"glosses":0,"usage":[{"input_tokens":15781,"output_tokens":673,"total_tokens":16454}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"after","id":"A","admitted":true,"entities":9,"arguments":1,"relations":6,"interpretations":19,"glosses":1,"usage":[{"input_tokens":13924,"output_tokens":31,"total_tokens":13955},{"input_tokens":14161,"output_tokens":3151,"total_tokens":17312}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"after","id":"B","admitted":true,"entities":6,"arguments":0,"relations":3,"interpretations":13,"glosses":0,"usage":[{"input_tokens":16310,"output_tokens":31,"total_tokens":16341},{"input_tokens":16546,"output_tokens":31,"total_tokens":16577},{"input_tokens":16782,"output_tokens":71,"total_tokens":16853},{"input_tokens":17058,"output_tokens":30,"total_tokens":17088},{"input_tokens":17293,"output_tokens":2217,"total_tokens":19510}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"after","id":"C","admitted":true,"entities":0,"arguments":1,"relations":0,"interpretations":11,"glosses":0,"usage":[{"input_tokens":16493,"output_tokens":2318,"total_tokens":18811}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"after","id":"D","admitted":true,"entities":1,"arguments":1,"relations":0,"interpretations":7,"glosses":0,"usage":[{"input_tokens":16483,"output_tokens":34,"total_tokens":16517},{"input_tokens":23854,"output_tokens":248,"total_tokens":24102},{"input_tokens":24309,"output_tokens":1412,"total_tokens":25721}]}
+
+stdout | docs/development/evidence/dcp-scholarly-authoring/live.test.ts > GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence
+{"variant":"after","id":"E","admitted":true,"entities":4,"arguments":0,"relations":0,"interpretations":4,"glosses":0,"usage":[{"input_tokens":16661,"output_tokens":31,"total_tokens":16692},{"input_tokens":16900,"output_tokens":30,"total_tokens":16930},{"input_tokens":17138,"output_tokens":33,"total_tokens":17171},{"input_tokens":17379,"output_tokens":33,"total_tokens":17412},{"input_tokens":17620,"output_tokens":1047,"total_tokens":18667}]}
+
+ ✓ docs/development/evidence/dcp-scholarly-authoring/live.test.ts (1 test) 282618ms
+   ✓ GPT-6.1 Sol before/after A–E with native occurrence and persistence evidence 282617ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  16:48:16
+   Duration  296.15s (transform 9.84s, setup 0ms, collect 12.19s, tests 282.62s, environment 566ms, prepare 97ms)
+

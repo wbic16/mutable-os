@@ -1,3 +1,4 @@
+import {contentLength} from "./inline-sequence";
 import { clone } from "./clone";
 import type { ContentRecord, JsonObject } from "./types";
 
@@ -7,7 +8,10 @@ export type AnnotationPatch = { start: number; end: number; value?: string; meta
 export function editAnnotation(record: JsonObject, action: AnnotationAction | AnnotationPatch, content: ContentRecord, text: () => string): JsonObject {
   const next = clone(record);
   let start = Number(next.start), end = Number(next.end);
-  if (next.isDeleted || !Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < start || end >= content.inlineContent.length) throw new Error("Annotation range is invalid or deleted");
+  const point = next.isZeroWidth === true, length = contentLength(content), endpointDelta = end - start;
+  const valid = () => Number.isInteger(start) && Number.isInteger(end) && start >= 0 &&
+    (point ? start <= length && (end === start || end === start - 1) : end >= start && end < length);
+  if (next.isDeleted || !valid()) throw new Error("Annotation range is invalid or deleted");
   if (typeof action !== "string") {
     for (const field of ["metadata", "attributes"] as const) {
       const value = action[field];
@@ -18,9 +22,9 @@ export function editAnnotation(record: JsonObject, action: AnnotationAction | An
     for (const field of ["value", "metadata", "attributes"] as const) if (action[field] !== undefined) next[field] = clone(action[field]);
   } else if (action === "delete") next.isDeleted = true;
   else if (action === "left") { if (start === 0) return next; start--; end--; }
-  else if (action === "right") { if (end === content.inlineContent.length - 1) return next; start++; end++; }
-  else if (action === "expand") { if (end === content.inlineContent.length - 1) return next; end++; }
-  else if (action === "contract") { if (end === start) return next; end--; }
+  else if (action === "right") { if (point ? start === length : end === length - 1) return next; start++; end++; }
+  else if (action === "expand") { if (point || end === length - 1) return next; end++; }
+  else if (action === "contract") { if (point || end === start) return next; end--; }
   else {
     const source = text();
     const offsets = new Map<number, number>();
@@ -33,8 +37,8 @@ export function editAnnotation(record: JsonObject, action: AnnotationAction | An
     const index = words.findIndex(word => word.start <= start && start <= word.end);
     const word = index < 0 ? undefined : words[index + (action === "previous-word" ? -1 : 1)];
     if (!word) return next;
-    start = word.start; end = word.end;
+    start = word.start; end = point ? start + endpointDelta : word.end;
   }
-  if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < start || end >= content.inlineContent.length) throw new Error("Use inclusive Cell endpoints within the paragraph (start ≤ end)");
+  if (!valid()) throw new Error(point ? "Use a point boundary within the paragraph (end = start or start − 1)" : "Use inclusive Cell endpoints within the paragraph (start ≤ end)");
   return { ...next, start, end };
 }

@@ -1,4 +1,4 @@
-import type { ExistingBlockDto, NodeKey, FeatureBlocks } from "../../feature-api";
+import type {ExistingBlockDto} from "../../block-tree/types";
 
 export const DEFAULT_TIMER_SECONDS = 5 * 60;
 export const MAX_TIMER_SECONDS = 24 * 60 * 60;
@@ -28,42 +28,23 @@ export function readTimerPayload(value: unknown): TimerPayload {
   return { durationSeconds, mode: "idle", remainingMilliseconds: durationSeconds * 1000 };
 }
 
-export function timerBlockDto(position?: { x: number; y: number }): ExistingBlockDto {
+export const timerParameters={durationSeconds:{type:'integer',minimum:1,maximum:MAX_TIMER_SECONDS},size:{anyOf:[{type:'object',properties:{width:{type:'number',minimum:MIN_TIMER_SIZE},height:{type:'number',minimum:MIN_TIMER_SIZE}},required:['width','height'],additionalProperties:false},{type:'null'}]}} as const;
+export function timerDuration(value:unknown):number {
+ if(!Number.isInteger(value)||Number(value)<1||Number(value)>MAX_TIMER_SECONDS)throw Error('Invalid timer duration');return value as number;
+}
+export function timerDimensions(value:unknown):{width:number;height:number} {
+ if(value===null)return {width:DEFAULT_TIMER_SIZE,height:DEFAULT_TIMER_SIZE};
+ const v=value as any;if(!v||typeof v!=='object'||Array.isArray(v)||Object.keys(v).some(k=>!['width','height'].includes(k))||!Number.isFinite(v.width)||!Number.isFinite(v.height)||v.width<MIN_TIMER_SIZE||v.height<MIN_TIMER_SIZE)throw Error('Invalid timer size');return {width:v.width,height:v.height};
+}
+export function timerBlockDto(position?: { x: number; y: number },duration=DEFAULT_TIMER_SECONDS,size:unknown=null): ExistingBlockDto {
+  const seconds=timerDuration(duration),dimensions=timerDimensions(size);
   return {
     id: crypto.randomUUID(),
     type: "timer-block",
-    timer: { durationSeconds: DEFAULT_TIMER_SECONDS, mode: "idle", remainingMilliseconds: DEFAULT_TIMER_SECONDS * 1000 },
+    timer: { durationSeconds: seconds, mode: "idle", remainingMilliseconds: seconds * 1000 },
     blockProperties: [
-      { type: "block/size", metadata: { width: DEFAULT_TIMER_SIZE, height: DEFAULT_TIMER_SIZE, "min-width": MIN_TIMER_SIZE } },
+      { type: "block/size", metadata: { ...dimensions, "min-width": MIN_TIMER_SIZE } },
       ...(position ? [{ type: "block/position", metadata: { ...position, position: "fixed" } }] : []),
     ],
   };
-}
-
-function initialPosition(blocks: FeatureBlocks, originKey: NodeKey) {
-  const rect = blocks.bounds(originKey);
-  if (!rect) return { x: 24, y: 80 };
-  const viewportWidth = typeof window === "undefined" ? 1024 : window.innerWidth;
-  const viewportHeight = typeof window === "undefined" ? 768 : window.innerHeight;
-  return {
-    x: Math.max(8, Math.min(rect.left - DEFAULT_TIMER_SIZE, viewportWidth - DEFAULT_TIMER_SIZE - 8)),
-    y: Math.max(8, Math.min(rect.top, viewportHeight - DEFAULT_TIMER_SIZE - 8)),
-  };
-}
-
-/** Adds a persistent timer beside the origin in the model and anchors its floating view to the origin on screen. */
-export function createTimerBlock(blocks: FeatureBlocks, originKey: NodeKey): string | undefined {
-  let origin = blocks.get(originKey);
-  if (!origin) return;
-  const position = initialPosition(blocks, origin.key);
-  if (origin.type === "document-window-block") {
-    const document = origin.children.find(key => blocks.get(key)?.type === "document-block");
-    if (document) origin = blocks.get(document)!;
-  }
-  const viewId = origin.viewId;
-  let placement: string;
-  if (origin.type === "document-block") placement = blocks.insert(timerBlockDto(position), { kind: "at", parentKey: origin.key, index: origin.children.length });
-  else placement = blocks.insert(timerBlockDto(position), { kind: "after", anchorKey: origin.key });
-  blocks.focusPlacement(placement, viewId);
-  return placement;
 }

@@ -1,0 +1,95 @@
+{
+  "all": [
+    {
+      "mounted": true,
+      "loadEditorMs": 306.30000001192093,
+      "mountMs": 666.4000000357628,
+      "contributions": 6,
+      "cells": 5376,
+      "xmlBytes": 2640,
+      "manifestMs": 3.199999988079071,
+      "requestBuildMs": 1.800000011920929,
+      "workspaceMs": 7.5,
+      "xmlProjectionMs": 1.399999976158142,
+      "historyColdMs": 3.399999976158142,
+      "historyWarmMs": 0.10000002384185791,
+      "xmlLowerMs": 3.600000023841858,
+      "nativePrepareMs": 7.5,
+      "definitions": 8,
+      "addedAnnotations": 8,
+      "responseReadyMs": 28.900000035762787,
+      "controllerValidateMs": 3.600000023841858,
+      "admissionMs": 270.5,
+      "controllerExchangeMs": 318,
+      "lastProviderPanelMs": 319.10000002384186,
+      "nextTwoFramesMs": 26.899999976158142,
+      "visibility": [
+        {
+          "ms": 348.2000000476837,
+          "key": "node:550062a2-d909-4475-a85c-71ed12e596f7",
+          "intersecting": false,
+          "ratio": 0
+        },
+        {
+          "ms": 348.2000000476837,
+          "key": "node:550062a2-d909-4475-a85c-71ed12e596f7",
+          "intersecting": true,
+          "ratio": 0.9609375
+        }
+      ],
+      "longAnimationFrames": [
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 3324.099999964237,
+          "duration": 339.30000001192093,
+          "navigationId": 1763,
+          "paintTime": 3663.399999976158,
+          "presentationTime": 3712,
+          "renderStart": 3662.099999964237,
+          "styleAndLayoutStart": 3663.2999999523163,
+          "firstUIEventTimestamp": 3325.5,
+          "blockingDuration": 270.8,
+          "scripts": []
+        }
+      ],
+      "scans": {},
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [
+        {
+          "ms": 344.9000000357628,
+          "key": "node:550062a2-d909-4475-a85c-71ed12e596f7"
+        }
+      ],
+      "responseRect": {
+        "x": 170,
+        "y": 207.34375,
+        "width": 816,
+        "height": 549,
+        "top": 207.34375,
+        "right": 986,
+        "bottom": 756.34375,
+        "left": 170
+      },
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 3.5,
+      "saveCaptureMs": 642.1000000238419,
+      "saveEncodeMs": 167.10000002384186,
+      "saveBytes": 556926,
+      "fullSaveWithInMemoryAdapterMs": 639.0999999642372,
+      "domNodes": 7909
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ],
+  "fixtureSha256": "9f5655fe8c24dad1d084dde7acc1f525fedfcfd174bfeeaf37c0897293867820",
+  "diagnosticDelayMs": 0,
+  "unrelatedParagraphs": 0
+}

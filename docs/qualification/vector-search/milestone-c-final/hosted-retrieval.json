@@ -1,0 +1,1097 @@
+{
+  "started": "2026-11-14T05:16:31.778Z",
+  "index": [
+    {
+      "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+      "passages": 15,
+      "embedded": 15,
+      "reused": 0,
+      "planningMs": 448.41087500000003,
+      "providerMs": 2255.4694160000004,
+      "publicationMs": 10.197415999999976,
+      "usage": 3485
+    },
+    {
+      "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+      "passages": 19,
+      "embedded": 19,
+      "reused": 0,
+      "planningMs": 297.5560409999998,
+      "providerMs": 276.85620800000015,
+      "publicationMs": 3.1116659999997864,
+      "usage": 2727
+    }
+  ],
+  "queries": [
+    {
+      "label": "poe-paraphrase",
+      "query": "Where do the wealthy hide from the suffering of the outside world?",
+      "ms": 606.6487079999997,
+      "results": [
+        {
+          "text": "The Masque of the Red Death\r\n\nThe red death had long devastated the country. No pestilence had ever been so fatal, or so hideous. Blood was its Avatar and its seal - the madness and the horror of blood. There were sharp pains, and sudden dizziness, and then profuse bleeding at the pores, with dissolution. The scarlet stains upon the body and especially upon the face of the victim, were the pest ban which shut him out from the aid and from the sympathy of his fellow-men. And the whole seizure, progress, and termination of the disease, were incidents of half an hour.\r\n\nBut Prince Prospero was happy and dauntless and sagacious. When his dominions were half depopulated, he summoned to his presence a thousand hale and light-hearted friends from among the knights and dames of his court, and with these retired to the deep seclusion of one of his crenellated abbeys. This was an extensive and magnificent structure, the creation of the prince's own eccentric yet august taste. A strong and lofty wall girdled it in. This wall had gates of iron. The courtiers, having entered, brought furnaces and massy hammers and welded the bolts.\r\n\nThey resolved to leave means neither of ingress nor egress to the sudden impulses of despair or of frenzy from within. The abbey was amply provisioned. With such precautions the courtiers might bid defiance to contagion. The external world could take care of itself. In the meantime it was folly to grieve or to think. The prince had provided all the appliances of pleasure. There were buffoons, there were improvisatori, there were ballet-dancers, there were musicians, there was Beauty, there was wine. All these and security were within. Without was the \"Red Death.\"\r",
+          "signals": {
+            "rrf": 0.032018442622950824,
+            "cosineDistance": 0.7483606934547424,
+            "bm25": -2.242261336021993
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+            "format": "mutable-document",
+            "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+            "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "53b35322-db68-4273-90dd-5db527fec3a3",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:ad4dfdb4-b77e-41ce-a25e-87d452f58a0f"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 28,
+                "runStart": 0,
+                "runEnd": 28,
+                "chunkStart": 0,
+                "chunkEnd": 28,
+                "textHash": "255d9ed2df0790daf69a1571a696347f79ef19fe86798b24459a593e0bd00603"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "b28cbb8b-6945-42b9-b86f-eab820a5f99e",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:4a52cbd0-5af8-488e-b261-cfeebf06baaa"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 542,
+                "runStart": 0,
+                "runEnd": 542,
+                "chunkStart": 30,
+                "chunkEnd": 572,
+                "textHash": "add7c92bc749e305e36ecc137a6b19df6380d3dc8b38022212231de7bcf43596"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "7d81ed11-fa71-49d1-9bcc-c44888ed7dbc",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e5d9e04e-c30d-48d8-8270-88da41880b37"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 563,
+                "runStart": 0,
+                "runEnd": 563,
+                "chunkStart": 574,
+                "chunkEnd": 1137,
+                "textHash": "567447ea2e39a43e56ffa40464d0a05b0729bd2819f84d8d75c0e2ae5c622bdf"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "7c879a5d-937d-40c7-bcbf-fd8266680d98",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:919f414b-7dec-45b0-b73e-f47c34b7f6a8"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 570,
+                "runStart": 0,
+                "runEnd": 570,
+                "chunkStart": 1139,
+                "chunkEnd": 1709,
+                "textHash": "f02395ddee22e1161b28a829162610398d5c087b015f9a8155eb7449ac519a84"
+              }
+            ]
+          },
+          "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98"
+        },
+        {
+          "text": "\"The Masque of the Red Death\" (originally published as \"The Mask of the Red Death: A Fantasy\") is a short story by American writer Edgar Allan Poe, first published in 1842. The story follows Prince Prospero's attempts to avoid a dangerous plague, known as the Red Death, by hiding in his abbey. He, along with many other wealthy nobles, hosts a masquerade ball in seven rooms of the abbey, each decorated with a different color. In the midst of their revelry, a mysterious figure disguised as a Red Death victim enters and makes his way through each of the rooms. Prospero dies after confronting this stranger, whose \"costume\" proves to contain nothing tangible inside it. The guests also die in turn.\r\n\nPoe's story follows many traditions of Gothic fiction and is often analyzed as an allegory about the inevitability of death, though some critics advise against an allegorical reading. Many different interpretations have been presented, as well as attempts to identify the true nature of the eponymous disease. The story was first published in May 1842 in Graham's Magazine and has since been adapted in many different forms, including a 1964 film starring Vincent Price. Poe's short story has also been alluded to by other works in many types of media.\r\n\nAnalysis\r",
+          "signals": {
+            "rrf": 0.030834914611005692,
+            "cosineDistance": 0.8044309020042419,
+            "bm25": -2.6356207273940426
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+            "format": "mutable-document",
+            "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+            "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "34ca1e40-9d82-4683-9f7b-62a49d632a57",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:1e961ec6-4b6c-46a9-a541-5688780ac93b"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 702,
+                "runStart": 0,
+                "runEnd": 702,
+                "chunkStart": 0,
+                "chunkEnd": 702,
+                "textHash": "b095cd21ffd13d03cf156553e32f4905194dacf507f1349b31cf6d6dce201402"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "c7efb0e1-f1de-401d-b6ca-cc9a2d97600a",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e2d6fe82-1c05-4380-8b48-f3f58fbb37a9"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 553,
+                "runStart": 0,
+                "runEnd": 553,
+                "chunkStart": 704,
+                "chunkEnd": 1257,
+                "textHash": "d032135e9e6fd856e20c923850bca5439213646fa0465d645b3c57ae1543dac1"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "09e0fe09-a956-407d-a25c-70f99294ae79",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:186ce0fe-d761-4281-be6f-bab2199e983d"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 9,
+                "runStart": 0,
+                "runEnd": 9,
+                "chunkStart": 1259,
+                "chunkEnd": 1268,
+                "textHash": "661c2dd3b2e135cacfb506151b82b6d8f436b41c096ec7fa6ef9aa0d930793af"
+              }
+            ]
+          },
+          "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98"
+        },
+        {
+          "text": "But to the chamber which lies most westwardly of the seven there are now none of the maskers who venture, for the night is waning away; and there flows a ruddier light through the blood-colored panes; and the blackness of the sable drapery appalls; and to him whose foot falls on the sable carpet, there comes from the near clock of ebony a muffled peal more solemnly emphatic than any which reaches their ears who indulge in the more remote gaieties of the other apartments.\r\n\nBut these other apartments were densely crowded, and in them beat feverishly the heart of life. And the revel went whirlingly on, until at length there commenced the sounding of midnight upon the clock. And then the music ceased, as I have told; and the evolutions of the waltzers were quieted; and there was an uneasy cessation of all things as before. But now there were twelve strokes to be sounded by the bell of the clock; and thus it happened, perhaps that more of thought crept, with more of time into the meditations of the thoughtful among those who revelled. And thus too, it happened, that before the last echoes of the last chime had utterly sunk into silence, there were many individuals in the crowd who had found leisure to become aware of the presence of a masked figure which had arrested the attention of no single individual before. And the rumor of this new presence having spread itself whisperingly around, there arose at length from the whole company a buzz, or murmur, of horror, and of disgust.\r",
+          "signals": {
+            "rrf": 0.0304147465437788,
+            "cosineDistance": 0.7611819505691528,
+            "bm25": -0.0000052056763857008395
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+            "format": "mutable-document",
+            "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+            "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "022574ae-3283-4b37-a3e0-7b4a193d202e",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:675dd646-9527-4f21-b57f-46cc8e81252b"
+                ],
+                "contribution": null,
+                "start": 1370,
+                "end": 1846,
+                "runStart": 1370,
+                "runEnd": 1846,
+                "chunkStart": 0,
+                "chunkEnd": 476,
+                "textHash": "6272400800ded520cd99942867d700449560ac15b9bb686974f3d6b88155723c"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "73a1bd69-9546-4eb9-a7b9-a906551890bc",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:f3d6acb6-840a-49b5-a6ee-c780162b0414"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 1020,
+                "runStart": 0,
+                "runEnd": 1020,
+                "chunkStart": 478,
+                "chunkEnd": 1498,
+                "textHash": "68673beb36cd758b11818a5fcdc1558e576973f1370a2092ee87ab832a8534cc"
+              }
+            ]
+          },
+          "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98"
+        },
+        {
+          "text": "It was in the blue room where stood the prince, with a group of pale courtiers by his side. At first, as he spoke, there was a slight rushing movement of this group in the direction of the intruder, who, at the moment was also near at hand, and now, with deliberate and stately step, made closer approach to the speaker. But from a certain nameless awe with which the mad assumptions of the mummer had inspired the whole party, there were found none who put forth a hand to seize him; so that, unimpeded, he passed within a yard of the prince's person; and while the vast assembly, as with one impulse, shrank from the centers of the rooms to the walls, he made his way uninterruptedly, but with the same solemn and measured step which had distinguished him from the first, through the blue chamber to the purple — to the purple to the green — through the green to the orange — through this again to the white — and even thence to the violet, ere a decided movement had been made to arrest him. It was then, however, that the Prince Prospero, maddened with rage and the shame of his own momentary cowardice, rushed hurriedly through the six chambers, while none followed him on account of a deadly terror that had seized upon all. He bore aloft a drawn dagger, and had approached, in rapid impetuosity, to within three or four feet of the retreating figure, when the latter, having attained the extremity of the velvet apartment, turned suddenly and confronted his pursuer. There was a sharp cry — and the dagger dropped gleaming upon the sable carpet, upon which most instantly afterward, fell prostrate in death the Prince Prospero. ",
+          "signals": {
+            "rrf": 0.029877369007803793,
+            "cosineDistance": 0.8124983906745911,
+            "bm25": -1.8589237913525076
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+            "format": "mutable-document",
+            "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+            "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "749983ba-bb85-49be-bb6c-01a0ee155db8",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:6b0eeeef-0d94-40e1-9229-4a07da252cfd"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 1635,
+                "runStart": 0,
+                "runEnd": 1635,
+                "chunkStart": 0,
+                "chunkEnd": 1635,
+                "textHash": "32b2acac9baa2e89897c19bd7182d18d271a5e63474ccc58756be6453c1d7609"
+              }
+            ]
+          },
+          "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98"
+        },
+        {
+          "text": "It was a voluptuous scene, that masquerade. But first let me tell of the rooms in which it was held. There were seven — an imperial suite, In many palaces, however, such suites form a long and straight vista, while the folding doors slide back nearly to the walls on either hand, so that the view of the whole extant is scarcely impeded. Here the case was very different; as might have been expected from the duke's love of the \"bizarre.\" The apartments were so irregularly disposed that the vision embraced but little more than one at a time. There was a sharp turn at the right and left, in the middle of each wall, a tall and narrow Gothic window looked out upon a closed corridor of which pursued the windings of the suite. These windows were of stained glass whose color varied in accordance with the prevailing hue of the decorations of the chamber into which it opened. That at the eastern extremity was hung, for example, in blue — and vividly blue were its windows. The second chamber was purple in its ornaments and tapestries, and here the panes were purple. The third was green throughout, and so were the casements. The fourth was furnished and lighted with orange — the fifth with white — the sixth with violet. The seventh apartment was closely shrouded in black velvet tapestries that hung all over the ceiling and down the walls, falling in heavy folds upon a carpet of the same material and hue. But in this chamber only, the color of the windows failed to correspond with the decorations. The panes were scarlet — a deep blood color. Now in no one of any of the seven apartments was there any lamp or candelabrum, amid the profusion of golden ornaments that lay scattered to and fro and depended from the roof. ",
+          "signals": {
+            "rrf": 0.02976190476190476,
+            "cosineDistance": 0.7669520974159241,
+            "bm25": -0.000005043682994250946
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+            "format": "mutable-document",
+            "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+            "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+            "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "1228c86a-1908-43a9-826e-04279a36387e",
+                "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                  "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:28ca4fbd-0f1e-4047-bef3-4f574d08575f"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 1730,
+                "runStart": 0,
+                "runEnd": 1730,
+                "chunkStart": 0,
+                "chunkEnd": 1730,
+                "textHash": "442d3049ef9d78f6526f28fb564ef7c62d9d8691c4a7ccf58956db5c7218d015"
+              }
+            ]
+          },
+          "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98"
+        }
+      ],
+      "evidence": "incomplete-evidence",
+      "answerability": "not-assessed",
+      "coverage": {
+        "complete": false,
+        "candidateLimit": 100,
+        "candidateLimitReached": false,
+        "staleCandidates": 0,
+        "contextSufficiency": "not-assessed",
+        "indexedResources": 2,
+        "knownSavedResources": 2317,
+        "sourceVerification": "exact-saved-file",
+        "unverifiedCandidates": 0,
+        "verifiedResources": 1,
+        "verificationBytes": 166147
+      },
+      "timing": {
+        "providerMs": 592.7102080000004,
+        "localMs": 12.456707999999708
+      },
+      "usage": 13,
+      "profile": {
+        "version": 2,
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "metric": "cosine",
+        "chunking": "structure",
+        "chunkVersion": 1,
+        "tokenizer": "cl100k_base",
+        "chunkSize": 128,
+        "extension": "0.1.9"
+      },
+      "provenance": {
+        "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "profileKey": "2458a973ba33cefb3309b1d15f9cc90a80f3267cfc194437600bc62ba796a61e"
+      }
+    },
+    {
+      "label": "theseus-revision",
+      "query": "How did the human change their view that physical composition is irrelevant to identity?",
+      "ms": 153.25383299999976,
+      "results": [
+        {
+          "text": "I'm beginning to doubt my earlier claim that physical composition is irrelevant to identity. I think I was too categorical. How would you revise that position?",
+          "signals": {
+            "rrf": 0.03278688524590164,
+            "cosineDistance": 0.24645443260669708,
+            "bm25": -11.545105315395372
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+            "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "b373c764-a223-4e28-a9c8-252646d25466",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc660786-f9be-417c-89ec-a75556c92536",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6fa2f0d-cf45-45a1-b442-37be760d67e5"
+                ],
+                "contribution": {
+                  "blockGuid": "5cc3ded9-2942-4437-acd8-295c6a66af8e",
+                  "ordinal": 11,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 159,
+                "runStart": 0,
+                "runEnd": 159,
+                "chunkStart": 0,
+                "chunkEnd": 159,
+                "textHash": "95a7a64175b03135937970afa3d952dfdedaa65f18efb788093d891abe9cc18c"
+              }
+            ]
+          },
+          "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810"
+        },
+        {
+          "text": "Here's my position: an object remains the same object as long as its history is continuous, even if none of its original material survives. Physical composition is irrelevant to identity.",
+          "signals": {
+            "rrf": 0.03200204813108039,
+            "cosineDistance": 0.4118666648864746,
+            "bm25": -9.434877221502271
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+            "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "1f6ceb47-fc95-4687-ba0a-48d4d9d35824",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9d6619a5-180c-4748-a109-8237ea6f7b16",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:615eefa8-2cd0-4f9f-866f-54e757790b44"
+                ],
+                "contribution": {
+                  "blockGuid": "cce46b92-34f2-4e82-be0f-0096f58b23cb",
+                  "ordinal": 7,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 187,
+                "runStart": 0,
+                "runEnd": 187,
+                "chunkStart": 0,
+                "chunkEnd": 187,
+                "textHash": "ac63bad1317e73a6b5aa166d21929bd71e85f85be4cf2b43801a096ad420a164"
+              }
+            ]
+          },
+          "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810"
+        },
+        {
+          "text": "Yes—the reasoning carries over, but it doesn’t settle which continuity matters. Personal identity shares the ship’s central puzzle: how can one individual persist while its constituents and qualities change? What people add is a potentially competing basis for persistence: a connected mental life.\n\nBiological accounts locate our persistence in the continuing life of the same human organism. Cell turnover is part of that organism’s self-maintenance, not necessarily its replacement. Many cells change, though some—including many neurons—can persist for decades.\n\nPsychological accounts emphasise appropriately caused connections among memories, intentions, dispositions and other mental states. Continuity needn’t mean an unchanged personality or remembering every earlier experience: overlapping connections can link childhood to adulthood without any single memory spanning the whole period.\n\nOrdinarily, these continuities travel together, so your experience fits both accounts. Changing your opinions or temperament is qualitative change; it doesn’t by itself establish a loss of numerical identity. The theories diverge in harder cases, such as profound memory loss or a hypothetical brain transplant.\n\nSo I wouldn’t assume personal identity is fundamentally different, but neither would I simply import our criterion for ships. Persons are living organisms and subjects of experience; artefacts are not. That introduces additional candidate criteria, while questions of responsibility, relationships and concern for our future make the stakes distinctive. Those practical concerns may also depend on more than strict identity.\n\nA revealing test is: if your memories, dispositions and conscious life continued through your brain being transplanted into another body, would you think you had moved—or that someone else had acquired your psychology? That tests which continuity you regard as central, rather than assuming the answer.",
+          "signals": {
+            "rrf": 0.030303030303030304,
+            "cosineDistance": 0.5054259896278381,
+            "bm25": -4.595714403230079
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+            "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "87b4fabb-f628-49fa-abe4-9c2232bd9f65",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9bcce951-56be-4216-aa94-5101f5ef521d"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 298,
+                "runStart": 0,
+                "runEnd": 298,
+                "chunkStart": 0,
+                "chunkEnd": 298,
+                "textHash": "52b77e470dc5f16cfa55e31ab75e6ad11f918b598223725adc30f3bfbb20d359"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "a566664f-4636-430b-8ad9-56a2fb94b104",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d8a349c9-5061-48dd-84a1-60f3e7e3f101",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1518e0c1-70c6-46ec-8cbd-a7050d93081f",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:3b6ef369-bccc-4c40-8b59-d8c3eea96b3c"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 264,
+                "runStart": 0,
+                "runEnd": 264,
+                "chunkStart": 300,
+                "chunkEnd": 564,
+                "textHash": "d18bbe1187e8c87d9edd8580b8be07799bcae8d04b7d81a8930e5e9526032f13"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "b06ae8c1-ca67-4f3d-8d47-dabd05d2a8c3",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d8a349c9-5061-48dd-84a1-60f3e7e3f101",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c7ea74c4-1b1d-4d2a-81d4-05b375fcbd49",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6dfaba2-bb61-4e24-94fb-28bf0725a711"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 330,
+                "runStart": 0,
+                "runEnd": 330,
+                "chunkStart": 566,
+                "chunkEnd": 896,
+                "textHash": "424dea4708cace2533661935256cb06f9c7a8b9025cc3d7ee102fa9532f4b636"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "e71bfcef-9642-4f4c-9962-eeb09fbc37f3",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:df9c7d64-0a22-43a5-b1a6-80f91c754af6"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 311,
+                "runStart": 0,
+                "runEnd": 311,
+                "chunkStart": 898,
+                "chunkEnd": 1209,
+                "textHash": "6edd5ac9849b0f43f62b1e8d86ae405e4287f635c8d996e38a3bd4b84eb44439"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "48b38695-ce9e-4095-95e1-1a7a1ef2976e",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f8982de4-0fd3-4baa-81c1-0f0bc47decdb"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 424,
+                "runStart": 0,
+                "runEnd": 424,
+                "chunkStart": 1211,
+                "chunkEnd": 1635,
+                "textHash": "fbcccd37ff42e9eb1b5c4c0e35a015daaa11d43a38b6f2078c9367a4a37a0de7"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "fe91f2a5-2de9-4eba-af54-d4b872f7525c",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:7722619f-ee33-403d-a7c5-2b34e2bc668f"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 302,
+                "runStart": 0,
+                "runEnd": 302,
+                "chunkStart": 1637,
+                "chunkEnd": 1939,
+                "textHash": "57665cd0442dd911ca0469f4fddae909a5c6383f6370bbc2f33bed0241bf0f6c"
+              }
+            ]
+          },
+          "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810"
+        },
+        {
+          "text": "I’d replace “irrelevant” with “not decisive on its own.” That preserves your central intuition without making every continuous physical transformation count as survival. A revised position might be:\n\nA ship can remain the same individual despite replacement of all its original material. Its identity depends primarily on the causal history through which it is maintained as an organised vessel, rather than on possession of particular planks. Nevertheless, material and structural changes matter when they turn maintenance or repair into destruction and replacement.\n\nThe key distinction is between retaining original matter and preserving an object through changes in matter. Repair can do the latter without doing the former. Burning the ship preserves a causal connection to its remains but not, ordinarily, the ship. And retaining every plank in a pile doesn’t by itself preserve an assembled vessel.\n\nThis also leaves room for temporary loss of function: a ship in dry dock needn’t stop existing because it cannot currently sail. So neither original material nor uninterrupted seaworthiness is the sole test of numerical identity.\n\nI’d present this as a better starting principle, not a complete solution. We still need to explain the boundary between repair and destruction, especially in dismantling and reconstruction cases. But the useful shift is clear: material replacement is compatible with identity; material change is not automatically irrelevant to it.",
+          "signals": {
+            "rrf": 0.030090497737556562,
+            "cosineDistance": 0.5510644912719727,
+            "bm25": -5.336858525068952
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+            "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "007e0eb4-c22c-47a7-8400-1cc0e47410a6",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:52e352e7-2b91-4749-b4b3-06bcd9d082ce"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 198,
+                "runStart": 0,
+                "runEnd": 198,
+                "chunkStart": 0,
+                "chunkEnd": 198,
+                "textHash": "4b5ef952cc8320a9fc1f06b8a0e4449b8c9e6a857aaecf4904692240bb054572"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bf442543-a1d9-4409-bebe-62128a2a94d3",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:3c59b77b-0f9e-406f-b268-4a97392d1f8c"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 367,
+                "runStart": 0,
+                "runEnd": 367,
+                "chunkStart": 200,
+                "chunkEnd": 567,
+                "textHash": "c5c2e3b2f9560a14d6ce3a9c144c0a6316fd1bc862a791a0f96f2de22a5afefe"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "0a768b76-c0dd-414c-ad50-3f907c48fe2a",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:fa31cf24-783b-4cf5-b280-1649f2ff3944"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 336,
+                "runStart": 0,
+                "runEnd": 336,
+                "chunkStart": 569,
+                "chunkEnd": 905,
+                "textHash": "f954488e1cdfbb32ee693af2beda591230bf7b9f6284e41fe34d1d9d27a5b1ce"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "9aaf4cde-1349-4956-8b71-d392f8f66849",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:cb74f586-b652-4634-b920-6bb1eb1a1a11"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 229,
+                "runStart": 0,
+                "runEnd": 229,
+                "chunkStart": 907,
+                "chunkEnd": 1136,
+                "textHash": "25bd280873a6eee6470328bb0f736b4834fcf155b35f8ceba4112dfa6d770089"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "389ed953-f560-4ce5-bdf8-a6e6cc08596d",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:924e4810-40b2-494b-8ab5-47c61ef89f87"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 331,
+                "runStart": 0,
+                "runEnd": 331,
+                "chunkStart": 1138,
+                "chunkEnd": 1469,
+                "textHash": "bc46cd75be19a283d25bb65558a2545c4a9ff9c29d7df50e2c1e494a78ad77b9"
+              }
+            ]
+          },
+          "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810"
+        },
+        {
+          "text": "Could we apply the same reasoning to a person? My body replaces many of its constituent cells over time, and my memories and personality also change. Yet I still regard myself as the same person. Is personal identity fundamentally different from the identity of an artefact?",
+          "signals": {
+            "rrf": 0.030017921146953404,
+            "cosineDistance": 0.411357045173645,
+            "bm25": -2.17963093175941
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+            "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "61add584-2e46-49a9-bddd-8b61259b6219",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9db991b1-3963-4d63-8050-e41d1de518ff",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:0445930d-257f-4b5f-8b0a-ed269fbbb833"
+                ],
+                "contribution": {
+                  "blockGuid": "25eea994-1072-4eea-862d-4a8efb3ed5c6",
+                  "ordinal": 13,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 274,
+                "runStart": 0,
+                "runEnd": 274,
+                "chunkStart": 0,
+                "chunkEnd": 274,
+                "textHash": "971631c134f830bae9ceda88b495fdf666e8485692169973a190cdef571ab77c"
+              }
+            ]
+          },
+          "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810"
+        }
+      ],
+      "evidence": "incomplete-evidence",
+      "answerability": "not-assessed",
+      "coverage": {
+        "complete": false,
+        "candidateLimit": 100,
+        "candidateLimitReached": false,
+        "staleCandidates": 0,
+        "contextSufficiency": "not-assessed",
+        "indexedResources": 2,
+        "knownSavedResources": 2317,
+        "sourceVerification": "exact-saved-file",
+        "unverifiedCandidates": 0,
+        "verifiedResources": 1,
+        "verificationBytes": 1195272
+      },
+      "timing": {
+        "providerMs": 142.6057090000004,
+        "localMs": 9.453082999999424
+      },
+      "usage": 15,
+      "profile": {
+        "version": 2,
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "metric": "cosine",
+        "chunking": "structure",
+        "chunkVersion": 1,
+        "tokenizer": "cl100k_base",
+        "chunkSize": 128,
+        "extension": "0.1.9"
+      },
+      "provenance": {
+        "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "profileKey": "2458a973ba33cefb3309b1d15f9cc90a80f3267cfc194437600bc62ba796a61e"
+      }
+    },
+    {
+      "label": "disposable-added",
+      "query": "Which vessel transports astronomical artefacts to an island?",
+      "ms": 147.49325000000044,
+      "results": [
+        {
+          "text": "The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. \n\nAt the violet harbour, the Zephyr archival vessel carries ceramic astrolabes to the moonlit island.",
+          "signals": {
+            "rrf": 0.03278688524590164,
+            "cosineDistance": 0.5215039253234863,
+            "bm25": -4.677544778271102
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "path": "acceptance-disposable.ink",
+            "format": "legacy-block-tree",
+            "rootBlockId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "sourceHash": "5ca8edcf83445b44fb970faf65be757229f190b28b5962fb0c19e80839acceb1",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                  "63eaf897-68fe-519b-84b6-088f866a4f76"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 966,
+                "runStart": 0,
+                "runEnd": 966,
+                "chunkStart": 0,
+                "chunkEnd": 966,
+                "textHash": "0497ecff4982ede38070ce98977d46c36165233e9b02359639c4be113e9e3880"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                  "e7e099b3-6db0-59ef-aad3-b5766a75ab89"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 99,
+                "runStart": 0,
+                "runEnd": 99,
+                "chunkStart": 968,
+                "chunkEnd": 1067,
+                "textHash": "cb783b22b85aaecede041099212e03e76f65494b5a71f7d9d0526227251fdd14"
+              }
+            ]
+          },
+          "stamp": "e7ef908cf656a368bca9d0d963695f3cd96cc971820904956da3e68b224845b0"
+        }
+      ],
+      "evidence": "incomplete-evidence",
+      "answerability": "not-assessed",
+      "coverage": {
+        "complete": false,
+        "candidateLimit": 100,
+        "candidateLimitReached": false,
+        "staleCandidates": 0,
+        "contextSufficiency": "not-assessed",
+        "indexedResources": 3,
+        "knownSavedResources": 2318,
+        "sourceVerification": "exact-saved-file",
+        "unverifiedCandidates": 0,
+        "verifiedResources": 1,
+        "verificationBytes": 1366
+      },
+      "timing": {
+        "providerMs": 141.0895419999997,
+        "localMs": 5.3292920000003505
+      },
+      "usage": 10,
+      "profile": {
+        "version": 2,
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "metric": "cosine",
+        "chunking": "structure",
+        "chunkVersion": 1,
+        "tokenizer": "cl100k_base",
+        "chunkSize": 128,
+        "extension": "0.1.9"
+      },
+      "provenance": {
+        "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "profileKey": "2458a973ba33cefb3309b1d15f9cc90a80f3267cfc194437600bc62ba796a61e"
+      }
+    }
+  ],
+  "incremental": [
+    {
+      "phase": "added",
+      "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "passages": 1,
+      "embedded": 1,
+      "reused": 0,
+      "planningMs": 5.747041999999965,
+      "providerMs": 194.2072909999997,
+      "publicationMs": 1.0792499999997744,
+      "usage": 178
+    },
+    {
+      "phase": "edited",
+      "oldReferenceRejected": true,
+      "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "passages": 1,
+      "embedded": 1,
+      "reused": 0,
+      "planningMs": 6.110541000000012,
+      "providerMs": 170.91237499999988,
+      "publicationMs": 0.7818340000003445,
+      "usage": 178
+    }
+  ]
+}

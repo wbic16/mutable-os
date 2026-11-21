@@ -1,3 +1,9 @@
+import { presentationEligible } from '../runtime/presentation-eligibility';
+import { passiveFocus } from '../runtime/passive-presentation';
+import {NativeTextProtection} from '../block-tree/text-protection';
+import {inlineAlternativeKey} from '../runtime/inline-alternatives';
+import {compactSelectionHistory} from "../runtime/compact-selection-history";
+import { teiLimits, type TeiLimits } from '../interchange/tei/model';
 import { MarkdownInput } from '../runtime/markdown-input';
 import { GlossRelationshipController } from "../features/gloss/relationship-controller";
 import { GlossController } from "../features/gloss/controller";
@@ -44,9 +50,12 @@ import { createViewId } from "../block-tree/ids";
 import { OccurrenceIndex } from "../block-tree/occurrences";
 import { BlockTreeProjection } from "../block-tree/projection";
 import { BlockRegistry, CommandRegistry } from "../block-tree/registry";
+import { BlockPropertyDefinitionIndex } from "../properties/block-property-definitions";
+import { BlockModeRegistry, validateModeAssignment } from "../block-tree/block-mode-registry";
+import { StandoffPropertyDefinitionIndex } from "../properties/standoff-property-definitions";
 import { CanonicalRepository } from "../block-tree/repository";
 import type { ExistingBlockDto, NodeKey, PlacementKey, ViewId } from "../block-tree/types";
-import { InputGateway } from "../input/gateway";
+import { InputGateway, installInlinePresentationInput } from "../input/gateway";
 import { FocusService } from "../runtime/focus";
 import { MountRegistry } from "../runtime/mounts";
 import { AnnotationRangeEvents } from "../runtime/annotation-range-events";
@@ -112,11 +121,20 @@ export class ReactiveEditor {
   readonly viewChildren: Record<string, string | undefined>;
   readonly setViewChild: (key: string, child?: string) => void;
   private disposeFindInput?: () => void;
+  private disposeInlineInput?: () => void;
   readonly bindings = new BindingRegistry();
   readonly repository: CanonicalRepository;
+  readonly textProtection: NativeTextProtection;
+  private disposeTextProtectionInput?:()=>void;
+  canEditText(key:string){const n=this.node(key);return !n||!this.textProtection.isProtected(n.contentKey);}
   readonly occurrences = new OccurrenceIndex();
   readonly commands: TreeCommands;
   readonly registry = new BlockRegistry();
+  /** Partial declaration indexes; historical property support does not require membership. */
+  readonly blockPropertyTypes = new BlockPropertyDefinitionIndex();
+  readonly teiImportLimits: Readonly<TeiLimits>;
+  readonly blockModes = new BlockModeRegistry();
+  readonly standoffPropertyTypes = new StandoffPropertyDefinitionIndex();
   readonly commandRegistry = new CommandRegistry();
   readonly featureHost = new FeatureHost();
   readonly featureActions = new FeatureActions();
@@ -160,19 +178,51 @@ export class ReactiveEditor {
   readonly multiSelections: MultiSelectionEditor;
   readonly projections = new Map<ViewId, BlockTreeProjection>();
   private gateway?: InputGateway;
+  private disposeCompactSelection?:()=>void;
   private crossInput?: CrossBlockInput;
   private disposeInterchangeStatus?: () => void;
   private disposeClipboardStatus?: () => void;
 
   constructor(dto: ExistingBlockDto | LoadedWorkspace, configuration: ReactiveEditorConfiguration = {}) {
     this.features = resolveFeatureFlags(configuration);
+    this.teiImportLimits = teiLimits(configuration.teiImportLimits);
     this.markdownInput = new MarkdownInput(this);
     this.commandRegistry.register({ id: 'markdown.toggleInput', label: 'Toggle Markdown Input Transformation', canExecute: () => true, execute: () => this.markdownInput.toggle() });
+    this.commandRegistry.register({
+      id: 'inlineAlternative.insert', label: 'Insert Inline Alternative',
+      canExecute: ({ targetKey }) => {
+        const node = this.node(targetKey), range = this.mounts.get(targetKey)?.captureInlineSelection?.();
+        return this.features.inlineAlternatives && !!node && !!this.repository.readState().contents[node.contentKey]?.compactInline && !!range && range.anchor === range.head;
+      },
+      execute: ({ targetKey }) => {
+        const range = this.mounts.get(targetKey)!.captureInlineSelection!()!;
+        this.commands.insertInlineAlternative(targetKey, range.head, [
+          { type: 'standoff-editor-block', text: '', metadata: { name: 'Reading 1' } },
+          { type: 'standoff-editor-block', text: '', metadata: { name: 'Reading 2' } },
+        ]);
+      },
+    });
     registerInputActions(this.bindings);
     const loadedWorkspace = "state" in dto && "references" in dto ? dto as LoadedWorkspace : undefined;
     if ((loadedWorkspace?.localContainer || loadedWorkspace?.manifest?.schemaVersion === 2) && !this.features.mutableWindowManager) throw new Error("Enable the Mutable Window Manager to open a managed Workspace.");
     const decoded = loadedWorkspace ? { state: loadedWorkspace.state } : isHistoryDocument(dto) ? decodeHistoryDocument(dto) : decodeBlockTree(dto as ExistingBlockDto);
-    this.repository = new CanonicalRepository(this.features.reversibleBlocks ? upgradeLegacySurfaces(decoded.state) : decoded.state);
+    this.repository = new CanonicalRepository(this.features.reversibleBlocks ? upgradeLegacySurfaces(decoded.state) : decoded.state, {compactCanonicalText:this.features.compactCanonicalText});
+    this.textProtection = new NativeTextProtection(this.repository);
+    const protectedInput=(event:Event)=>{
+      if(this.textProtection.isTransientInput(event.target))return;
+      const resolved=this.mounts.resolveEvent(event);if(!resolved||this.canEditText(resolved.nodeKey))return;
+      if(event instanceof KeyboardEvent){
+        // Native button activation has the same authority as a pointer click.
+        // Widget guards and canonical admission still protect authored state.
+        if(event.target instanceof HTMLButtonElement&&!event.target.disabled&&['Enter',' '].includes(event.key))return;
+        const command=event.metaKey||event.ctrlKey;
+        if(command?!['x','v'].includes(event.key.toLowerCase()):!(['Backspace','Delete','Enter'].includes(event.key)||event.key.length===1&&!event.altKey))return;
+      }
+      event.preventDefault();event.stopImmediatePropagation();
+    };
+    const inputEvents=['keydown','beforeinput','input','cut','paste','drop','compositionstart','compositionend'];
+    inputEvents.forEach(name=>window.addEventListener(name,protectedInput,true));
+    this.disposeTextProtectionInput=()=>inputEvents.forEach(name=>window.removeEventListener(name,protectedInput,true));
     this.annotationIdentities = new AnnotationIdentities(this.repository);
     registerVisualEffectRenderers(this.visualEffects);
     registerFocusFade(this.visualEffects);
@@ -188,7 +238,14 @@ export class ReactiveEditor {
     }, this.features.caretModes, this.features.readingSpotlight);
     this.pointerSpotlight = new PointerSpotlight(this.visualEffects, this.features.pointerSpotlight, () => this.caretModes.select('normal'), this.caretModes.active);
     this.viewVisibility = new ViewVisibility(this.repository);
-    this.commands = new TreeCommands(this.repository, (key) => this.occurrences.resolve(key));
+    this.commands = new TreeCommands(this.repository, (key) => {
+      if(this.isPassiveOccurrence(key)) throw new Error('Open source to edit this composition.');
+      return this.occurrences.resolve(key);
+    }, key=>{
+      const contentKey=this.node(key)?.contentKey??this.repository.readState().placements[key]?.contentKey;
+      if(contentKey&&this.textProtection.isProtected(contentKey))throw Error('Base content is protected; annotations remain available.');
+    }, key => {const cell=this.node(key),owner=cell?.editingInlineOwner&&this.node(cell.editingInlineOwner);if(!owner)return;const index=owner.inlineContent.indexOf(key);return index<0?undefined:{placementKey:owner.placementKey,index};}, () => this.features.inlineAlternativeInteroperability);
+    this.commandRegistry.authoringAllowed = (key,id) => ['workspace.presentation.desktop','workspace.presentation.textual'].includes(id) || !this.isPassiveOccurrence(key) && !passiveFocus();
     this.textRanges = new TextRanges(key => {
       const node = this.node(key), content = node && this.repository.readState().contents[node.contentKey];
       if (!node || !content || !["standoff-editor-block", "plain-text-block", ...sourceTextTypes].includes(node.viewType)) return;
@@ -222,6 +279,7 @@ export class ReactiveEditor {
       this.selections,
       (nodeKey) => this.node(nodeKey),
     );
+    if(this.features.compactCanonicalText)this.disposeCompactSelection=compactSelectionHistory(this);
     this.repository.subscribeBeforeChanges((label) => {
       this.selectionGestures.cancelGesture();
       this.crossText.beforeChange();
@@ -254,6 +312,12 @@ export class ReactiveEditor {
       queueMicrotask(() => this.overlays.closeMissingOwners((nodeKey) => !!this.node(nodeKey)));
       if (this.blockSelection.state.items.length) queueMicrotask(() => this.blockSelection.prune());
     });
+  }
+
+  readonly passiveViews = new Set<string>();
+  isPassiveOccurrence(key: string): boolean {
+    for (const id of this.passiveViews) if (this.projections.get(id)?.state.nodes[key]) return true;
+    return false;
   }
 
   createView(
@@ -291,7 +355,9 @@ export class ReactiveEditor {
       this.mounts.releaseOccurrence(key);
       this.setViewChild(key, undefined);
     }
+    for(const choice of Object.keys(this.viewChildren))if([...keys].some(key=>choice.startsWith(key+'/inline-alternative/')))this.setViewChild(choice,undefined);
     projection.dispose();
+    this.passiveViews.delete(projection.viewId);
     this.projections.delete(projection.viewId);
   }
 
@@ -335,14 +401,25 @@ export class ReactiveEditor {
     this.viewVisibility.set(node.placementKey, true);
   }
 
+  /** Explicit semantic authoring. Registry availability never governs loading. */
+  setBlockMode(key: NodeKey, mode: string | undefined): void {
+    if (!this.features.blockModes) throw Error('Block Mode authoring is disabled');
+    const node = this.node(key);
+    if (!node || ['text-cell', 'image-cell'].includes(node.viewType)) throw Error('Select an authored Block');
+    validateModeAssignment(this.blockModes, node.viewType, mode);
+    this.commands.setPayloadField(key, 'mode', mode, mode === undefined ? 'Clear Block Mode' : 'Set Block Mode');
+  }
+
   installGateway(document: Document): () => void {
     this.disposeInterchangeStatus?.();
     this.disposeInterchangeStatus = this.features.documentInterchange ? installInterchangeStatus(document, this.interchange) : undefined;
     this.gateway?.dispose();
     this.crossInput?.dispose();
     this.disposeFindInput?.();
+    this.disposeInlineInput?.();
     this.disposeClipboardStatus?.();
     if (this.features.mutableClipboard || this.features.documentInterchange) this.disposeClipboardStatus = installClipboardStatus(document, this.clipboard);
+    this.disposeInlineInput = installInlinePresentationInput(document,this.mounts);
     this.disposeFindInput = this.find.install(document);
     const disposeSelectionGestures = this.selectionGestures.install(document);
     this.crossInput = new CrossBlockInput(this, document);
@@ -376,13 +453,16 @@ export class ReactiveEditor {
       () => this.completionInput,
       key => { const target=this.surfaces.wholeBlockKey(key); return this.surfaces.confirmDelete([target])?target:undefined; },
       this.markdownInput,
+      message => this.crossText.notice(message),
+      event => inlineAlternativeKey(this,event),
     );
     const dispose = this.gateway.install();
     const crossInput = this.crossInput;
     const disposeFind = this.disposeFindInput;
+    const disposeInlineInput = this.disposeInlineInput;
     const disposeClipboardStatus = this.disposeClipboardStatus;
     const disposeInterchangeStatus = this.disposeInterchangeStatus;
-    return () => { disposeInterchangeStatus?.(); disposeClipboardStatus?.(); disposeFind(); disposeSelectionGestures(); crossInput.dispose(); dispose(); };
+    return () => { disposeInlineInput?.(); disposeInterchangeStatus?.(); disposeClipboardStatus?.(); disposeFind(); disposeSelectionGestures(); crossInput.dispose(); dispose(); };
   }
 
   node(nodeKey: NodeKey) {
@@ -398,77 +478,55 @@ export class ReactiveEditor {
   }
 
   adjacentSibling(nodeKey: NodeKey, direction: -1 | 1) {
-    for (const projection of this.projections.values()) {
-      if (!projection.state.nodes[nodeKey]) continue;
-      for (const parent of Object.values(projection.state.nodes)) {
-        const index = parent.children.indexOf(nodeKey);
-        if (index >= 0) return projection.state.nodes[parent.children[index + direction]];
-      }
-    }
-    return undefined;
+    const node = this.node(nodeKey), projection = node && this.projections.get(node.viewId);
+    const parent = projection?.parentOf(nodeKey);
+    const index = parent?.children.indexOf(nodeKey) ?? -1;
+    return index >= 0 ? projection!.state.nodes[parent!.children[index + direction]] : undefined;
   }
 
   adjacentEditable(nodeKey: NodeKey, direction: -1 | 1) {
-    for (const projection of this.projections.values()) {
-      const origin = projection.state.nodes[nodeKey];
-      if (!origin) continue;
-      const parent = new Map<NodeKey, NodeKey>();
-      for (const candidate of Object.values(projection.state.nodes)) {
-        candidate.children.forEach((child) => parent.set(child, candidate.key));
-        Object.values(candidate.ownedRelations).forEach((child) => parent.set(child, candidate.key));
-      }
-      let scope = origin;
-      let cursor: NodeKey | undefined = origin.key;
-      while (cursor) {
-        const candidate = projection.state.nodes[cursor];
-        if (candidate && ["document-block", "left-margin-block", "right-margin-block"].includes(candidate.viewType)) {
-          scope = candidate;
-          break;
-        }
-        cursor = parent.get(cursor);
-      }
-      const ordered: typeof origin[] = [];
-      const visit = (key: NodeKey) => {
-        const candidate = projection.state.nodes[key];
-        if (!candidate) return;
-        const registration = this.registry.resolve(candidate.viewType);
-        const mount = this.mounts.get(candidate.key);
-        const hidden = mount?.root.closest('[hidden], [aria-hidden="true"]');
-        if (
-          mount &&
-          !hidden &&
-          (registration?.capabilities.includes("inline-editor") ||
-            registration?.capabilities.includes("native-text"))
-        ) {
-          ordered.push(candidate);
-        }
-        candidate.children.forEach(visit);
-      };
-      visit(scope.key);
-      const index = ordered.findIndex((candidate) => candidate.key === nodeKey);
-      if (index >= 0) return ordered[index + direction];
+    const origin = this.node(nodeKey);
+    if (!origin) return;
+    const projection = this.projections.get(origin.viewId)!;
+    let scope = origin;
+    for (let current: typeof origin | undefined = origin; current; current = projection.parentOf(current.key)) {
+      if (["document-block", "left-margin-block", "right-margin-block"].includes(current.viewType)) { scope = current; break; }
     }
-    return undefined;
+    // Traverse only the adjacent structural branches, never inline Cell records.
+    const edge = (key: NodeKey): typeof origin | undefined => {
+      const node = projection.state.nodes[key];
+      if (!node || !presentationEligible(this, key)) return;
+      const capabilities = this.registry.resolve(node.viewType)?.capabilities;
+      const editable = capabilities?.includes('inline-editor') || capabilities?.includes('native-text');
+      if (direction === 1 && editable) return node;
+      const children = direction === 1 ? node.children : [...node.children].reverse();
+      for (const child of children) { const found = edge(child); if (found) return found; }
+      if (editable) return node;
+    };
+    if (direction === 1) for (const child of origin.children) { const found = edge(child); if (found) return found; }
+    for (let current = origin; current.key !== scope.key;) {
+      const parent = projection.parentOf(current.key); if (!parent) return;
+      const index = parent.children.indexOf(current.key);
+      // Named relations are independent navigation regions, not ordinary children.
+      if (index < 0) return;
+      for (let i = index + direction; i >= 0 && i < parent.children.length; i += direction) {
+        const found = edge(parent.children[i]); if (found) return found;
+      }
+      if (direction === -1 && parent.key !== scope.key) {
+        const caps = this.registry.resolve(parent.viewType)?.capabilities;
+        if (presentationEligible(this, parent.key) && (caps?.includes('inline-editor') || caps?.includes('native-text'))) return parent;
+      }
+      current = parent;
+    }
   }
 
   focusFallback(nodeKey: NodeKey): NodeKey | undefined {
-    for (const projection of this.projections.values()) {
-      const node = projection.state.nodes[nodeKey];
-      if (!node) continue;
-      for (const parent of Object.values(projection.state.nodes)) {
-        const index = parent.children.indexOf(nodeKey);
-        if (index >= 0) {
-          if (!this.concertina.state.owner) return parent.children[index + 1] ?? parent.children[index - 1] ?? parent.key;
-          const visible = (key: NodeKey) => {
-            const root = this.mounts.get(key)?.root;
-            return root && !root.closest('[hidden], [aria-hidden="true"]');
-          };
-          return [parent.children[index + 1], parent.children[index - 1], parent.key].find(key => key && visible(key));
-        }
-        if (Object.values(parent.ownedRelations).includes(nodeKey)) return parent.key;
-      }
-    }
-    return undefined;
+    const node = this.node(nodeKey), projection = node && this.projections.get(node.viewId);
+    const parent = projection?.parentOf(nodeKey);
+    if (!parent) return;
+    const index = parent.children.indexOf(nodeKey);
+    const candidates = index >= 0 ? [parent.children[index + 1], parent.children[index - 1], parent.key] : [parent.key];
+    return candidates.find(key => key && presentationEligible(this, key));
   }
 
   encodeDocument(): ExistingBlockDto {
@@ -524,6 +582,7 @@ export class ReactiveEditor {
   }
 
   dispose(): void {
+    this.disposeTextProtectionInput?.();this.textProtection.dispose();
     this.tables.dispose();
     this.tabs.dispose();
     this.viewCloseGuards.clear();
@@ -540,7 +599,12 @@ export class ReactiveEditor {
     this.decorations.dispose();
     this.persistence.dispose();
     this.featureHost.dispose();
+    this.blockModes.dispose();
+    this.blockPropertyTypes.dispose();
+    this.standoffPropertyTypes.dispose();
+    this.linkedAnnotations.dispose();
     this.disposeFindInput?.();
+    this.disposeInlineInput?.();
     this.stickyNotes.dispose();
     this.concertina.dispose();
     this.find.dispose();
@@ -553,6 +617,7 @@ export class ReactiveEditor {
     this.blockClipboard.dismiss();
     this.blockSelection.clear();
     this.bindings.dispose();
+    this.disposeCompactSelection?.();
     this.gateway?.dispose();
     this.focus.dispose();
     this.annotationEvents.dispose();

@@ -1,3 +1,4 @@
+import type { TeiLimits } from './interchange/tei/model';
 /**
  * Application feature switches.
  *
@@ -15,6 +16,25 @@
  * disabled unless a host or dedicated demo explicitly enables it.
  */
 export type FeatureFlags = Readonly<{
+  /** Dialectic conversational chrome and progress feedback. */
+  dialecticConversationUpdates: boolean;
+  dialecticSemanticsWorkspace: boolean;
+  dialecticSemanticRefresh: boolean;
+  dcpEntityEnrichment: boolean;
+  authorityCache: boolean;
+  /** Optional contribution-boundary saves, independent of conversation chrome. */
+  dialecticAutosave: boolean;
+  /** Independent native conversations and background responses. */
+  dialecticMultiSession: boolean;
+  dialecticAttachments: boolean;
+  dialecticArtifacts: boolean;
+  dialecticImageGeneration: boolean;
+  /** Isolated title utility; never a conversational contribution. */
+  dialecticAutomaticTitles: boolean;
+  /** Bounded native text flows. Opt-in pending browser qualification. */
+  virtualTextFlows: boolean;
+  /** Explicit Block Mode authoring; retained data and safety do not depend on this flag. */
+  blockModes: boolean;
   /** Lezer-derived, session-only syntax on standoff CodeBlocks. */
   standoffCodeHighlighting: boolean;
   markdownInputTransformation: boolean;
@@ -48,6 +68,8 @@ export type FeatureFlags = Readonly<{
   phextDocuments: boolean;
   /** Cavern application services, durable preparation jobs and bounded host execution. */
   applicationServices: boolean;
+  /** Typed Pipeline runs and Entity identity resolution carousel. */
+  pipelineManager: boolean;
   /** Explicit reviewed static publication; independent of ordinary editing. */
   webPublishing: boolean;
   /** Semantic external HTML through the shared Mutable clipboard pipeline. */
@@ -69,10 +91,15 @@ export type FeatureFlags = Readonly<{
   iiifResourceLoaders: boolean;
   /** Explicit global Cavern setup and startup lifecycle. */
   cavernStartup: boolean;
+  /** Bounded browser-local Save/connection evidence; no document content. */
+  browserSaveDiagnostics: boolean;
   /** Generic Desktop Window maximize/restore; normal geometry is retained. */
   windowMaximize: boolean;
   /** Composite Document application; transient tabs share canonical content. */
+  quill: boolean;
   flint: boolean;
+  /** Scry slash commands for activating Flint and choosing a native Document. */
+  flintSlashCommands: boolean;
   /** Compact HTML shell, resizable panels and local editor-density preferences. */
   flintCompactShell: boolean;
   /** Vault-scoped list of the ten most recently opened Documents. */
@@ -97,8 +124,19 @@ export type FeatureFlags = Readonly<{
   presentationProbe: boolean;
   /** Live sculptural entity graph in the normal Flint application. */
   flintSpatialGraph: boolean;
+  /** Selected at native admission; false retains legacy loading. Never converts a live Document. */
+  compactCanonicalText: boolean;
+  /** Creation/import of native one-position owned inline alternatives. */
+  inlineAlternatives: boolean;
+  /** Native clipboard and qualified structural operations for compact alternatives. */
+  inlineAlternativeInteroperability: boolean;
   /** Per-resource native/Markdown persistence through the managed server store. */
   nativeDocumentPersistence: boolean;
+  teiImport: boolean;
+  /** Rich TEI alternatives, exact points and editorial semantics on new imports. */
+  teiSemanticSublimation: boolean;
+  /** Local TEI relationships and semantic navigation; no external knowledge writes. */
+  teiOperationalSemantics: boolean;
   /** Persistent Library listings with background filesystem reconciliation. */
   vaultDiscoveryCache: boolean;
   /** Accepted loaded-resource provider; false retains the legacy rollback. */
@@ -107,12 +145,57 @@ export type FeatureFlags = Readonly<{
   nativeKnowledgeSaved: boolean;
   /** Vault-owned saved SQLite lifecycle only; does not change query/Entity providers. */
   sqliteKnowledge: boolean;
+  /** Internal consent-gated retrieval service; no Scry/Dialectic UI integration. */
+  derivedRetrieval: boolean;
+  /** User-facing retrieval; uploads still require persistent explicit consent. */
+  semanticRetrieval: boolean;
   /** Canonical vault Entity resolver. Disabling never resumes legacy writes. */
   sqliteEntities: boolean;
   /** Typed canonical temporal, assertion and observation services. */
   sqliteSemanticServices: boolean;
   /** Native Proposition authoring with vault-scoped canonical SQLite persistence. */
   thesis: boolean;
+  /** Native Block conversations with explicit context and a deterministic mock assistant. */
+  dialectic: boolean;
+  /** Native contribution effects and historical notices beside committed content. */
+  dialecticContributionActivity: boolean;
+  dialecticLargeImageConsent: boolean;
+  dialecticSmallerImage: boolean;
+  dialecticSemanticContents: boolean;
+  /** Validated structured mock exchanges; no live provider or Stage 4B authoring. */
+  dialecticDcp: boolean;
+  /** Bounded discovery of admitted DCP authoring capabilities. */
+  /** Experimental alternative provider dialect; native persistence is unchanged. */
+  dcpXmlAuthoring: boolean;
+  /** Read-only fragment display before atomic native admission. */
+  dcpXmlStreaming: boolean;
+  dcpCapabilityCatalogue: boolean;
+  /** Exchange-local authoring selection; no persistent settings or UI. */
+  dcpVocabularySelection: boolean;
+  /** Derived committed semantic context and declarative passage targets. */
+  dcpProactiveSemanticAuthoring: boolean;
+  dcpSemanticWorkspace: boolean;
+  /** Native heading/grid/media/annotation projections and bounded inspection. */
+  dcpNativeAuthoringStage1: boolean;
+  /** Stage 2A text configuration, literal code/source and curated formatting. Requires Stage 1. */
+  dcpNativeAuthoringStage2Text: boolean;
+  /** Shared native list/task and layout authoring. Requires Stage 1. */
+  dcpNativeAuthoringStage2Layouts: boolean;
+  /** Native Surface/tab/page/margin projections, within a contribution. Requires Stage 1. */
+  dcpNativeAuthoringStage2Compounds: boolean;
+  dcpNativeAuthoringStage2Widgets: boolean;
+  /** Existing managed images through current same-Document DCP source authority. */
+  dcpNativeAuthoringStage3ManagedImages: boolean;
+  /** Ordinary external image/video/embed composition; no acquisition. */
+  dcpNativeAuthoringStage3ExternalMedia: boolean;
+  /** Current-source binding to a verified retained native PDF capture. */
+  dcpNativeAuthoringStage3RetainedPdf: boolean;
+  dialecticProviders: boolean;
+  dialecticProviderContinuity: boolean;
+  /** Temporary local wire/contribution diagnostics; disable after DCP qualification. */
+  dcpTestPhaseLogging: boolean;
+  nativeTextProtection: boolean;
+  scopedSemantics: boolean;
   /** Cardex shell and local Entity Card authoring. */
   cardex: boolean;
   cardexIncrement2: boolean;
@@ -171,6 +254,19 @@ export type FeatureFlags = Readonly<{
 }>;
 
 export const featureFlags: FeatureFlags = Object.freeze({
+  dialecticConversationUpdates: true,
+  dialecticSemanticsWorkspace: true,
+  dialecticSemanticRefresh: true,
+  dcpEntityEnrichment: true,
+  authorityCache: true,
+  dialecticAutosave: false,
+  dialecticMultiSession: true,
+  dialecticAttachments: true,
+  dialecticArtifacts: true,
+  dialecticImageGeneration: true,
+  dialecticAutomaticTitles: true,
+  virtualTextFlows: true,
+  blockModes: true,
   standoffCodeHighlighting: true,
   markdownInputTransformation: true,
   verticalTabs: true,
@@ -188,6 +284,7 @@ export const featureFlags: FeatureFlags = Object.freeze({
   documentInterchange: true,
   phextDocuments: true,
   applicationServices: true,
+  pipelineManager: true,
   webPublishing: true,
   externalHtmlClipboard: true,
   markdownClipboard: true,
@@ -202,8 +299,11 @@ export const featureFlags: FeatureFlags = Object.freeze({
   deterministicAcademicResources: true,
   iiifResourceLoaders: true,
   cavernStartup: true,
+  browserSaveDiagnostics: true,
   windowMaximize: true,
+  quill: true,
   flint: true,
+  flintSlashCommands: true,
   flintCompactShell: true,
   flintRecentDocuments: true,
   phosphor: true,
@@ -216,14 +316,47 @@ export const featureFlags: FeatureFlags = Object.freeze({
   flintProbe: false,
   presentationProbe: false,
   flintSpatialGraph: true,
+  compactCanonicalText: true,
+  inlineAlternatives: true,
+  inlineAlternativeInteroperability: true,
   nativeDocumentPersistence: true,
+  teiImport: true,
+  teiSemanticSublimation: true,
+  teiOperationalSemantics: true,
   vaultDiscoveryCache: true,
   nativeKnowledge: true,
   nativeKnowledgeSaved: false,
   sqliteKnowledge: true,
+  derivedRetrieval: true,
+  semanticRetrieval: true,
   sqliteEntities: true,
   sqliteSemanticServices: true,
   thesis: true,
+  dialectic: true,
+  dialecticContributionActivity: true,
+  dialecticLargeImageConsent: true,
+  dialecticSmallerImage: true,
+  dialecticSemanticContents: true,
+  dialecticDcp: true,
+  dcpXmlAuthoring: true,
+  dcpXmlStreaming: true,
+  dcpCapabilityCatalogue: true,
+  dcpVocabularySelection: true,
+  dcpProactiveSemanticAuthoring: true,
+  dcpSemanticWorkspace: true,
+  dcpNativeAuthoringStage1: true,
+  dcpNativeAuthoringStage2Text: true,
+  dcpNativeAuthoringStage2Layouts: true,
+  dcpNativeAuthoringStage2Compounds: true,
+  dcpNativeAuthoringStage2Widgets: true,
+  dcpNativeAuthoringStage3ManagedImages: true,
+  dcpNativeAuthoringStage3ExternalMedia: true,
+  dcpNativeAuthoringStage3RetainedPdf: true,
+  dialecticProviders: true,
+  dialecticProviderContinuity: true,
+  dcpTestPhaseLogging: false,
+  nativeTextProtection: true,
+  scopedSemantics: true,
   cardex: true,
   cardexIncrement2: true,
   legacyCodexImport: true,
@@ -263,6 +396,8 @@ export const featureFlags: FeatureFlags = Object.freeze({
 
 export type ReactiveEditorConfiguration = {
   features?: Partial<FeatureFlags>;
+  /** Explicit import budgets; unrelated to clipboard and typing. */
+  teiImportLimits?: Partial<TeiLimits>;
 };
 
 export function resolveFeatureFlags(configuration: ReactiveEditorConfiguration = {}): FeatureFlags {

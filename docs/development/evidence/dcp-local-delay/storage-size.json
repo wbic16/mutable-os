@@ -1,0 +1,13 @@
+{
+  "minifiedDocumentBytes": 371128,
+  "embeddedDcpDiagnosticBytes": 261305,
+  "diagnosticComponents": {
+    "request": 187174,
+    "provider": 31705,
+    "tools": 8520,
+    "response": 13692,
+    "identityMap": 7625,
+    "annotationRefs": 8759,
+    "xmlBindings": 3270
+  }
+}

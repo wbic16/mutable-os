@@ -1,6 +1,10 @@
 import {safeUrl} from './inline-values.mjs';
 export {safeUrl} from './inline-values.mjs';
 import type { JsonObject } from '../block-tree/types';
+import { isReadingRelation, validateAlternativeSlot, type InlineAlternativeProperties } from '../block-tree/inline-alternative';
+import { validateCapabilities } from './capabilities';
+import { transferSemanticPointers } from './semantic-transfer';
+import { clone } from '../block-tree/clone';
 
 export type Reference = { kind: 'local'; object: 'block' | 'definition' | 'asset'; id: string }
   | { kind: 'external'; object: 'block' | 'definition' | 'entity' | 'asset'; id: string; source: { cavernId?: string; resourceId?: string } }
@@ -8,10 +12,11 @@ export type Reference = { kind: 'local'; object: 'block' | 'definition' | 'asset
 export interface Property {
   localId: string; type: string; startIndex: number; endIndex: number; isZeroWidth: boolean;
   affinity?: 'before' | 'after'; attributes: JsonObject; target?: Reference;
+  pointEndOffset?: -1;
 }
 export interface FragmentBlock {
   localId: string; type: string; data: JsonObject;
-  inline?: { atoms: Array<{ kind: 'text'; text: string } | { kind: 'embed'; embed: string }>; properties: Property[] };
+  inline?: { atoms: Array<{ kind: 'text'; text: string } | { kind: 'embed'; embed: string } | { kind: 'alternative'; properties: InlineAlternativeProperties; displayReading?: number }>; properties: Property[] };
   blockProperties: Array<{ localId: string; type: string; attributes: JsonObject; target?: Reference }>;
   children: string[]; relations: Record<string, string>;
 }
@@ -25,6 +30,7 @@ export interface MutableFragment {
   embeds: Array<{ localId: string; type: string; asset?: Reference; data: JsonObject }>;
   assets: Array<{ localId: string; source: JsonObject; mediaType?: string }>;
   provenance?: { cavernId?: string; resourceId?: string; producer?: string };
+  requiredCapabilities?: string[];
 }
 export interface InterchangeScope { cavernId?: string; resourceId?: string }
 export const LIMITS = { bytes: 8 * 1024 * 1024, cells: 200000, blocks: 10000, properties: 20000, depth: 64, opaque: 256 * 1024 };
@@ -52,6 +58,14 @@ export function fragmentGroup(f: MutableFragment, roots: MutableFragment['roots'
   for (const b of f.blocks) if (blocks.has(b.localId)) for (const p of [...b.blockProperties, ...b.inline?.properties ?? []]) target(p.target);
   const links = f.links.filter(l => l.from.object === 'block' && blocks.has(l.from.id)); links.forEach(l => target(l.to));
   for (const d of f.definitions) if (definitions.has(d.localId)) target(d.target);
+  const scan=(value:unknown)=>transferSemanticPointers(clone(value),(kind,id)=>{
+    if(kind==='definition')definitions.add(id);
+    else if(!blocks.has(id))throw Error('A disjoint clipboard group references another group. Paste into one selection to preserve that relationship.');
+    return id;
+  },f.provenance??{});
+  for(const b of f.blocks)if(blocks.has(b.localId)){scan(b.data);for(const p of [...b.blockProperties,...b.inline?.properties??[]])scan(p.attributes);for(const a of b.inline?.atoms??[])if(a.kind==='alternative'&&a.properties.metadata)scan(a.properties.metadata);}
+  const dm=new Map(f.definitions.map(d=>[d.localId,d]));
+  for(const id of definitions){const d=dm.get(id);if(d){scan(d.attributes);target(d.target);}}
   for (const e of f.embeds) if (embeds.has(e.localId)) target(e.asset);
   return validateFragment({ ...f, roots: roots.map((r, i) => ({ ...r, separatorAfter: i < roots.length - 1 ? r.separatorAfter : undefined })).map(r => Object.fromEntries(Object.entries(r).filter(([, v]) => v !== undefined))), blocks: f.blocks.filter(b => blocks.has(b.localId)), placements: f.placements.filter(p => edges.has(p.localId)), definitions: f.definitions.filter(d => definitions.has(d.localId)), links, embeds: f.embeds.filter(e => embeds.has(e.localId)), assets: f.assets.filter(a => assets.has(a.localId)) });
 }
@@ -73,6 +87,7 @@ export function validateFragment(input: unknown): MutableFragment {
   data(input);
   if (new TextEncoder().encode(JSON.stringify(input)).length > LIMITS.bytes) throw Error('Clipboard data exceeds the size limit.');
   const f = input as MutableFragment;
+  validateCapabilities(f.requiredCapabilities);
   function assert(ok: unknown, message = 'Invalid Mutable clipboard fragment.'): asserts ok { if (!ok) throw Error(message); }
   const str = (v: unknown) => typeof v === 'string' && v.length > 0 && v.length <= 1024;
   const obj = (v: unknown) => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -90,7 +105,10 @@ export function validateFragment(input: unknown): MutableFragment {
       assert(obj(b.inline) && Array.isArray(b.inline.atoms) && Array.isArray(b.inline.properties));
       for (const a of b.inline.atoms) {
         assert(obj(a));
-        assert(a.kind === 'text' ? typeof a.text === 'string' : a.kind === 'embed' && ids.get(a.embed) === 'embed');
+        if(a.kind==='alternative') {
+          validateAlternativeSlot(a.properties);
+          assert(a.displayReading===undefined || Number.isInteger(a.displayReading)&&a.displayReading>=0&&a.displayReading<a.properties.readings.length);
+        } else assert(a.kind === 'text' ? typeof a.text === 'string' : a.kind === 'embed' && ids.get(a.embed) === 'embed');
       }
       const length = lengthOf(b); cells += length;
       for (const p of b.inline.properties) {
@@ -98,6 +116,7 @@ export function validateFragment(input: unknown): MutableFragment {
         assert(str(p.type) && obj(p.attributes) && Number.isInteger(p.startIndex) && Number.isInteger(p.endIndex) && p.startIndex >= 0 && p.endIndex <= length);
         assert(typeof p.isZeroWidth === 'boolean' && (p.isZeroWidth ? p.startIndex === p.endIndex : p.startIndex < p.endIndex));
         assert(p.affinity === undefined || p.affinity === 'before' || p.affinity === 'after');
+        assert(p.pointEndOffset===undefined||p.isZeroWidth&&p.pointEndOffset===-1);
         if (p.target) references.push(p.target);
       }
     }
@@ -118,6 +137,23 @@ export function validateFragment(input: unknown): MutableFragment {
   }
   const placements = new Map(f.placements.map(p => [p.localId, p]));
   const blocks = new Map(f.blocks.map(b => [b.localId, b]));
+  const readingOwners = new Set<string>();
+  for(const b of f.blocks) {
+    const relations = new Set<string>(), slots = new Set<string>();
+    for(const a of b.inline?.atoms??[]) if(a.kind==='alternative') {
+      assert(!slots.has(a.properties.id),'Duplicate alternative slot identity.'); slots.add(a.properties.id);
+      for(const name of a.properties.readings) {
+        assert(!relations.has(name),'Shared inline reading relation.'); relations.add(name);
+        const p=placements.get(b.relations[name]), reading=p?.target.kind==='local'?blocks.get(p.target.id):undefined;
+        assert(p?.kind==='owned' && reading?.type==='standoff-editor-block' && reading.inline && !reading.children.length && Object.keys(reading.relations).every(isReadingRelation) && !reading.data.opaqueRelations,'Invalid native inline reading closure.');
+        assert(!readingOwners.has(reading.localId),'Shared inline reading ownership.'); readingOwners.add(reading.localId);
+      }
+    }
+    assert(Object.keys(b.relations).filter(isReadingRelation).every(name=>relations.has(name)),'Orphan inline reading relation.');
+  }
+  const ownerCounts=new Map<string,number>();
+  for(const p of f.placements)if(p.kind==='owned'&&p.target.kind==='local')ownerCounts.set(p.target.id,(ownerCounts.get(p.target.id)??0)+1);
+  for(const id of readingOwners) assert(ownerCounts.get(id)===1,'Inline reading has multiple owners.');
   const visiting = new Set<string>(), visited = new Set<string>(), edges = new Set<string>();
   const walk = (id: string, depth: number) => {
     assert(depth <= LIMITS.depth && !visiting.has(id), 'Cyclic clipboard ownership.');

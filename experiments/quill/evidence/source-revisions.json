@@ -1,0 +1,197 @@
+{
+  "inspectedOn": "2026-11-21",
+  "repositories": [
+    {
+      "repo": "chenglou/pretext",
+      "branch": "main",
+      "pushedAt": "2026-11-19T01:45:50Z",
+      "archived": false,
+      "license": "NOASSERTION",
+      "commit": "6ed1edd294698374ab2fb0d3eb36276527084879",
+      "repositoryUrl": "https://github.com/chenglou/pretext/tree/6ed1edd294698374ab2fb0d3eb36276527084879"
+    },
+    {
+      "repo": "foliojs/textkit",
+      "branch": "master",
+      "pushedAt": "2019-02-21T17:36:11Z",
+      "archived": false,
+      "commit": "2f8963734a1e04d078cfea390192e130999387b6",
+      "repositoryUrl": "https://github.com/foliojs/textkit/tree/2f8963734a1e04d078cfea390192e130999387b6"
+    },
+    {
+      "repo": "diegomura/react-pdf",
+      "branch": "master",
+      "pushedAt": "2026-11-16T21:15:53Z",
+      "archived": false,
+      "license": "MIT",
+      "commit": "f765c957902eb1f0d15b1571d6f61e5818e8bc50",
+      "repositoryUrl": "https://github.com/diegomura/react-pdf/tree/f765c957902eb1f0d15b1571d6f61e5818e8bc50"
+    },
+    {
+      "repo": "svgdotjs/svg.js",
+      "branch": "master",
+      "pushedAt": "2026-08-04T07:48:43Z",
+      "archived": false,
+      "license": "NOASSERTION",
+      "commit": "4b8809b1554c44a84f8992cdbda60480336cc040",
+      "repositoryUrl": "https://github.com/svgdotjs/svg.js/tree/4b8809b1554c44a84f8992cdbda60480336cc040"
+    },
+    {
+      "repo": "charming-art/charming",
+      "branch": "main",
+      "pushedAt": "2026-11-19T05:02:16Z",
+      "archived": false,
+      "license": "MIT",
+      "commit": "91db8115a88d1e093fcfc045b9ba14afb4730406",
+      "repositoryUrl": "https://github.com/charming-art/charming/tree/91db8115a88d1e093fcfc045b9ba14afb4730406"
+    },
+    {
+      "repo": "visioncortex/xsvg",
+      "branch": "main",
+      "pushedAt": "2026-11-19T19:01:29Z",
+      "archived": false,
+      "license": "MIT",
+      "commit": "48ec313160babbef86ff4352d3059f27b5eccfda",
+      "repositoryUrl": "https://github.com/visioncortex/xsvg/tree/48ec313160babbef86ff4352d3059f27b5eccfda"
+    },
+    {
+      "repo": "asuramaya/hector-vector",
+      "branch": "main",
+      "pushedAt": "2026-09-05T06:27:57Z",
+      "archived": false,
+      "license": "MIT",
+      "commit": "42f0427f0122d38b51f16a6eae5fb6b9808200b0",
+      "repositoryUrl": "https://github.com/asuramaya/hector-vector/tree/42f0427f0122d38b51f16a6eae5fb6b9808200b0"
+    },
+    {
+      "repo": "Pixerate/editor",
+      "branch": "main",
+      "pushedAt": "2026-11-21T00:26:58Z",
+      "archived": false,
+      "license": "MIT",
+      "commit": "21e6276362f37f27b9438bf2b532e4bb83515e5f",
+      "repositoryUrl": "https://github.com/Pixerate/editor/tree/21e6276362f37f27b9438bf2b532e4bb83515e5f",
+      "manifest": {
+        "name": "@pixerate/editor",
+        "version": "0.343.0",
+        "dependencies": {},
+        "peerDependencies": {
+          "@dagrejs/dagre": "^1.1.8",
+          "@tiptap/core": "^2.27.3",
+          "@tiptap/extension-character-count": "^2.27.3",
+          "@tiptap/extension-color": "^2.27.3",
+          "@tiptap/extension-highlight": "^2.27.3",
+          "@tiptap/extension-image": "^2.27.3",
+          "@tiptap/extension-link": "^2.27.3",
+          "@tiptap/extension-mention": "^2.27.3",
+          "@tiptap/extension-placeholder": "^2.27.3",
+          "@tiptap/extension-subscript": "^2.27.3",
+          "@tiptap/extension-superscript": "^2.27.3",
+          "@tiptap/extension-table": "^2.27.3",
+          "@tiptap/extension-table-cell": "^2.27.3",
+          "@tiptap/extension-table-header": "^2.27.3",
+          "@tiptap/extension-table-row": "^2.27.3",
+          "@tiptap/extension-task-item": "^2.27.3",
+          "@tiptap/extension-task-list": "^2.27.3",
+          "@tiptap/extension-text-align": "^2.27.3",
+          "@tiptap/extension-text-style": "^2.27.3",
+          "@tiptap/extension-typography": "^2.27.3",
+          "@tiptap/extension-underline": "^2.27.3",
+          "@tiptap/pm": "^2.27.3",
+          "@tiptap/starter-kit": "^2.27.3",
+          "@tiptap/suggestion": "^2.27.3",
+          "markdown-it": "^15.0.3",
+          "markdown-it-task-lists": "^2.1.1",
+          "prosemirror-markdown": "^1.13.9",
+          "three": ">=0.184.0"
+        },
+        "peerDependenciesMeta": {
+          "@dagrejs/dagre": {
+            "optional": true
+          },
+          "@tiptap/core": {
+            "optional": true
+          },
+          "@tiptap/extension-character-count": {
+            "optional": true
+          },
+          "@tiptap/extension-color": {
+            "optional": true
+          },
+          "@tiptap/extension-highlight": {
+            "optional": true
+          },
+          "@tiptap/extension-image": {
+            "optional": true
+          },
+          "@tiptap/extension-link": {
+            "optional": true
+          },
+          "@tiptap/extension-mention": {
+            "optional": true
+          },
+          "@tiptap/extension-placeholder": {
+            "optional": true
+          },
+          "@tiptap/extension-subscript": {
+            "optional": true
+          },
+          "@tiptap/extension-superscript": {
+            "optional": true
+          },
+          "@tiptap/extension-table": {
+            "optional": true
+          },
+          "@tiptap/extension-table-cell": {
+            "optional": true
+          },
+          "@tiptap/extension-table-header": {
+            "optional": true
+          },
+          "@tiptap/extension-table-row": {
+            "optional": true
+          },
+          "@tiptap/extension-task-item": {
+            "optional": true
+          },
+          "@tiptap/extension-task-list": {
+            "optional": true
+          },
+          "@tiptap/extension-text-align": {
+            "optional": true
+          },
+          "@tiptap/extension-text-style": {
+            "optional": true
+          },
+          "@tiptap/extension-typography": {
+            "optional": true
+          },
+          "@tiptap/extension-underline": {
+            "optional": true
+          },
+          "@tiptap/pm": {
+            "optional": true
+          },
+          "@tiptap/starter-kit": {
+            "optional": true
+          },
+          "@tiptap/suggestion": {
+            "optional": true
+          },
+          "markdown-it": {
+            "optional": true
+          },
+          "markdown-it-task-lists": {
+            "optional": true
+          },
+          "prosemirror-markdown": {
+            "optional": true
+          },
+          "three": {
+            "optional": true
+          }
+        }
+      }
+    }
+  ]
+}

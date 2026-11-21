@@ -1,3 +1,5 @@
+import {stickyNoteDto} from '../block-tree/note-authoring';
+export {stickyNoteDto} from '../block-tree/note-authoring';
 import { createStore, unwrap } from "solid-js/store";
 import type { ExistingBlockDto, NodeKey } from "../block-tree/types";
 import type { ReactiveEditor } from "../reactive-editor/editor";
@@ -10,14 +12,6 @@ export interface StickyNoteDraft {
   parentKey: NodeKey;
   position: { x: number; y: number };
   size: { width: number; height: number };
-}
-
-export function stickyNoteDto(text = ""): ExistingBlockDto {
-  return {
-    id: crypto.randomUUID(), type: "sticky-note-block",
-    metadata: { colour: "yellow", material: "paper", overflowMode: "scroll", fontStep: 0 },
-    children: [{ id: crypto.randomUUID(), type: "standoff-editor-block", text, standoffProperties: [], children: [] }],
-  };
 }
 
 export function stickyWindowDto(text: string, position: StickyNoteDraft["position"], size: StickyNoteDraft["size"]): ExistingBlockDto {

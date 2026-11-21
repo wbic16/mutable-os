@@ -73,11 +73,16 @@ export class ConcertinaService {
   }
 
   presentation(nodeKey: NodeKey) {
+    this.state.revision;
     const derived = this.derivation;
     if (!derived) return { hidden: false, matched: false };
-    const node = this.editor.node(nodeKey);
-    const root = node && this.editor.mounts.get(nodeKey)?.root;
-    return { hidden: !!root?.closest("[data-concertina-hidden]"), matched: derived.matching.has(nodeKey) };
+    let node = this.editor.node(nodeKey);
+    const projection = node && this.editor.projections.get(node.viewId);
+    while (node) {
+      if (derived.hiddenBranchRoots.has(node.key)) return { hidden: true, matched: derived.matching.has(nodeKey) };
+      node = projection?.parentOf(node.key);
+    }
+    return { hidden: false, matched: derived.matching.has(nodeKey) };
   }
 
   deactivate(owner?: string, retainClaim = false) {

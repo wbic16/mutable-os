@@ -76,3 +76,13 @@ test('legacy UTF-16 source ranges convert to verified scalar boundaries without 
 test('mention filtering searches the displayed excerpt rather than invisible distant Block text',t=>{
  const {db,call}=fixture(t),entity=call(blank()).entity,d=documentFixture(db,entity.id,{segments:1});db.prepare('UPDATE Block SET text=? WHERE guid=?').run('Hello Ada'+' '.repeat(200)+'Distant term',d.block);assert.equal(call({op:'mentions',id:entity.id,query:'Ada'}).rows.length,1);assert.equal(call({op:'mentions',id:entity.id,query:'Distant'}).rows.length,0);
 });
+
+test('canonical Entity and authority lookups expose the saved Cardex image without extra mutations',t=>{
+ const {db,call,entities}=fixture(t),imageRef={kind:'managed',cavernId:'test-cavern',assetId:'sha256:'+'a'.repeat(64)};
+ const record=call({...blank('Portrait'),imageRef}).entity;
+ db.prepare('INSERT INTO ExternalIdentity(guid,entityGuid,resourceGuid,namespace,externalKey,attributes) VALUES(?,?,?,?,?,?)').run(uuid(),record.id,uuid(),'wikidata','Q762','{}');
+ const before=db.prepare('SELECT count(*) AS n FROM PendingAuditMutation').get().n;
+ assert.deepEqual(entities({op:'get',id:record.id}).entity.imageRef,imageRef);
+ assert.deepEqual(entities({op:'authority-lookup',record:{provider:'wikidata',id:'Q762'}}).entity.imageRef,imageRef);
+ assert.equal(db.prepare('SELECT count(*) AS n FROM PendingAuditMutation').get().n,before);
+});

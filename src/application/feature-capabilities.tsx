@@ -35,6 +35,7 @@ export function blockFeatureCapabilities(editor: ReactiveEditor, scope: FeatureS
     };
     const runtime: BlockRuntime = {
       nodeKey: key,
+      authoredStateProtected: () => !editor.canEditText(key),
       scale: () => coordinates?.scale() ?? 1,
       contextMenuOpen: () => mounted && editor.overlays.overlays.some(item => item.ownerKey === key && item.viewType === "context-menu"),
       openContextMenu(point) {

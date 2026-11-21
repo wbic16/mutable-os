@@ -1,0 +1,1313 @@
+[
+  {
+    "query": "physical composition identity",
+    "strategy": "hybrid",
+    "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+    "started": 1794633818261,
+    "completed": 1794633818477,
+    "data": {
+      "results": [
+        {
+          "text": "Here's my position: an object remains the same object as long as its history is continuous, even if none of its original material survives. Physical composition is irrelevant to identity.",
+          "signals": {
+            "rrf": 0.03252247488101534,
+            "cosineDistance": 0.4077519476413727,
+            "bm25": -6.1774699003264235
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "1f6ceb47-fc95-4687-ba0a-48d4d9d35824",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9d6619a5-180c-4748-a109-8237ea6f7b16",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:615eefa8-2cd0-4f9f-866f-54e757790b44"
+                ],
+                "contribution": {
+                  "blockGuid": "cce46b92-34f2-4e82-be0f-0096f58b23cb",
+                  "ordinal": 7,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 187,
+                "runStart": 0,
+                "runEnd": 187,
+                "chunkStart": 0,
+                "chunkEnd": 187,
+                "textHash": "ac63bad1317e73a6b5aa166d21929bd71e85f85be4cf2b43801a096ad420a164"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "I'm beginning to doubt my earlier claim that physical composition is irrelevant to identity. I think I was too categorical. How would you revise that position?",
+          "signals": {
+            "rrf": 0.03252247488101534,
+            "cosineDistance": 0.44527867436408997,
+            "bm25": -6.276112725530638
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "b373c764-a223-4e28-a9c8-252646d25466",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc660786-f9be-417c-89ec-a75556c92536",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6fa2f0d-cf45-45a1-b442-37be760d67e5"
+                ],
+                "contribution": {
+                  "blockGuid": "5cc3ded9-2942-4437-acd8-295c6a66af8e",
+                  "ordinal": 11,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 159,
+                "runStart": 0,
+                "runEnd": 159,
+                "chunkStart": 0,
+                "chunkEnd": 159,
+                "textHash": "95a7a64175b03135937970afa3d952dfdedaa65f18efb788093d891abe9cc18c"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "Use search_symposium to find my earlier positions about physical composition and identity, including my later doubt and your objections or qualifications. Read the relevant returned sources, then briefly compare how the position changed, citing the earlier contributions. Two paragraphs are enough.",
+          "signals": {
+            "rrf": 0.03149801587301587,
+            "cosineDistance": 0.601087749004364,
+            "bm25": -5.921528080361761
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "e371621c-25f5-4328-9a4c-abae6a6c22f0",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9a29d608-c9a7-4833-a895-81b59b0df607",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:82fadb2a-fb3b-4e63-988d-b45637b92774"
+                ],
+                "contribution": {
+                  "blockGuid": "7b1a702b-f6e0-4e25-8763-2f45fc9fd69b",
+                  "ordinal": 20,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 298,
+                "runStart": 0,
+                "runEnd": 298,
+                "chunkStart": 0,
+                "chunkEnd": 298,
+                "textHash": "8040c763b06c6b4d69aee6a379d9b97f19f4960ef2bca931d0f767064097f50d"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "Could we apply the same reasoning to a person? My body replaces many of its constituent cells over time, and my memories and personality also change. Yet I still regard myself as the same person. Is personal identity fundamentally different from the identity of an artefact?",
+          "signals": {
+            "rrf": 0.030798389007344232,
+            "cosineDistance": 0.5825153589248657,
+            "bm25": -0.6386488088775332
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "61add584-2e46-49a9-bddd-8b61259b6219",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9db991b1-3963-4d63-8050-e41d1de518ff",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:0445930d-257f-4b5f-8b0a-ed269fbbb833"
+                ],
+                "contribution": {
+                  "blockGuid": "25eea994-1072-4eea-862d-4a8efb3ed5c6",
+                  "ordinal": 13,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 274,
+                "runStart": 0,
+                "runEnd": 274,
+                "chunkStart": 0,
+                "chunkEnd": 274,
+                "textHash": "971631c134f830bae9ceda88b495fdf666e8485692169973a190cdef571ab77c"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "I’m sympathetic to giving historical continuity priority, but I’d separate two claims: original material need not survive, and physical composition is irrelevant. The first doesn’t establish the second. Material and structural changes might affect whether an object survives, even if no particular plank is indispensable.\n\nConsider a ship gradually consumed by fire. There’s an uninterrupted causal history connecting the vessel to the resulting ash, but we ordinarily say the ship was destroyed—not that it became a ship made of ash. That puts pressure on continuity alone as a sufficient condition for numerical identity: causal succession can connect an object to its remains without preserving the object.\n\nYour view could distinguish identity-preserving continuity from mere causal succession. But then it needs an independent account of that distinction; otherwise “its history remains continuous” risks meaning “it continues to be the same object.” Preserving an organised whole through repairs is one possible answer, though that gives physical organisation a role again.\n\nWhat, on your account, distinguishes replacing the ship’s planks from burning it—without already assuming which process preserves the ship?",
+          "signals": {
+            "rrf": 0.030330882352941176,
+            "cosineDistance": 0.6598919034004211,
+            "bm25": -4.659701485306435
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "607cfdad-9607-4379-b0f2-fa8413aa6f32",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:73a2cbf0-968c-4159-bd5a-2e7007496f8f"
+                ],
+                "contribution": {
+                  "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+                  "ordinal": 8,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 321,
+                "runStart": 0,
+                "runEnd": 321,
+                "chunkStart": 0,
+                "chunkEnd": 321,
+                "textHash": "71408f03e74b814c7c6083f956c1ebc81486e5dfd80282c160c97b670f2ba1cf"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "a255bc30-d869-40d6-a652-f33562e76633",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc68af9b-6c72-402c-8438-6361c831c646"
+                ],
+                "contribution": {
+                  "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+                  "ordinal": 8,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 386,
+                "runStart": 0,
+                "runEnd": 386,
+                "chunkStart": 323,
+                "chunkEnd": 709,
+                "textHash": "b319a5e765705c148f31f6fa27ac21e3702b15ed8fc7402d9733a8b32942ab66"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bd6fb13f-442d-4dd8-a4fc-39736994d3bc",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c8d71a11-770b-4d94-989b-431b511ef3e0"
+                ],
+                "contribution": {
+                  "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+                  "ordinal": 8,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 368,
+                "runStart": 0,
+                "runEnd": 368,
+                "chunkStart": 711,
+                "chunkEnd": 1079,
+                "textHash": "ef3b82c59f941bb25dc08bc2c021b91e61f11e4c11af3738e9e419127db33829"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "46b8d4a1-978d-453f-a507-cbdc2be79749",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:6118982b-81c4-4732-9750-82bbd6025e6a"
+                ],
+                "contribution": {
+                  "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+                  "ordinal": 8,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 139,
+                "runStart": 0,
+                "runEnd": 139,
+                "chunkStart": 1081,
+                "chunkEnd": 1220,
+                "textHash": "731b36ec643646fcddfa0c705a3c0d3deee3063162796ecb40c5a97bc6129270"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "I'm wondering whether the word 'same' is doing too much work here. Perhaps numerical identity and qualitative identity are quite different things. That seems like a distinction that could change the whole discussion.",
+          "signals": {
+            "rrf": 0.03007688828584351,
+            "cosineDistance": 0.6515495777130127,
+            "bm25": -0.6564956213300643
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "5b9170c6-6ce3-4569-8871-0354ee06fdb3",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:6a03861a-7b9f-44f5-8c4c-23ae6224e426",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dff2fbba-1123-4ac2-81c8-7c8ec499bf12"
+                ],
+                "contribution": {
+                  "blockGuid": "47dcf723-9bb3-40e3-889c-4558dce093ad",
+                  "ordinal": 5,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 216,
+                "runStart": 0,
+                "runEnd": 216,
+                "chunkStart": 0,
+                "chunkEnd": 216,
+                "textHash": "ca6743d1c117c654b1b704b07331f7b888b6c2372c3d556cbb6a65874967176c"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "Yes—that distinction separates being one and the same thing from being alike. It changes how we should frame the puzzle.\n\nNumerical identity: there is just one individual, considered at different times or under different descriptions. A ship can acquire a new mast or colour without necessarily becoming another ship.\n\nQualitative identity: things share the same qualities—strictly, all relevant qualitative properties; in ordinary speech, often just the features we’re comparing. Two separately built ships might look exactly alike yet still be two ships.\n\nSo the Ship of Theseus can change qualitatively while, arguably, remaining numerically identical. Conversely, a replica can preserve its design without preserving its individual identity. Our earlier discussion of materials and function concerns possible criteria for persistence, not interchangeable meanings of identity.\n\nThe distinction clarifies the problem but doesn’t dissolve it. If the continuously repaired ship and the ship reassembled from discarded planks both exist, they cannot both be numerically identical to the original: that would make them identical to each other. The sharpened question is: what makes either later ship the original individual, rather than merely a successor or duplicate?",
+          "signals": {
+            "rrf": 0.029877369007803793,
+            "cosineDistance": 0.6306142210960388,
+            "bm25": -0.6087088460432959
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "40daf5a8-28b7-48d5-b8ee-1c2c6a10f848",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dd555c66-a145-4490-8b95-3190f931facc",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f196ad55-bc81-41e4-9566-7305a694efda"
+                ],
+                "contribution": {
+                  "blockGuid": "9e47f423-35b4-4a7b-b10e-ac0dada33488",
+                  "ordinal": 6,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 120,
+                "runStart": 0,
+                "runEnd": 120,
+                "chunkStart": 0,
+                "chunkEnd": 120,
+                "textHash": "bc757cfaf88bfed50cb89dc5cd3d95a91063dacd5b056c4b0304a088d7340336"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "286ad861-844c-441b-b1e7-5d13a932335c",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dd555c66-a145-4490-8b95-3190f931facc",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ce2e9524-de25-4b4b-b71f-a3215593c979",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:fb2cb020-3450-4e7c-a56a-a21e5785274a",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:a6964a00-0cd6-4dbd-b309-a066e751dab1"
+                ],
+                "contribution": {
+                  "blockGuid": "9e47f423-35b4-4a7b-b10e-ac0dada33488",
+                  "ordinal": 6,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 195,
+                "runStart": 0,
+                "runEnd": 195,
+                "chunkStart": 122,
+                "chunkEnd": 317,
+                "textHash": "637ab8e745113b17e5ed9759efb6de91d53698b4d9c3332083b2030e0222cfd5"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "cee5909a-db1d-40db-82c7-f1fa7cfa9f79",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dd555c66-a145-4490-8b95-3190f931facc",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ce2e9524-de25-4b4b-b71f-a3215593c979",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ac518281-4dd7-461f-af25-fc11badbaca6",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:a1d35e22-7634-4d82-93a9-a6cb1678fe4e"
+                ],
+                "contribution": {
+                  "blockGuid": "9e47f423-35b4-4a7b-b10e-ac0dada33488",
+                  "ordinal": 6,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 237,
+                "runStart": 0,
+                "runEnd": 237,
+                "chunkStart": 319,
+                "chunkEnd": 556,
+                "textHash": "2fc234f477aedfb37cd27c71ea204a654a78d88d576d9be88da93a3458d04bd2"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "e975bc4a-664d-4981-9c07-7ba2dc825c91",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dd555c66-a145-4490-8b95-3190f931facc",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:bcc665d2-6130-45e4-ba17-55d7f1947948"
+                ],
+                "contribution": {
+                  "blockGuid": "9e47f423-35b4-4a7b-b10e-ac0dada33488",
+                  "ordinal": 6,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 322,
+                "runStart": 0,
+                "runEnd": 322,
+                "chunkStart": 558,
+                "chunkEnd": 880,
+                "textHash": "a398ac36fbdd79af1fd26c4bbd2cb9db9a18a17ef30aea6ac0ade29c052524b5"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "98b3a3f5-b98e-4904-b89d-ad9758399b15",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dd555c66-a145-4490-8b95-3190f931facc",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:cb240954-afe4-46fc-ba4a-af27ec884c89"
+                ],
+                "contribution": {
+                  "blockGuid": "9e47f423-35b4-4a7b-b10e-ac0dada33488",
+                  "ordinal": 6,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 386,
+                "runStart": 0,
+                "runEnd": 386,
+                "chunkStart": 882,
+                "chunkEnd": 1268,
+                "textHash": "d7adcf209a70f753682ad4f7795732a8f83a686a37f2d80f284ecef3a1cd74d9"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "I’d replace “irrelevant” with “not decisive on its own.” That preserves your central intuition without making every continuous physical transformation count as survival. A revised position might be:\n\nA ship can remain the same individual despite replacement of all its original material. Its identity depends primarily on the causal history through which it is maintained as an organised vessel, rather than on possession of particular planks. Nevertheless, material and structural changes matter when they turn maintenance or repair into destruction and replacement.\n\nThe key distinction is between retaining original matter and preserving an object through changes in matter. Repair can do the latter without doing the former. Burning the ship preserves a causal connection to its remains but not, ordinarily, the ship. And retaining every plank in a pile doesn’t by itself preserve an assembled vessel.\n\nThis also leaves room for temporary loss of function: a ship in dry dock needn’t stop existing because it cannot currently sail. So neither original material nor uninterrupted seaworthiness is the sole test of numerical identity.\n\nI’d present this as a better starting principle, not a complete solution. We still need to explain the boundary between repair and destruction, especially in dismantling and reconstruction cases. But the useful shift is clear: material replacement is compatible with identity; material change is not automatically irrelevant to it.",
+          "signals": {
+            "rrf": 0.02946912242686891,
+            "cosineDistance": 0.7055444717407227,
+            "bm25": -2.0318478480851248
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "007e0eb4-c22c-47a7-8400-1cc0e47410a6",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:52e352e7-2b91-4749-b4b3-06bcd9d082ce"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 198,
+                "runStart": 0,
+                "runEnd": 198,
+                "chunkStart": 0,
+                "chunkEnd": 198,
+                "textHash": "4b5ef952cc8320a9fc1f06b8a0e4449b8c9e6a857aaecf4904692240bb054572"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bf442543-a1d9-4409-bebe-62128a2a94d3",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:3c59b77b-0f9e-406f-b268-4a97392d1f8c"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 367,
+                "runStart": 0,
+                "runEnd": 367,
+                "chunkStart": 200,
+                "chunkEnd": 567,
+                "textHash": "c5c2e3b2f9560a14d6ce3a9c144c0a6316fd1bc862a791a0f96f2de22a5afefe"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "0a768b76-c0dd-414c-ad50-3f907c48fe2a",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:fa31cf24-783b-4cf5-b280-1649f2ff3944"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 336,
+                "runStart": 0,
+                "runEnd": 336,
+                "chunkStart": 569,
+                "chunkEnd": 905,
+                "textHash": "f954488e1cdfbb32ee693af2beda591230bf7b9f6284e41fe34d1d9d27a5b1ce"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "9aaf4cde-1349-4956-8b71-d392f8f66849",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:cb74f586-b652-4634-b920-6bb1eb1a1a11"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 229,
+                "runStart": 0,
+                "runEnd": 229,
+                "chunkStart": 907,
+                "chunkEnd": 1136,
+                "textHash": "25bd280873a6eee6470328bb0f736b4834fcf155b35f8ceba4112dfa6d770089"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "389ed953-f560-4ce5-bdf8-a6e6cc08596d",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:56b7fe97-b94d-4e48-8422-71a7c8ec9bcf",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:924e4810-40b2-494b-8ab5-47c61ef89f87"
+                ],
+                "contribution": {
+                  "blockGuid": "253df462-22fb-44e6-9185-50775a2a730e",
+                  "ordinal": 12,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 331,
+                "runStart": 0,
+                "runEnd": 331,
+                "chunkStart": 1138,
+                "chunkEnd": 1469,
+                "textHash": "bc46cd75be19a283d25bb65558a2545c4a9ff9c29d7df50e2c1e494a78ad77b9"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "Yes—the reasoning carries over, but it doesn’t settle which continuity matters. Personal identity shares the ship’s central puzzle: how can one individual persist while its constituents and qualities change? What people add is a potentially competing basis for persistence: a connected mental life.\n\nBiological accounts locate our persistence in the continuing life of the same human organism. Cell turnover is part of that organism’s self-maintenance, not necessarily its replacement. Many cells change, though some—including many neurons—can persist for decades.\n\nPsychological accounts emphasise appropriately caused connections among memories, intentions, dispositions and other mental states. Continuity needn’t mean an unchanged personality or remembering every earlier experience: overlapping connections can link childhood to adulthood without any single memory spanning the whole period.\n\nOrdinarily, these continuities travel together, so your experience fits both accounts. Changing your opinions or temperament is qualitative change; it doesn’t by itself establish a loss of numerical identity. The theories diverge in harder cases, such as profound memory loss or a hypothetical brain transplant.\n\nSo I wouldn’t assume personal identity is fundamentally different, but neither would I simply import our criterion for ships. Persons are living organisms and subjects of experience; artefacts are not. That introduces additional candidate criteria, while questions of responsibility, relationships and concern for our future make the stakes distinctive. Those practical concerns may also depend on more than strict identity.\n\nA revealing test is: if your memories, dispositions and conscious life continued through your brain being transplanted into another body, would you think you had moved—or that someone else had acquired your psychology? That tests which continuity you regard as central, rather than assuming the answer.",
+          "signals": {
+            "rrf": 0.028850145288501453,
+            "cosineDistance": 0.6506667733192444,
+            "bm25": -0.5526266783812427
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "87b4fabb-f628-49fa-abe4-9c2232bd9f65",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9bcce951-56be-4216-aa94-5101f5ef521d"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 298,
+                "runStart": 0,
+                "runEnd": 298,
+                "chunkStart": 0,
+                "chunkEnd": 298,
+                "textHash": "52b77e470dc5f16cfa55e31ab75e6ad11f918b598223725adc30f3bfbb20d359"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "a566664f-4636-430b-8ad9-56a2fb94b104",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d8a349c9-5061-48dd-84a1-60f3e7e3f101",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1518e0c1-70c6-46ec-8cbd-a7050d93081f",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:3b6ef369-bccc-4c40-8b59-d8c3eea96b3c"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 264,
+                "runStart": 0,
+                "runEnd": 264,
+                "chunkStart": 300,
+                "chunkEnd": 564,
+                "textHash": "d18bbe1187e8c87d9edd8580b8be07799bcae8d04b7d81a8930e5e9526032f13"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "b06ae8c1-ca67-4f3d-8d47-dabd05d2a8c3",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d8a349c9-5061-48dd-84a1-60f3e7e3f101",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c7ea74c4-1b1d-4d2a-81d4-05b375fcbd49",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6dfaba2-bb61-4e24-94fb-28bf0725a711"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 330,
+                "runStart": 0,
+                "runEnd": 330,
+                "chunkStart": 566,
+                "chunkEnd": 896,
+                "textHash": "424dea4708cace2533661935256cb06f9c7a8b9025cc3d7ee102fa9532f4b636"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "e71bfcef-9642-4f4c-9962-eeb09fbc37f3",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:df9c7d64-0a22-43a5-b1a6-80f91c754af6"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 311,
+                "runStart": 0,
+                "runEnd": 311,
+                "chunkStart": 898,
+                "chunkEnd": 1209,
+                "textHash": "6edd5ac9849b0f43f62b1e8d86ae405e4287f635c8d996e38a3bd4b84eb44439"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "48b38695-ce9e-4095-95e1-1a7a1ef2976e",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f8982de4-0fd3-4baa-81c1-0f0bc47decdb"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 424,
+                "runStart": 0,
+                "runEnd": 424,
+                "chunkStart": 1211,
+                "chunkEnd": 1635,
+                "textHash": "fbcccd37ff42e9eb1b5c4c0e35a015daaa11d43a38b6f2078c9367a4a37a0de7"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "fe91f2a5-2de9-4eba-af54-d4b872f7525c",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ff6876e8-d1c0-402d-ab35-ce7b4c3f0ac4",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:7722619f-ee33-403d-a7c5-2b34e2bc668f"
+                ],
+                "contribution": {
+                  "blockGuid": "e7db604e-282f-486c-959b-b66164b9d511",
+                  "ordinal": 14,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 302,
+                "runStart": 0,
+                "runEnd": 302,
+                "chunkStart": 1637,
+                "chunkEnd": 1939,
+                "textHash": "57665cd0442dd911ca0469f4fddae909a5c6383f6370bbc2f33bed0241bf0f6c"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "Returning to the original ship, do you think our discussion of personal identity has changed the way we should understand the difference between material continuity and historical continuity?",
+          "signals": {
+            "rrf": 0.02857142857142857,
+            "cosineDistance": 0.695526659488678,
+            "bm25": -0.5604658226566002
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "96b285b3-b992-41ad-a5a6-365a02a3a994",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:fd99610a-8fcf-4060-8174-364d719d0426",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:4d6ddb54-c21f-4df5-a0e9-d52dd8e63fd7"
+                ],
+                "contribution": {
+                  "blockGuid": "168cd252-1119-46f3-9b04-1ddb444e51f7",
+                  "ordinal": 17,
+                  "author": "human",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                    "kind": "human",
+                    "name": "Local author"
+                  }
+                },
+                "start": 0,
+                "end": 191,
+                "runStart": 0,
+                "runEnd": 191,
+                "chunkStart": 0,
+                "chunkEnd": 191,
+                "textHash": "c85f2c8a31ec5dd552fe5e6363487792885e093a6bc40db967aa0ec8c4613bbf"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "Yes—it has sharpened the distinction rather than overturned it. The main lesson from personal identity is that “continuity” names several relationships that ordinarily coincide but can come apart. We shouldn’t treat historical continuity as a single, self-explanatory alternative to matter.\n\nMaterial continuity tracks the persistence of constituent matter. Historical continuity, in the sense we’ve favoured, tracks how an organised object develops through maintenance, repair and change. But the original planks have histories too. So the contrast isn’t really matter versus history; it’s the history of the components versus the continuing history of the vessel as a whole.\n\nThe personal case makes that clearer. Continuing as an organism and retaining psychological connections are both historical processes, not simply competing amounts of original material. Memory loss can separate them without automatically settling which constitutes the person’s persistence. Likewise, the two ships separate continuity of the maintained vessel from the provenance of its timber.\n\nThat develops our earlier proposal: the question is not merely whether there is a continuous history, but what that history preserves. For the ship, I still favour continuity through repair of the organised vessel. Yet we owe an explanation of why that relationship preserves the individual while the timber’s separate history does not; simply calling one history “the ship’s history” would assume the answer.\n\nSo the analogy strengthens a method, not a universal criterion: distinguish the continuities first, then argue which matters for the kind of thing under discussion. It doesn’t establish that persons and ships must persist in the same way.",
+          "signals": {
+            "rrf": 0.02782608695652174,
+            "cosineDistance": 0.6812483072280884,
+            "bm25": -0.2897363780009605
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "863fdc20-43da-4e60-ae4d-86495742fde8",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d51d32a1-e043-48f4-bde2-4bd223671093"
+                ],
+                "contribution": {
+                  "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+                  "ordinal": 18,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 290,
+                "runStart": 0,
+                "runEnd": 290,
+                "chunkStart": 0,
+                "chunkEnd": 290,
+                "textHash": "9d4582359dd62857edc55e61ff2812575dd796aa6d393721bb6c3d87ce877781"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "9aa5f689-8b02-4db5-8208-a06264c69a57",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f82987c1-645c-47ce-ad8a-44435fc36ab5"
+                ],
+                "contribution": {
+                  "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+                  "ordinal": 18,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 384,
+                "runStart": 0,
+                "runEnd": 384,
+                "chunkStart": 292,
+                "chunkEnd": 676,
+                "textHash": "64cef9cb72e54061e142a0d46fdf368e6fbafd528951014a17d79ca7189367f5"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "5a3bc2e5-827d-4d4a-8de6-6d38201113f7",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:989d6e64-b7ae-4056-bce7-10ab731043a2"
+                ],
+                "contribution": {
+                  "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+                  "ordinal": 18,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 394,
+                "runStart": 0,
+                "runEnd": 394,
+                "chunkStart": 678,
+                "chunkEnd": 1072,
+                "textHash": "e191e4d4a2162c1900661beffeb6479d28e65cd580e56b802c9c1f4ba566f627"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "3dc2312b-945e-4b91-80d9-cabbe1caf343",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d98c908f-44fe-4eb8-a88c-af4d49edaa32"
+                ],
+                "contribution": {
+                  "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+                  "ordinal": 18,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 409,
+                "runStart": 0,
+                "runEnd": 409,
+                "chunkStart": 1074,
+                "chunkEnd": 1483,
+                "textHash": "7e3f47f4df34bf8c47cc5ea79c09d2e128b1e197dfc6158a0f3f2ce3c1a4bf86"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bd679ae9-9eef-4ebc-9f1d-0e8fd49b1e18",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:c6b6249a-f631-4c36-b6e7-4df3f72704d2",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:d9da5633-40fb-4955-bc89-ccf783678188"
+                ],
+                "contribution": {
+                  "blockGuid": "ec4246b7-ff72-4eb5-9990-48aeff8923df",
+                  "ordinal": 18,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 238,
+                "runStart": 0,
+                "runEnd": 238,
+                "chunkStart": 1485,
+                "chunkEnd": 1723,
+                "textHash": "af401580280345565cfb2e46df58f140ade897dd3832d9c3abcc277d59833750"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        },
+        {
+          "text": "For keeping a ship in service, I’d give functional continuity more weight. Replacing rotten timber preserves what the ship enables people to do. For conserving a historical artifact, material continuity may matter more: original timber provides evidence of its construction and past. So “matters more” partly depends on what we’re trying to preserve.\n\nBut usefulness and identity are different questions. A ship that becomes unseaworthy can still be that very ship—just damaged or retired. Conversely, a newly built vessel can perform exactly the same function without being the same individual ship. Function alone is therefore neither necessary nor sufficient for identity.\n\nFor the identity question, I’d put causal-historical continuity ahead of either criterion alone: does the later vessel arise through the repair and transformation of this particular earlier vessel? That allows both replacement of material and interruptions in use, without treating every seaworthy replica as the original.\n\nA useful test is a ship converted into a permanently moored museum. Its sailing function is gone, but would you say the ship itself has ceased to exist—or that the same ship now serves a different purpose?",
+          "signals": {
+            "rrf": 0.027417840375586856,
+            "cosineDistance": 0.721470832824707,
+            "bm25": -0.5583590338626968
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "path": "Conversation on November 11, 2026 (3).ink",
+            "format": "mutable-document",
+            "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+            "sourceHash": "79e87ba7a7c9620e3895755a3591c3d3ac11b42aaddfacf59ec90fb30eca8469",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "b1ca452f-d9f4-4a42-bd0d-5425d5f689b0",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:6f87490b-bcee-483f-a48f-ee9ca72c6a48"
+                ],
+                "contribution": {
+                  "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+                  "ordinal": 4,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 350,
+                "runStart": 0,
+                "runEnd": 350,
+                "chunkStart": 0,
+                "chunkEnd": 350,
+                "textHash": "aebe3141ec2a13c2493104e700338f75cd436e39aa6c8e1037a939e74308681f"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "c6185760-934e-45d3-92f9-de287ab26c87",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:5c54c3f3-6387-4dff-b489-dc4861ef7f17"
+                ],
+                "contribution": {
+                  "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+                  "ordinal": 4,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 323,
+                "runStart": 0,
+                "runEnd": 323,
+                "chunkStart": 352,
+                "chunkEnd": 675,
+                "textHash": "05f884c75f0e7e9a9487c0fe5535d162925266120f87cc8f658d962efbcd4d5a"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "3e63945b-b0f7-4faa-b4a5-c7d0248c39fb",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:2b71f658-c69c-45cc-bc86-d8254f2cb9af"
+                ],
+                "contribution": {
+                  "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+                  "ordinal": 4,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 322,
+                "runStart": 0,
+                "runEnd": 322,
+                "chunkStart": 677,
+                "chunkEnd": 999,
+                "textHash": "4a5b077a6c6597bc7cf0878fd6b4c850a990db62d28121233c011d587f5027c1"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "c3ccf189-8c94-4d3c-a518-40aa53fa0d10",
+                "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:ed51b509-b62c-4b49-abc6-59db898c0ab8",
+                  "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:8f2d0689-2326-4cc7-b751-58e5e7c703dc"
+                ],
+                "contribution": {
+                  "blockGuid": "4ed3672a-4f1b-4992-98c7-5bf1726982a2",
+                  "ordinal": 4,
+                  "author": "ai",
+                  "participant": {
+                    "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                    "kind": "ai",
+                    "name": "AI participant"
+                  }
+                },
+                "start": 0,
+                "end": 205,
+                "runStart": 0,
+                "runEnd": 205,
+                "chunkStart": 1001,
+                "chunkEnd": 1206,
+                "textHash": "d01d5cd7ea69326f16ab3cb3b15c6f3f8b9b28e4c4c4ce76f552bbcdf3c81aea"
+              }
+            ]
+          },
+          "stamp": "f57d3a513d5f0e6bbedb1f2ce7a18b4f7a587d200a16f7c730ba20523beae2d4"
+        }
+      ],
+      "evidence": "incomplete-evidence",
+      "answerability": "not-assessed",
+      "coverage": {
+        "complete": false,
+        "candidateLimit": 100,
+        "candidateLimitReached": false,
+        "staleCandidates": 0,
+        "contextSufficiency": "not-assessed",
+        "indexedResources": 3,
+        "knownSavedResources": 2318,
+        "sourceVerification": "exact-saved-file",
+        "unverifiedCandidates": 0,
+        "verifiedResources": 1,
+        "verificationBytes": 1197041
+      },
+      "timing": {
+        "providerMs": 169.47787499999686,
+        "localMs": 42.74779199999466
+      },
+      "usage": 3,
+      "profile": {
+        "version": 2,
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "metric": "cosine",
+        "chunking": "structure",
+        "chunkVersion": 1,
+        "tokenizer": "cl100k_base",
+        "chunkSize": 128,
+        "extension": "0.1.9"
+      },
+      "provenance": {
+        "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "profileKey": "2458a973ba33cefb3309b1d15f9cc90a80f3267cfc194437600bc62ba796a61e"
+      }
+    }
+  }
+]

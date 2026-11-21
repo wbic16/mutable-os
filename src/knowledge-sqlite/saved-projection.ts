@@ -1,3 +1,4 @@
+import { inlineUnits } from '../block-tree/inline-sequence';
 /** Read-only SQL projection of validated saved state. Never an admission or authoring DTO. */
 import { createHash } from 'node:crypto';
 import { v5 as uuid } from 'uuid';
@@ -14,7 +15,7 @@ import { normalizePolicy, opaqueType, nativeTextTypes, sourceTextTypes, type Ext
 import type { RepositoryState, ContentRecord } from '../block-tree/types';
 
 const namespace='38e2b9ce-d3e7-5a14-b67d-b265437bcad8';
-export const PROFILE='mutable-saved-sql-v3';
+export const PROFILE='mutable-saved-sql-v4';
 // Extraction changes invalidate evidence, not the stable identity of authored SQL objects.
 const identityProfile='mutable-saved-sql-v1';
 const digest=(v:string|Uint8Array)=>createHash('sha256').update(v).digest('hex');
@@ -44,7 +45,7 @@ export async function projectSaved(bytes:Uint8Array,vaultGuid:string,policy?:Ext
   const value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
   const extraction=normalizePolicy(policy);
   let state:RepositoryState,resourceId:string,format:string,version:number|null,manifest:any;
-  if(value?.format==='mutable-document') {const r=decodeNative(bytes);state=resourceToRepository(r);resourceId=r.resourceId;format='mutable-document';version=value.version;}
+  if(value?.format==='mutable-document') {const r=decodeNative(bytes, undefined, true);state=resourceToRepository(r);resourceId=r.resourceId;format='mutable-document';version=value.version;}
   else if(value?.format==='codex-history-document') {const r=decodeHistoryDocument(value);state=r.state;resourceId=r.resourceId;format=value.format;version=value.version;}
   else if(value?.kind==='speedy-workspace') {manifest=parseWorkspaceManifest(value);state=legacy(manifest.root);resourceId=manifest.workspaceId;format=manifest.kind;version=manifest.schemaVersion;}
   else {
@@ -86,10 +87,10 @@ export async function projectSaved(bytes:Uint8Array,vaultGuid:string,policy?:Ext
     check();
     const blockId=String(c.payload.id),p=c.payload as any;
     const coordinate=c.inlineKind==='standoff'?'cell':nativeTextTypes.includes(c.viewType)?'utf16':null;
-    const units=c.inlineContent.map(pk=>state.contents[state.placements[pk].contentKey]);
+    const units = c.compactInline ? [...inlineUnits(c.compactInline.spans)].map(a => ({ viewType: a.kind === 'text' ? 'text-cell' : a.kind === 'image' ? 'image-cell' : 'inline-alternative-cell', payload: a.kind === 'text' ? { text: a.text } : a.properties })) : c.inlineContent.map(pk=>state.contents[state.placements[pk].contentKey]);
     const text=coordinate==='cell'?units.map(c=>c.viewType==='text-cell'?c.payload.text:'\ufffc').join(''):coordinate==='utf16'?String(p.text??''):null;
     const attrs={payload:p,...(generated.has(blockId)?{indexIdentity:{origin:'generated-missing-block',resourceId}}:{}),opaqueRelations:c.opaqueRelations,wireChildren:c.wireChildren,wireRelation:c.wireRelation,
-      ...(c.inlineKind==='standoff'?{inlineObjects:units.flatMap((c,index)=>c.viewType==='image-cell'?[{index,payload:c.payload}]:[])}:{}),
+      ...(c.inlineKind==='standoff'?{inlineObjects:units.flatMap((c,index)=>c.viewType!=='text-cell'?[{index,kind:c.viewType,payload:c.payload}]:[])}:{}),
       ...(manifest&&c===root?{workspaceDocuments:manifest.documents}: {})};
     const row={guid:blockId,resourceGuid:resourceId,entityGuid:null,typename:c.viewType,authoredType:String(p.type??c.viewType),text,coordinate,cellCount:c.inlineKind==='standoff'?units.length:null,
       explicitlyRetained:c.definitionOwnerKey===undefined?0:1,attributes:json(attrs),...attribution(p)};
@@ -132,9 +133,10 @@ export async function projectSaved(bytes:Uint8Array,vaultGuid:string,policy?:Ext
       const a=resolveLinkedProperty(state,raw,c.key),owner=linkedDefinitionOwner(state,raw,c.key),external=externalDefinitionLink(raw);
       const definition=owner?.payload.linkedAnnotations?.[raw.annotationId];
       const resolved=!!definition&&!external;
-      requireValue(coordinate&&Number.isSafeInteger(raw.start)&&Number.isSafeInteger(raw.end)&&raw.start>=0&&raw.end+1>=raw.start&&raw.end+1<=(coordinate==='cell'?units.length:text!.length),'invalid or unrepresentable standoff range');
       const zeroWidth=raw.isZeroWidth===true;
-      if(zeroWidth)requireValue(raw.end===raw.start-1,'marked zero-width annotation is not collapsed');
+      const length=coordinate==='cell'?units.length:text?.length??0;
+      requireValue(coordinate&&Number.isSafeInteger(raw.start)&&Number.isSafeInteger(raw.end)&&raw.start>=0&&
+        (zeroWidth ? raw.start<=length&&(raw.end===raw.start||raw.end===raw.start-1) : raw.end+1>=raw.start&&raw.end+1<=length),'invalid or unrepresentable standoff range');
       const segmentCoordinate=zeroWidth?'utf16':coordinate;
       const startIndex=zeroWidth&&coordinate==='cell'?units.slice(0,raw.start).map(c=>c.viewType==='text-cell'?String(c.payload.text):'\ufffc').join('').length:raw.start;
       const endIndex=zeroWidth?startIndex:raw.end+1;

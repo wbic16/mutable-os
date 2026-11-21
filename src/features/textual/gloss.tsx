@@ -33,8 +33,10 @@ export function TextualGloss(props:{model:GlossViewModel}) {
    </div>
    <div class="tw-gloss-list-status">{m.filtered().length} Glosses · ↑↓ Select · Enter Details</div>
    <div ref={detail} class="tw-gloss-detail" role="region" aria-label="Gloss details" tabindex={-1} onKeyDown={e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!(e.target as Element).closest('input,textarea,select,[role=dialog]')){e.preventDefault();e.stopPropagation();list.focus();}}}>
+    <m.Milestones/>
     <Show when={active()} keyed>{entry=><article class="gloss-register-row" data-gloss-id={entry.localId}>
      <strong class="tw-gloss-detail-type">{entry.data().type||'Note'}</strong><p class="tw-gloss-full-text">{entry.data().body||'(unfinished Gloss)'}</p><small>{entry.occurrences().length} occurrence(s)</small>
+     <m.SourceDetails entry={entry}/>
      <nav class="tw-tool-row"><button disabled={!entry.occurrences().length} onClick={()=>passage(entry)}>Passage</button><button onClick={e=>void m.navigate(entry,undefined,true,e.currentTarget)}>Edit</button><button onClick={e=>m.remove(entry,e.currentTarget)}>Delete</button></nav>
      <Show when={m.relationships}>{ui=>{const Groups=ui().Groups;return <Groups entry={entry}/>;}}</Show>
     </article>}</Show>

@@ -1,4 +1,6 @@
+import {CavernRetrieval} from './retrieval-host.js';
 import {createApplicationServiceHost} from './application-services/host.js';
+import {imageReferenceRouter} from './image-reference.js';
 /** One application-level folder context; existing stores remain confined to it. */
 import { Router, type RequestHandler } from 'express';
 import { promises as fs, constants } from 'node:fs';
@@ -217,6 +219,8 @@ export function createCavernLifecycle(options: { stateFile?: string; drainTimeou
     }
     const coordinate = <T>(action: () => Promise<T>) => sql.foreground(action);
     const api = Router();
+    let retrieval:CavernRetrieval|undefined;
+    api.use('/retrieval',(req,res,next)=>retrieval?retrieval.router()(req,res,next):res.status(409).json({Success:false,Error:'Semantic retrieval unavailable'}));
     // Applications share the root Cavern; they may still browse its subfolders.
     api.use((req, res, next) => {
       if (req.body?.vault !== undefined && req.body.vault !== '.') { res.status(409).json({ Success: false, Error: 'Use the current Cavern. Open another Cavern from the Mutable system control.' }); return; }
@@ -224,6 +228,7 @@ export function createCavernLifecycle(options: { stateFile?: string; drainTimeou
     });
     api.use('/sqlite/knowledge', sql.router());
     api.use('/history', history.router);
+    if(featureFlags.dialecticLargeImageConsent)api.use('/image-reference',imageReferenceRouter());
     if (featureFlags.nativeDocumentPersistence) api.use('/native', createNativeDocumentStoreRouter({ root, coordinate, defaultVault: '.', establishVault: vault => sql.establish(vault) }));
     api.use(createDocumentStoreRouter({ root, coordinate, history }));
     // Workspace files are ordinary files within this same Cavern.
@@ -254,13 +259,14 @@ export function createCavernLifecycle(options: { stateFile?: string; drainTimeou
       indexWork = read().finally(() => { indexWork = undefined; });
       return indexWork;
     };
-    return { api, sql, mode, phextReady, phextVfs,
+    return { api, sql, attachmentServices:()=>assets&&services?{store:assets.store,executor:services.executor}:undefined, mode, phextReady, phextVfs,
       async activateAssets(cavern: Cavern) {
+        if(featureFlags.semanticRetrieval&&featureFlags.derivedRetrieval){retrieval=new CavernRetrieval(sql,root,cavern.cavernGuid,{deferStartup:true});await retrieval.start();}
         if(featureFlags.applicationServices)services=createApplicationServiceHost({root,cavernId:cavern.cavernGuid,nativeEnabled:featureFlags.nativeDocumentPersistence,publicationEnabled:featureFlags.webPublishing,academicEnabled:featureFlags.academicResourceLoaders,iiifEnabled:featureFlags.iiifResourceLoaders,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,everydayEnabled:featureFlags.everydayWebResources,academic:(request,signal)=>sql.academic(request,signal),assets:()=>assets?.store,knowledge:(request,signal)=>sql.entityLookup({vault:'.',request},signal,true)});
-        if (featureFlags.managedAssetClipboard) { assets = createManagedAssetService({ root, cavernId: cavern.cavernGuid, session: cavern.session,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,inspectOriginal:(bytes,mediaType,signal)=>{if(!services)throw Error('Application services unavailable');return services.executor.run(['application/xml','application/epub+zip','application/x-bibtex','application/x-research-info-systems'].includes(mediaType)?{kind:'academic-original-inspect',bytes,mediaType}:mediaType==='application/pdf'?{kind:'pdf-inspect',bytes}:{kind:'json-inspect',bytes},signal);} }); return assets.recover(); } },
-      async index(policy: any) { indexPolicy ??= normalizePolicy(policy); return indexStatus(); },
+        if (featureFlags.managedAssetClipboard) { assets = createManagedAssetService({ root, quillEnabled:featureFlags.quill, cavernId: cavern.cavernGuid, session: cavern.session,crossResourceEnabled:featureFlags.crossResourceLoaders,structuredEnabled:featureFlags.structuredResources,deterministicEnabled:featureFlags.deterministicAcademicResources,webEnabled:featureFlags.webResourceViewers,inspectOriginal:(bytes,mediaType,signal)=>{if(!services)throw Error('Application services unavailable');return services.executor.run(['application/xml','application/epub+zip','application/x-bibtex','application/x-research-info-systems'].includes(mediaType)?{kind:'academic-original-inspect',bytes,mediaType}:mediaType==='application/pdf'?{kind:'pdf-inspect',bytes}:{kind:'json-inspect',bytes},signal);} }); return assets.recover(); } },
+      async index(policy: any) { indexPolicy ??= normalizePolicy(policy); const result=await indexStatus();retrieval?.resume();return result; },
       async status() { return indexPolicy ? indexStatus() : undefined; },
-      async close() { await services?.close(); await assets?.close(); await indexWork?.catch(() => {}); await sql.close(); await history.dispose(); if (mode === 'phext') { await phextReady?.catch(() => {}); const phextFs = await import(pathToFileURL(path.resolve('server/phext-fs.mjs')).href); phextFs.unregisterPhextFs(root); const knowledge = await import(pathToFileURL(path.resolve('src/knowledge-sqlite/phext-registry.mjs')).href); knowledge.unregisterPhextKnowledge(root); const gates = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href); await gates.unregisterPhextBackend(root); phextVfs?.close(); } },
+      async close() { await retrieval?.close(); await services?.close(); await assets?.close(); await indexWork?.catch(() => {}); await sql.close(); await history.dispose(); if (mode === 'phext') { await phextReady?.catch(() => {}); const phextFs = await import(pathToFileURL(path.resolve('server/phext-fs.mjs')).href); phextFs.unregisterPhextFs(root); const knowledge = await import(pathToFileURL(path.resolve('src/knowledge-sqlite/phext-registry.mjs')).href); knowledge.unregisterPhextKnowledge(root); const gates = await import(pathToFileURL(path.resolve('scripts/stage-c-gates/filesystem.mjs')).href); await gates.unregisterPhextBackend(root); phextVfs?.close(); } },
     };
   }
   // Mode selection replaces the cutover's convert-on-encounter:
@@ -544,7 +550,13 @@ export function createCavernLifecycle(options: { stateFile?: string; drainTimeou
     res.once('finish', finish); res.once('close', finish);
     runtime.api(req, res, next);
   };
-  return { router, middleware, current: () => current, async close() {
+  return { router, middleware, current: () => current,
+    attachments(session:string) {
+      const selected=current,active=runtime,services=active?.attachmentServices();
+      const check=()=>{if(!selected||!active||!services||switching||current!==selected||runtime!==active||session!==selected.session)throw Error('Attachment Vault/session changed. Reopen the Document.');};
+      check();return {...services!,cavernId:selected!.cavernGuid,session,check};
+    },
+    async close() {
     // Bounded the same way as the drain wait (H1): a serial action
     // that never settles must not hang shutdown forever either.
     let settled = false;

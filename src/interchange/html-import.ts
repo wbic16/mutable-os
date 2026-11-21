@@ -1,3 +1,4 @@
+import {listMetadata,listItemPayload,tableCellMetadata} from '../block-tree/layout-authoring';
 import {safeColor as color} from './inline-values.mjs';
 import { emptyFragment, LIMITS, safeUrl, validateFragment, type FragmentBlock, type MutableFragment, type Property, type Reference } from './fragment';
 import { activeTags, attribute, type HtmlNode } from './html-ast';
@@ -143,13 +144,13 @@ export function importSemanticHtml(tree: HtmlNode, baseUrl?: string): { fragment
       if (child.tagName === 'li') {
         const value = attribute(child, 'value');
         const task = leadingTaskCheckbox(child.childNodes ?? []);
-        const item = makeBlock('container-block', { ...(task.checked === undefined ? {} : { checked: task.checked }), metadata: { htmlListItem: { ...(value !== undefined ? { value: integer(value, start) } : {}) } } }, flow(task.nodes, marksFor(child, marks), preformatted(child, preserve), true));
+        const item = makeBlock('container-block', listItemPayload(value===undefined?undefined:integer(value,start),task.checked), flow(task.nodes, marksFor(child, marks), preformatted(child, preserve), true));
         children.push(item.edge);
       } else if (child.nodeName === '#text' && !child.value?.trim()) continue;
       else { warn('Non-item list content was retained without a list marker.'); children.push(...flow([child], marks, preserve)); }
     }
     if (attribute(node, 'type')) warn('Custom list marker styles were replaced with standard markers.');
-    return makeBlock('indented-list-block', { metadata: { htmlList: { ordered, start, reversed } } }, children).edge;
+    return makeBlock('indented-list-block', {metadata:listMetadata(ordered,start,reversed)}, children).edge;
   }
   function table(node: HtmlNode, marks: Mark[], preserve: boolean): string[] {
     const rows: string[] = [], captions: string[] = [];
@@ -161,7 +162,7 @@ export function importSemanticHtml(tree: HtmlNode, baseUrl?: string): { fragment
           const header = cell.tagName === 'th', colSpan = Math.max(1, integer(attribute(cell, 'colspan'), 1)), rowSpan = Math.max(1, integer(attribute(cell, 'rowspan'), 1));
           if (colSpan > 1 || rowSpan > 1) warn('Merged table cells were flattened; text and span metadata were retained.');
           const cellMarks = marksFor(cell, header ? [...rowMarks, { type: 'style/bold', attributes: {} }] : rowMarks);
-          cells.push(makeBlock('table-cell-block', { metadata: { htmlTableCell: { header, colSpan, rowSpan } } }, flow(cell.childNodes ?? [], cellMarks, preformatted(cell, preserve), true)).edge);
+          cells.push(makeBlock('table-cell-block', {metadata:tableCellMetadata(header,colSpan,rowSpan)}, flow(cell.childNodes ?? [], cellMarks, preformatted(cell, preserve), true)).edge);
         }
         rows.push(makeBlock('table-row-block', {}, cells).edge); return;
       }

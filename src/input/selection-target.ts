@@ -1,3 +1,4 @@
+import { passiveElement } from '../runtime/passive-presentation';
 import type { NodeKey } from "../block-tree/types";
 import type { MountRegistry } from "../runtime/mounts";
 import type { SelectionInputTarget } from "./selection-gestures";
@@ -13,6 +14,7 @@ export function ownSelectionToolbar(element: Element, mounts: Pick<MountRegistry
 
 /** Existing native/modal exclusions shared by retained-selection input. */
 export function selectionInputTarget(event: Event, mounts: Pick<MountRegistry, "resolveEvent">, crossHead: (target: Element) => NodeKey | undefined): SelectionInputTarget {
+  if(passiveElement(event.target))return {excluded:true};
   const element = event.target instanceof Element ? event.target : undefined;
   const excluded = !!element?.closest('input, textarea:not([data-cross-text-input]), select, [role="dialog"]:not(.compact-toolbar__panel), [role="menu"], [data-bindings-window], [data-block-selection-handle], [data-block-selection-inspector]');
   if (excluded) return { excluded: true };

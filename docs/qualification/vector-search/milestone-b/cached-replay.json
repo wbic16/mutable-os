@@ -1,0 +1,66 @@
+{
+  "profile": {
+    "version": 2,
+    "provider": "openai",
+    "model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "metric": "cosine",
+    "chunking": "structure",
+    "chunkVersion": 1,
+    "tokenizer": "cl100k_base",
+    "chunkSize": 128,
+    "extension": "0.1.9"
+  },
+  "indexed": {
+    "results": [
+      {
+        "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+        "passages": 15,
+        "embedded": 15,
+        "reused": 0,
+        "planningMs": 277.76137500000004,
+        "providerMs": 0.6225419999999531,
+        "publicationMs": 8.671459000000027,
+        "usage": 15
+      },
+      {
+        "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+        "passages": 19,
+        "embedded": 19,
+        "reused": 0,
+        "planningMs": 227.116583,
+        "providerMs": 0.14958400000000438,
+        "publicationMs": 2.9529999999999745,
+        "usage": 19
+      }
+    ],
+    "issues": [],
+    "complete": true
+  },
+  "unchanged": {
+    "results": [
+      {
+        "unchanged": true,
+        "embedded": 0,
+        "projectionReads": 0
+      },
+      {
+        "unchanged": true,
+        "embedded": 0,
+        "projectionReads": 0
+      }
+    ],
+    "issues": [],
+    "complete": true
+  },
+  "storage": {
+    "bytes": 1167360,
+    "pageSize": 4096,
+    "pageCount": 285,
+    "freePages": 0,
+    "activeCacheBlobBytes": 0
+  },
+  "sourceReferenceCount": 7,
+  "hits": 5,
+  "paidCalls": 0
+}

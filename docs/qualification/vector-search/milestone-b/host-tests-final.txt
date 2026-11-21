@@ -1,0 +1,18 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+stdout | server/sqlite-knowledge-host.test.ts > retrieval receives only confirmed saved projections and never delays a foreground save
+retrieval-save-qualification {"baselineSaveMs":54.64525000000003,"concurrentSaveMs":81.33620799999971,"providerDelayMs":250,"maxForegroundWaitMs":0.16979200000014316}
+
+stdout | server/sqlite-knowledge-host.test.ts > retrieval receives only confirmed saved projections and never delays a foreground save
+retrieval-warm-save-qualification {"idle":[94.98462500000005,87.86504199999945,90.65358300000025],"active":[90.55104199999914,95.36537500000031,93.50887500000044]}
+
+ ✓ server/sqlite-knowledge-host.test.ts (5 tests) 5192ms
+   ✓ real native/legacy publication routes schedule saved indexing without altering receipts or providers 560ms
+   ✓ retrieval receives only confirmed saved projections and never delays a foreground save 4102ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  10:10:07
+   Duration  6.56s (transform 446ms, setup 0ms, collect 745ms, tests 5.19s, environment 0ms, prepare 48ms)
+

@@ -1,0 +1,457 @@
+{
+  "source": "vaults/imported/Conversation on November 11, 2026.ink",
+  "resourceId": "1e567a77-495c-4a83-83d1-143a34a6b7f8",
+  "sha256": "b1f60392e65bf912fc338355c6f7fc6ac0e8b3b04cc7a2a15fb0d1e0866166d3",
+  "committedHuman": 9,
+  "committedAI": 9,
+  "humanDrafts": 1,
+  "nativeMarks": {
+    "style/bold": 34,
+    "dialectic/range-anchor": 1,
+    "dialectic/claim": 1,
+    "style/italics": 38
+  },
+  "nativeTables": 3,
+  "exchanges": [
+    {
+      "contributionOrdinal": 2,
+      "contributionId": "320ba26b-4ad3-4235-ab7b-45d026fd8a8c",
+      "exchangeId": "c0e42f5d-3636-47d5-9cc9-da9d3c009796",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 15806,
+        "output_tokens": 574,
+        "total_tokens": 16380
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 4,
+      "contributionId": "99371f20-d69a-4ab3-aa81-36fa8c568653",
+      "exchangeId": "5ff9d0f9-180a-4f13-b744-19b6bc3d3a46",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 24418,
+        "output_tokens": 1052,
+        "total_tokens": 25470
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 6,
+      "contributionId": "0c174f4f-098b-4624-abb0-828aea7b509e",
+      "exchangeId": "380f9561-7efd-4cd7-967f-79160b005a22",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 33476,
+        "output_tokens": 609,
+        "total_tokens": 34085
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 8,
+      "contributionId": "955d423f-5639-421b-b278-08594bc7b343",
+      "exchangeId": "36f41a33-03d4-4c49-961b-02cd046c57d5",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 42117,
+        "output_tokens": 705,
+        "total_tokens": 42822
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 10,
+      "contributionId": "0ad27146-9b08-4541-8798-f7a08a413cb9",
+      "exchangeId": "78b8d0e3-9351-42ed-b84b-aaae42f16a36",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 1,
+        "interpretations": 1
+      },
+      "tools": [
+        "search_symposium"
+      ],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 51476,
+        "output_tokens": 884,
+        "total_tokens": 52360
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 12,
+      "contributionId": "8a37289a-db91-4af0-a162-50f85b2bf815",
+      "exchangeId": "6fb9ec69-b7a1-426a-b08f-1d788bcaf248",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 60262,
+        "output_tokens": 1339,
+        "total_tokens": 61601
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 14,
+      "contributionId": "ba2839be-f437-4ddd-9b8c-9d86ab0c855e",
+      "exchangeId": "1e4db854-d0c8-47a9-be91-492981f900ea",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 69645,
+        "output_tokens": 662,
+        "total_tokens": 70307
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 16,
+      "contributionId": "d5fbf148-6fcf-4c2d-a608-07e5c48d3c69",
+      "exchangeId": "6fbb18aa-cfc4-4dc6-bd1b-084232d00e84",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 78328,
+        "output_tokens": 1639,
+        "total_tokens": 79967
+      },
+      "finalStop": "completed"
+    },
+    {
+      "contributionOrdinal": 18,
+      "contributionId": "e4ddd89c-f0e0-4b4a-8b9e-60c7dca8018c",
+      "exchangeId": "e1b6a52f-9b65-4835-978b-f860a88b3a56",
+      "model": "gpt-5.4-2026-03-05",
+      "profile": "all-qualified",
+      "entitiesEnabled": true,
+      "mentionsEnabled": true,
+      "semantics": {
+        "entities": 0,
+        "glosses": 0,
+        "arguments": 0,
+        "relations": 0,
+        "anchors": 0,
+        "interpretations": 0
+      },
+      "tools": [],
+      "repaired": false,
+      "finalUsage": {
+        "input_tokens": 87946,
+        "output_tokens": 270,
+        "total_tokens": 88216
+      },
+      "finalStop": "completed"
+    }
+  ],
+  "diagnosticLog": "vaults/imported/.mutable/dcp-test-phase/2026-11-10T23-47-31-060Z-9c87ef7d-fa00-4821-836e-98e88a9a652b.jsonl",
+  "outgoingRequests": [
+    {
+      "line": 23,
+      "exchange": "c0e42f5d-3636-47d5-9cc9-da9d3c009796",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 51,
+      "exchange": "5ff9d0f9-180a-4f13-b744-19b6bc3d3a46",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 79,
+      "exchange": "380f9561-7efd-4cd7-967f-79160b005a22",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 107,
+      "exchange": "36f41a33-03d4-4c49-961b-02cd046c57d5",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 135,
+      "exchange": "78b8d0e3-9351-42ed-b84b-aaae42f16a36",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 140,
+      "exchange": "78b8d0e3-9351-42ed-b84b-aaae42f16a36",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 168,
+      "exchange": "6fb9ec69-b7a1-426a-b08f-1d788bcaf248",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 196,
+      "exchange": "1e4db854-d0c8-47a9-be91-492981f900ea",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 224,
+      "exchange": "6fbb18aa-cfc4-4dc6-bd1b-084232d00e84",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    },
+    {
+      "line": 252,
+      "exchange": "e1b6a52f-9b65-4835-978b-f860a88b3a56",
+      "model": "gpt-5.4",
+      "policy": true,
+      "tools": [
+        "list_text_blocks",
+        "read_source",
+        "search_symposium",
+        "describe_capabilities"
+      ],
+      "entities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/LocalEntity"
+        }
+      },
+      "entityRefEnabled": true,
+      "tokens": 2048,
+      "continuity": true
+    }
+  ]
+}

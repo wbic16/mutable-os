@@ -28,6 +28,8 @@ export type { BlockMenuItem } from "../runtime/block-menu-types";
 export interface BlockRuntime {
   /** Cumulative client pixels per local CSS unit for this occurrence. */
   scale(): number;
+  /** Canonical authored-content protection for this occurrence; no repository access. */
+  authoredStateProtected(): boolean;
   openContextMenu(point?: { x: number; y: number }): void;
   contextMenuOpen(): boolean;
   readonly nodeKey: NodeKey;

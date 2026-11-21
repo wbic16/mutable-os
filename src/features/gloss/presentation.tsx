@@ -1,3 +1,4 @@
+import {TeiMilestones,TeiDefinitionDetails} from '../tei-import/presentation';
 import {observeFontLayout} from '../../rendering/font-layout';
 import {Dynamic} from 'solid-js/web';
 import {useInstrumentPresentations} from '../../rendering/instrument-presentations';
@@ -22,7 +23,11 @@ export function GlossPresentation(props:{editor:ReactiveEditor;session:RetainedD
  const [active,setActive]=createSignal(false),[narrow,setNarrow]=createSignal(false),[drawer,setDrawer]=createSignal(false),[fallback,setFallback]=createSignal(false);
  const registerState=createGlossRegisterState(),graphState=createGlossGraphState(),argumentState=createArgumentState();
  const presenters=useInstrumentPresentations();
- const controls={active,narrow,references:()=>presenters?.()?.gloss?drawer():!narrow()||drawer(),toggle:()=>{setActive(v=>!v);if(active()&&presenters?.()?.gloss)setDrawer(true);},toggleReferences:()=>setDrawer(v=>!v)};
+ const controls={active,narrow,references:()=>presenters?.()?.gloss?drawer():!narrow()||drawer(),toggle:()=>{setActive(v=>!v);if(active()&&presenters?.()?.gloss)setDrawer(true);},toggleReferences:()=>setDrawer(v=>!v),inspectDefinition:(id:string)=>{
+  const root=editor.repository.readState().contents[session.projection.node(session.rootKey)!.contentKey];
+  const definition=(root.payload.linkedAnnotations as any)?.[id];if(!definition)return;
+  registerState.selected[1](definition.metadata.gloss.localId);registerState.query[1]('');registerState.type[1]('');graphState.tab[1]('references');setActive(true);setDrawer(true);
+ }};
  if(enabled)onCleanup(ownGlossPresentation(session,controls));
  let alive=true;
  onMount(()=>{if(!enabled)return;setFallback(!session.element.querySelector('.reactive-document-occurrence'));
@@ -52,7 +57,7 @@ function createGlossViewModel(props:{argumentState:ArgumentState;graphState:Glos
  createEffect(()=>session.element.classList.toggle('gloss-showing-graph',graphSelected()));
  onCleanup(()=>{session.element.classList.remove('gloss-showing-graph');delete (session.element as any).glossGraphDiagnostics;});
  const [selected,setSelected]=props.registerState.selected,[query,setQuery]=props.registerState.query,[type,setType]=props.registerState.type,[message,setMessage]=createSignal('');
- const [source,setSource]=createSignal<HTMLElement>(),[scrollport,setScrollport]=createSignal<HTMLElement>();let live=true;
+ const [source,setSource]=createSignal<HTMLElement>(),[scrollport,setScrollport]=createSignal<HTMLElement>();let live=true,navigationEpoch=0;
  // Exposed only on this session's DOM for qualification/diagnostics, never persisted.
  (session.element as any).glossIndex=index;
  onMount(()=>{const root=editor.mounts.get(session.rootKey)?.root??session.element.querySelector<HTMLElement>('[data-block-type="document-block"]')!;if(!(root instanceof HTMLElement))return;
@@ -64,15 +69,15 @@ function createGlossViewModel(props:{argumentState:ArgumentState;graphState:Glos
  const types=createMemo(()=>[...new Set(index.rows[0]().map(e=>e.data().type).filter(Boolean))].sort());
  const filtered=createMemo(()=>{const q=query().trim().toLocaleLowerCase(),t=type();return index.rows[0]().filter(e=>{const d=e.data();return (!t||d.type===t)&&(!q||`${d.type} ${d.body} ${d.alias}`.toLocaleLowerCase().includes(q));});});
  const navigate=async(entry:GlossEntry,occurrence?:GlossOccurrence,edit=false,invoker?:HTMLElement)=>{
-  setSelected(entry.localId);const anchor=occurrence??entry.occurrences().find(a=>editor.mounts.get(a.nodeKey))??entry.occurrences()[0];
+  const ticket=++navigationEpoch;setSelected(entry.localId);const anchor=occurrence??entry.occurrences().find(a=>editor.mounts.get(a.nodeKey))??entry.occurrences()[0];
   if(!anchor){setMessage('Anchor removed. This Gloss can still be edited or deleted.');if(edit)editor.gloss.openDefinition(session.rootKey,entry.definitionId,invoker);return;}
   const range=index.range(anchor);if(!range){setMessage('This anchor changed. Choose the Gloss again.');return;}
   const path=ancestorPath(editor,anchor.nodeKey).map(n=>n.key);
-  const revealed=await revealMatch(editor,{path,ranges:[{nodeKey:anchor.nodeKey,start:range.start,coordinate:'cell'}]} as SearchMatch,()=>live&&session.current());
+  const revealed=await revealMatch(editor,{path,ranges:[{nodeKey:anchor.nodeKey,start:range.start,coordinate:'cell'}]} as SearchMatch,()=>live&&ticket===navigationEpoch&&session.current());
   if(!revealed){setMessage('The source occurrence is not available in this view.');return;}
   const current=index.range(anchor),h=editor.mounts.get(anchor.nodeKey);if(!current||!h)return;
   h.focus();h.restoreInlineSelection?.({anchor:current.start,head:current.end});setMessage('');
-  if(edit)editor.gloss.open(anchor.nodeKey,{anchor:current.start,head:current.end},entry.definitionId);
+  if(edit){if(current.start===current.end)editor.gloss.openDefinition(session.rootKey,entry.definitionId,invoker);else editor.gloss.open(anchor.nodeKey,{anchor:current.start,head:current.end},entry.definitionId);}
  };
  const selectRelated=(id:string,reveal=false)=>{setSelected(id);setQuery('');setType('');const entry=index.rows[0]().find(e=>e.localId===id);if(!entry)return;if(reveal&&entry.occurrences().length)void navigate(entry);else{if(!entry.occurrences().length)setMessage('Unanchored Gloss selected. Use Edit to open its definition.');queueMicrotask(()=>{const row=[...session.element.querySelectorAll<HTMLElement>('.gloss-register-row')].find(el=>el.dataset.glossId===id);row?.scrollIntoView({block:'nearest'});row?.focus({preventScroll:true});});}};
  const relationships=editor.features.glossRelationshipAuthoring&&index.relationships?createRelationshipAuthoring(index,props.registerState,selectRelated):undefined;
@@ -84,6 +89,9 @@ function createGlossViewModel(props:{argumentState:ArgumentState;graphState:Glos
    <div class="gloss-card-actions"><button type="button" onClick={()=>void navigate(p.entry,p.occurrence)}>↖ Passage</button><button type="button" aria-expanded={expanded()} onClick={()=>setExpanded(v=>!v)}>{expanded()?'Less':'More'}</button></div>
   </article>;
  };
+ const teiEnabled=editor.features.teiOperationalSemantics&&!!(session.projection.node(session.rootKey)?.payload.metadata as any)?.tei;
+ const Milestones=()=> <Show when={teiEnabled}><TeiMilestones editor={editor} session={session}/></Show>;
+ const SourceDetails=(p:{entry:GlossEntry})=> <Show when={editor.features.teiOperationalSemantics}><TeiDefinitionDetails entry={p.entry} index={index} navigate={navigate}/></Show>;
  const Graphical=()=> <>
   <Show when={!exploring()&&scrollport()}>{port=><Show when={props.narrow} fallback={<GlossMargin index={index} session={session} scrollport={port()} card={Card}/>}><GlossBelow index={index} session={session} card={Card}/></Show>}</Show>
   <aside tabindex="-1" class="gloss-register" aria-label="Local References" hidden={!props.references}>
@@ -91,7 +99,8 @@ function createGlossViewModel(props:{argumentState:ArgumentState;graphState:Glos
    <Show when={graphEnabled||argumentEnabled}><div class="gloss-view-tabs" role="tablist" aria-label="Local References view"><button type="button" role="tab" aria-selected={props.graphState.tab[0]()==='references'} onPointerDown={e=>e.preventDefault()} onClick={()=>props.graphState.tab[1]('references')}>References</button><Show when={graphEnabled}><button type="button" role="tab" aria-selected={props.graphState.tab[0]()==='graph'} disabled={!!relationships?.draft()} onPointerDown={e=>e.preventDefault()} onClick={()=>props.graphState.tab[1]('graph')}>Graph</button></Show><Show when={argumentEnabled}><button type="button" role="tab" aria-selected={props.graphState.tab[0]()==="argument"} disabled={!!relationships?.draft()} onPointerDown={e=>e.preventDefault()} onClick={()=>props.graphState.tab[1]("argument")}>Argument</button></Show></div></Show>
    <Show when={graphActive()}><GlossGraphView navigationEnabled={editor.features.glossGraphNavigation} active={graphActive} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}} hostPort={()=>session.host.port} index={index} state={props.graphState} registerState={props.registerState} diagnostics={graphDiagnostics} select={selectRelated} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}}/></Show>
    <Show when={argumentActive()}><GlossArgumentView index={index} state={props.argumentState} registerState={props.registerState} diagnostics={argumentDiagnostics} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}} reveal={id=>selectRelated(id,true)} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}}/></Show>
-   <div class="gloss-reference-content" hidden={exploring()}>
+   <div class="gloss-reference-content" classList={{'tei-reference-content':teiEnabled}} hidden={exploring()}>
+   <Milestones/>
    <Show when={relationships}>{ui=>{const Panel=ui().Panel;return <Panel/>;}}</Show>
    <div class="gloss-register-filters"><input aria-label="Search Glosses" placeholder="Search Glosses" value={query()} onInput={e=>setQuery(e.currentTarget.value)}/><select aria-label="Filter Gloss type" value={type()} onChange={e=>setType(e.currentTarget.value)}><option value="">All types</option><For each={types()}>{t=><option value={t}>{t}</option>}</For></select></div>
    <p class="gloss-register-count">{filtered().length} Glosses</p><Show when={message()}><p role="status">{message()}</p></Show>
@@ -99,13 +108,14 @@ function createGlossViewModel(props:{argumentState:ArgumentState;graphState:Glos
    <div class="gloss-register-rows"><For each={filtered()}>{entry=><article tabindex="-1" class="gloss-register-row" data-gloss-id={entry.localId} classList={{'gloss-selected':selected()===entry.localId}}>
     <button type="button" class="gloss-card-main" onClick={e=>void navigate(entry,undefined,true,e.currentTarget)}><strong>{entry.data().type||'Note'}</strong><span class="gloss-card-body">{entry.data().body||'(unfinished Gloss)'}</span></button>
     <Show when={entry.data().alias}><small>{entry.data().alias}</small></Show><small>{entry.occurrences().length?`${entry.occurrences().length} occurrence(s)`:'anchor removed'}</small>
+    <SourceDetails entry={entry}/>
     <div class="gloss-register-actions"><button type="button" disabled={!entry.occurrences().length} onClick={()=>void navigate(entry)}>Navigate</button><button type="button" onClick={e=>void navigate(entry,undefined,true,e.currentTarget)}>Edit</button><button type="button" onClick={e=>remove(entry,e.currentTarget)}>Delete</button></div>
     <Show when={relationships}>{ui=>{const Groups=ui().Groups;return <Groups entry={entry}/>;}}</Show>
    </article>}</For><Show when={!filtered().length}><p>No matching Glosses.</p></Show></div>
    </div>
   </aside>
  </>;
- return {Graphical,Margin:(p:{scrollport:HTMLElement;metrics:()=>{rowHeight:number;gap:number};card:(p:GlossMarginCardProps)=>JSX.Element})=><GlossMargin index={index} session={session} {...p}/>,props,index,selected,setSelected,query,setQuery,type,setType,types,filtered,message,navigate,remove,relationships,graphEnabled,argumentEnabled,
+ return {Graphical,Milestones,SourceDetails,Margin:(p:{scrollport:HTMLElement;metrics:()=>{rowHeight:number;gap:number};card:(p:GlossMarginCardProps)=>JSX.Element})=><GlossMargin index={index} session={session} {...p}/>,props,index,selected,setSelected,query,setQuery,type,setType,types,filtered,message,navigate,remove,relationships,graphEnabled,argumentEnabled,
  Graph:()=> <GlossGraphView navigationEnabled={editor.features.glossGraphNavigation} active={graphActive} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}} hostPort={()=>session.host.port} index={index} state={props.graphState} registerState={props.registerState} diagnostics={graphDiagnostics} select={selectRelated} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}}/>,
  Argument:()=> <GlossArgumentView index={index} state={props.argumentState} registerState={props.registerState} diagnostics={argumentDiagnostics} inspect={id=>{props.graphState.tab[1]('references');selectRelated(id);}} reveal={id=>selectRelated(id,true)} definition={(id,invoker)=>{const entry=index.rows[0]().find(row=>row.localId===id);if(entry)void navigate(entry,undefined,true,invoker);}}/>};
 

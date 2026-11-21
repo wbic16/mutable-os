@@ -1,0 +1,309 @@
+{
+  "content": [
+    {
+      "tag": "p",
+      "id": "b1",
+      "markup": "In this account, <e ref=\"e9\">patronage</e> appears as both <b>opportunity and dependence</b>. <e ref=\"e1\">Leonardo’s</e> move from <e ref=\"e2\">Florence</e> to <e ref=\"e3\">Milan</e> ties artistic work to access to a powerful employer. <e ref=\"e4\">Ludovico’s</e> commission of <e ref=\"e5\">The Last Supper</e> shows a patron helping determine which projects receive support. The mention of <e ref=\"e6\">Cecilia Gallerani</e> broadens the picture of artistic production, although the account does not identify who commissioned her portrait."
+    },
+    {
+      "tag": "p",
+      "id": "b2",
+      "markup": "<mark id=\"s1\" kind=\"claim\">The conquest of <e ref=\"e3\">Milan</e> by <e ref=\"e7\">French forces</e> under <e ref=\"e8\">Louis XII</e> reveals the arrangement’s vulnerability: political upheaval disrupts both <e ref=\"e4\">Ludovico’s</e> court and <e ref=\"e1\">Leonardo’s</e> employment. <e ref=\"e9\">Patronage</e> therefore connects artistic opportunity to political stability; the same concentration of support that enables work can expose an artist’s livelihood to a patron’s changing fortunes.</mark>"
+    }
+  ],
+  "definitions": [
+    {
+      "tag": "passage",
+      "id": "r1",
+      "target": "@b1",
+      "quote": "Leonardo da Vinci moved from Florence to Milan to work for Ludovico Sforza."
+    },
+    {
+      "tag": "passage",
+      "id": "r2",
+      "target": "@b1",
+      "quote": "Ludovico commissioned The Last Supper from Leonardo."
+    },
+    {
+      "tag": "passage",
+      "id": "r3",
+      "target": "@b1",
+      "quote": "Leonardo painted Cecilia Gallerani."
+    },
+    {
+      "tag": "passage",
+      "id": "r4",
+      "target": "@b1",
+      "quote": "French forces under Louis XII conquered Milan in 1499, disrupting Ludovico's court and Leonardo's employment."
+    },
+    {
+      "tag": "entity",
+      "id": "e1",
+      "name": "Leonardo da Vinci",
+      "type": "Person",
+      "description": "Artist identified in the supplied account.",
+      "aliases": [
+        "Leonardo"
+      ]
+    },
+    {
+      "tag": "entity",
+      "id": "e2",
+      "name": "Florence",
+      "type": "Place",
+      "description": "Place from which Leonardo moves in the supplied account."
+    },
+    {
+      "tag": "entity",
+      "id": "e3",
+      "name": "Milan",
+      "type": "Place",
+      "description": "Destination of Leonardo's move and location conquered in the supplied account."
+    },
+    {
+      "tag": "entity",
+      "id": "e4",
+      "name": "Ludovico Sforza",
+      "type": "Person",
+      "description": "Leonardo's employer and commissioner of The Last Supper in the supplied account.",
+      "aliases": [
+        "Ludovico"
+      ]
+    },
+    {
+      "tag": "entity",
+      "id": "e5",
+      "name": "The Last Supper",
+      "type": "Artwork",
+      "description": "Work commissioned from Leonardo by Ludovico in the supplied account."
+    },
+    {
+      "tag": "entity",
+      "id": "e6",
+      "name": "Cecilia Gallerani",
+      "type": "Person",
+      "description": "Person whom Leonardo painted in the supplied account."
+    },
+    {
+      "tag": "entity",
+      "id": "e7",
+      "name": "French forces under Louis XII",
+      "type": "Military force",
+      "description": "Forces described as conquering Milan in 1499 in the supplied account.",
+      "aliases": [
+        "French forces"
+      ]
+    },
+    {
+      "tag": "entity",
+      "id": "e8",
+      "name": "Louis XII",
+      "type": "Person",
+      "description": "Leader under whom the French forces act in the supplied account."
+    },
+    {
+      "tag": "entity",
+      "id": "e9",
+      "name": "Artistic patronage",
+      "type": "Concept",
+      "description": "Support of artistic work through a patron, considered here in relation to opportunity and political dependence.",
+      "aliases": [
+        "patronage"
+      ]
+    },
+    {
+      "tag": "classify",
+      "id": "m1",
+      "target": "r1",
+      "kind": "claim"
+    },
+    {
+      "tag": "classify",
+      "id": "m2",
+      "target": "r2",
+      "kind": "claim"
+    },
+    {
+      "tag": "classify",
+      "id": "m3",
+      "target": "r3",
+      "kind": "claim"
+    },
+    {
+      "tag": "classify",
+      "id": "m4",
+      "target": "r4",
+      "kind": "claim"
+    },
+    {
+      "tag": "mention",
+      "id": "m5",
+      "target": "@b1",
+      "quote": "Leonardo da Vinci",
+      "ref": "e1"
+    },
+    {
+      "tag": "mention",
+      "id": "m6",
+      "target": "@b1",
+      "quote": "Florence",
+      "ref": "e2"
+    },
+    {
+      "tag": "mention",
+      "id": "m7",
+      "target": "@b1",
+      "quote": "Milan",
+      "prefix": "from Florence to ",
+      "ref": "e3"
+    },
+    {
+      "tag": "mention",
+      "id": "m8",
+      "target": "@b1",
+      "quote": "Ludovico Sforza",
+      "ref": "e4"
+    },
+    {
+      "tag": "mention",
+      "id": "m9",
+      "target": "@b1",
+      "quote": "Ludovico",
+      "suffix": " commissioned",
+      "ref": "e4"
+    },
+    {
+      "tag": "mention",
+      "id": "m10",
+      "target": "@b1",
+      "quote": "The Last Supper",
+      "ref": "e5"
+    },
+    {
+      "tag": "mention",
+      "id": "m11",
+      "target": "@b1",
+      "quote": "Leonardo",
+      "prefix": "The Last Supper from ",
+      "ref": "e1"
+    },
+    {
+      "tag": "mention",
+      "id": "m12",
+      "target": "@b1",
+      "quote": "Leonardo",
+      "suffix": " painted",
+      "ref": "e1"
+    },
+    {
+      "tag": "mention",
+      "id": "m13",
+      "target": "@b1",
+      "quote": "Cecilia Gallerani",
+      "ref": "e6"
+    },
+    {
+      "tag": "mention",
+      "id": "m14",
+      "target": "@b1",
+      "quote": "French forces",
+      "ref": "e7"
+    },
+    {
+      "tag": "mention",
+      "id": "m15",
+      "target": "@b1",
+      "quote": "Louis XII",
+      "ref": "e8"
+    },
+    {
+      "tag": "mention",
+      "id": "m16",
+      "target": "@b1",
+      "quote": "Milan",
+      "prefix": "conquered ",
+      "ref": "e3"
+    },
+    {
+      "tag": "mention",
+      "id": "m17",
+      "target": "@b1",
+      "quote": "Ludovico's",
+      "ref": "e4"
+    },
+    {
+      "tag": "mention",
+      "id": "m18",
+      "target": "@b1",
+      "quote": "Leonardo's",
+      "ref": "e1"
+    },
+    {
+      "tag": "mention",
+      "id": "m19",
+      "target": "@b1",
+      "quote": "patronage",
+      "ref": "e9"
+    },
+    {
+      "tag": "argument",
+      "id": "arg1",
+      "target": "s1"
+    },
+    {
+      "tag": "gloss",
+      "id": "g1",
+      "target": "r4",
+      "kind": "scope",
+      "text": "The relationships recorded here represent the supplied account, not independent historical verification. Its conquest is dated 1499; the interpretation concerns the dependence exposed by the stated disruption, not a claim that all patronage arrangements function identically."
+    },
+    {
+      "tag": "relation",
+      "id": "rel1",
+      "kind": "entity",
+      "type": "employed-by",
+      "from": "e1",
+      "to": "e4"
+    },
+    {
+      "tag": "relation",
+      "id": "rel2",
+      "kind": "entity",
+      "type": "commissioned",
+      "from": "e4",
+      "to": "e5"
+    },
+    {
+      "tag": "relation",
+      "id": "rel3",
+      "kind": "entity",
+      "type": "commissioned-from",
+      "from": "e5",
+      "to": "e1"
+    },
+    {
+      "tag": "relation",
+      "id": "rel4",
+      "kind": "entity",
+      "type": "painted",
+      "from": "e1",
+      "to": "e6"
+    },
+    {
+      "tag": "relation",
+      "id": "rel5",
+      "kind": "entity",
+      "type": "under-command-of",
+      "from": "e7",
+      "to": "e8"
+    },
+    {
+      "tag": "relation",
+      "id": "rel6",
+      "kind": "entity",
+      "type": "conquered",
+      "from": "e7",
+      "to": "e3"
+    }
+  ]
+}

@@ -14,12 +14,12 @@ export function createEntityLookup() {
   let version, bytes = 0, configured = false;
   return (db, request, check = () => {}) => {
     check();
-    if (!request || !['search', 'get', 'authority-lookup'].includes(request.op)) throw Error('Unsupported Entity lookup');
+    if (!request || !['search', 'get', 'authority-lookup', 'document-association'].includes(request.op)) throw Error('Unsupported Entity lookup');
     if (!configured) { db.function('entity_fold', {deterministic:true}, value => fold(value ?? '')); configured = true; }
     return db.transaction(() => {
       const revision = [db.pragma('data_version', {simple:true}), db.prepare('SELECT total_changes() AS n').get().n].join(':');
       if (revision !== version) { cache.clear(); bytes = 0; version = revision; }
-      if (request.op === 'get' || request.op === 'authority-lookup') return canonicalEntities(db, request, check);
+      if (['get','authority-lookup','document-association'].includes(request.op)) return canonicalEntities(db, request, check);
       const {query, stream, match, resourceId} = request;
       if (typeof query !== 'string' || query.length > 1000 || !['all','name','alias','mention'].includes(stream) || !['exact','partial'].includes(match) ||
           resourceId !== undefined && (typeof resourceId !== 'string' || !resourceId || resourceId.length > 512)) throw Error('Invalid Entity search');

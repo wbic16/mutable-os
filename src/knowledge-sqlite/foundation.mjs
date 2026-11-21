@@ -1,3 +1,4 @@
+import { sharedCache } from './cache.mjs';
 import { canonicalCardex } from './cardex.mjs';
 import { isMainThread } from 'node:worker_threads';
 import { inspectVaultScope, lockVaultEstablishment } from './vault-scope.mjs';
@@ -153,6 +154,7 @@ function openValidatedFoundation({ vault, readOnly = false, initialize: create =
     return {
       vaultGuid: identity.vaultGuid,
       entities(request, check) { active(); if (entityMutation(request.op)) writable(); return canonicalEntities(mutable, request, check, ledger); },
+      cache(request, check) { active(); check?.(); if (request.op !== 'get') writable(); return sharedCache(mutable, request); },
       cardex(request, check) { active(); if (request.op === 'semantic') semanticActive(); if (['save', 'delete', 'restore', 'bulk-state'].includes(request.op) || request.op === 'semantic' && request.command?.op !== 'get') writable(); return canonicalCardex(mutable, ledger, request, check); },
       propositions(request, check) { active(); if (!thesisEnabled) throw Error('Thesis is disabled'); if (propositionMutation(request.op)) writable(); return canonicalPropositions(mutable, ledger, request, check); },
       semantics(request, check) { semanticActive(); if (semanticMutation(request)) writable(); return canonicalSemantics(mutable, ledger, request, check); },

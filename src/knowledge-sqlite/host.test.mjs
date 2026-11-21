@@ -46,3 +46,10 @@ test('confines roots, rejects overlaps and conflicting policy, and expires aband
  await assert.rejects(f.host.acquire('.',{version:1,opaqueTypes:['new-widget']}),/policy differs/);await new Promise(r=>setTimeout(r,100));await assert.rejects(f.host.status(l.lease),/expired/);
  await assert.rejects(f.host.acquire('nested'),/Overlapping Vault/); // Persisted ancestor ownership outlives a lease.
 });
+
+test('shared cache reads and writes persist without scheduling saved-document reconciliation',async t=>{
+ const f=await fixture(t);const key='external/test',value={schemaVersion:1,label:'Cached externally'};
+ await f.host.cache({vault:'.',request:{op:'set',key,value,ttl:60000}});assert.equal(f.host.timer,undefined);assert.equal(f.host.metrics.sweeps,0);
+ const row=await f.host.cache({vault:'.',request:{op:'get',key}});assert.deepEqual(row.value,value);assert.equal(row.stale,false);assert.equal(f.host.timer,undefined);assert.equal(f.host.metrics.sweeps,0);
+ await f.host.cache({vault:'.',request:{op:'invalidate',key}});assert.equal(await f.host.cache({vault:'.',request:{op:'get',key}}),null);
+});

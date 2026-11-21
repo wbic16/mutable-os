@@ -10,7 +10,7 @@ const fail = message => { throw Error(message); };
 const validId = value => typeof value === 'string' && /^[0-9a-f-]{36}$/.test(value);
 const digestOf = id => typeof id === 'string' && /^sha256:[0-9a-f]{64}$/.test(id) ? id.slice(7) : fail('Invalid asset identity.');
 const missing = e => e.code === 'ENOENT';
-const LIMIT = { bytes: 50*1024*1024, total: 60*1024*1024, count: 20, lease: 600000 };
+const LIMIT = { bytes: 100000000, total: 60*1024*1024, count: 20, lease: 600000 };
 
 export class ManagedAssetStore {
   constructor({ root, cavernId, session, now = Date.now, fault = async () => {} }) {
@@ -56,11 +56,11 @@ export class ManagedAssetStore {
   async renew(lease) {return this.locked(async(home,fd)=>{const dir=await this.operation(home,lease.id,fd);await this.authority(dir,lease,fd);for(let n=0;n<100;n++)if(!await this.read(dir,`renew-${n}.json`,65536,fd)){await this.write(dir,`renew-${n}.json`,{expires:this.now()+LIMIT.lease},fd);return;}fail('Lease renewal limit reached.');});}
   async stages(dir,fd) {const rows=[];for(let i=0;i<LIMIT.count;i++){const row=await this.json(dir,`stage-${i}.json`,fd);if(!row)break;rows.push(row);}return rows;}
   // metadata is produced by a trusted admission adapter, never HTTP request data.
-  async stage(lease,bytes,metadata) { return this.locked(async(home,fd)=>{
+  async stage(lease,bytes,metadata,profile) { return this.locked(async(home,fd)=>{
     const dir=await this.operation(home,lease.id,fd);await this.authority(dir,lease,fd);
     if(await this.read(dir,'intent.json',65536,fd))fail('Import publication already started.');
     const rows=await this.stages(dir,fd), size=rows.reduce((n,r)=>n+r.byteLength,0);
-    if((!bytes.length&&metadata.mediaType!=='text/plain')||bytes.length>(metadata.mediaType==='application/pdf'?LIMIT.bytes:10*1024*1024)||size+bytes.length>(metadata.mediaType==='application/pdf'?LIMIT.total:40*1024*1024)||rows.length>=LIMIT.count)fail('Asset import limit exceeded.');
+    if((!bytes.length&&metadata.mediaType!=='text/plain')||bytes.length>(metadata.mediaType==='application/pdf'?(profile==='dialectic-attachment'?LIMIT.bytes:50*1024*1024):profile==='dialectic-generated'?20000000:10*1024*1024)||size+bytes.length>(metadata.mediaType==='application/pdf'?(profile==='dialectic-attachment'?LIMIT.bytes:LIMIT.total):40*1024*1024)||rows.length>=LIMIT.count)fail('Asset import limit exceeded.');
     const digest=hash(bytes), item={...metadata,byteLength:bytes.length,assetId:`sha256:${digest}`,cavernId:this.cavernId,slot:rows.length};
     // A failed stage may have left bytes without metadata. Verify instead of overwriting.
     const name=`stage-${rows.length}.bin`, prior=await this.read(dir,name,LIMIT.bytes,fd);

@@ -20,10 +20,28 @@ export class ManagedAssets {
   beginText(url:string, format:LinkedTextFormat, signal?:AbortSignal):Promise<AssetLease> {return this.request('begin-text',{url,format},signal);}
   acquireText(lease:AssetLease,url:string,format:LinkedTextFormat,signal?:AbortSignal):Promise<AcquiredText> {return this.request(`${lease.id}/text/remote`,{url,format},signal,lease);}
   verify(asset: ManagedAssetReference, signal?: AbortSignal): Promise<AssetManifest> { return this.request('verify', asset, signal); }
+  /** Bind an existing original, without downloading/acquiring it. The native
+   * verify endpoint hashes the stored bytes. Recheck this fence at admission. */
+  async verifiedImage(value: unknown, signal?: AbortSignal) {
+    const parsed = managedAsset(value), scope = { ...this.context() };
+    if (!parsed) throw Error('Invalid managed image reference.');
+    const reference: ManagedAssetReference = {kind:'managed', cavernId:parsed.cavernId, assetId:parsed.assetId};
+    const check = () => {
+      signal?.throwIfAborted();
+      const current = this.context();
+      if (!this.alive || !this.enabled() || !scope.session || !scope.cavernId || reference.cavernId !== scope.cavernId || current.session !== scope.session || current.cavernId !== scope.cavernId) throw Error('Managed image is outside the active Cavern/session.');
+    };
+    check();
+    const manifest = await this.verify(reference, signal);
+    check();
+    if (manifest?.assetId !== reference.assetId || manifest?.cavernId !== reference.cavernId || !['image/png','image/jpeg'].includes(manifest?.mediaType) || !Number.isSafeInteger(manifest?.byteLength) || manifest.byteLength <= 0 || manifest.byteLength > 10*1024*1024) throw Error('Managed image verification mismatch.');
+    return {manifest:{...manifest,...reference}, check};
+  }
   async stage(lease: AssetLease, file: Blob, signal?: AbortSignal): Promise<AssetManifest> {
     const form = new FormData(); form.append('asset', file, 'clipboard-image');
     return this.request(`${lease.id}/images/stage`, form, signal, lease);
   }
+  async stageSvg(lease:AssetLease,file:Blob,signal?:AbortSignal):Promise<AssetManifest>{const form=new FormData();form.append('asset',file,'composition.svg');return this.request(`${lease.id}/images/svg`,form,signal,lease);}
   async stageOriginal(lease:AssetLease,file:Blob,signal?:AbortSignal):Promise<AssetManifest>{const form=new FormData();form.append('asset',file,'retained-original');return this.request(`${lease.id}/originals/stage`,form,signal,lease);}
   remote(lease: AssetLease, url: string, signal?: AbortSignal): Promise<AssetManifest> { return this.request(`${lease.id}/images/remote`, { url }, signal, lease); }
   action(lease: AssetLease, action: string, signal?: AbortSignal) { return this.request(`${lease.id}/${action}`, {}, signal, lease); }

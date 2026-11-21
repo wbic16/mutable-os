@@ -53,7 +53,10 @@ export function joinFragments(inputs: MutableFragment[]): MutableFragment {
 }
 export function documentFragment(fragment:MutableFragment,title:string,filename:string) {
   const f=structuredClone(fragment),id='document-'+crypto.randomUUID(),edge=id+'-edge';
-  f.blocks.push({localId:id,type:'document-block',data:{metadata:{title,interchange:{version:1,suggestedFilename:filename}}},children:f.roots.map(r=>r.placement),relations:{},blockProperties:[]});
+  const page=id+'-page',pageEdge=page+'-edge';
+  f.blocks.push({localId:page,type:'page-block',data:{},children:f.roots.map(r=>r.placement),relations:{},blockProperties:[]});
+  f.placements.push({localId:pageEdge,kind:'owned',target:{kind:'local',object:'block',id:page}});
+  f.blocks.push({localId:id,type:'document-block',data:{metadata:{title,interchange:{version:1,suggestedFilename:filename}}},children:[pageEdge],relations:{},blockProperties:[]});
   f.placements.push({localId:edge,kind:'owned',target:{kind:'local',object:'block',id}});
   f.roots=[{placement:edge,openStart:false,openEnd:false,clippedStart:false,clippedEnd:false}];return validateFragment(f);
 }

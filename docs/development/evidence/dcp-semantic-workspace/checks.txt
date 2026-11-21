@@ -1,0 +1,60 @@
+Typecheck
+
+> speedy-ts-reactive@0.0.0 typecheck
+> tsc --noEmit --project tsconfig.reactive.json && tsc --noEmit --project tsconfig.server.json
+
+
+
+Focused native/provider checks
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ server/dialectic/providers.test.ts (40 tests) 193ms
+ ✓ src/features/dialectic/dcp/editorial.test.ts (10 tests) 608ms
+ ✓ src/features/dialectic/dcp/workspace.test.ts (6 tests) 670ms
+   ✓ creates in N, reuses fresh authority in N+1 across agents, authors a Gloss and reconstructs in N+2 438ms
+ ✓ src/features/dialectic/dcp/vocabulary.test.ts (9 tests) 675ms
+
+ Test Files  4 passed (4)
+      Tests  65 passed (65)
+   Start at  11:28:05
+   Duration  8.53s (transform 6.46s, setup 0ms, collect 20.72s, tests 2.15s, environment 1.66s, prepare 306ms)
+
+
+
+Controller and actual Symposium checks
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ src/features/dialectic/dialectic.test.tsx (103 tests | 92 skipped) 1420ms
+ ✓ docs/development/evidence/dcp-semantic-workspace/authenticity.test.ts (1 test) 4595ms
+   ✓ projects only real committed semantics from the authenticity Symposium 4594ms
+
+ Test Files  2 passed (2)
+      Tests  12 passed | 92 skipped (104)
+   Start at  11:31:15
+   Duration  12.96s (transform 7.33s, setup 0ms, collect 14.77s, tests 6.01s, environment 1.11s, prepare 149ms)
+
+
+
+Live exercise
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+stdout | docs/development/evidence/dcp-semantic-workspace/live.test.ts > ordinary authenticity conversation, N → N+1 → second agent N+2
+{"exchange":1,"admitted":true,"entities":0,"glosses":0,"workspaceBytes":514,"tools":[]}
+
+stdout | docs/development/evidence/dcp-semantic-workspace/live.test.ts > ordinary authenticity conversation, N → N+1 → second agent N+2
+{"exchange":2,"admitted":true,"entities":4,"glosses":0,"workspaceBytes":514,"tools":[]}
+
+stdout | docs/development/evidence/dcp-semantic-workspace/live.test.ts > ordinary authenticity conversation, N → N+1 → second agent N+2
+{"exchange":3,"admitted":true,"entities":0,"glosses":0,"workspaceBytes":2767,"tools":[]}
+
+ ✓ docs/development/evidence/dcp-semantic-workspace/live.test.ts (1 test) 31186ms
+   ✓ ordinary authenticity conversation, N → N+1 → second agent N+2 31185ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  11:20:08
+   Duration  37.92s (transform 4.73s, setup 0ms, collect 5.83s, tests 31.19s, environment 428ms, prepare 39ms)
+

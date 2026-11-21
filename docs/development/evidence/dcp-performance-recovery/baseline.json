@@ -1,0 +1,246 @@
+{
+  "exchange": "a87f3d67-cb32-4715-bfc5-0c193770d89b",
+  "start": "2026-11-11T08:35:12.317Z",
+  "end": "2026-11-11T08:36:00.993Z",
+  "turns": [
+    {
+      "utc": "2026-11-11T08:35:17.902Z",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 15245,
+        "input_tokens_details": {
+          "cache_write_tokens": 15242,
+          "cached_tokens": 0
+        },
+        "output_tokens": 31,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15276
+      },
+      "incomplete_details": null,
+      "streamBytes": 171006,
+      "output": [
+        {
+          "id": "fc_0600570047b1fc3f006af428c50adc819694aa46e444406a3a",
+          "type": "function_call",
+          "status": "completed",
+          "arguments": "{\"cursor\":null,\"query\":\"Leonardo\",\"scope\":\"document\",\"limit\":12}",
+          "call_id": "call_QNotafbf8YLQdliRqW193e6e",
+          "name": "search_entities"
+        }
+      ]
+    },
+    {
+      "utc": "2026-11-11T08:35:20.370Z",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 15482,
+        "input_tokens_details": {
+          "cache_write_tokens": 15479,
+          "cached_tokens": 0
+        },
+        "output_tokens": 32,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15514
+      },
+      "incomplete_details": null,
+      "streamBytes": 173141,
+      "output": [
+        {
+          "id": "fc_0600570047b1fc3f006af428c78bf0819698568ae6586e440b",
+          "type": "function_call",
+          "status": "completed",
+          "arguments": "{\"cursor\":null,\"query\":\"Sforza\",\"scope\":\"document\",\"limit\":12}",
+          "call_id": "call_ZeyRs5NZUUY8I0Egtw7U2qhN",
+          "name": "search_entities"
+        }
+      ]
+    },
+    {
+      "utc": "2026-11-11T08:35:30.995Z",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 15720,
+        "input_tokens_details": {
+          "cache_write_tokens": 15717,
+          "cached_tokens": 0
+        },
+        "output_tokens": 277,
+        "output_tokens_details": {
+          "reasoning_tokens": 239
+        },
+        "total_tokens": 15997
+      },
+      "incomplete_details": null,
+      "streamBytes": 187301,
+      "output": [
+        {
+          "id": "rs_0600570047b1fc3f006af428ca082c81968442ad63eaaa9cf5",
+          "type": "reasoning",
+          "content": [],
+          "encrypted_content": "gAAAAABq9CjRBdLfICGuPniQROsgOUng7Tgq88qKo2aw0O30-bfuphPDfkeAs75tSTJOzCzDZT-07rFT7a7OFkLCv9AlzfmMde1AqT1W_KsKRQSC0DX6w7kyuk7Dgx1reeDzGZWind_szZdwoRrlb1AhEPs-PNlFrdCEi3f84Ne3mhQnNje46K9VfTqiF-TLPbL7ulPEqN0xBiDjZMk0YZHenlRN7vWFqZpMGly9nxHpiP-qooYkez_XFPFcOB3TP5jhxcLhwmHLbI9A1kbg4B-SrCFyn7QZJBp2AFifHcmMtlnU2jttIRrHc7GcSRJGubBM3QzzWzSJsxxHPt4_cxAr8mmiInRK7g0t0pheXAn3LQFF3wusOBRRsyulmiGWnNKGOPvx_wgA4pQlGYrYoWk0FM5exSbwD5Jvz_YJO-DP46sbqq57aR_sQBU8k0ZBHkx4dsjE5v5RZ-AA7EGSDgDkeWN78XR5s0YOzXx1AJ9w0xFEhavl41vQfIUAm4hmjtQqN04asrHvzH6Uhvg0O_M1ehyluS1BJz9sRdIgo-FN_ZqqjjvPA2yVX1MZx_cEmUfJSt_7N3WB-4QUcF7NDWRJPchXfxckeTutrGiPC3L0WdVB86KYQS_vYorAB1NdT__oK7z-3w9YMt3VXplzzV91lL0lfayyq7EeSrKIkRiQPmubDa0UUNTcaV_Ilh9fw-Mvz0d9iunp3byrNhNCqc5udZvoJJWM0FJxTTWWM1FrgFERZpKl4eXNhq4dv6qTWiCDzioWlUUZmzaePzFolFndank1uEqUpyRYHsszbo37LnNb2w7xVZqkpYp_KARWXEf4vxVvq1kh3_PIoDzGefmcqQRaUjZbPnbukZKNbh1MDKGaTWEsBfNgk_HUS0m-J2IFqxtXhRWOdBLFf2YX7VKaNJTzs9_D2OJH_Wpdma5Fh2tOOIf0DbhG92OwEaQjmtaXoz-dzsfxtOC7bo4QM1MOB0tKUFcESwh8111ACpUGSh81g-DUWRcKOl8KkYgkPLdvzNmyC8cByfYhohxFUWqnFLcLxbLYeTrd7KxTM3FEm-Pqq4XWkYtFglgWFN7LgeRXT6w3m1xZpeWy6LTRS7y116kf3TdjCT2uJmclpIrCP9xcX3ScSUNCAe44EBPOtx8bsDoikYAOOjdBof9IAIhYO4myDlOam70X_OYMDgg-20mzNebi1taLvsgX_Rt3NBaksp6EPixcJzVp9IAJZWmJX9xNmsfCiLDS388Umq4eaKPioC9PKXYX_QuIYq83IYsYRa1SobRlGXbDngg_PMhgIX1S4lERtTU3FR45oMr3CHBRkLAbBF7GqoK0l7QduyYLdXaP6bWo-vBEJRezLySte1Glqkr_Cez1by4bh-ba6KVmsk4VKtLk2YlWys4AphVtNAl8xHOjeiVqMJbrlWOM5gEcFDXgPk2ExRkVCAewCtJl-HWhq-JvH-EGZbUgNXSEawkpFnTAp0w797d3xneMY2aVCP04Lcs0FCVg1DOzsYWbQSh3OB-pcktL9eKBJZ71jfgTrXpVWG5E4ZVK2e40r8J5s-Q_CtwWI0D8A4RPkW6orL0fNljrS7EdCekFbRAKB186Qz8iM8y4hYuslHr2ATeIyqbmsmGKxhkATVLB1D6KGUuhuyrrqIMAUMeyEk1K063ziSkgm6QiqonIG-80F2n5Vf8NCTb-DKW_e-QPAEQ411Y6oqyr7xj3om_YWmaOvxdx36m0-aS_enwRGjmx7UlAQjP7O150m12x31Zj-XUGcxaLRNkJB9vmK_GdaVACBBpVWFcCifcFUdW5jhlNh-oaZZWFhABwv_W0qDNRS76VxyvPz0z0KpCnBMzXo7wHpwxV7JOgZqw3gOBBtqVtmkc0EjAbY_R9-85s2wanIlQywqqWxNJ3ufyIzNcVz4CRhTuqCHq7YfSDwHKM3if1CV4w7FNrsmPKOsJxr2FhkI9iyGrJuwy7K9cspacjXJ1CYoBg59qXz3GtJH_uUAiqJtnQn0xmqX3T1XQ_DEm4or7LZvWQJ7gOIQxEN3m1ZqZhibUjal_llYAH8_ZG-LoT2IJoRHNjd8LNMDpDq-9L74Gz6IHrf88iEK0S5j2-qbTiNh6MTS5SUEq-pr4aVq_ZblgNk60158ESLwZe041kHgKWLWZwya5zJQQ725pL_JzUCjUtqannhInfQoZ0-PTaBcaqt-PivuLDd78MTdwdzeW5ZVT_Ejq2RaxR89QaUclAip1-Bl1RNU792SWaHUGH9URehs11UsmtMEOuBYgCXCOsRYNOcahcJcWHHzub7gymrhsO9PTS4CEs0QLNX575Ig7LJNVX1yvCbod-ZGCvhEVC7eHhRobUnuZbSkBFRBsJP6_zBfnQc0pHWaM_WJNRFkqR15StEG9OLrlKZMPGLcXEg0exqsVw8a0pppZLfJNRAm2a1mJ5OPzAnEjYksd3OGopDFUEGxBomsv7a-U2TLCXqfhsyySHrjVH4yrIQEpKvvdd2WkLbYqp7qzRIWXygMQOl520Oj4zcsKnhxmBXIqNW2sUMw64LT6O8NhYu4XnW01ebSJUkgHlf8h1iDXSH2rDxhYoJKIdmRaGxuO4p1yj-jaeXR6KF-BsAC__5fRRoTaTyOfXR07EpxYlRW90xqZzmd9nr8ZCqpbCB7NFYoU4YX2GcnYJaoDQhQV30jyfd0tvWIbJ5tY5ffQlUfPs3Rr7iciXT7Noft2nSKOaMh0f3uUDoP0Dw0OlG021W-gPDHeZngCSBqVWHaFWoQ4xikEvRmQ8eqfHyE-0hhPN4nfXlf4qjL1W6uFmRs9xmre764kpdBxmF29Oe2JGAerfzZIoxWaL5rlGuS8iBJHhEXYORhpknNuA-CSUk-YBfTJIHipss6xmGjj7dDEl8nSYpZPKKkOtTASkXcoi7Db7d5sv8hZgMUD4oCHXSl1NtbeEtKoQTZ-dSob7o4HXPFQSoBti7b6KwsPMBu4rIyHMfqN5VTSrMlZhmakH2iJUNqvGIuGcxCRP_fTSYH2enAd-lxRNvHPQOaQ6Yk1ZkBAzJxWKVwc8_HIpaNLn9aC-8_5k5265_s6GTH_oDENng6Xtiwm1MogbUze76pwvnD7GfyTbGpv3Oq6RYb4f-RdJoQybqE58eRGzm0SiCakwvExaI-7nUdqh6yOpSFyyBdAUj06Q1qfhfaEyl23qPswFeCsw8nsVoDLjpb6P1EHIfB8MCoz2YiArYJ_NAsU7WG55hzSwsDNym7o36bgtXR5uOBDj5kZkMJiEI9auK9UUwMTaOuWKnM6cg1XfMaMol4_YW_VKoybRmccOU96rOyuhSvHZaATw9cHztOMPj4GBNXXB0rSdt8zwOPwwHfX10Jk7QsABlntyKrGPYUAw9_0GGMNxWisZ0AKFhpAfHzLzCUNwE5QmbQtKgY96iBF-V3BVqMGAtuhcGCaxLn8T8vMuaRQ1t0UuzlqmTSg4GALLEHUFZXmtXUFhOOCgHiDqK1xCXWuJU0zX6u6RylPOESaIHNHsR1ij6vmuRZBfrrYy67hKlpkR2HLKfNYO_0RspGsR0ySc5XXxZ-MBa_XUDheVpgUQo_Nsj1nEmPf15uzXhYQv8RmxD5ndk8-jNmO5sw9gCFg1rF3cTJDiKYFwjQ7Zs7pH2gr2T0ao2obGAh4r3-adFaSZzFl0MPieyUnA2I35XZYmpE0tp-9mg4BI-gdhl2MvTPz9S1uiMnt3rtyVJXwJJkbkWDW2wA1scSpVAjwTwA5Ow0gsjJ75eJzYcH39kDXYRb_3lpjTdVInEiNCIFy16pxxrGwbUxZPa944TplzpfHncSeKULXWLEQRDOMv9feDx5CY9z3u_SFh-QTH2jgr-veN4UoQpkua5hKz4mhGnUFRBxLpjAnCqRn8heUdyWLDd1NdNLoVMSJgYhj0eAjS-AOrGyfqpc8A8BdvArEMAUj53SEoYH3pzxfYo9VRaiRKacr9pwSYL2TAfnr5Co1hXS6-moaftGVjvHOn59ldz9z1QAyGcySzbwxQ5BuMLOMWoShq8lwTkM9B6FMQR7HNrpDSEt47XXocCEBlJcCtIMboOohifW5YsCYkxfi_TTwmchxcnlyMn5UYMTtSyoPAsnD6-umXm2jbGmcyjREj0xOnbGVAitk97qJQ0NnAE9EbedEp6iMSQvZtoCO-EVpoewVmZuqo2vck2-ZOUj5LjAxoBmTKcX5zpoKJGGcJKIX9kLAkLqWhg0M-S3xlQLqAemWmpziKBTjW-QtV1SPmTsF5atPihjpZkXzTB3Ofgp0j56bsOLA25grSSQ8pvPz67r0DNF4Z3ONye7jL3URTVUmGzeFAsBV0Z2uQMNETD1JoXQLod0MVgrRfeeCOno1Ak4aHDc0HREcjtaQDq-Snzi80uSzuizoRRq7EYF9UwwIsgR9JRmlMsSGx2FeNVd2qGOC07jNBxZwo6QQQwNZ6q8Bf-9Ii9kxQ0NX0HN1bsX2L7MdeMxDzOU3gw0TuEMHGldnHsOhTxjJ22RiPIRNSe09i47ZZAWRdSBkVnb3RuBDcDE3PU0AKoz-1WgKP5SmMtIXvPmKuO1X25xUJQP_skA7BAArMZfS7wTeruvIar5TqPlIsK_xoglCHyD0QK0bft0SFTfragiHDqDE_hMJ--ycxYDEMy9Q=",
+          "summary": []
+        },
+        {
+          "id": "fc_0600570047b1fc3f006af428d15b34819692e329c4d539c8be",
+          "type": "function_call",
+          "status": "completed",
+          "arguments": "{\"handle\":\"src:SlBOjO6ooYEFiwgc3JZ0EA:b2\"}",
+          "call_id": "call_WytkbnJ45w6PP5b9xWVwvup4",
+          "name": "read_source"
+        }
+      ]
+    },
+    {
+      "utc": "2026-11-11T08:36:00.940Z",
+      "status": "incomplete",
+      "usage": {
+        "input_tokens": 16798,
+        "input_tokens_details": {
+          "cache_write_tokens": 16795,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2048,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18846
+      },
+      "incomplete_details": {
+        "reason": "max_output_tokens"
+      },
+      "streamBytes": 739913,
+      "output": [
+        {
+          "id": "msg_0600570047b1fc3f006af428d589c881969c30bb080dcea447",
+          "type": "message",
+          "status": "incomplete",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\n  \"protocol\": \"dcp/1.0\",\n  \"kind\": \"contribution\",\n  \"exchange\": \"a87f3d67-cb32-4715-bfc5-0c193770d89b\",\n  \"intent\": \"answer\",\n  \"replyTargets\": [],\n  \"composition\": [\n    {\n      \"id\": \"new:b1\",\n      \"kind\": \"paragraph\",\n      \"markup\": \"Your impression captures something important: <e ref=\\\"new:e1\\\">Leonardo da Vinci</e> offered <e ref=\\\"new:e2\\\">Ludovico Sforza</e> much more than paintings. At the <e ref=\\\"new:e3\\\">Sforza court</e> in <e ref=\\\"new:e4\\\">Milan</e>, engineering, spectacle and art all served a ruler\u2019s practical needs and prestige.\",\n      \"ranges\": [],\n      \"textStyle\": null,\n      \"margins\": null\n    },\n    {\n      \"id\": \"new:b2\",\n      \"kind\": \"heading\",\n      \"markup\": \"How he entered Ludovico\u2019s service\",\n      \"ranges\": [],\n      \"level\": 2,\n      \"textStyle\": null,\n      \"margins\": null\n    },\n    {\n      \"id\": \"new:b3\",\n      \"kind\": \"paragraph\",\n      \"markup\": \"<e ref=\\\"new:e1\\\">Leonardo</e> moved from Florence to <e ref=\\\"new:e4\\\">Milan</e> around <b>1482</b>. A surviving draft letter addressed to <e ref=\\\"new:e2\\\">Ludovico</e>, usually dated to this period, reads like an application: it foregrounds portable bridges, siege equipment, artillery, tunnelling and other military engineering. Only near the end does he advertise his abilities in sculpture and painting, including a proposed equestrian monument to the ruling family.\",\n      \"ranges\": [],\n      \"textStyle\": null,\n      \"margins\": null\n    },\n    {\n      \"id\": \"new:b4\",\n      \"kind\": \"paragraph\",\n      \"markup\": \"<annotation type=\\\"dialectic/qualification\\\">The precise recruitment story is less certain than that letter makes it sound: we cannot establish that the draft was actually sent or that it directly secured his appointment.</annotation> A later biographical tradition also associates his arrival with a diplomatic musical gift\u2014a silver lyre\u2014and his skill as a performer. His position developed over time; by the later 1480s he was firmly engaged in court work.\",\n      \"ranges\": [],\n      \"textStyle\": null,\n      \"margins\": null\n    },\n    {\n      \"id\": \"new:b5\",\n      \"kind\": \"heading\",\n      \"markup\": \"Major projects during his first Milanese period, c. 1482\u20131499\",\n      \"ranges\": [],\n      \"level\": 2,\n      \"textStyle\": null,\n      \"margins\": null\n    },\n    {\n      \"id\": \"new:b6\",\n      \"kind\": \"list\",\n      \"style\": \"bullet\",\n      \"items\": [\n        [\n          {\n            \"id\": \"new:b7\",\n            \"kind\": \"paragraph\",\n            \"markup\": \"<b>The <e ref=\\\"new:e5\\\">Sforza equestrian monument</e>.</b> Intended to honour <e ref=\\\"new:e6\\\">Francesco Sforza</e>, <e ref=\\\"new:e2\\\">Ludovico\u2019s</e> father, this enormous bronze horse became one of <e ref=\\\"new:e1\\\">Leonardo\u2019s</e> most ambitious undertakings. A full-scale clay model was displayed in 1493, but the bronze was diverted to military use. The monument was never cast, and the model was destroyed after the French occupation in 1499.\",\n            \"ranges\": [],\n            \"textStyle\": null,\n            \"margins\": null\n          }\n        ],\n        [\n          {\n            \"id\": \"new:b8\",\n            \"kind\": \"paragraph\",\n            \"markup\": \"<b><i><e ref=\\\"new:e7\\\">The Last Supper</e></i>, c. 1495\u20131498.</b> Painted for the refectory of <e ref=\\\"new:e8\\\">Santa Maria delle Grazie</e>, this was closely connected to <e ref=\\\"new:e2\\\">Ludovico\u2019s</e> patronage and dynastic ambitions for the church. Its experimental wall-painting technique, rather than traditional true fresco, contributed to its early deterioration.\",\n            \"ranges\": [],\n            \"textStyle\": null,\n            \"margins\": null\n          }\n        ],\n        [\n          {\n            \"id\": \"new:b9\",\n            \"kind\": \"paragraph\",\n            \"markup\": \"<b>Court portraits and decoration.</b> These included <i><e ref=\\\"new:e9\\\">Lady with an Ermine</e></i>, generally dated around 1489\u20131490 and depicting <e ref=\\\"new:e10\\\">Cecilia Gallerani</e>, <e ref=\\\"new:e2\\\">Ludovico\u2019s</e> mistress; and the interlacing trees and branches of the <e ref=\\\"new:e11\\\">Sala delle Asse</e> decoration in the Sforza Castle, undertaken in 1498.\",\n            \"ranges\": [],\n            \"textStyle\": null,\n            \"margins\": null\n          }\n        ],\n        [\n          {\n            \"id\": \"new:b10\",\n            \"kind\": \"paragraph\",\n            \"markup\": \"<b>Engineering and court entertainments.</b> <e ref=\\\"new:e1\\\">Leonardo</e> investigated fortifications, hydraulic works, machinery and architectural problems, and devised festival settings and theatrical effects. These activities genuinely mattered to the court, but many surviving engineering drawings are proposals or investigations\u2014not evidence of completed machines.\",\n            \"ranges\": [],\n            \"textStyle\": null,\n            \"margins\": null\n          }\n        ],\n        [\n          {\n            \"id\": \"new:b11\",\n            \"kind\": \"paragraph\",\n            \"markup\": \"<b><i><e ref=\\\"new:e12\\\">The Virgin of the Rocks</e></i>, commissioned in 1483.</b> This was another major undertaking in <e ref=\\\"new:e4\\\">Milan</e>, produced with collaborators. An important distinction: its commission came from a religious confraternity, <i>not directly from <e ref=\\\"new:e2\\\">Ludovico</e></i>. His Milanese work extended beyond court patronage.\",\n            \"ranges\": [],\n            \"textStyle\": null,\n            \"margins\": null\n          }\n        ]\n      ],\n      \"configuration\": null\n    },\n    {\n      \"id\": \"new:b12\",\n      \"kind\": \"paragraph\",\n      \"markup\": \"So <e ref=\\\"new:e1\\\">Leonardo</e> was not simply a painter who occasionally invented things: he cultivated the role of a <b>versatile court expert</b>. The French conquest of <e ref=\\\"new:e4\\\">Milan</e> in 1499 brought this first sustained period of service under <e ref=\\\"new:e2\\\">Ludovico</e> to an end.\",\n      \"ranges\": [],\n      \"textStyle\": null,\n      \"margins\": null\n    }\n  ],\n  \"anchors\": [\n    {\n      \"id\": \"new:r1\",\n      \"source\": \"src:SlBOjO6ooYEFiwgc3JZ0EA:b2\",\n      \"revision\": \"30e22adf-9f5c-4d5c-8ebc-f7879cfed326\",\n      \"selector\": {\n        \"exact\": \"Ludovico Sforza seems to have valued Leonardo as much for his engineering abilities as for his painting.\",\n        \"prefix\": \"\",\n        \"suffix\": \"\"\n      }\n    }\n  ],\n  \"entities\": [\n    {\"id\":\"new:e1\",\"name\":\"Leonardo da Vinci\",\"typename\":\"Person\",\"description\":\"Florentine artist and engineer who worked in Milan under Ludovico Sforza during his first Milanese period, c. 1482\u20131499.\",\"aliases\":[\"Leonardo\"]},\n    {\"id\":\"new:e2\",\"name\":\"Ludovico Sforza\",\"typename\":\"Person\",\"description\":\"Milanese ruler and patron of Leonardo da Vinci, known as il Moro.\",\"aliases\":[\"Ludovico\",\"il Moro\"]},\n    {\"id\":\"new:e3\",\"name\":\"Sforza court in Milan\",\"typename\":\"Institution\",\"description\":\"The courtly establishment of the Sforza rulers in Milan, including Ludovico Sforza's patronage network.\",\"aliases\":[\"Sforza court\"]},\n    {\"id\":\"new:e4\",\"name\":\"Milan\",\"typename\":\"Place\",\"description\":\"Italian city where Leonardo worked under Sforza patronage.\",\"aliases\":[\"Milano\"]},\n    {\"id\":\"new:e5\",\"name\":\"Sforza equestrian monument\",\"typename\":\"Art project\",\"description\":\"Leonardo's unrealized monumental bronze horse project honouring Francesco Sforza; a full-scale clay model was displayed in 1493.\",\"aliases\":[\"Sforza horse\"]},\n    {\"id\":\"new:e6\",\"name\":\"Francesco Sforza\",\"typename\":\"Person\",\"description\":\"Duke of Milan, father of Ludovico Sforza, and intended subject of Leonardo's equestrian monument.\",\"aliases\":[]},\n    {\"id\":\"new:e7\",\"name\":\"The Last Supper\",\"typename\":\"Artwork\",\"description\":\"Leonardo's wall painting of c. 1495\u20131498 in the refectory of Santa Maria delle"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "utc": "2026-11-11T06:27:26.015Z",
+      "event": "broker.request",
+      "data": {
+        "path": "/settings",
+        "method": "POST",
+        "body": {
+          "settings": {
+            "provider": "openai",
+            "model": "gpt-6.1-sol",
+            "maxOutputTokens": 2048,
+            "repair": true,
+            "cadence": "conversational"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-11-11T06:27:26.027Z",
+      "event": "broker.response",
+      "data": {
+        "path": "/settings",
+        "body": {
+          "settings": {
+            "provider": "openai",
+            "model": "gpt-6.1-sol",
+            "maxOutputTokens": 2048,
+            "repair": true,
+            "cadence": "conversational"
+          },
+          "ready": true
+        }
+      }
+    },
+    {
+      "utc": "2026-11-11T08:30:24.139Z",
+      "event": "broker.request",
+      "data": {
+        "path": "/settings",
+        "method": "POST",
+        "body": {
+          "settings": {
+            "provider": "openai",
+            "model": "gpt-6.1-sol",
+            "maxOutputTokens": 2048,
+            "repair": true,
+            "cadence": "conversational"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-11-11T08:30:24.148Z",
+      "event": "broker.response",
+      "data": {
+        "path": "/settings",
+        "body": {
+          "settings": {
+            "provider": "openai",
+            "model": "gpt-6.1-sol",
+            "maxOutputTokens": 2048,
+            "repair": true,
+            "cadence": "conversational"
+          },
+          "ready": true
+        }
+      }
+    }
+  ],
+  "nativeTools": [
+    [
+      {
+        "id": "call_QNotafbf8YLQdliRqW193e6e",
+        "tool": "search_entities",
+        "arguments": {
+          "cursor": null,
+          "query": "Leonardo",
+          "scope": "document",
+          "limit": 12
+        }
+      }
+    ],
+    [
+      {
+        "id": "call_ZeyRs5NZUUY8I0Egtw7U2qhN",
+        "tool": "search_entities",
+        "arguments": {
+          "cursor": null,
+          "query": "Sforza",
+          "scope": "document",
+          "limit": 12
+        }
+      }
+    ],
+    [
+      {
+        "id": "call_WytkbnJ45w6PP5b9xWVwvup4",
+        "tool": "read_source",
+        "arguments": {
+          "handle": "src:SlBOjO6ooYEFiwgc3JZ0EA:b2"
+        }
+      }
+    ]
+  ],
+  "maxOutputTokens": [
+    2048,
+    2048,
+    2048,
+    2048
+  ]
+}

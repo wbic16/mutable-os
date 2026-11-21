@@ -1,3 +1,4 @@
+import {contentUnits} from "../block-tree/inline-sequence";
 import type { ContentRecord, RepositoryState } from "../block-tree/types";
 import { previewImageUrl, type DocumentPreview, type PreviewBlock } from "../features/spatial/document-preview";
 /** Read a bounded first-page digest directly from authored records at a desk
@@ -19,10 +20,9 @@ export function spatialDocumentPreview(state: RepositoryState, root: ContentReco
     } else {
       let text = "";
       if (content.inlineKind === "standoff") {
-        for (const key of content.inlineContent) {
+        for (const cell of contentUnits(state,content)) {
           if (text.length >= remaining || inlineBudget-- <= 0) { truncated = true; break; }
-          const cell = state.contents[state.placements[key]?.contentKey];
-          if (typeof cell?.payload.text === "string") text += cell.payload.text.slice(0, remaining - text.length);
+          if (cell.kind==='text') text += cell.text.slice(0, remaining - text.length);
         }
       } else if (typeof content.payload.text === "string") text = content.payload.text;
       text = text.slice(0, remaining); remaining -= text.length;

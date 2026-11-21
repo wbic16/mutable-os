@@ -89,6 +89,14 @@ await editor.commandRegistry.execute("block.remove", {
 });
 ```
 
+## Flint slash commands
+
+With `flintSlashCommands` enabled (the default), Scry offers `/flint open` to open or activate Flint. `/flint open --doc` begins Document-name completion; continue typing a title or filename, then use the arrow keys and Enter, or click a suggestion. For example, `/flint open --doc Court of Milan`. Multiword titles do not require quotes; quoted titles are also accepted. Paths distinguish Documents with the same title.
+
+Suggestions include loaded Documents, including unsaved ones, and saved Documents in the invoking application's current Cavern listing. One local candidate pool is retained for the Scry session; subsequent query edits filter that pool without vault discovery, file admission or repository snapshots. Reopen the command to refresh its suggestions. Saved Documents are verified and admitted only after explicit selection; loaded Documents retain their live edits.
+
+Flint is reused where possible, restored if minimized, and made active. Successful execution removes the typed command through the normal local text-edit command, with Undo available. Cancellation or failed preparation leaves the command text intact. Navigation does not save Documents or create document references. Disabling `flintSlashCommands` removes these suggestions and leaves the syntax literal.
+
 ## Keybindings
 
 Modules register their own actions through `register.binding`; [`registerInputActions`](../../src/input/binding-catalog.ts) retains legacy action metadata, scopes, default keyboard/mouse/custom triggers, and a handler which calls `context.run(id)`. [`BindingRegistry`](../../src/input/bindings.ts) matches a normalized event in the active scope, including chords and user overrides.

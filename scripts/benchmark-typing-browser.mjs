@@ -2,12 +2,17 @@
 // Uses an isolated Chrome profile and an in-memory fixture; never saves documents.
 // Optional: CHROME_BIN, BENCHMARK_URL and BENCHMARK_DOCUMENT_URL (read-only API
 // loadDocumentJson URL). A supplied document benchmarks its longest paragraph.
-// BENCHMARK_PRESENTATION=desktop|spatial optionally hosts the same fixture in a Window.
+// BENCHMARK_PRESENTATION=desktop|spatial|flint optionally hosts the same fixture in a Window.
 // BENCHMARK_BACKLINKS=1 adds the real C3 panel/service over an in-memory bound fixture.
 // BENCHMARK_IIIF=off|idle|active qualifies IIIF isolation with a controlled tile service.
 // BENCHMARK_ENCYCLOPEDIA=off|idle|pending uses the Wikipedia dispatcher instead.
 // BENCHMARK_ACADEMIC=off|idle|pending qualifies DOI loader isolation (pending uses a controlled service response).
 // BENCHMARK_CODE=5|50|200|embedded adds a standoff CodeBlock to the real editor fixture.
+// BENCHMARK_DIALECTIC=1 adds linked range anchors and the incremental Dialectic index.
+// BENCHMARK_CONTENTS=off disables Semantic Contents membership for comparison.
+// BENCHMARK_SEMANTICS=off disables the Semantics Workspace index for comparison.
+// BENCHMARK_ACTIVITY=off disables its contribution-activity membership projection for comparison.
+// BENCHMARK_VIRTUAL=1 opts into native text-flow virtualisation; BENCHMARK_BLOCKS sets fixture size.
 // Requires Node 22+ (WebSocket).
 import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -47,8 +52,16 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
    const host = document.createElement('div'); document.body.append(host);
    host.style.cssText = 'position:fixed;inset:0;overflow:auto;background:white;z-index:99999';
    const documentUrl = ${JSON.stringify(process.env.BENCHMARK_DOCUMENT_URL ?? "")};
-   const dto = documentUrl ? (await (await fetch(documentUrl)).json()).Data.document : {id:'typing-benchmark-document',type:'document-block',children:Array.from({length:250},(_,i)=>({id:'bench-'+i,type:'standoff-editor-block',text:'x'.repeat(100),standoffProperties:[{type:'style/bold',start:40,end:60}]}))};
+   const retrievalUrl=${JSON.stringify(process.env.BENCHMARK_RETRIEVAL_URL??'')};
+   if(retrievalUrl){
+    const original=window.fetch.bind(window);window.fetch=(input,init)=>String(input).startsWith('/api/retrieval/')?original(retrievalUrl+String(input).slice('/api/retrieval'.length),init):original(input,init);
+    const retrieval=await import('/src/application/retrieval-client.ts');await retrieval.retrievalRequest('status');retrieval.retrievalForeground();
+   }
+   const mountStarted = performance.now();
+   const dto = documentUrl ? (await (await fetch(documentUrl)).json()).Data.document : {id:'typing-benchmark-document',type:'document-block',children:Array.from({length:${Number(process.env.BENCHMARK_BLOCKS ?? 250)}},(_,i)=>({id:'bench-'+i,type:'standoff-editor-block',text:'x'.repeat(100),standoffProperties:[{type:'style/bold',start:40,end:60}]}))};
    const codeMode=${JSON.stringify(process.env.BENCHMARK_CODE??'')}, codeEnabled=${JSON.stringify(process.env.BENCHMARK_CODE_HIGHLIGHT!=='off')};
+   const dialecticRanges=${JSON.stringify(process.env.BENCHMARK_DIALECTIC === '1')};
+   if(dialecticRanges){dto.linkedAnnotations={...(dto.linkedAnnotations??{})};for(const b of dto.children??[])if(b.type==='standoff-editor-block'&&b.text){const id='bench-range-'+b.id;dto.linkedAnnotations[id]={id,type:'dialectic/range-anchor',metadata:{dialecticRange:{version:1,excerpt:b.text,source:{resourceId:dto.id,blockId:b.id}}}};b.standoffProperties=[...(b.standoffProperties??[]),{id:id+'-segment',type:'dialectic/range-anchor',annotationId:id,start:0,end:[...b.text].length-1}];}}
    if(codeMode){const lines=Array.from({length:codeMode==='embedded'?200:Number(codeMode)},(_,i)=>'const value'+i+': number = '+i+'; // code with a stable trailing comment for trusted caret tests');dto.children.unshift({id:'syntax-code',type:'standoff-code-block',metadata:{markdownCode:{language:'typescript'}},children:(codeMode==='embedded'?[lines.join(String.fromCharCode(10))]:lines).map((text,i)=>({id:'code-line-'+i,type:'standoff-editor-block',text}))});}
    const structuredMode=${JSON.stringify(process.env.BENCHMARK_STRUCTURED??'')};let structuredWorkers=0;
    if(structuredMode){dto.children.push(...[{filename:'data.json',presentation:'json',text:JSON.stringify({values:Array.from({length:1000},(_,i)=>({id:i,name:'Example'}))})},{filename:'code.ts',presentation:'source',text:'const value: number = 42;'}, {filename:'flow.mmd',presentation:'mermaid',text:'flowchart TD; A-->B'}].map((r,i)=>({id:'structured-'+i,type:'mutable/structured-resource-block',structured:{version:1,filename:r.filename,presentation:r.presentation},text:r.text})));}
@@ -70,17 +83,18 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
      const {WorkspaceSession}=await import('/src/application/workspace-session.ts');
      const {WorkspacePresentationView}=await import('/src/application/workspace-presentation-view.tsx');
      const {materializeLocalWorkspace}=await import('/src/reactive-editor/workspace-manifest.ts');
-     const session=new WorkspaceSession(materializeLocalWorkspace({type:'workspace-block',children:[{id:'bench-window',type:'document-window-block',metadata:{size:{w:900,h:700}},children:[dto]}]}),{features:{spatialWorkspace:true,markdownInputTransformation:${JSON.stringify(process.env.BENCHMARK_MIT !== 'off')},standoffCodeHighlighting:codeEnabled}});
+     const session=new WorkspaceSession(materializeLocalWorkspace({type:'workspace-block',children:presentation==='flint'?[{type:'workspace-object-bank-block',children:[dto]}]:[{id:'bench-window',type:'document-window-block',metadata:{size:{w:900,h:700}},children:[dto]}]}),{features:{...(presentation==='flint'?{nativeDocumentPersistence:false,nativeKnowledge:false,sqliteKnowledge:false}:{}),virtualTextFlows:${JSON.stringify(process.env.BENCHMARK_VIRTUAL === '1')},dialecticSemanticsWorkspace:${JSON.stringify(process.env.BENCHMARK_SEMANTICS !== 'off')},dialecticSemanticContents:${JSON.stringify(process.env.BENCHMARK_CONTENTS !== 'off')},dialecticContributionActivity:${JSON.stringify(process.env.BENCHMARK_ACTIVITY !== 'off')},spatialWorkspace:true,markdownInputTransformation:${JSON.stringify(process.env.BENCHMARK_MIT !== 'off')},standoffCodeHighlighting:codeEnabled}});
      editor=session.editor;projection=session.projection;
      if(presentation==='spatial')session.selectPresentation('spatial');
      const stop=render(()=>createComponent(WorkspacePresentationView,{session}),host);
      dispose=()=>{stop();session.dispose()};
+     if(presentation==='flint') await editor.commandRegistry.execute('flint.open',{targetKey:projection.state.rootKey,args:undefined});
      if(presentation==='spatial') {
        for(let i=0;i<100&&!host.querySelector('.workspace-spatial canvas');i++)await new Promise(r=>setTimeout(r,50));
        if(!session.spatial.document.activate('block:bench-window'))throw new Error('Benchmark Document authorization failed');
      }
    } else {
-     editor = new ReactiveEditor(dto,{features:{markdownInputTransformation:${JSON.stringify(process.env.BENCHMARK_MIT !== 'off')},standoffCodeHighlighting:codeEnabled,structuredResources:structuredMode!=='off',crossResourceLoaders:pdfMode!=='off',iiifResourceLoaders:iiifMode!=='off',academicResourceLoaders:${JSON.stringify((process.env.BENCHMARK_ENCYCLOPEDIA??process.env.BENCHMARK_ACADEMIC) !== 'off')}}}); registerApplicationViews(editor);
+     editor = new ReactiveEditor(dto,{features:{virtualTextFlows:${JSON.stringify(process.env.BENCHMARK_VIRTUAL === '1')},dialecticSemanticsWorkspace:${JSON.stringify(process.env.BENCHMARK_SEMANTICS !== 'off')},dialecticSemanticContents:${JSON.stringify(process.env.BENCHMARK_CONTENTS !== 'off')},dialecticContributionActivity:${JSON.stringify(process.env.BENCHMARK_ACTIVITY !== 'off')},markdownInputTransformation:${JSON.stringify(process.env.BENCHMARK_MIT !== 'off')},standoffCodeHighlighting:codeEnabled,structuredResources:structuredMode!=='off',crossResourceLoaders:pdfMode!=='off',iiifResourceLoaders:iiifMode!=='off',academicResourceLoaders:${JSON.stringify((process.env.BENCHMARK_ENCYCLOPEDIA??process.env.BENCHMARK_ACADEMIC) !== 'off')}}}); registerApplicationViews(editor);
      if(iiifMode||pdfMode)editor.clipboard.setContext(()=>({cavernId:'fixture',session:'fixture'}));
      projection = editor.createView('browser-performance');
      dispose = render(() => createComponent(ReactiveTreeView,{editor,projection}), host);
@@ -97,6 +111,10 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
     for(let i=0;i<200&&!block.querySelector('canvas');i++)await new Promise(r=>setTimeout(r,20));
     if(!block.querySelector('canvas'))throw Error('IIIF viewer did not activate');await new Promise(r=>setTimeout(r,1000));
    }
+   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+   const mountMs=performance.now()-mountStarted, mountedElements=host.querySelectorAll('*').length, characterSpans=host.querySelectorAll('.reactive-standoff-flow > span').length;
+   const sampleBlocks=[...host.querySelectorAll('.reactive-standoff-block')].slice(0,2).map(el=>el.getBoundingClientRect());
+   const blockHeight=sampleBlocks[0]?.height, blockStep=sampleBlocks.length===2?sampleBlocks[1].top-sampleBlocks[0].top:undefined;
    editor.installGateway(document);
    let stopMarkdown = () => {};
    if (${JSON.stringify(process.env.BENCHMARK_MARKDOWN ?? "")} === '1') {
@@ -146,8 +164,12 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
      const data=new DataTransfer();data.setData('text/plain',${JSON.stringify(process.env.BENCHMARK_ENCYCLOPEDIA?'https://en.wikipedia.org/wiki/Typing':'10.1234/typing')});flow.dispatchEvent(new ClipboardEvent('paste',{bubbles:true,cancelable:true,clipboardData:data}));
      await Promise.resolve();if(academicRequests!==1)throw Error('Academic preparation did not start');
    }
+   let dialecticIndex,stopSemanticInventory=()=>{};if(dialecticRanges){const {DialecticReferences}=await import('/src/features/dialectic/references.ts');const owner=Object.values(projection.state.nodes).find(n=>n.viewType==='document-block'&&n.payload.id===dto.id);if(!owner)throw Error('Dialectic benchmark owner unavailable');dialecticIndex=new DialecticReferences(editor,projection,owner.key);if(editor.features.dialecticSemanticsWorkspace){const source=await (await fetch('/src/features/dialectic/references.ts')).text(),solidPath=source.split('"').find(p=>p.includes('/solid-js.js'));const {createRoot,createMemo}=await import(solidPath);createRoot(dispose=>{stopSemanticInventory=dispose;createMemo(()=>dialecticIndex.workspaceInventory());});}}
+   const dialecticBefore={...dialecticIndex?.diagnostics};
    const pdfBefore=pdfCalls;const iiifBefore=iiifCalls;const samples=[];let snapshots=0; const snapshot=editor.repository.snapshot.bind(editor.repository);
    editor.repository.snapshot=()=>{snapshots++;return snapshot();};
+   const {virtualTextFlowDiagnostics}=await import('/src/rendering/virtual-text-flow.tsx');
+   const virtualDiagnostics=virtualTextFlowDiagnostics.get(host.querySelector('[data-virtual-text-flow]')), virtualBefore=virtualDiagnostics?.itemKeys??0;
    const before=flow.textContent;
    for(let i=0;i<20;i++){
      if(i%5===0)pdfNavigation?.();
@@ -162,9 +184,9 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
    }
    finishAcademic?.();await Promise.resolve();
    const restored=flow.textContent===before;
-   window.typingBench={editor,projection,host,flow,dispose:()=>{stopBacklinks();dispose();},stopMarkdown,caret,midpoint,before,originalCell,unrelated};
+   window.typingBench={editor,projection,host,flow,dispose:()=>{stopSemanticInventory();dialecticIndex?.dispose();stopBacklinks();dispose();},stopMarkdown,caret,midpoint,before,originalCell,unrelated};
    samples.sort((a,b)=>a-b);
-   window.Worker=previousWorker;return {codeMode,codeInitial,codeRefresh:codeMode&&codeEnabled?[...codeSyntaxDiagnostics.get(editor).values()][0]:undefined,structuredMode,structuredWorkersDuringTyping:structuredWorkers,pdfMode,pdfCallsDuringTyping:pdfCalls-pdfBefore,iiifMode,iiifCallsDuringTyping:iiifCalls-iiifBefore,academicMode,academicRequests,backlinks:${JSON.stringify(process.env.BENCHMARK_BACKLINKS === '1')},markdownExperiment:${JSON.stringify(process.env.BENCHMARK_MARKDOWN === '1')},presentation:presentation||"standalone",sceneFramesDuringTyping:Number(study?.dataset.frames??0)-sceneFramesBefore,characters:[...flows].reduce((n,f)=>n+[...f.textContent].length,0),paragraphCharacters:[...before].length,paragraphs:flows.length,edits:samples.length,meanMs:samples.reduce((a,b)=>a+b)/samples.length,medianMs:samples[20],p95Ms:samples[38],maxMs:samples[39],snapshots,restored,unrelatedCellStable:unrelated.firstChild===originalCell};
+   window.Worker=previousWorker;return {virtualTextFlows:editor.features.virtualTextFlows,virtualItemKeysDuringTyping:(virtualDiagnostics?.itemKeys??0)-virtualBefore,blockHeight,blockStep,mountMs,mountedElements,characterSpans,dialecticRanges,dialecticIndex:dialecticIndex&&Object.fromEntries(Object.entries(dialecticIndex.diagnostics).map(([key,value])=>[key,value-dialecticBefore[key]])),codeMode,codeInitial,codeRefresh:codeMode&&codeEnabled?[...codeSyntaxDiagnostics.get(editor).values()][0]:undefined,structuredMode,structuredWorkersDuringTyping:structuredWorkers,pdfMode,pdfCallsDuringTyping:pdfCalls-pdfBefore,iiifMode,iiifCallsDuringTyping:iiifCalls-iiifBefore,academicMode,academicRequests,backlinks:${JSON.stringify(process.env.BENCHMARK_BACKLINKS === '1')},markdownExperiment:${JSON.stringify(process.env.BENCHMARK_MARKDOWN === '1')},presentation:presentation||"standalone",sceneFramesDuringTyping:Number(study?.dataset.frames??0)-sceneFramesBefore,characters:[...flows].reduce((n,f)=>n+[...f.textContent].length,0),paragraphCharacters:[...before].length,paragraphs:flows.length,edits:samples.length,meanMs:samples.reduce((a,b)=>a+b)/samples.length,medianMs:samples[20],p95Ms:samples[38],maxMs:samples[39],snapshots,restored,unrelatedCellStable:unrelated.firstChild===originalCell};
  })()`);
  console.log(JSON.stringify(result,null,2)); assert.equal(result.restored,true);if(result.pdfMode)assert.equal(result.pdfCallsDuringTyping,0);if(result.iiifMode)assert.equal(result.iiifCallsDuringTyping,0);assert.equal(result.snapshots,0);assert.equal(result.unrelatedCellStable,true);
  const before = await evaluate('window.typingBench.before');
@@ -185,14 +207,15 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
    caret(midpoint); let snapshots=0;
    const original=editor.repository.snapshot.bind(editor.repository);
    editor.repository.snapshot=()=>{snapshots++;return original();};
-   const count=host.querySelectorAll('[contenteditable=true]').length;
+   const source=editor.node(editor.mounts.resolveElement(flow).nodeKey), parent=editor.projections.get(source.viewId).parentOf(source.key);
+   const count=parent.children.length;
    const start=performance.now();
    flow.dispatchEvent(new InputEvent('beforeinput',{bubbles:true,cancelable:true,inputType:'insertParagraph'}));
    const splitMs=performance.now()-start;
    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
    const frameMs=performance.now()-start;
    const splitSnapshots=snapshots;
-   const added=host.querySelectorAll('[contenteditable=true]').length===count+1;
+   const added=parent.children.length===count+1;
    const focusedRight=document.activeElement?.textContent===[...before].slice(midpoint).join('');
    const undoStart=performance.now(); editor.repository.undo(); const undoMs=performance.now()-undoStart;
    const restored=flow.textContent===before;
@@ -217,7 +240,8 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
        flow.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));
        await Promise.resolve(); target=document.activeElement;
      }
-     const count=host.querySelectorAll('[contenteditable=true]').length;
+     const source=editor.node(editor.mounts.resolveElement(flow).nodeKey), parent=editor.projections.get(source.viewId).parentOf(source.key);
+   const count=parent.children.length;
      let snapshots=0; const original=editor.repository.snapshot.bind(editor.repository);
      editor.repository.snapshot=()=>{snapshots++;return original();};
      const start=performance.now();
@@ -225,7 +249,7 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
      const handlerMs=performance.now()-start;
      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
      const frameMs=performance.now()-start;
-     const added=host.querySelectorAll('[contenteditable=true]').length===count+1;
+     const added=parent.children.length===count+1;
      const focusCorrect=position==='end' ? document.activeElement!==flow && document.activeElement.textContent==='' : document.activeElement===target;
      const editSnapshots=snapshots;
      const undoStart=performance.now(); editor.repository.undo(); const undoMs=performance.now()-undoStart;
@@ -237,6 +261,37 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
  })()`);
  console.log(JSON.stringify({boundaries},null,2));
  for (const result of boundaries) { assert.equal(result.added,true); assert.equal(result.focusCorrect,true); assert.equal(result.restored,true); assert.equal(result.unrelatedCellStable,true); }
+ if (process.env.BENCHMARK_SCROLL === '1') {
+   const scrolling=await evaluate(`(async()=>{
+     const {editor,host,flow}=window.typingBench,key=editor.mounts.resolveElement(flow).nodeKey;
+     const scroll=editor.documentSessions?.forNode(key)?.host.port?.scrollport??host;
+     flow.focus();scroll.scrollTop=0;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+     const samples=[],revision=editor.repository.state.revision;
+     let elementReads=0,rangeReads=0,maximumMounted=0;
+     const element=Element.prototype.getBoundingClientRect,range=Range.prototype.getClientRects;
+     Element.prototype.getBoundingClientRect=function(){elementReads++;return element.call(this)};
+     Range.prototype.getClientRects=function(){rangeReads++;return range.call(this)};
+     try {for(let i=0;i<5;i++){const start=performance.now();scroll.scrollTop+=600;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));samples.push(performance.now()-start);maximumMounted=Math.max(maximumMounted,host.querySelectorAll('.reactive-standoff-flow').length)}}
+     finally {Element.prototype.getBoundingClientRect=element;Range.prototype.getClientRects=range}
+     if(editor.repository.state.revision!==revision)throw Error('Scroll changed canonical content');
+     return {twoFrameMs:samples,elementReads,rangeReads,maximumMounted};
+   })()`);
+   console.log(JSON.stringify({scrolling},null,2));
+ }
+ if (process.env.BENCHMARK_VIRTUAL_QUALIFY === '1') {
+   const qualification = await evaluate(`(async()=>{const {qualifyTextFlow}=await import('/src/rendering/virtual-text-flow.browser.ts');return qualifyTextFlow(window.typingBench)})()`);
+   console.log(JSON.stringify({qualification},null,2));
+   const imeBefore = await evaluate(`(()=>{const b=window.typingBench,m=b.editor.mounts.get(${JSON.stringify(qualification.imeKey)});window.imeMount=m;window.imeScroll=b.editor.documentSessions?.forNode(${JSON.stringify(qualification.imeKey)})?.host.port?.scrollport??b.host;return m.captureText()})()`);
+   await send('Input.imeSetComposition',{text:'あ',selectionStart:1,selectionEnd:1},sessionId);
+   await evaluate(`(async()=>{const b=window.typingBench;window.imeScroll.scrollTop=0;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));if(b.editor.mounts.get(${JSON.stringify(qualification.imeKey)})!==window.imeMount||!window.imeMount.composing)throw Error('IME occurrence was evicted');if(document.activeElement!==window.imeMount.focusElement)throw Error('IME focus was lost while scrolling: '+document.activeElement?.tagName)})()`);
+   await send('Input.insertText',{text:'あ'},sessionId);
+   assert.equal(await evaluate('window.imeMount.captureText()'), [...imeBefore].slice(0,17).join('')+'あ'+[...imeBefore].slice(17).join(''));
+   assert.equal(await evaluate('window.imeMount.composing'),false);
+   assert.equal(await evaluate(`(()=>{const e=window.typingBench.editor,n=e.node(${JSON.stringify(qualification.imeKey)});return n.inlineContent.map(k=>e.node(k).payload.text).join('')})()`), [...imeBefore].slice(0,17).join('')+'あ'+[...imeBefore].slice(17).join(''));
+   await evaluate('window.typingBench.editor.repository.undo()');
+   assert.equal(await evaluate('window.imeMount.captureText()'),imeBefore);
+   console.log('Trusted Chrome IME retained across scrolling, committed and undone: passed');
+ }
  await evaluate('window.typingBench.stopMarkdown();window.typingBench.dispose();window.typingBench.editor.dispose();window.typingBench.host.remove()');
 } finally {
   // Finish the CDP close handshake before killing Chrome. Otherwise Node's

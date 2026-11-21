@@ -1,0 +1,65 @@
+TAP version 13
+# Subtest: incremental saved indexing, metadata reuse, exact source references, edits, deletion and restoration
+ok 1 - incremental saved indexing, metadata reuse, exact source references, edits, deletion and restoration
+  ---
+  duration_ms: 812.28125
+  ...
+# Subtest: hosted consent is exact, durable, separate for queries, and never inferred from Document approval
+ok 2 - hosted consent is exact, durable, separate for queries, and never inferred from Document approval
+  ---
+  duration_ms: 743.376208
+  ...
+# Subtest: superseded jobs and queries cannot publish; termination recovers without automatic paid replay
+ok 3 - superseded jobs and queries cannot publish; termination recovers without automatic paid replay
+  ---
+  duration_ms: 1363.206708
+  ...
+# Subtest: independent worker does not hold the canonical writer, disabled/profile/Vault restrictions and fixed-window rebuild
+ok 4 - independent worker does not hold the canonical writer, disabled/profile/Vault restrictions and fixed-window rebuild
+  ---
+  duration_ms: 2304.1145
+  ...
+# Subtest: unknown external outcomes retain their reservation across worker interruption and cannot spend the cap again
+ok 5 - unknown external outcomes retain their reservation across worker interruption and cannot spend the cap again
+  ---
+  duration_ms: 810.130333
+  ...
+# Subtest: native Unicode mappings survive indexing; forged derived ranges are not returned as evidence
+ok 6 - native Unicode mappings survive indexing; forged derived ranges are not returned as evidence
+  ---
+  duration_ms: 486.124958
+  ...
+# Subtest: interruption during actual passage/vector publication rolls the sidecar transaction back
+ok 7 - interruption during actual passage/vector publication rolls the sidecar transaction back
+  ---
+  duration_ms: 942.794708
+  ...
+# Subtest: native FTS is immediate without embedding consent, with exact Unicode source and current-Symposium filtering
+ok 8 - native FTS is immediate without embedding consent, with exact Unicode source and current-Symposium filtering
+  ---
+  duration_ms: 573.278833
+  ...
+# Subtest: explicit persistent scope authorises future saved revisions but never queries or foreign Vaults
+ok 9 - explicit persistent scope authorises future saved revisions but never queries or foreign Vaults
+  ---
+  duration_ms: 806.915292
+  ...
+# Subtest: bounded maintenance yields between Documents and reports progress without resetting receipts
+ok 10 - bounded maintenance yields between Documents and reports progress without resetting receipts
+  ---
+  duration_ms: 489.211916
+  ...
+# Subtest: foreground pause defers maintenance without blocking lexical queries or initiating uploads
+ok 11 - foreground pause defers maintenance without blocking lexical queries or initiating uploads
+  ---
+  duration_ms: 760.238083
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10439.811125

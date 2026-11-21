@@ -1,0 +1,113 @@
+{
+  "browser": {
+    "fixture": "Real Flint, 250 paragraphs / 25000 characters, Dialectic range annotations; 40 edits",
+    "idle": {
+      "virtualTextFlows": false,
+      "virtualItemKeysDuringTyping": 0,
+      "blockHeight": 30.296875,
+      "blockStep": 42.296875,
+      "mountMs": 2197.399999976158,
+      "mountedElements": 29272,
+      "characterSpans": 25000,
+      "dialecticRanges": true,
+      "dialecticIndex": {
+        "treeVisits": 0,
+        "propertyReads": 0,
+        "recordUpdates": 0,
+        "definitionReads": 0,
+        "contentsUpdates": 0,
+        "contentsReads": 0,
+        "excerptReads": 0
+      },
+      "codeMode": "",
+      "structuredMode": "",
+      "structuredWorkersDuringTyping": 0,
+      "pdfMode": "",
+      "pdfCallsDuringTyping": 0,
+      "iiifMode": "",
+      "iiifCallsDuringTyping": 0,
+      "academicMode": "",
+      "academicRequests": 0,
+      "backlinks": false,
+      "markdownExperiment": false,
+      "presentation": "flint",
+      "sceneFramesDuringTyping": 0,
+      "characters": 25000,
+      "paragraphCharacters": 100,
+      "paragraphs": 250,
+      "edits": 40,
+      "meanMs": 1.727499994635582,
+      "medianMs": 1.5,
+      "p95Ms": 3.399999976158142,
+      "maxMs": 5,
+      "snapshots": 0,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    "continuousIndexing": {
+      "virtualTextFlows": false,
+      "virtualItemKeysDuringTyping": 0,
+      "blockHeight": 30.296875,
+      "blockStep": 42.296875,
+      "mountMs": 2409.7000000476837,
+      "mountedElements": 29272,
+      "characterSpans": 25000,
+      "dialecticRanges": true,
+      "dialecticIndex": {
+        "treeVisits": 0,
+        "propertyReads": 0,
+        "recordUpdates": 0,
+        "definitionReads": 0,
+        "contentsUpdates": 0,
+        "contentsReads": 0,
+        "excerptReads": 0
+      },
+      "codeMode": "",
+      "structuredMode": "",
+      "structuredWorkersDuringTyping": 0,
+      "pdfMode": "",
+      "pdfCallsDuringTyping": 0,
+      "iiifMode": "",
+      "iiifCallsDuringTyping": 0,
+      "academicMode": "",
+      "academicRequests": 0,
+      "backlinks": false,
+      "markdownExperiment": false,
+      "presentation": "flint",
+      "sceneFramesDuringTyping": 0,
+      "characters": 25000,
+      "paragraphCharacters": 100,
+      "paragraphs": 250,
+      "edits": 40,
+      "meanMs": 1.8650000035762786,
+      "medianMs": 1.6999999284744263,
+      "p95Ms": 3.200000047683716,
+      "maxMs": 6.100000023841858,
+      "snapshots": 0,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    "notes": "One controlled pair; earlier exploratory run overlapped other qualification processes and is not used for the comparison."
+  },
+  "save": {
+    "warm": {
+      "idle": [
+        94.98462500000005,
+        87.86504199999945,
+        90.65358300000025
+      ],
+      "active": [
+        90.55104199999914,
+        95.36537500000031,
+        93.50887500000044
+      ]
+    },
+    "sample": {
+      "baselineSaveMs": 54.64525000000003,
+      "concurrentSaveMs": 81.33620799999971,
+      "providerDelayMs": 250,
+      "maxForegroundWaitMs": 0.16979200000014316
+    },
+    "notes": "Six alternating local native HTTP saves, three idle and three cancelling an in-flight 250ms local embedding provider; no paid calls."
+  }
+}

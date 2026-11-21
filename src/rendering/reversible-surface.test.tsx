@@ -234,3 +234,10 @@ describe('structural containers and recursive reverse surfaces',()=>{
  });
  it('leaves commands unavailable under the feature fallback',()=>{const s=setup([text('a')],false);expect(s.editor.surfaces.can('surface.create',s.byId('a').key)).toBe(false);s.editor.surfaces.run('surface.create',s.byId('a').key);expect(s.editor.encodeDocument().children![0].id).toBe('a');});
 });
+
+it('resolves a resource information owner through its Surface without enumerating repository contents',()=>{
+ const editor=new ReactiveEditor({type:'document-block',id:'bounded',children:[{type:'surface-block',children:[{type:'side-block',children:[{type:'iframe-block',id:'resource',metadata:{url:'https://example.org'}}]},{type:'side-block',children:[{type:'container-block',children:[resourceInformation({id:'resource'})]}]}]}]},{features:{reversibleBlocks:true}});registerCoreViews(editor);const projection=editor.createView('bounded-information');
+ const read=editor.repository.readState.bind(editor.repository),keys=vi.fn(Reflect.ownKeys);vi.spyOn(editor.repository,'readState').mockImplementation(()=>{const state=read();return {...state,contents:new Proxy<typeof state.contents>(state.contents,{ownKeys:keys})};});
+ const host=document.body.appendChild(document.createElement('div')),dispose=render(()=><ReactiveTreeView editor={editor} projection={projection}/>,host);cleanups.push(()=>{dispose();editor.dispose();});
+ expect(host.querySelector('.resource-reverse-information')).not.toBeNull();expect(keys).not.toHaveBeenCalled();
+});

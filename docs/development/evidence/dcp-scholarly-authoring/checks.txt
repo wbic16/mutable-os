@@ -1,0 +1,16 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ server/dialectic/providers.test.ts (42 tests) 646ms
+ ✓ src/features/dialectic/dcp/scholarly.test.ts (2 tests) 353ms
+ ✓ src/features/dialectic/dcp/proactive.test.ts (5 tests) 450ms
+ ✓ src/features/dialectic/dcp/efficiency.test.ts (5 tests) 522ms
+ ✓ src/features/dialectic/dcp/editorial.test.ts (10 tests) 661ms
+ ✓ src/features/dialectic/dcp/workspace.test.ts (6 tests) 837ms
+   ✓ creates in N, reuses fresh authority in N+1 across agents, authors a Gloss and reconstructs in N+2 382ms
+
+ Test Files  6 passed (6)
+      Tests  70 passed (70)
+   Start at  16:48:18
+   Duration  13.48s (transform 10.05s, setup 0ms, collect 53.52s, tests 3.47s, environment 6.25s, prepare 1.02s)
+

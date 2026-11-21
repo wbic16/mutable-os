@@ -1,0 +1,85 @@
+{
+  "virtualTextFlows": false,
+  "virtualItemKeysDuringTyping": 0,
+  "blockHeight": 30.296875,
+  "blockStep": 42.296875,
+  "mountMs": 3144.399999976158,
+  "mountedElements": 29272,
+  "characterSpans": 25000,
+  "dialecticRanges": false,
+  "codeMode": "",
+  "structuredMode": "",
+  "structuredWorkersDuringTyping": 0,
+  "pdfMode": "",
+  "pdfCallsDuringTyping": 0,
+  "iiifMode": "",
+  "iiifCallsDuringTyping": 0,
+  "academicMode": "",
+  "academicRequests": 0,
+  "backlinks": false,
+  "markdownExperiment": false,
+  "presentation": "flint",
+  "sceneFramesDuringTyping": 0,
+  "characters": 25000,
+  "paragraphCharacters": 100,
+  "paragraphs": 250,
+  "edits": 40,
+  "meanMs": 1.9300000011920928,
+  "medianMs": 1.600000023841858,
+  "p95Ms": 6.199999988079071,
+  "maxMs": 8,
+  "snapshots": 0,
+  "restored": true,
+  "unrelatedCellStable": true
+}
+Real Chrome insertText, Backspace, undo and redo: passed
+{
+  "split": {
+    "splitMs": 8.5,
+    "frameMs": 68.59999996423721,
+    "undoMs": 24.400000035762787,
+    "splitSnapshots": 0,
+    "added": true,
+    "focusedRight": true,
+    "restored": true,
+    "unrelatedCellStable": true
+  }
+}
+Real Chrome Enter and split undo: passed
+{
+  "boundaries": [
+    {
+      "position": "start",
+      "handlerMs": 3.899999976158142,
+      "frameMs": 45.69999998807907,
+      "undoMs": 3.199999988079071,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    {
+      "position": "end",
+      "handlerMs": 3.900000035762787,
+      "frameMs": 38,
+      "undoMs": 18.100000023841858,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    {
+      "position": "empty",
+      "handlerMs": 3.5,
+      "frameMs": 47.5,
+      "undoMs": 3.399999976158142,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    }
+  ]
+}

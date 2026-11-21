@@ -1,6 +1,8 @@
 import { For, Show, createSignal, onMount, onCleanup } from 'solid-js';
 import type { DocumentApplicationInstance } from '../../feature-api/document-application';
 import { ApplicationSurfaceBoundary } from '../../feature-api';
+import { featureFlags } from '../../configuration';
+import { downloadSaveDiagnostics } from '../../persistence/browser-save-diagnostics';
 
 /** Local presentation of the existing file capability; no binding or save authority. */
 export function StorageSheet(props: {application: DocumentApplicationInstance; close: () => void; destination: {folder:string;filename:string}; setDestination: (value:{folder:string;filename:string}) => void}) {
@@ -28,6 +30,7 @@ export function StorageSheet(props: {application: DocumentApplicationInstance; c
           <button disabled={busy()} onClick={()=>void run(()=>app.files!.open(location()))}>Open native</button>
           <button disabled={busy()} onClick={()=>void run(()=>app.files!.open(location(),true))}>Import Markdown</button>
           <button disabled={busy()} onClick={()=>void run(()=>app.files!.recover(location()))}>Retry / Recover</button>
+          <Show when={featureFlags.browserSaveDiagnostics}><button disabled={busy()} onClick={()=>void run(downloadSaveDiagnostics)}>Download save diagnostics</button></Show>
           <p>Documents save as Mutable JSON using their opened filename. Saving is manual (Command-S or Control-S). Workspace saving remains unavailable when native resource semantics cannot be preserved. Changing the fields selects a file to open or a first-save destination; it does not relocate an already bound Document.</p>
       <button disabled={busy()||app.vault?.state()?.readOnly||app.vault?.state()?.busy||!app.properties()} onClick={()=>void run(()=>app.files!.save(location()))}>Save to selected destination</button>
     </Show>

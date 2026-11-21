@@ -1,0 +1,31 @@
+{
+  "persistedSourceMaps": {
+    "passages": 66,
+    "spans": 164,
+    "exact": true
+  },
+  "createdUtc": "2026-11-13T21:36:18.456Z",
+  "sourceProof": {
+    "chunks": 66,
+    "spans": 164,
+    "allExact": true,
+    "contributionBoundaries": true
+  },
+  "unicode": {
+    "chunks": 6,
+    "spans": 6,
+    "allExact": true,
+    "contributionBoundaries": true
+  },
+  "sqliteVersion": "v0.1.9",
+  "atomicRollback": true,
+  "reopen": true,
+  "staleRejection": true,
+  "foreignResourceRejection": true,
+  "foreignOccurrenceRejection": true,
+  "changedExcerptRejection": true,
+  "hashReuseProof": true,
+  "networkCalls": 0,
+  "applicationHooksAdded": 0,
+  "notes": "Hash-reuse test is a pure proof; not an application Undo/Redo or save integration qualification."
+}

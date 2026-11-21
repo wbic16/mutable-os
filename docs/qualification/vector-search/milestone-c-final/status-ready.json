@@ -1,0 +1,30 @@
+{
+  "at": "2026-11-14T04:48:00.714Z",
+  "current": "imported",
+  "status": {
+    "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+    "decision": "enabled",
+    "provider": {
+      "kind": "hosted",
+      "name": "OpenAI",
+      "model": "text-embedding-3-small",
+      "configured": true,
+      "localAvailable": false
+    },
+    "documents": true,
+    "queries": false,
+    "documentTokens": 50000,
+    "queryTokens": 5000,
+    "documentTokensUsed": 40457,
+    "queryTokensUsed": 0,
+    "index": {
+      "complete": false,
+      "state": "indexing"
+    },
+    "indexed": 271,
+    "known": 2314,
+    "error": "",
+    "coverage": "Saved Documents only; unsaved content is not covered",
+    "reauthorizationRequired": false
+  }
+}

@@ -1,4 +1,5 @@
 import { documentStylePorts } from '../runtime/document-style-ports';
+import {textAppearanceProperty} from '../block-tree/native-authoring';
 import {useGlossPresentation} from '../features/gloss/presentation-context';
 import { initialisCommand } from "../features/initialis/controller";
 import { ownSelectionToolbar } from "../input/selection-target";
@@ -168,10 +169,11 @@ export function DocumentStyleBar(props: { editor: ReactiveEditor; scopeKey?: Nod
   const blockStyle = (type: string, value: string) => {
     if (editor.crossText.range()) { editor.crossText.notice("Collapse the text selection before changing paragraph layout."); return; }
     capture(); const node = target(); if (!node) { setNotice("Focus a text Block first."); return; }
+    const property=textAppearanceProperty(node.viewType,type,type==='block/indent'?Number(value):value);
     const current = (node.payload.blockProperties as Record<string, unknown>[] | undefined) ?? [];
     const existing = current.find(p => p.type === type && !p.isDeleted);
-    if (existing?.value === value) return;
-    editor.commands.setPayloadField(node.key, "blockProperties", [...unwrap(current).filter(p => p !== unwrap(existing)), { ...unwrap(existing), type, value }], "Format Block");
+    if (existing?.value === property.value) return;
+    editor.commands.setPayloadField(node.key, "blockProperties", [...unwrap(current).filter(p => p !== unwrap(existing)), { ...unwrap(existing), ...property }], "Format Block");
     setNotice(""); restore();
   };
   const indent = (delta: number) => {

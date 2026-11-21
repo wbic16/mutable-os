@@ -1,0 +1,73 @@
+{
+  "defaultModel": "gpt-5.4-mini",
+  "openai": {
+    "observedMs": 198.5999999642372,
+    "commitMs": 18.799999952316284,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "author": "ai",
+    "participant": "fcc0da9a-3242-4eb3-aae4-42717e44373d:ai",
+    "provider": "openai",
+    "model": "fixture-openai",
+    "tools": 1,
+    "attempts": 2,
+    "definitions": 0,
+    "sameMount": true,
+    "sameSession": true
+  },
+  "anthropic": {
+    "observedMs": 109.30000001192093,
+    "commitMs": 14.600000023841858,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "author": "ai",
+    "participant": "fcc0da9a-3242-4eb3-aae4-42717e44373d:ai",
+    "provider": "anthropic",
+    "model": "fixture-anthropic",
+    "tools": 1,
+    "attempts": 2,
+    "definitions": 0,
+    "sameMount": true,
+    "sameSession": true
+  },
+  "undoRedo": true,
+  "repair": [
+    {
+      "repair": "Error: Unsupported markup element",
+      "usage": {
+        "input_tokens": 50,
+        "output_tokens": 20
+      }
+    },
+    {
+      "usage": {
+        "input_tokens": 50,
+        "output_tokens": 20
+      }
+    }
+  ],
+  "cancelWhileEditing": {
+    "aborted": 1,
+    "networkDuringTyping": 0,
+    "snapshots": 0,
+    "rebuilds": 0
+  },
+  "rateLimitNoRetry": true,
+  "submitAndAsk": {
+    "observedMs": 117.39999997615814,
+    "commitMs": 7.399999976158142,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "unrelatedUnchanged": true,
+    "repliedToSubmitted": true
+  },
+  "textual": true,
+  "desktopReturn": true,
+  "saveReload": {
+    "contributions": 6,
+    "providerRecords": 4,
+    "keysForgotten": true
+  },
+  "fixtureOnly": true,
+  "providerRequests": 10
+}

@@ -1,0 +1,94 @@
+{
+  "virtualTextFlows": false,
+  "virtualItemKeysDuringTyping": 0,
+  "blockHeight": 30.296875,
+  "blockStep": 42.296875,
+  "mountMs": 2197.399999976158,
+  "mountedElements": 29272,
+  "characterSpans": 25000,
+  "dialecticRanges": true,
+  "dialecticIndex": {
+    "treeVisits": 0,
+    "propertyReads": 0,
+    "recordUpdates": 0,
+    "definitionReads": 0,
+    "contentsUpdates": 0,
+    "contentsReads": 0,
+    "excerptReads": 0
+  },
+  "codeMode": "",
+  "structuredMode": "",
+  "structuredWorkersDuringTyping": 0,
+  "pdfMode": "",
+  "pdfCallsDuringTyping": 0,
+  "iiifMode": "",
+  "iiifCallsDuringTyping": 0,
+  "academicMode": "",
+  "academicRequests": 0,
+  "backlinks": false,
+  "markdownExperiment": false,
+  "presentation": "flint",
+  "sceneFramesDuringTyping": 0,
+  "characters": 25000,
+  "paragraphCharacters": 100,
+  "paragraphs": 250,
+  "edits": 40,
+  "meanMs": 1.727499994635582,
+  "medianMs": 1.5,
+  "p95Ms": 3.399999976158142,
+  "maxMs": 5,
+  "snapshots": 0,
+  "restored": true,
+  "unrelatedCellStable": true
+}
+Real Chrome insertText, Backspace, undo and redo: passed
+{
+  "split": {
+    "splitMs": 11.600000023841858,
+    "frameMs": 62.89999997615814,
+    "undoMs": 26.100000023841858,
+    "splitSnapshots": 0,
+    "added": true,
+    "focusedRight": true,
+    "restored": true,
+    "unrelatedCellStable": true
+  }
+}
+Real Chrome Enter and split undo: passed
+{
+  "boundaries": [
+    {
+      "position": "start",
+      "handlerMs": 8.299999952316284,
+      "frameMs": 44.699999928474426,
+      "undoMs": 5.400000095367432,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    {
+      "position": "end",
+      "handlerMs": 7.800000071525574,
+      "frameMs": 37.40000009536743,
+      "undoMs": 18.899999976158142,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    {
+      "position": "empty",
+      "handlerMs": 7.5,
+      "frameMs": 63.799999952316284,
+      "undoMs": 5.600000023841858,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    }
+  ]
+}

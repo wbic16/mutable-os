@@ -12,6 +12,8 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      // The local credential broker verifies browser Origin against Host.
+      '/api/dialectic': { target: `http://127.0.0.1:${process.env.PORT || 3002}`, changeOrigin: false },
       '/api': `http://127.0.0.1:${process.env.PORT || 3002}`,
     },
   },

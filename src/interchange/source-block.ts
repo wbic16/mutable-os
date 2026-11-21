@@ -1,5 +1,6 @@
 import { emptyFragment, LIMITS, validateFragment } from './fragment';
-import type { JsonObject } from '../block-tree/types';
+import type { JsonObject,ExistingBlockDto } from '../block-tree/types';
+import {validateLiteralText} from '../block-tree/literal-authoring';
 export type SourceFormat = 'markdown' | 'html';
 export const sourceTypes = ['mutable/markdown-source-block', 'mutable/html-source-block'] as const;
 export const sourceType = (format: SourceFormat) => `mutable/${format}-source-block`;
@@ -11,7 +12,13 @@ export function sourceFormat(type: string, payload: JsonObject): SourceFormat {
  return format;
 }
 export function sourcePayload(format: SourceFormat, text = '', metadata: JsonObject = {}) {
+ if(!['markdown','html'].includes(format))throw Error('Unsupported source format');
+ validateLiteralText(text);
  return {text, sourceFormat: {version: 1, format, profile: `mutable-${format}-source-v1`}, metadata};
+}
+export const sourceOperation={purpose:'Retain exact Markdown or HTML as native source, not as composition fallback.',parameters:{format:{type:'string',enum:['markdown','html']},text:{type:'string'}},nativeEffects:sourceTypes} as const;
+export function sourceBlockDto(format:SourceFormat,text=''):ExistingBlockDto {
+ return {id:crypto.randomUUID(),type:sourceType(format),...sourcePayload(format,text),children:[]};
 }
 export function sourceFragment(format: SourceFormat, text: string, metadata: JsonObject = {}) {
  if (text.length > LIMITS.cells * 2 || new TextEncoder().encode(text).length > LIMITS.bytes) throw Error('Source exceeds the import limit.');

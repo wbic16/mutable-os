@@ -1,3 +1,4 @@
+import {contentUnits} from "../block-tree/inline-sequence";
 import { batch } from "solid-js";
 import { createStore, reconcile } from "solid-js/store";
 import type { CanonicalRepository } from "../block-tree/repository";
@@ -89,14 +90,13 @@ export class DocumentCounts {
         const chunks: string[] = []; let text = "";
         if (content.inlineKind === "standoff") {
           let processed = 0;
-          for (const placement of content.inlineContent) {
+          for (const cell of contentUnits(state,content)) {
             if (++processed % 2048 === 0) {
               await new Promise(resolve => setTimeout(resolve, 0));
               if (this.disposed) return;
               if (generation !== this.generation) { for (const pending of keys.slice(index)) this.dirty.add(pending); return; }
             }
-            const cell = state.contents[state.placements[placement].contentKey];
-            if (cell.viewType === "text-cell") text += String(cell.payload.text ?? "");
+            if (cell.kind === "text") text += cell.text;
             else { chunks.push(text); text = ""; }
           }
         } else text = String(content.payload.text ?? "");

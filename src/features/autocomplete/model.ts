@@ -8,7 +8,9 @@ export function invocation(caret: number, cell: (index: number) => string | unde
   const from = Math.max(0, caret - TOKEN_LIMIT), chars: string[] = [];
   for (let i = from; i < caret; i++) { const text = cell(i); if (text === undefined || text.includes('\n')) { chars.length = 0; continue; } chars.push(text); }
   const text = chars.join(''), base = caret - chars.length;
-  const match = /(?:^|\s)(@|\[\[|\(\(|\/)([^\n\[\]()]*)$/u.exec(text);
+  // Document parameter values may contain punctuation used by other invocations.
+  const match = /(?:^|\s)(\/)(flint\s+open\s+--doc(?:\s[^\n]*)?)$/iu.exec(text)
+    ?? /(?:^|\s)(@|\[\[|\(\(|\/)([^\n\[\]()]*)$/u.exec(text);
   if (!match) return;
   const start = base + [...text.slice(0, match.index + match[0].indexOf(match[1]))].length;
   // A token beginning at the truncated suffix boundary is not known to be a boundary.

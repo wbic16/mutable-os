@@ -1,3 +1,4 @@
+import {LOCAL_ENTITY,LOCAL_ENTITY_RELATION,ENTITY_REFERENCE} from '../../feature-api/scoped-entities';
 import type { DeepReadonly } from '../../block-tree/commit-capture';
 import { clone } from '../../block-tree/clone';
 import { createBlockId, createContentKey } from '../../block-tree/ids';
@@ -22,12 +23,15 @@ export function documentContextInventory(snapshot: DeepReadonly<ResourceSnapshot
       ...Object.values(c.payload.linkedAnnotations as Record<string, any> ?? {})];
     for (const p of properties) {
       if (p.isDeleted) continue;
+      if(p.type===LOCAL_ENTITY_RELATION||p.type===ENTITY_REFERENCE){const r=p.metadata?.scopedEntityRelation;for(const reference of r?[r.from,r.to]:[p.metadata?.entityReference])if(reference?.scope==='vault')unresolved.push({reference,reason:'Scope-qualified Vault Entity retained; no automatic global lookup or mutation.'});}
+
       if (p.type === 'codex/block-reference' && typeof p.value === 'string' && !localIds.has(p.value)) blockReferences.add(p.value);
       if (p.type === 'codex/document-reference' && p.value !== snapshot.resourceId) unresolved.push({ reference: p.value, reason: 'Referenced Document is outside the export.' });
       for (const reference of [externalDefinitionLink(p), externalAssetLink(p)]) if (reference) unresolved.push({reference, reason: 'External annotation definition or asset is not embedded.'});
     }
   }
-  return { ...inventory, blockReferences: [...blockReferences], unresolved };
+  const localEntities=Object.values(snapshot.contents).flatMap(c=>Object.values(c.payload.linkedAnnotations??{}).filter((d:any)=>d.type===LOCAL_ENTITY));
+  return { ...inventory, localEntities, blockReferences: [...blockReferences], unresolved };
 }
 export function unavailableDocumentContext(snapshot: DeepReadonly<ResourceSnapshot>, reason: string) {
   const inventory = documentContextInventory(snapshot);

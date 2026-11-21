@@ -73,6 +73,7 @@ export function FlintView(props:{application:DocumentApplicationInstance; initia
           <button aria-label="Reading density" aria-pressed={preferences.layout.density==='reading'} onClick={()=>{preferences.set('density',preferences.layout.density==='compact'?'reading':'compact');setMenu(false);}}>Reading density</button></Show>
           <button disabled={!app.vault} onClick={()=>{setMenu(false);chooseVault();}}>Open Another Cavern…</button>
           <button onClick={()=>openStorage()}>Open / Save native Ink…</button>
+          <Show when={app.interchange?.openTeiXml}><button onClick={()=>{setMenu(false);app.interchange!.openTeiXml!();}}>Open TEI XML…</button></Show>
           <Show when={app.publish}><button onClick={()=>{setMenu(false);app.publish!();}}>Publish to Web…</button></Show>
           <Show when={app.interchange}><button onClick={()=>{setMenu(false);app.interchange!.importCollection();}}>Import collection…</button><button onClick={()=>{setMenu(false);app.interchange!.exportCollection();}}>Export collection…</button><button onClick={()=>{setMenu(false);app.interchange!.importFiles();}}>Import external files…</button>
           <button onClick={()=>{setMenu(false);app.interchange!.importPackage();}}>Import Ink package…</button>

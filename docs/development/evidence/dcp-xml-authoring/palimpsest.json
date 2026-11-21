@@ -1,0 +1,59 @@
+{
+  "source": "dcp-performance-recovery/A1.json",
+  "xml": "<response intent=\"answer\"><p id=\"b1\">A <e ref=\"e1\"><b>palimpsest</b></e> is a manuscript page whose original writing has been scraped or washed away so it can be written on again, often leaving traces of the earlier text. Figuratively, a <e ref=\"e1\">palimpsest</e> is something whose earlier forms or history remain visible beneath its present appearance.</p>\n<definitions><passage id=\"r1\" target=\"@b96ba8573ff_2\" quote=\"palimpsest\"/>\n<entity id=\"e1\" name=\"Palimpsest\" type=\"Concept\"><description>A manuscript surface reused after earlier writing was erased; figuratively, something retaining traces of earlier layers or forms.</description></entity>\n<mention id=\"m1\" target=\"r1\" ref=\"e1\"/></definitions></response>\n",
+  "json": {
+    "protocol": "dcp/1.0",
+    "kind": "contribution",
+    "exchange": "aca38754-d76c-4545-b0e2-bc6b4edb4a99",
+    "intent": "answer",
+    "replyTargets": [],
+    "composition": [
+      {
+        "id": "new:b1",
+        "kind": "paragraph",
+        "markup": "A <e ref=\"new:e1\"><b>palimpsest</b></e> is a manuscript page whose original writing has been scraped or washed away so it can be written on again, often leaving traces of the earlier text. Figuratively, a <e ref=\"new:e1\">palimpsest</e> is something whose earlier forms or history remain visible beneath its present appearance.",
+        "ranges": [],
+        "textStyle": null,
+        "margins": null
+      }
+    ],
+    "anchors": [
+      {
+        "id": "new:r1",
+        "source": "src:vWZ-7wTu5pXfCNOdGUSKTg:b2",
+        "revision": "68288a68-8686-4e44-8bee-c73bd7c60e7f",
+        "selector": {
+          "exact": "palimpsest",
+          "prefix": "",
+          "suffix": ""
+        }
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Palimpsest",
+        "typename": "Concept",
+        "description": "A manuscript surface reused after earlier writing was erased; figuratively, something retaining traces of earlier layers or forms.",
+        "aliases": []
+      }
+    ],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r1",
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      }
+    ],
+    "arguments": [],
+    "glosses": [],
+    "relations": []
+  },
+  "nativeDefinitionCounts": {
+    "mutable/entity": 1,
+    "dialectic/range-anchor": 1
+  },
+  "nativeTextAndRangesEquivalent": true
+}

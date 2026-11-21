@@ -25,20 +25,25 @@ export function enrollPair(repository: CanonicalRepository, resourceId: string, 
 export class ResourcePair {
   private inFlight?: Promise<PairResult>;
   private pending?: DeepReadonly<PairGeneration>;
-  private savedNative?: string;
+  private savedRevision?: number;
+  private pendingRevision?: number;
   result: PairResult = { phase: "failed", dirty: true };
   constructor(private repository: CanonicalRepository, readonly resourceId: string, readonly adapter: PairAdapter, private targets: () => readonly LinkTarget[], private markdown = false) {}
-  acknowledgeOpen(native: string) {
+  /** Called only after native admission of the opened bytes. */
+  acknowledgeOpen() {
     if (this.inFlight || this.pending) throw new Error("Cannot change an active save baseline");
-    this.savedNative = native;
+    this.savedRevision = this.repository.resourceGeneration(this.resourceId);
   }
-  get dirty() { try { return this.savedNative !== nativeText(captureNative(this.repository.snapshot(), this.resourceId)); } catch { return true; } }
+  get dirty() { return this.savedRevision !== this.repository.resourceGeneration(this.resourceId); }
   save(acceptMarkdownHash?: string): Promise<PairResult> {
     if (this.inFlight) return this.inFlight;
     if (this.pending) return Promise.resolve({ ...this.result, error: "Resolve/recover the pending generation before saving newer edits", dirty: true });
     let generation: DeepReadonly<PairGeneration>;
+    const revision = this.repository.resourceGeneration(this.resourceId);
     try {
-      const resource = captureNative(this.repository.snapshot(), this.resourceId), native = nativeText(resource);
+      // Capture is synchronous and returns a detached, validated frozen resource.
+      // Cloning the entire repository first adds no consistency guarantee.
+      const resource = captureNative(this.repository.readState(), this.resourceId), native = nativeText(resource);
       // Normal saves capture only the authoritative JSON. Legacy paired export
       // remains explicit; it must not run its traversal on application Save.
       const captured = { resourceId: this.resourceId, generation: crypto.randomUUID(), native };
@@ -48,21 +53,22 @@ export class ResourcePair {
       } else generation = freeze(captured);
     } catch (error) { return Promise.resolve(this.result = { phase: "failed", error: String(error), dirty: true }); }
     this.pending = generation;
-    return this.run(() => this.adapter.save(generation, acceptMarkdownHash), generation.native, generation.generation);
+    this.pendingRevision = revision;
+    return this.run(() => this.adapter.save(generation, acceptMarkdownHash), revision, generation.generation);
   }
   recover(): Promise<PairResult> {
     if (this.inFlight) return this.inFlight;
-    return this.run(() => this.adapter.recover(), this.pending?.native, this.pending?.generation);
+    return this.run(() => this.adapter.recover(), this.pendingRevision, this.pending?.generation);
   }
-  private run(action: () => Promise<PairResult & { native?: string }>, native?: string, expectedGeneration?: string) {
+  private run(action: () => Promise<PairResult & { native?: string }>, revision?: number, expectedGeneration?: string) {
     this.inFlight = (async () => {
       let result: PairResult & { native?: string };
       try { result = await action(); } catch (error) { result = { phase: "failed", error: String(error), generation: expectedGeneration }; }
       if (expectedGeneration && (result.phase === "saved" || result.generation) && result.generation !== expectedGeneration) result = { phase: "failed", error: "Stale save completion", generation: expectedGeneration };
-      if (result.phase === "saved") { if (native ?? result.native) this.savedNative = native ?? result.native; this.pending = undefined; }
+      if (result.phase === "saved") { if (revision !== undefined) this.savedRevision = revision; this.pending = undefined; this.pendingRevision = undefined; }
       // Preflight/encoding rejection has no durable generation to recover.
-      if (result.phase === "failed" && !result.generation) this.pending = undefined;
-      return this.result = { ...result, dirty: this.dirty };
+      if (result.phase === "failed" && !result.generation) { this.pending = undefined; this.pendingRevision = undefined; }
+      return this.result = { ...result, dirty: result.phase !== 'saved' || this.dirty };
     })().finally(() => { this.inFlight = undefined; });
     return this.inFlight;
   }

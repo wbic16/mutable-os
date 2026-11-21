@@ -1,3 +1,4 @@
+import {contentLength,contentSlice} from "../block-tree/inline-sequence";
 import {annotationCollector} from './facts-annotations';
 import {resolveLinkedProperty, linkedDefinitionOwner} from '../block-tree/linked-annotations';
 import {canonicalSearchSource} from '../runtime/canonical-search-source';
@@ -39,7 +40,7 @@ export async function collectFacts(state:RepositoryState,resourceId:string,signa
   const c=state.contents[p.contentKey];if(!c||seen.has(c.key))continue;seen.add(c.key);
   const blockId=String(c.payload.id),block:BlockFact={id:blockId,type:c.viewType,ordinal:visits,cellCount:0};facts.blocks.push(block);
   if(opaqueType(c.viewType,extraction)||c.inlineKind!=='standoff'&&!nativeTextTypes.includes(c.viewType)&&typeof c.payload.text==='string'&&!!c.payload.text){warn(`Unsupported hosted content (${c.viewType}) omitted.`);continue;}
-  block.cellCount=c.inlineContent.length;
+  block.cellCount=contentLength(c);
   let inline:InlineFacts|undefined;const textStart=performance.now();
   if(c.inlineKind==='standoff') {
    if(inlineReader){inline=await inlineReader(blockId,signal);block.text=inline.text;block.cellCount=inline.length;}
@@ -50,11 +51,9 @@ export async function collectFacts(state:RepositoryState,resourceId:string,signa
   }
   policy?.check?.();if(policy?.timings)policy.timings.textMs+=performance.now()-textStart;const annotationStart=performance.now();
   for(const raw of !sourceTextTypes.includes(c.viewType)&&Array.isArray(c.payload.standoffProperties)?c.payload.standoffProperties:[]) {
-   await annotations.add({raw,blockId,standoff:c.inlineKind==='standoff',length:inline?.length??c.inlineContent.length,
+   await annotations.add({raw,blockId,standoff:c.inlineKind==='standoff',length:inline?.length??contentLength(c),
     resolve:raw=>{const owner=linkedDefinitionOwner(state,raw,c.key);return {property:resolveLinkedProperty(state,raw,c.key),owner:owner?{root:owner.key===root.key,blockId:String(owner.payload.id)}:undefined};},
-    snippet:(from,to,context)=>inline?inline.snippet(from,to):c.inlineContent.slice(from,to).map(key=>{
-     const cell=state.contents[state.placements[key]?.contentKey];return context?cell?.payload.text??'[inline object]':cell.viewType==='text-cell'?String(cell.payload.text):'[inline object]';
-    }).join('')});
+    snippet:(from,to,context)=>inline?inline.snippet(from,to):contentSlice(state,c,from,to).map(a=>a.kind==='text'?a.text:'[inline object]').join('')});
   }
   if(policy?.timings)policy.timings.annotationsMs+=performance.now()-annotationStart;
   const relations=Object.keys(c.ownedRelations).sort((a,b)=>a.localeCompare(b));

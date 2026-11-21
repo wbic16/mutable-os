@@ -1,0 +1,170 @@
+{
+  "all": [
+    {
+      "mounted": true,
+      "loadEditorMs": 1943.4000000357628,
+      "mountMs": 3147.7999999523163,
+      "contributions": 6,
+      "cells": 55376,
+      "xmlBytes": 2804,
+      "manifestMs": 2.800000011920929,
+      "requestBuildMs": 1.800000011920929,
+      "workspaceMs": 5.799999952316284,
+      "xmlProjectionMs": 0.8999999761581421,
+      "historyColdMs": 8.800000011920929,
+      "historyWarmMs": 0.10000002384185791,
+      "xmlLowerMs": 4,
+      "nativePrepareMs": 7,
+      "definitions": 10,
+      "addedAnnotations": 8,
+      "controllerValidateMs": 3.099999964237213,
+      "lastProviderPanelMs": 1064.199999988079,
+      "controllerExchangeMs": 1062.800000011921,
+      "autosaveMs": 748.0999999642372,
+      "nextTwoFramesMs": 111.10000002384186,
+      "visibility": [
+        {
+          "ms": 1062.199999988079,
+          "key": "node:b7a83d25-475f-45ed-925e-061bc9e7c447",
+          "intersecting": false,
+          "ratio": 0
+        },
+        {
+          "ms": 1062.199999988079,
+          "key": "node:b7a83d25-475f-45ed-925e-061bc9e7c447",
+          "intersecting": true,
+          "ratio": 0.9609517455101013
+        }
+      ],
+      "longAnimationFrames": [
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 12431.400000035763,
+          "duration": 312.5,
+          "navigationId": 7888,
+          "paintTime": 12743.900000035763,
+          "presentationTime": 13408,
+          "renderStart": 12740.600000023842,
+          "styleAndLayoutStart": 12741.699999988079,
+          "firstUIEventTimestamp": 12435,
+          "blockingDuration": 246.3,
+          "scripts": []
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 12749.100000023842,
+          "duration": 743.1999999880791,
+          "navigationId": 7888,
+          "paintTime": 13492.300000011921,
+          "presentationTime": 13780,
+          "renderStart": 12750.800000011921,
+          "styleAndLayoutStart": 13492.100000023842,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 692.5,
+          "scripts": [
+            {
+              "duration": 739,
+              "forcedStyleAndLayoutDuration": 0,
+              "source": "http://localhost:3005/src/persistence/after-paint.ts",
+              "function": "finish"
+            }
+          ]
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 13492.900000035763,
+          "duration": 56.5,
+          "navigationId": 7888,
+          "paintTime": 13549.400000035763,
+          "presentationTime": 13872,
+          "renderStart": 13544.300000011921,
+          "styleAndLayoutStart": 13546.800000011921,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": []
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 13556,
+          "duration": 53.10000002384186,
+          "navigationId": 7888,
+          "paintTime": 13609.100000023842,
+          "presentationTime": 13904,
+          "renderStart": 13608.600000023842,
+          "styleAndLayoutStart": 13609,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": []
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 13611.600000023842,
+          "duration": 70.39999997615814,
+          "navigationId": 7888,
+          "paintTime": 13682,
+          "presentationTime": 13940,
+          "renderStart": 13681.900000035763,
+          "styleAndLayoutStart": 13681.900000035763,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": []
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 13698.400000035763,
+          "duration": 81.5,
+          "navigationId": 7888,
+          "paintTime": 13779.900000035763,
+          "presentationTime": 13980,
+          "renderStart": 13779.699999988079,
+          "styleAndLayoutStart": 13779.699999988079,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": []
+        }
+      ],
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [
+        {
+          "ms": 317.9000000357628,
+          "key": "node:b7a83d25-475f-45ed-925e-061bc9e7c447"
+        }
+      ],
+      "responseRect": {
+        "x": 170,
+        "y": 207.328125,
+        "width": 816,
+        "height": 549,
+        "top": 207.328125,
+        "right": 986,
+        "bottom": 756.328125,
+        "left": 170
+      },
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 3.5,
+      "saveCaptureMs": 574.7999999523163,
+      "saveEncodeMs": 49.80000001192093,
+      "saveBytes": 559712,
+      "fullSaveWithInMemoryAdapterMs": 442,
+      "domNodes": 7913
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ],
+  "fixtureSha256": "9f5655fe8c24dad1d084dde7acc1f525fedfcfd174bfeeaf37c0897293867820",
+  "diagnosticDelayMs": 0,
+  "unrelatedParagraphs": 500
+}

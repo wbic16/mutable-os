@@ -1,4 +1,11 @@
+import {assertScopedSemanticCopy} from '../block-tree/scoped-semantic-copy';
+import {contentLength,contentSlice} from "../block-tree/inline-sequence";
+import { isReadingRelation, type InlineAlternativeProperties } from '../block-tree/inline-alternative';
+import { INLINE_ALTERNATIVES_CAPABILITY } from './capabilities';
+import { transferSemanticPointers } from './semantic-transfer';
+import { resourceOwner, type ResourceOwnershipLookup } from '../block-tree/resource-identity';
 import {glossDefinition} from "../features/gloss/model";
+import {rangeDefinition} from '../features/dialectic/anchors';
 import {STRUCTURED_BLOCK} from '../structured/model';
 import { isSourceType } from './source-block';
 import { managedAsset } from './managed-asset';
@@ -9,14 +16,26 @@ import { clipProperties } from './ranges';
 import { emptyFragment, LIMITS, validateFragment, type FragmentBlock, type InterchangeScope, type MutableFragment, type Reference } from './fragment';
 
 export interface Slice { placementKey: string; start?: number; end?: number; gap?: boolean }
+/** Explicit text projection, not a clone of scoped semantic definitions. Work is
+ * bounded by selected Cells; no owner discovery or repository inventory. */
+export function selectionText(state:RepositoryState,slices:Slice[]):string {
+  return slices.map(slice=>{
+    const placement=state.placements[slice.placementKey],content=placement&&state.contents[placement.contentKey];
+    const {start,end}=slice;
+    if(!content||content.inlineKind!=='standoff'||start===undefined||end===undefined||!Number.isInteger(start)||!Number.isInteger(end)||start<0||end<start||end>contentLength(content))throw Error('Stale text selection.');
+    return contentSlice(state,content,start,end).map(atom=>atom.kind==='text'?atom.text:atom.kind==='image'?String(atom.properties.alt??'\uFFFC'):'\uFFFC').join('');
+  }).join('\n');
+}
 const omit = (data: JsonObject, keys: string[]) => Object.fromEntries(Object.entries(clone(data)).filter(([key, v]) => !keys.includes(key) && v !== undefined));
 
 /** Selected authored data only. Inline Cells are compact runs, never repository keys. */
-export function serializeSelection(state: RepositoryState, slices: Slice[], scope: InterchangeScope = {}, packageDefinitions = false, observeBlock?: (localId:string, canonicalId:string)=>void): MutableFragment {
+export function serializeSelection(state: RepositoryState, slices: Slice[], scope: InterchangeScope = {}, packageDefinitions = false, observeBlock?: (localId:string, canonicalId:string)=>void, displayedReading?: (placement: string, slot: InlineAlternativeProperties) => number, ownership?:ResourceOwnershipLookup): MutableFragment {
   const f = emptyFragment(); if(packageDefinitions)Object.assign(f,{packageRetainedBlocks:[]}); f.provenance = { producer: 'Mutable', ...scope };
   let serial = 0; const id = () => `f${++serial}`;
   const contentIds = new Map<string, string>(), placementIds = new Map<string, string>(), blockIds = new Map<string, string>(), definitionIds = new Map<string, string>();
   const pending: Array<{ reference: Reference; sourceId: string }> = [];
+  const semanticSources=new Map<string,string>();
+  const annotationIds=new Map<string,string>();
   const external = (object: 'entity' | 'block', value: string): Reference => {
     const ref: Reference = { kind: 'external', object, id: value, source: { ...scope } };
     if (object === 'block') pending.push({ reference: ref, sourceId: value });
@@ -29,12 +48,13 @@ export function serializeSelection(state: RepositoryState, slices: Slice[], scop
   const property = (p: JsonObject, contentKey: string) => {
     let reference = target(p);
     if (typeof p.annotationId === 'string') {
-      const owner = linkedDefinitionOwner(state, p, contentKey);
+      const owner = linkedDefinitionOwner(state, p, contentKey,ownership);
       const definition = owner && linkedRegistry(state, owner.key)[p.annotationId];
       if (definition) {
         const key = `${owner.key}:${p.annotationId}`;
         if (!definitionIds.has(key)) {
           const localId = id(); definitionIds.set(key, localId);
+          annotationIds.set(p.annotationId,localId);semanticSources.set(localId,owner.key);
           const ref = target(definition);
           f.definitions.push({ localId, type: String(definition.type), attributes: omit(definition, ['id', 'type', ...(ref ? ['value'] : [])]), ...(ref ? { target: ref } : {}) });
         }
@@ -53,8 +73,9 @@ export function serializeSelection(state: RepositoryState, slices: Slice[], scop
       return edge;
     }
     const c = state.contents[p.contentKey]; if (!c) throw Error('Missing selected content.');
+    if(!packageDefinitions)assertScopedSemanticCopy(state,c.key);
     // A whole Document copy owns its unanchored/tombstoned Glosses too.
-    if(c.viewType==='document-block'&&!slice)for(const [annotationId,d]of Object.entries(linkedRegistry(state,c.key)))if(glossDefinition(d))property({type:d.type,annotationId},c.key);
+    if(c.viewType==='document-block'&&!slice)for(const [annotationId,d]of Object.entries(linkedRegistry(state,c.key)))if(glossDefinition(d)||rangeDefinition(d))property({type:d.type,annotationId},c.key);
     const localId = !slice && contentIds.get(c.key) || id();
     f.placements.push({ localId: edge, kind: p.kind === 'reference' ? 'reference' : 'owned', target: { kind: 'local', object: 'block', id: localId } });
     if (!slice && contentIds.has(c.key)) return edge;
@@ -71,6 +92,7 @@ export function serializeSelection(state: RepositoryState, slices: Slice[], scop
     if (c.viewType === STRUCTURED_BLOCK || c.viewType === 'plain-text-block' || isSourceType(c.viewType)) b.data.text = String(c.payload.text ?? '');
     if(isSourceType(c.viewType) && c.payload.standoffProperties!==undefined)b.data.standoffProperties=clone(c.payload.standoffProperties);
     f.blocks.push(b);
+    semanticSources.set(localId,c.key);
     if(packageDefinitions && c.definitionOwnerKey)(f as MutableFragment&{packageRetainedBlocks:string[]}).packageRetainedBlocks.push(b.localId);
     const anchor = (b.data.metadata as any)?.anchor;
     if (anchor && typeof anchor.blockId === 'string') {
@@ -79,11 +101,19 @@ export function serializeSelection(state: RepositoryState, slices: Slice[], scop
     }
     for (const p of (Array.isArray(c.payload.blockProperties) ? c.payload.blockProperties : [])) b.blockProperties.push(property(p, c.key));
     if (c.inlineKind === 'standoff') {
-      const start = slice?.start ?? 0, end = slice?.end ?? c.inlineContent.length;
-      if (start < 0 || end < start || end > c.inlineContent.length) throw Error('Stale text selection.');
+      const start = slice?.start ?? 0, end = slice?.end ?? contentLength(c);
+      if (start < 0 || end < start || end > contentLength(c)) throw Error('Stale text selection.');
       b.inline = { atoms: [], properties: [] };
-      for (const key of c.inlineContent.slice(start, end)) {
-        const cell = state.contents[state.placements[key].contentKey];
+      for (const atom of contentSlice(state,c,start,end)) {
+        if (atom.kind === 'alternative') {
+          f.requiredCapabilities=[INLINE_ALTERNATIVES_CAPABILITY];
+          const properties=clone(atom.properties),owner=resourceOwner(state,c.key,ownership),provenance=(owner?.payload.metadata as any)?.interchange?.provenance;
+          if(provenance && !properties.metadata?.nativeTransfer)properties.metadata={...properties.metadata,nativeTransfer:{version:1,source:{...scope},provenance:clone(provenance)}};
+          b.inline.atoms.push({kind:'alternative',properties,displayReading:displayedReading?.(placementKey,atom.properties)??0});
+          for(const name of atom.properties.readings)b.relations[name]=visit(c.ownedRelations[name]);
+          continue;
+        }
+        const cell=atom.kind==='text'?{viewType:'text-cell',payload:{text:atom.text} as Record<string,any>}:{viewType:'image-cell',payload:atom.properties};
         if (cell.viewType === 'text-cell') {
           const text = String(cell.payload.text ?? ''), last = b.inline.atoms.at(-1);
           if (last?.kind === 'text') last.text += text; else b.inline.atoms.push({ kind: 'text', text });
@@ -99,17 +129,18 @@ export function serializeSelection(state: RepositoryState, slices: Slice[], scop
       }
       for (const p of (Array.isArray(c.payload.standoffProperties) ? c.payload.standoffProperties : [])) {
         if (!p || !Number.isInteger(p.start) || !Number.isInteger(p.end) || p.start < 0 ||
-          (p.isZeroWidth === true ? p.start !== p.end || p.end > c.inlineContent.length : p.end < p.start || p.end >= c.inlineContent.length)) {
+          (p.isZeroWidth === true ? ![p.start,p.start-1].includes(p.end) || p.start > contentLength(c) : p.end < p.start || p.end >= contentLength(c))) {
           throw Error('A selected Block contains an invalid annotation range; nothing was copied or cut.');
         }
       }
-      for (const p of clipProperties(c.payload.standoffProperties, start, end, c.inlineContent.length, -start, !slice)) {
-        b.inline.properties.push({ ...property(p, c.key), startIndex: Number(p.start), endIndex: Number(p.end) + (p.isZeroWidth === true ? 0 : 1), isZeroWidth: p.isZeroWidth === true, ...(p.isZeroWidth === true ? { affinity: p.affinity as 'before' | 'after' } : {}) });
+      const priorPoints=new Set((Array.isArray(c.payload.standoffProperties)?c.payload.standoffProperties:[]).filter(p=>p.isZeroWidth&&p.end===p.start-1).map(p=>p.id));
+      for (const p of clipProperties(c.payload.standoffProperties, start, end, contentLength(c), -start, !slice)) {
+        b.inline.properties.push({ ...property(p, c.key), startIndex: Number(p.start), endIndex: Number(p.end) + (p.isZeroWidth === true ? 0 : 1), isZeroWidth: p.isZeroWidth === true, ...(p.isZeroWidth === true ? { affinity: p.affinity as 'before' | 'after',...(priorPoints.has(p.id)?{pointEndOffset:-1 as const}:{}) } : {}) });
       }
     }
     if (!slice) {
       b.children = c.children.map(key => visit(key));
-      b.relations = Object.fromEntries(Object.entries(c.ownedRelations).map(([name, key]) => [name, visit(key)]));
+      for(const [name,key] of Object.entries(c.ownedRelations)) if(!isReadingRelation(name)) b.relations[name]=visit(key);
     }
     return edge;
   };
@@ -117,8 +148,17 @@ export function serializeSelection(state: RepositoryState, slices: Slice[], scop
   for (let i = 0; i < slices.length; i++) {
     const s = slices[i], partial = s.start !== undefined;
     const c = state.contents[state.placements[s.placementKey]?.contentKey];
-    f.roots.push({ placement: visit(s.placementKey, partial ? s : undefined), openStart: partial, openEnd: partial, clippedStart: partial && s.start! > 0, clippedEnd: partial && s.end! < c.inlineContent.length, ...(i < slices.length - 1 ? { separatorAfter: s.gap ? 'selection-gap' as const : 'paragraph' as const } : {}) });
+    f.roots.push({ placement: visit(s.placementKey, partial ? s : undefined), openStart: partial, openEnd: partial, clippedStart: partial && s.start! > 0, clippedEnd: partial && s.end! < contentLength(c), ...(i < slices.length - 1 ? { separatorAfter: s.gap ? 'selection-gap' as const : 'paragraph' as const } : {}) });
   }
+  // Include known semantic-definition dependencies lazily from the selected
+  // closure. This never inventories unrelated workspace Documents.
+  const remap=(value:unknown,owner:string)=>transferSemanticPointers(value,(kind,sourceId)=>{
+    if(kind==='block')return blockIds.get(sourceId);
+    if(!annotationIds.has(sourceId))property({type:'tei/semantic',annotationId:sourceId},owner);
+    return annotationIds.get(sourceId);
+  },scope);
+  for(const b of f.blocks){const owner=semanticSources.get(b.localId)!;remap(b.data,owner);for(const p of [...b.blockProperties,...b.inline?.properties??[]])remap(p.attributes,owner);for(const a of b.inline?.atoms??[])if(a.kind==='alternative')remap(a.properties.metadata,owner);}
+  for(let i=0;i<f.definitions.length;i++){if(f.definitions.length>LIMITS.properties)throw Error('Clipboard semantic closure exceeds the limit.');const d=f.definitions[i];remap(d.attributes,semanticSources.get(d.localId)!);}
   for (const { reference, sourceId } of pending) if (blockIds.has(sourceId)) Object.assign(reference, { kind: 'local', object: 'block', id: blockIds.get(sourceId) });
   // Validate authored values before JSON encoding can discard or coerce them
   // (for example Maps, non-finite numbers, or nested undefined values).
@@ -144,7 +184,7 @@ export function fragmentText(f: MutableFragment): string {
   const visit = (edge: string): string => {
     const p = placements.get(edge)!; if (p.target.kind !== 'local') return '[Unresolved Block]';
     const b = blocks.get(p.target.id)!;
-    const text = b.inline?.atoms.map(a => a.kind === 'text' ? a.text : String(embeds.get(a.embed)?.data.alt ?? '\uFFFC')).join('') ?? String(b.data.text ?? '');
+    const text = b.inline?.atoms.map(a => a.kind === 'text' ? a.text : a.kind==='alternative'?visit(b.relations[a.properties.readings[a.displayReading??0]]):String(embeds.get(a.embed)?.data.alt ?? '\uFFFC')).join('') ?? String(b.data.text ?? '');
     return [text, ...b.children.map(visit)].filter((v, i) => v || i > 0).join('\n');
   };
   return f.roots.map(r => visit(r.placement)).join('\n');

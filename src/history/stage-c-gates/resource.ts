@@ -1,3 +1,5 @@
+import {validateAlternativeReadings, validateReadingOwnership, isReadingRelation} from '../../block-tree/inline-alternative';
+import { validateCompactInline } from "../../block-tree/inline-sequence";
 import type { ReadMeasure } from "../read-timing";
 /** G1 candidate only. Not a shipped schema or an editor repository. */
 import { isOwnedResourceTarget } from "../../block-tree/resource-registration";
@@ -41,8 +43,12 @@ export function validateResource(state: ResourceSnapshot): void {
   const root = state.placements[state.rootPlacementKey];
   requireValid(root && root.kind === "owned" && root.target.kind === "local" &&
     state.contents[root.target.contentKey]?.viewType === "document-block", "invalid local Document root");
+  const readingTargets = new Set<string>();
   const assigned = new Set<string>(), authored = new Set<string>(), slots = new Set<string>();
   for (const [key, c] of Object.entries(state.contents)) {
+    validateCompactInline(c);
+    for (const [name, key] of Object.entries(c.ownedRelations)) if (isReadingRelation(name)) { const p = state.placements[key]; if (p?.target.kind === 'local') readingTargets.add(p.target.contentKey); }
+    validateAlternativeReadings(c, key => { const p=state.placements[key];return p && {owned:p.kind==='owned'&&p.target.kind==='local',content:p.target.kind==='local'?state.contents[p.target.contentKey]:undefined}; });
     requireValid(c.key === key, "content key mismatch");
     if (c.definitionOwnerKey !== undefined) requireValid(root.target.kind === "local" &&
       c.definitionOwnerKey === root.target.contentKey && !["text-cell", "image-cell"].includes(c.viewType), "invalid definition membership");
@@ -51,7 +57,7 @@ export function validateResource(state: ResourceSnapshot): void {
       authored.add(c.payload.id);
     }
     requireValid(c.viewType !== "workspace-block" && (c.viewType !== "document-block" || root.target.kind === "local" && root.target.contentKey === key), "nested resource");
-    for (const value of [c.payload, ...Array.isArray(c.payload.standoffProperties) ? c.payload.standoffProperties : [], ...Array.isArray(c.payload.blockProperties) ? c.payload.blockProperties : []]) {
+    for (const value of [c.payload, ...c.compactInline?.spans.flatMap(a=>a.kind==='image'?[a.properties,...Array.isArray(a.properties.standoffProperties)?a.properties.standoffProperties:[]]:[])??[], ...Array.isArray(c.payload.standoffProperties) ? c.payload.standoffProperties : [], ...Array.isArray(c.payload.blockProperties) ? c.payload.blockProperties : []]) {
       if (value && typeof value === "object") {
         const link = externalDefinitionLink(value as Record<string, unknown>);
         externalAssetLink(value as Record<string, unknown>);
@@ -64,6 +70,7 @@ export function validateResource(state: ResourceSnapshot): void {
     }
     for (const p of c.inlineContent) requireValid(state.placements[p]?.kind === "inline", "non-inline Cell placement");
   }
+  if (readingTargets.size) validateReadingOwnership(readingTargets, Object.values(state.placements).map(p => ({ kind: p.kind, contentKey: p.target.kind === 'local' ? p.target.contentKey : undefined })));
   for (const [key, p] of Object.entries(state.placements)) {
     requireValid(p.key === key && id(p.placementId) && !assigned.has(p.placementId), "missing/duplicate placement identity");
     assigned.add(p.placementId);
@@ -81,12 +88,21 @@ export function validateResource(state: ResourceSnapshot): void {
     if (ancestors.has(p.target.contentKey)) {
       requireValid(p.kind === "reference", "owned cycle"); return;
     }
-    const c = state.contents[p.target.contentKey], next = new Set(ancestors).add(c.key);
+    const c = state.contents[p.target.contentKey];
+    // Target existence and all record/slot predicates were checked above. Keep
+    // the cycle check, but do not allocate ancestry for a childless Cell/Block.
+    if (!c.children.length && !c.inlineContent.length && !Object.keys(c.ownedRelations).length) return;
+    const next = new Set(ancestors).add(c.key);
     for (const child of [...c.children, ...c.inlineContent, ...Object.values(c.ownedRelations)]) visit(child, next);
   };
   visit(state.rootPlacementKey, new Set());
   // Owned unplaced content is still owned state; validate its component too.
-  for (const c of Object.values(state.contents)) for (const p of [...c.children, ...c.inlineContent, ...Object.values(c.ownedRelations)]) visit(p, new Set([c.key]));
+  for (const c of Object.values(state.contents)) {
+    if (!c.children.length && !c.inlineContent.length && !Object.keys(c.ownedRelations).length) continue;
+    // visit never mutates its incoming ancestry. Siblings can share this seed.
+    const ancestors = new Set([c.key]);
+    for (const p of [...c.children, ...c.inlineContent, ...Object.values(c.ownedRelations)]) visit(p, ancestors);
+  }
 }
 
 /** Whole-state correctness oracle, deliberately unsuitable for a commit callback. */

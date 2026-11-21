@@ -1,4 +1,6 @@
+import { passiveElement } from '../runtime/passive-presentation';
 import { openBlockContextMenu } from "../runtime/open-block-context-menu";
+import { modeContinuationError, modeJoinError } from '../block-tree/mode-editing';
 import type { MutableClipboard } from '../runtime/mutable-clipboard';
 import type { NodeKey, PlacementKey, ViewId } from "../block-tree/types";
 import type { TreeCommands } from "../block-tree/commands";
@@ -39,6 +41,20 @@ export interface CompletionInput {
   cancel(keepLiteral?:boolean): void;
 }
 
+/** Alternate native presentations must arbitrate before cross-Block selection
+ * and clipboard guards. Existing mounts have no interceptor and pass through. */
+export function installInlinePresentationInput(document:Document,mounts:MountRegistry){
+  const events=['keydown','beforeinput','input','compositionstart','compositionupdate','compositionend','copy','cut','paste'];
+  const intercept=(event:Event)=>{
+    if(event.defaultPrevented)return;
+    if(mounts.resolveEvent(event)?.handle.interceptInlineInput?.(event)){
+      if(event.cancelable)event.preventDefault();event.stopImmediatePropagation();
+    }
+  };
+  for(const name of events)document.addEventListener(name,intercept,true);
+  return ()=>{for(const name of events)document.removeEventListener(name,intercept,true);};
+}
+
 export class InputGateway {
   private installed = false;
 
@@ -67,6 +83,8 @@ export class InputGateway {
     private readonly completion?: () => CompletionInput | undefined,
     private readonly blockDeleteTarget?: (key:NodeKey)=>NodeKey|undefined,
     private readonly markdown?: { typed(key: string, start: number, end: number, text: string): number | undefined; cancel(): void },
+    private readonly notice: (message: string) => void = () => {},
+    private readonly inlineNavigation?: (event:KeyboardEvent)=>boolean,
   ) {}
 
   install(): () => void {
@@ -121,12 +139,14 @@ export class InputGateway {
   }
 
   private scopes(event: Event) {
+    if(passiveElement(event.target))return [];
     if (event.target instanceof Element && event.target.closest('[data-block-selection-handle], [data-block-selection-inspector], [data-candidate-exclusion], [data-table-controls]')) return [];
     const resolved = this.mounts.resolveEvent(event);
     if (!resolved || resolved.handle.composing || resolved.handle.inputPolicy === "opaque-widget" || (event.target instanceof Element && event.target.closest('[data-bindings-window], [role="dialog"]'))) return [];
     return resolved.handle.inputPolicy === "standoff" ? ["editor/standoff", "editor"] : ["editor"];
   }
   private onKeyDown = (event: KeyboardEvent) => {
+    if(this.inlineNavigation?.(event))return;
     if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1 && event.key !== "Shift") this.markdown?.cancel();
     if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1 && event.key !== "Shift") this.listInput.cancelTask?.();
     this.clipboard?.key(event);
@@ -177,8 +197,9 @@ export class InputGateway {
         event.inputType === "deleteContentBackward" ||
         event.inputType === "deleteContentForward")
     ) {
+      if(this.commands.isCompactText(resolved.nodeKey)){if(event.cancelable)event.preventDefault();event.stopPropagation();this.notice('Multiple-caret editing is not yet qualified for compact text. Use one selection or reopen in legacy mode.');return;}
       const sourceText = node.inlineContent
-        .map((cellKey) => this.node(cellKey)?.payload.text ?? "")
+        .map((cellKey) => this.node(cellKey)?.payload.text ?? (this.node(cellKey)?.editingInlineOwner ? "\uFFFC" : ""))
         .join("");
       const boundaries = graphemeBoundaries(sourceText);
       const replacements = selectionSet.items.map((item) => {
@@ -213,7 +234,7 @@ export class InputGateway {
     } else if (event.inputType === "deleteContentBackward") {
       if (start === end && start > 0) {
         const textValue = node.inlineContent
-          .map((cellKey) => this.node(cellKey)?.payload.text ?? "")
+          .map((cellKey) => this.node(cellKey)?.payload.text ?? (this.node(cellKey)?.editingInlineOwner ? "\uFFFC" : ""))
           .join("");
         start = graphemeBoundaries(textValue).filter((boundary) => boundary < start).at(-1) ?? 0;
       } else if (start === end && start === 0) {
@@ -221,6 +242,8 @@ export class InputGateway {
         if (previous) {
           if (event.cancelable) event.preventDefault();
           event.stopPropagation();
+          const reason = modeJoinError(previous.payload, node.payload);
+          if (reason) { this.notice(reason); return; }
           if (node.inlineContent.length === 0) {
             this.focus.clearRemoved(resolved.nodeKey);
             this.commands.remove(resolved.nodeKey);
@@ -252,7 +275,7 @@ export class InputGateway {
     } else if (event.inputType === "deleteContentForward") {
       if (start === end && end < node.inlineContent.length) {
         const textValue = node.inlineContent
-          .map((cellKey) => this.node(cellKey)?.payload.text ?? "")
+          .map((cellKey) => this.node(cellKey)?.payload.text ?? (this.node(cellKey)?.editingInlineOwner ? "\uFFFC" : ""))
           .join("");
         end = graphemeBoundaries(textValue).find((boundary) => boundary > end) ?? node.inlineContent.length;
       } else if (start === end && end === node.inlineContent.length) {
@@ -260,6 +283,8 @@ export class InputGateway {
         if (next) {
           if (event.cancelable) event.preventDefault();
           event.stopPropagation();
+          const reason = modeJoinError(node.payload, next.payload);
+          if (reason) { this.notice(reason); return; }
           if (next.viewType !== "standoff-editor-block") {
             queueMicrotask(() => this.focus.request(next.key, { reason: "delete-boundary", caret: "start" }));
             return;
@@ -292,6 +317,7 @@ export class InputGateway {
   };
 
   private onFocusIn = (event: FocusEvent) => {
+    if(passiveElement(event.target))return;
     if (this.bindings.pendingHint()) this.bindings.cancelChord();
     if (event.target instanceof Element && event.target.closest('[data-block-selection-handle], [data-block-selection-inspector], [data-table-controls]')) return;
     const resolved = this.mounts.resolveEvent(event);
@@ -315,7 +341,8 @@ export class InputGateway {
     this.bindings.cancelChord();
     const resolved = this.mounts.resolveEvent(event);
     if (resolved && (resolved.handle.inputPolicy === "native-text" || resolved.handle.inputPolicy === "standoff")) {
-      if(!this.completion?.()?.composition?.(resolved.nodeKey,'start',event.data??''))this.completion?.()?.cancel();
+      if(resolved.handle.compactComposition){this.completion?.()?.cancel();resolved.handle.compactComposition('start',event.data??'');}
+      else if(!this.completion?.()?.composition?.(resolved.nodeKey,'start',event.data??''))this.completion?.()?.cancel();
       resolved.handle.composing = true;
       this.caretEvents?.setComposing?.(true);
     }
@@ -326,6 +353,7 @@ export class InputGateway {
     this.caretEvents?.setComposing?.(false);
     if (!resolved) return;
     resolved.handle.composing = false;
+    if(resolved.handle.compactComposition){resolved.handle.compactComposition('end',event.data??'');return;}
     if(this.completion?.()?.composition?.(resolved.nodeKey,'end',event.data??''))return;
     if (resolved.handle.inputPolicy === "native-text" && event.target instanceof HTMLTextAreaElement) {
       this.recordNativeText(resolved.nodeKey, event.target);
@@ -363,6 +391,7 @@ export class InputGateway {
   };
 
   private onPointerDown = (event: PointerEvent) => {
+    if(passiveElement(event.target))return;
     this.markdown?.cancel();
     this.listInput.cancelTask?.();
     if (this.bindings.pendingHint()) this.bindings.cancelChord();
@@ -413,6 +442,10 @@ export class InputGateway {
       const bi = Math.min(b.anchor.boundary.index, b.head.boundary.index);
       return ai - bi;
     });
+    if (ordered.some(item => context.node.inlineContent.slice(Math.min(item.anchor.boundary.index, item.head.boundary.index), Math.max(item.anchor.boundary.index, item.head.boundary.index)).some(key => this.node(key)?.viewType === 'inline-alternative-cell'))) {
+      if (event.cancelable) event.preventDefault(); event.stopPropagation();
+      this.notice('The legacy clipboard cannot preserve inline alternatives. Use native Save for the complete reading closure.'); return false;
+    }
     const fragments = ordered.map((item) => {
       const start = Math.min(item.anchor.boundary.index, item.head.boundary.index);
       const end = Math.max(item.anchor.boundary.index, item.head.boundary.index);
@@ -588,7 +621,9 @@ export class InputGateway {
       const properties = node.payload.standoffProperties;
       const indexes = Array.isArray(properties) ? properties.flatMap((p, index) =>
         p && !p.isDeleted && Number.isInteger(p.start) && Number.isInteger(p.end) && p.start >= 0 &&
-          p.end < node.inlineContent.length && p.start <= cell && cell <= p.end ? [index] : []) : [];
+          (p.isZeroWidth === true
+            ? p.start <= node.inlineContent.length && (p.end === p.start || p.end === p.start - 1) && p.start === selection.anchor
+            : p.end < node.inlineContent.length && p.start <= cell && cell <= p.end) ? [index] : []) : [];
       const range = this.document.getSelection()?.rangeCount ? this.document.getSelection()!.getRangeAt(0) : undefined;
       const rect = range && typeof range.getBoundingClientRect === "function" ? range.getBoundingClientRect() : resolved.handle.root.getBoundingClientRect();
       this.overlays.open({ viewType: "annotation-panel", ownerKey: node.key, annotationIndexes: indexes,
@@ -682,24 +717,18 @@ export class InputGateway {
     start: number,
     end: number,
   ): void {
+    const reason = modeContinuationError(node.payload);
+    if (reason) { this.notice(reason); return; }
     if (this.listInput.taskEnter?.(nodeKey, start, end)) return;
     if (start === 0 && end === 0 && node.inlineContent.length === 0 && this.listInput.exitEmpty(nodeKey)) return;
     const resultingLength = node.inlineContent.length - (end - start);
     let focusPlacement: PlacementKey | undefined;
     const insert = () => {
-      const emptyDto = {
-        ...JSON.parse(JSON.stringify(node.payload)),
-        id: globalThis.crypto.randomUUID(),
-        type: "standoff-editor-block",
-        text: "",
-        standoffProperties: [],
-        children: [],
-      };
       if (start !== end) this.commands.replaceInlineRange(nodeKey, start, end, "");
       if (start === 0) {
-        this.commands.insert(emptyDto, { kind: "before", anchorKey: nodeKey });
+        this.commands.insertEmptyStandoffSibling(nodeKey,"before");
       } else if (start === resultingLength) {
-        focusPlacement = this.commands.insert(emptyDto, { kind: "after", anchorKey: nodeKey });
+        focusPlacement = this.commands.insertEmptyStandoffSibling(nodeKey,"after");
       } else {
         focusPlacement = this.commands.splitStandoff(nodeKey, start);
       }

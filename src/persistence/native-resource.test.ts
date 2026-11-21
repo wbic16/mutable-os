@@ -105,3 +105,30 @@ describe('native Open ownership validation', () => {
     expect(nativeText(decodeNative(bytes(wire)))).toBe(before);
   });
 });
+
+it('bounds resource-identity scans independently of linked annotation count during capture',()=>{
+ const measure=(count:number)=>{
+  const state=decodeBlockTree({id:'workspace',type:'workspace-block',children:[
+   {id:'doc',type:'document-block',linkedAnnotations:{shared:{type:'style/bold'}},children:[{id:'p',type:'standoff-editor-block',text:'Annotated text',standoffProperties:Array.from({length:count},(_,i)=>({id:'a'+i,annotationId:'shared',start:0,end:8}))}]},
+   {id:'other',type:'document-block',children:Array.from({length:20},(_,i)=>({id:'other-'+i,type:'standoff-editor-block',text:'Unrelated text '.repeat(10)}))},
+  ]}).state;
+  let scans=0;
+  state.contents=new Proxy(state.contents,{ownKeys:target=>{scans++;return Reflect.ownKeys(target);}});
+  const captured=captureNative(state,'doc'),wire=nativeText(captured);
+  expect(nativeText(decodeNative(new TextEncoder().encode(wire)))).toBe(wire);
+  expect(Object.values(captured.contents).find(c=>c.payload.id==='p')!.payload.standoffProperties).toHaveLength(count);
+  return scans;
+ };
+ expect(measure(100)).toBe(measure(1));
+});
+
+it('rechecks identity ambiguity on a subsequent capture without retaining lookup authority',()=>{
+ const state=decodeBlockTree({id:'workspace',type:'workspace-block',children:[
+  {id:'doc',type:'document-block',linkedAnnotations:{shared:{type:'style/bold'}},children:[{id:'p',type:'standoff-editor-block',text:'Text',standoffProperties:[{id:'a',annotationId:'shared',start:0,end:3}]}]},
+  {id:'other',type:'document-block',children:[]},
+ ]}).state;
+ expect(()=>captureNative(state,'doc')).not.toThrow();
+ const other=Object.values(state.contents).find(c=>c.payload.id==='other')!;
+ other.payload.metadata={documentId:'doc'};
+ expect(()=>captureNative(state,'doc')).toThrow('ambiguous canonical Document identity');
+});

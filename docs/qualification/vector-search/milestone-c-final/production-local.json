@@ -1,0 +1,449 @@
+{
+  "at": "2026-11-14T04:42:44.223Z",
+  "cavern": {
+    "path": "/Users/iianneill/Documents/GitHub/speedy-ts-reactive/vaults/imported",
+    "name": "imported",
+    "cavernGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024"
+  },
+  "status": {
+    "ms": 75.5508749999999,
+    "Success": true,
+    "Data": {
+      "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+      "decision": "enabled",
+      "provider": {
+        "kind": "hosted",
+        "name": "OpenAI",
+        "model": "text-embedding-3-small",
+        "configured": true,
+        "localAvailable": false
+      },
+      "documents": true,
+      "queries": false,
+      "documentTokens": 50000,
+      "queryTokens": 5000,
+      "documentTokensUsed": 25042,
+      "queryTokensUsed": 0,
+      "index": {
+        "complete": false,
+        "state": "indexing"
+      },
+      "indexed": 229,
+      "known": 2314,
+      "error": "",
+      "coverage": "Saved Documents only; unsaved content is not covered",
+      "reauthorizationRequired": false
+    }
+  },
+  "results": [
+    {
+      "query": "Prospero",
+      "ms": 512.0391670000001,
+      "Success": true,
+      "Data": {
+        "results": [
+          {
+            "text": "It was toward the close of the fifth or sixth month of his seclusion that the Prince Prospero entertained his thousand friends at a masked ball of the most unusual magnificence.\r",
+            "signals": {
+              "bm25": -6.629611208245121
+            },
+            "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+              "format": "mutable-document",
+              "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+              "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "d08e16ea-478e-4137-9068-189d7b75330b",
+                  "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:0740ac5a-6122-4147-bcf9-05310afd4e72"
+                  ],
+                  "contribution": null,
+                  "start": 0,
+                  "end": 178,
+                  "runStart": 0,
+                  "runEnd": 178,
+                  "chunkStart": 0,
+                  "chunkEnd": 178,
+                  "textHash": "e7ac005e4c88ac027c3bfe89904be19a09f615b021744dd8f411b4fd62429652"
+                }
+              ]
+            }
+          },
+          {
+            "text": "It was in the eastern or blue chamber in which stood Prince Prospero as he uttered these words. They rang throughout the seven rooms loudly and clearly, for the prince was a bold and robust man, and the music had become hushed at the waving",
+            "signals": {
+              "bm25": -5.496269677237784
+            },
+            "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+              "format": "mutable-document",
+              "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+              "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "16d69382-d846-427b-9be9-5d749b7f58af",
+                  "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a0d8e2de-08f3-4c08-9b43-c0ed1fe5106f"
+                  ],
+                  "contribution": null,
+                  "start": 0,
+                  "end": 254,
+                  "runStart": 0,
+                  "runEnd": 254,
+                  "chunkStart": 0,
+                  "chunkEnd": 254,
+                  "textHash": "f6f2923744c066e708228ede5e71edbc8453ec1bdced059b3ecbdeb35c764aec"
+                }
+              ]
+            }
+          },
+          {
+            "text": "\"The Masque of the Red Death\" (originally published as \"The Mask of the Red Death: A Fantasy\") is a short story by American writer Edgar Allan Poe, first published in 1842. The story follows Prince Prospero's attempts to avoid a dangerous p",
+            "signals": {
+              "bm25": -5.1317246122009
+            },
+            "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+              "format": "mutable-document",
+              "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+              "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "34ca1e40-9d82-4683-9f7b-62a49d632a57",
+                  "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:80e46d2c-a328-44bf-bc9a-91cf2a42688b",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:75b46c52-f44e-496f-888b-3c4942968f72",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:1e961ec6-4b6c-46a9-a541-5688780ac93b"
+                  ],
+                  "contribution": null,
+                  "start": 0,
+                  "end": 702,
+                  "runStart": 0,
+                  "runEnd": 702,
+                  "chunkStart": 0,
+                  "chunkEnd": 702,
+                  "textHash": "b095cd21ffd13d03cf156553e32f4905194dacf507f1349b31cf6d6dce201402"
+                }
+              ]
+            }
+          },
+          {
+            "text": "When the eyes of Prince Prospero fell on this spectral image (which, with a slow and solemn movement, as if more fully to sustain its role, stalked to and fro among the waltzers) he was seen to be convulsed, in the first moment with a stron",
+            "signals": {
+              "bm25": -4.860825758088823
+            },
+            "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+              "format": "mutable-document",
+              "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+              "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "de356f7e-88c0-414a-9e40-96f5245c03bc",
+                  "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:842941e9-aeea-411c-ae95-5b6a100a0823"
+                  ],
+                  "contribution": null,
+                  "start": 0,
+                  "end": 326,
+                  "runStart": 0,
+                  "runEnd": 326,
+                  "chunkStart": 0,
+                  "chunkEnd": 326,
+                  "textHash": "0b409627ca0b3286898ed64f4f5b9b5822f86bf911e8f01f856384a14786e6e0"
+                }
+              ]
+            }
+          },
+          {
+            "text": "But Prince Prospero was happy and dauntless and sagacious. When his dominions were half depopulated, he summoned to his presence a thousand hale and light-hearted friends from among the knights and dames of his court, and with these retired",
+            "signals": {
+              "bm25": -3.7322803905707147
+            },
+            "stamp": "4d1d2a0034f114e69e00d07e38c9170d69167a7b29e0e9e8bdc52c9e9b448c98",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "path": "documents/edgar-allan-poe/masque-of-the-red-death-[1c48f303].ink",
+              "format": "mutable-document",
+              "rootBlockId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+              "sourceHash": "2b8f2d68e44165080060c27f8f1e6c5b886d2f450c3710dc2b6c6c6188d508bd",
+              "saveGeneration": "b3768814-9185-4e16-83e4-2a63446ebee2",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "7d81ed11-fa71-49d1-9bcc-c44888ed7dbc",
+                  "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+                    "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e5d9e04e-c30d-48d8-8270-88da41880b37"
+                  ],
+                  "contribution": null,
+                  "start": 0,
+                  "end": 563,
+                  "runStart": 0,
+                  "runEnd": 563,
+                  "chunkStart": 0,
+                  "chunkEnd": 563,
+                  "textHash": "567447ea2e39a43e56ffa40464d0a05b0729bd2819f84d8d75c0e2ae5c622bdf"
+                }
+              ]
+            }
+          }
+        ],
+        "evidence": "retrieved-evidence",
+        "answerability": "not-assessed",
+        "coverage": {
+          "complete": false,
+          "candidateLimitReached": false,
+          "omitted": 0,
+          "contextSufficiency": "not-assessed",
+          "sourceVerification": "exact-saved-file",
+          "unverifiedCandidates": 0,
+          "verifiedResources": 1,
+          "verificationBytes": 166147
+        },
+        "timing": {
+          "providerMs": 0,
+          "localMs": 45.46037499999511
+        },
+        "usage": 0
+      }
+    },
+    {
+      "query": "composition",
+      "ms": 45.49174999999991,
+      "Success": true,
+      "Data": {
+        "results": [
+          {
+            "text": "I'm beginning to doubt my earlier claim that physical composition is irrelevant to identity. I think I was too categorical. How would you revise that position?",
+            "signals": {
+              "bm25": -6.6356709818844415
+            },
+            "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+              "path": "Conversation on November 11, 2026 (3).ink",
+              "format": "mutable-document",
+              "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+              "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+              "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "b373c764-a223-4e28-a9c8-252646d25466",
+                  "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:dc660786-f9be-417c-89ec-a75556c92536",
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:f6fa2f0d-cf45-45a1-b442-37be760d67e5"
+                  ],
+                  "contribution": {
+                    "blockGuid": "5cc3ded9-2942-4437-acd8-295c6a66af8e",
+                    "ordinal": 11,
+                    "author": "human",
+                    "participant": {
+                      "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                      "kind": "human",
+                      "name": "Local author"
+                    }
+                  },
+                  "start": 0,
+                  "end": 159,
+                  "runStart": 0,
+                  "runEnd": 159,
+                  "chunkStart": 0,
+                  "chunkEnd": 159,
+                  "textHash": "95a7a64175b03135937970afa3d952dfdedaa65f18efb788093d891abe9cc18c"
+                }
+              ]
+            }
+          },
+          {
+            "text": "Here's my position: an object remains the same object as long as its history is continuous, even if none of its original material survives. Physical composition is irrelevant to identity.",
+            "signals": {
+              "bm25": -6.313720792927347
+            },
+            "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+              "path": "Conversation on November 11, 2026 (3).ink",
+              "format": "mutable-document",
+              "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+              "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+              "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "1f6ceb47-fc95-4687-ba0a-48d4d9d35824",
+                  "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:9d6619a5-180c-4748-a109-8237ea6f7b16",
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:615eefa8-2cd0-4f9f-866f-54e757790b44"
+                  ],
+                  "contribution": {
+                    "blockGuid": "cce46b92-34f2-4e82-be0f-0096f58b23cb",
+                    "ordinal": 7,
+                    "author": "human",
+                    "participant": {
+                      "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:human",
+                      "kind": "human",
+                      "name": "Local author"
+                    }
+                  },
+                  "start": 0,
+                  "end": 187,
+                  "runStart": 0,
+                  "runEnd": 187,
+                  "chunkStart": 0,
+                  "chunkEnd": 187,
+                  "textHash": "ac63bad1317e73a6b5aa166d21929bd71e85f85be4cf2b43801a096ad420a164"
+                }
+              ]
+            }
+          },
+          {
+            "text": "I’m sympathetic to giving historical continuity priority, but I’d separate two claims: original material need not survive, and physical composition is irrelevant. The first doesn’t establish the second. Material and structural changes might",
+            "signals": {
+              "bm25": -5.234381180838202
+            },
+            "stamp": "2d0c130aeb5c1e15552e74b16087f5f7456d677410c71a5189dca8cacdfe7810",
+            "source": {
+              "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+              "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+              "path": "Conversation on November 11, 2026 (3).ink",
+              "format": "mutable-document",
+              "rootBlockId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+              "sourceHash": "3aecdd6abb3518838b2d47b37c522de3c74064baa7f60811c32374bd7e08ae3d",
+              "saveGeneration": "31f70e6b-9fbc-4c2e-a804-f882e0544298",
+              "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[\"3d-object-block\",\"canvas-counter-block\",\"cardex-application-block\",\"code-mirror-block\",\"desktop-application-placeholder-block\",\"html-block\",\"html-editor-block\",\"iframe-block\",\"mutable/academic-resource-block\",\"mutable/citation-block\",\"mutable/iiif-image-block\",\"mutable/iiif-manifest-block\",\"mutable/pdf-document-block\",\"mutable/structured-resource-block\",\"mutable/video-block\",\"mutable/web-article-block\",\"mutable/web-resource-block\",\"pdf-block\",\"thesis-application-block\",\"timer-block\",\"vimeo-player-block\",\"youtube-player-block\",\"youtube-video-block\"]}",
+              "currency": "verified-saved-projection",
+              "liveCurrency": "unknown",
+              "spans": [
+                {
+                  "runOrdinal": 0,
+                  "blockGuid": "607cfdad-9607-4379-b0f2-fa8413aa6f32",
+                  "resourceId": "f4ce69a1-bfae-4770-902e-8f344cce1409",
+                  "coordinate": "cell",
+                  "occurrence": [
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:e3380267-d218-460b-858f-99be0ec75d5d",
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:1c919135-26c5-47ec-8e0b-b7e450f62c5f",
+                    "legacy:f4ce69a1-bfae-4770-902e-8f344cce1409:placement:73a2cbf0-968c-4159-bd5a-2e7007496f8f"
+                  ],
+                  "contribution": {
+                    "blockGuid": "4119f884-c37a-468f-80a7-8b9a7f8be61a",
+                    "ordinal": 8,
+                    "author": "ai",
+                    "participant": {
+                      "id": "f4ce69a1-bfae-4770-902e-8f344cce1409:ai",
+                      "kind": "ai",
+                      "name": "AI participant"
+                    }
+                  },
+                  "start": 0,
+                  "end": 321,
+                  "runStart": 0,
+                  "runEnd": 321,
+                  "chunkStart": 0,
+                  "chunkEnd": 321,
+                  "textHash": "71408f03e74b814c7c6083f956c1ebc81486e5dfd80282c160c97b670f2ba1cf"
+                }
+              ]
+            }
+          }
+        ],
+        "evidence": "retrieved-evidence",
+        "answerability": "not-assessed",
+        "coverage": {
+          "complete": false,
+          "candidateLimitReached": false,
+          "omitted": 0,
+          "contextSufficiency": "not-assessed",
+          "sourceVerification": "exact-saved-file",
+          "unverifiedCandidates": 0,
+          "verifiedResources": 1,
+          "verificationBytes": 1195272
+        },
+        "timing": {
+          "providerMs": 0,
+          "localMs": 39.10562499999651
+        },
+        "usage": 0
+      }
+    }
+  ]
+}

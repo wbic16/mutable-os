@@ -1,0 +1,26 @@
+{
+  "withoutSchema": {
+    "status": 200,
+    "tokens": 10576
+  },
+  "withoutContract": {
+    "status": 200,
+    "tokens": 4087
+  },
+  "full": {
+    "status": 200,
+    "tokens": 12851
+  },
+  "withoutHistory": {
+    "status": 200,
+    "tokens": 12656
+  },
+  "contractWithoutReference": {
+    "status": 200,
+    "tokens": 10880
+  },
+  "withoutTools": {
+    "status": 200,
+    "tokens": 12383
+  }
+}

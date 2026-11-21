@@ -1,3 +1,4 @@
+import {listMetadata,listItemPayload} from '../block-tree/layout-authoring';
 import { parser, GFM } from '@lezer/markdown';
 import type { SyntaxNode } from '@lezer/common';
 import { emptyFragment, LIMITS, safeUrl, validateFragment, type FragmentBlock } from './fragment';
@@ -85,10 +86,10 @@ export function importNativeMarkdown(source: string) {
         let from = task?.name === 'TaskMarker' ? task.to : content.from;
         if (task) while (from < content.to && /[ \t]/.test(source[from])) from++;
         const text = textBlock(from, content.to, content);
-        return block('container-block', { metadata: { htmlListItem: {} }, ...(task ? { checked: /[xX]/.test(source.slice(task.from, task.to)) } : {}) }, [text]).edge;
+        return block('container-block', listItemPayload(undefined,task ? /[xX]/.test(source.slice(task.from, task.to)) : undefined), [text]).edge;
       });
       const ordered = node.name === 'OrderedList', start = ordered ? Number(/^\d+/.exec(source.slice(node.from))?.[0] ?? 1) : 1;
-      edge = block('indented-list-block', { metadata: { htmlList: { ordered, start, reversed: false } } }, items).edge;
+      edge = block('indented-list-block', {metadata:listMetadata(ordered,start,false)}, items).edge;
     } else { literal = true; edge = textBlock(node.from, node.to); }
     const ordinary = node.name === 'Paragraph';
     fragment.roots.push({ placement: edge, openStart: ordinary, openEnd: ordinary, clippedStart: false, clippedEnd: false, separatorAfter: 'paragraph' });

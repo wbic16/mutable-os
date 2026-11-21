@@ -4,7 +4,7 @@ import type { HistoricalFragment } from "./types";
 
 /** Only inert text and a fixed annotation style allowlist; no live view registry. */
 export function textRuns(content: DeepReadonly<ContentRecord>, fragment: DeepReadonly<HistoricalFragment>) {
-  const value = content.inlineContent.length ? content.inlineContent.map(key => {
+  const value = content.compactInline ? content.compactInline.spans.map(a=>a.kind==='text'?a.text:'\uFFFC').join('') : content.inlineContent.length ? content.inlineContent.map(key => {
     const cell = fragment.contents[fragment.placements[key]?.contentKey];
     return cell?.viewType === "image-cell" ? "[Image]" : String(cell?.payload.text ?? "");
   }).join("") : String(content.payload.text ?? "");

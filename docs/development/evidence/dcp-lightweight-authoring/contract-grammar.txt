@@ -1,0 +1,17 @@
+XML shorthand below describes the core; * means repeated, ? optional. Quotes delimit attribute values. ID is a local name; REF is ID or a current @alias. Text uses XML escaping; structural whitespace is ignored, inline whitespace retained.
+Response := <response intent? reply?> Block+ Definitions? </response>
+Block := <p id?>Inline*</p> | <hN id?>Inline*</hN> (N=1..6)
+       | <ul id?>Item+</ul> | <ol id? start?>Item+</ol>
+       | <table id?>Row+</table> | <group id?>Block+</group>
+Item := <li>Block+</li>; Row := <tr>(<td>Block+</td>)+</tr>
+Inline := Text | <b>Inline*</b> | <i>Inline*</i>
+        | <e ref=REF>Inline*</e> | <span id=ID>Inline*</span>
+        | <mark kind=KIND id?>Inline*</mark>
+Definitions := <definitions>Definition*</definitions>
+Definition := entity(id,name,type; description?,alias*)
+ | passage(id,TARGET) | mention(id?,TARGET,ref)
+ | classify(id?,TARGET,kind) | argument(id,TARGET)
+ | gloss(id?,TARGET,kind; Text)
+ | relation(id?,kind,type,from,to)
+TARGET := target=REF [quote=Text prefix? suffix? | whole="true"]
+A passage target needs no selector; a Block target needs exactly one selector form. In Definition notation, fields are attributes; semicolon introduces children. description/alias are text elements. Attributes and child names not specified or discovered are invalid. Nested inline spans cannot cross; discover boundary/range syntax for overlaps. No native n-ary claim declaration is enabled in this core.

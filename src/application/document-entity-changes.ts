@@ -18,7 +18,7 @@ function snapshot(editor: ReactiveEditor, root: string) {
     if (content.viewType === 'standoff-editor-block' || ['mutable/citation-block','mutable/web-article-block'].includes(content.viewType)) {
       const properties = ['mutable/citation-block','mutable/web-article-block'].includes(content.viewType)?content.payload.blockProperties:content.payload.standoffProperties;
       if (Array.isArray(properties)) properties.forEach((property, index) => {
-        if (!property || typeof property !== 'object' || Array.isArray(property) || property.type === 'mutable/gloss') return;
+        if (!property || typeof property !== 'object' || Array.isArray(property) || property.type === 'mutable/gloss' || property.type === 'dialectic/range-anchor') return;
         // A definition can live on the Document or, for cross-resource links,
         // the Workspace. Watch that owner as well as the local segment.
         if (property.annotationId) {
@@ -50,7 +50,7 @@ function localReferences(content: ContentRecord, includeOffsets: boolean, state?
   const properties = ['mutable/citation-block','mutable/web-article-block'].includes(content.viewType)?content.payload.blockProperties:content.payload.standoffProperties;
   if (!Array.isArray(properties)) return '[]';
   return JSON.stringify(properties.filter(property => property && typeof property === 'object'
-    && !Array.isArray(property) && property.type !== 'mutable/gloss' && (property.type === 'codex/entity-reference' || property.annotationId))
+    && !Array.isArray(property) && property.type !== 'mutable/gloss' && property.type !== 'dialectic/range-anchor' && (property.type === 'codex/entity-reference' || property.annotationId))
     .filter(property => !state || resolveLinkedProperty(state, property, content.key).type === 'codex/entity-reference')
     .map(({ start, end, ...property }) => includeOffsets ? { ...property, start, end } : property));
 }

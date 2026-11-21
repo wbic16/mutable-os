@@ -1,4 +1,6 @@
+import {surfaceSide,surfaceShell} from '../block-tree/compound-authoring';
 import { createStore } from 'solid-js/store';
+import { hasBlockMode } from '../block-tree/mode-editing';
 import type { ReactiveEditor } from '../reactive-editor/editor';
 import type { BlockNode } from '../block-tree/types';
 import { resourceTypes, resourceNotes, resourceInformation } from '../interchange/resource-surface';
@@ -90,7 +92,7 @@ export class BlockSurfaces {
   }
   private back(surface:string, resource?:BlockNode) {
     const c=this.editor.commands;
-    return c.insert({type:'side-block',metadata:{surfaceRole:'back'},children:[{type:'container-block',metadata:{structuralContainer:true},children:[...(resource?[resourceInformation(resource.payload),...resourceNotes(resource.payload,resource.viewType)]:[]),{type:'standoff-editor-block',text:''}]}]}, {kind:'at',parentKey:surface,index:1});
+    return c.insert(surfaceSide('back',[...(resource?[resourceInformation(resource.payload),...resourceNotes(resource.payload,resource.viewType)]:[]),{type:'standoff-editor-block',text:''}]), {kind:'at',parentKey:surface,index:1});
   }
   run(id:string,key:string, invocation?:{nodeKey:string;start:number;end:number;version:number}) {
     if(!this.editor.features.reversibleBlocks)return;
@@ -105,10 +107,12 @@ export class BlockSurfaces {
       let dissolveSurface:BlockNode|undefined;
       if(id==='container.dissolve') {
         if(n.viewType!=='container-block')throw Error('Choose a ContainerBlock.');
+        if(hasBlockMode(n.payload))throw Error('Dissolving would remove this Block Mode; clear it explicitly first.');
         const parent=this.parent(n);
         if(parent?.viewType==='side-block'&&this.parent(parent)?.viewType==='surface-block'){
           if(parent.children.length!==1||Object.keys(n.ownedRelations).length||e.repository.contentReferenceCount(n.contentKey)!==1)throw Error('This container has other face content, owned relations or shared occurrences. Unwrap the reverse explicitly before dissolving it.');
           dissolveSurface=this.parent(parent);
+          if(hasBlockMode(parent.payload)||hasBlockMode(dissolveSurface!.payload))throw Error('Dissolving would remove the surrounding Block Mode; move the children explicitly instead.');
           if(dissolveSurface!.children[0]!==parent.key)throw Error('Use reverse unwrap to extract a reverse container.');
           if(dissolveSurface!.children[1]&&!window.confirm('Dissolve this container and unwrap its reverse after its children? All reverse content will be preserved. Cancel to keep the structure.'))return;
         }
@@ -131,7 +135,7 @@ export class BlockSurfaces {
           const direct=this.parent(n), existing=n.viewType==='surface-block'?n:direct?.viewType==='side-block'&&this.parent(direct)?.children[0]===direct.key?this.parent(direct):undefined;
           const use=id==='surface.flip'?surface:existing;
           if(use){result=use.placementKey;if(!use.children[1])this.back(result);}
-          else {this.ordinary(n);result=c.insert({type:'surface-block',metadata:{reversible:true},children:[]},{kind:'before',anchorKey:n.placementKey});const front=c.insert({type:'side-block',metadata:{surfaceRole:'front'},children:[]},{kind:'at',parentKey:result,index:0});c.move(n.placementKey,{kind:'at',parentKey:front,index:0});this.back(result,resourceTypes.has(n.viewType)?n:undefined);}
+          else {this.ordinary(n);result=c.insert(surfaceShell(),{kind:'before',anchorKey:n.placementKey});const front=c.insert(surfaceSide('front',[]),{kind:'at',parentKey:result,index:0});c.move(n.placementKey,{kind:'at',parentKey:front,index:0});this.back(result,resourceTypes.has(n.viewType)?n:undefined);}
           flipAfter=id==='surface.flip';
         } else if(id==='surface.unwrap'||id==='surface.delete') {
           if(!surface?.children[1])throw Error('There is no reverse.');
@@ -153,6 +157,7 @@ export class BlockSurfaces {
     const e=this.editor, c=e.commands, back=e.node(surface.children[1]);if(!back)return;
     const parent=this.parent(surface);if(extract&&!parent)throw Error('This surface has no surrounding insertion point.');
     const containers=back.children.map(k=>e.node(k)!);
+    if(extract&&(hasBlockMode(back.payload)||containers.some(n=>n.viewType==='container-block'&&hasBlockMode(n.payload))))throw Error('Extracting this reverse would remove a Block Mode; move its Blocks explicitly instead.');
     const children=containers.flatMap(n=>n.viewType==='container-block'?n.children.map(k=>e.node(k)!):[n]);
     if(extract){let after=surface.placementKey;for(const child of children){
       // Preserve the information Block and its typed resource reference.

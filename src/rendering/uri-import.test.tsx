@@ -51,7 +51,7 @@ it('source refresh requires fresh consent and restores source identity and basel
 it('player loads automatically without autoplay, remains history-free and reloads on restored occurrence',async()=>{
  const s=setup(),snapshot=authored(s),revision=s.editor.repository.state.revision;const iframe=s.host.querySelector('iframe')!;
  expect(iframe.src).toBe('https://player.vimeo.com/video/76979871?autoplay=0&dnt=1');expect(iframe.getAttribute('sandbox')).toBe('allow-scripts allow-same-origin allow-presentation');expect(iframe.getAttribute('allow')).not.toContain('autoplay');expect(s.editor.repository.state.revision).toBe(revision);expect(authored(s)).toEqual(snapshot);
- s.button().click();expect(s.host.querySelector('iframe')).toBeNull();s.button().click();expect(s.host.querySelector('iframe')).not.toBeNull();
+ s.editor.interchange.closeView(s.view.viewId);expect(s.host.querySelector('iframe')).toBeNull();
  s.editor.commands.remove(s.node('v').key);expect(s.host.querySelector('iframe')).toBeNull();s.editor.repository.undo();expect(s.host.querySelector('iframe')).not.toBeNull();
  s.editor.disposeView(s.view);expect(s.host.querySelector('iframe')).toBeNull();
 });
@@ -64,12 +64,12 @@ it('retains the exact player across hidden, graph and browser visibility transit
  const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(true);document.dispatchEvent(new Event('visibilitychange'));await new Promise(r=>setTimeout(r,0));
  hidden.mockReturnValue(false);document.dispatchEvent(new Event('visibilitychange'));expect(s.host.querySelector('iframe')).toBe(iframe);
  expect(s.editor.repository.state.revision).toBe(revision);expect(commit).not.toHaveBeenCalled();expect(snapshot).not.toHaveBeenCalled();
- s.editor.dispose();expect(s.host.querySelector('iframe')).toBeNull();s.button().click();expect(s.host.querySelector('iframe')).toBeNull();
+ s.editor.dispose();expect(s.host.querySelector('iframe')).toBeNull();
 });
-it('respects an explicit Stop across visibility transitions until Load is clicked',async()=>{
- const s=setup();s.button().click();expect(s.button().textContent).toBe('Load player');
+it('keeps a closed native video occurrence unloaded across visibility transitions',async()=>{
+ const s=setup();s.editor.interchange.closeView(s.view.viewId);expect(s.host.querySelector('iframe')).toBeNull();
  s.host.hidden=true;await new Promise(r=>setTimeout(r,0));s.host.hidden=false;await new Promise(r=>setTimeout(r,0));
- expect(s.host.querySelector('iframe')).toBeNull();s.button().click();expect(s.host.querySelector('iframe')).not.toBeNull();
+ expect(s.host.querySelector('iframe')).toBeNull();
 });
 it('feature-off hides URI commands and leaves video data inactive',async()=>{
  const s=setup(false),fetch=vi.spyOn(globalThis,'fetch');expect(blockMenuItems(s.editor,s.node().key).some(i=>i.label==='Inspect / Import linked resource…')).toBe(false);expect(s.button()).toBeNull();await s.editor.interchange.inspectLinkedResource(s.node().key,'https://example.org');expect(fetch).not.toHaveBeenCalled();

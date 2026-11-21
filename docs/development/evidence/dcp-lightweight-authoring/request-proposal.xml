@@ -1,0 +1,5 @@
+<turn id="t1" dialect="intent-xml-draft1" capabilities="general-v1" agent="@a1" action="respond" focus="@c1">
+<contribution id="@c1" author="@u1" role="human" name="Local author" ordinal="1"><source id="@b1" kind="text" status="complete" anchor="exact">What is a palimpsest? Two sentences, please.</source></contribution>
+<workspace scope="document" coverage="partial" document-entities-empty="true" selected="0" unavailable="0"/>
+<limits tools="6" source-cells="12000" search-blocks="512" search-characters="100000" response-bytes="262144" nodes="256" depth="12"/>
+</turn>

@@ -5,14 +5,20 @@ import type {RepositoryChange} from '../../block-tree/repository';
 import {glossOwner} from '../../block-tree/gloss-plan';
 import {glossDefinition,parseGloss,GLOSS} from './model';
 
-export interface GlossAnchor {contentKey:string;segmentId:string;definitionId:string}
+export interface GlossAnchor {contentKey:string;segmentId:string;definitionId:string;role?:string}
 export interface GlossOccurrence extends GlossAnchor {nodeKey:string;order:number}
 export interface GlossEntry {
  definitionId:string;localId:string;
- data:Accessor<{raw:string;type:string;body:string;alias:string}>;
+ data:Accessor<{raw:string;type:string;body:string;alias:string;source?:Record<string,any>}>;
  occurrences:Accessor<GlossOccurrence[]>;
 }
 type Entry=GlossEntry&{setData:(v:ReturnType<GlossEntry['data']>)=>unknown;setOccurrences:(v:GlossOccurrence[])=>unknown;signature:string};
+export interface AnnotationInventoryPolicy {
+ type:string;
+ accepts(definition:any):boolean;
+ describe(definition:any):ReturnType<GlossEntry['data']>;
+ order?(definition:any):number;
+}
 /** A derived inventory for one viewing session. Offsets remain in native segments;
  * offset rebasing neither replaces rows nor invalidates their text/filter signals. */
 export class GlossSessionIndex {
@@ -28,9 +34,9 @@ export class GlossSessionIndex {
  private segments=new Map<string,GlossAnchor[]>();
  private listeners=new Set<(keys:Set<string>,structure:boolean)=>void>();
  private stop:()=>void;private alive=true;private queued=false;
- constructor(readonly editor:ReactiveEditor,readonly projection:BlockTreeProjection,readonly rootKey:string){
+ constructor(readonly editor:ReactiveEditor,readonly projection:BlockTreeProjection,readonly rootKey:string,private policy?:AnnotationInventoryPolicy){
   this.owner=projection.node(rootKey)!.contentKey;
-  if(editor.features.glossRelationships)this.relationships=editor.glossRelationships.document(this.owner);
+  if(!policy&&editor.features.glossRelationships)this.relationships=editor.glossRelationships.document(this.owner);
   this.definitions();this.tree();this.publish();
   this.stop=editor.repository.subscribeChanges(change=>this.changed(change));
  }
@@ -39,12 +45,12 @@ export class GlossSessionIndex {
   const registry=this.editor.repository.readState().contents[this.owner]?.payload.linkedAnnotations as Record<string,any>??{};
   const keep=new Set<string>();let membership=false;
   for(const [id,d]of Object.entries(registry)){
-   this.diagnostics.definitionReads++;if(!glossDefinition(d)||d.isDeleted)continue;keep.add(id);
-   const signature=JSON.stringify([d.value,d.metadata.gloss.localId,d.metadata.gloss.alias]);let entry=this.entries.get(id);
+   this.diagnostics.definitionReads++;if(!(this.policy?this.policy.accepts(d):glossDefinition(d))||d.isDeleted)continue;keep.add(id);
+   const signature=JSON.stringify(this.policy?d:[d.value,d.metadata.gloss.localId,d.metadata.gloss.alias,d.metadata.tei]);let entry=this.entries.get(id);
    if(entry?.signature===signature)continue;
-   const parsed=parseGloss(d.value),data={raw:d.value,type:parsed.type,body:parsed.text,alias:String(d.metadata.gloss.alias??'')};
-   if(!entry){const [read,setData]=createSignal(data),[occ,setOccurrences]=createSignal<GlossOccurrence[]>([]);entry={definitionId:id,localId:d.metadata.gloss.localId,data:read,setData,occurrences:occ,setOccurrences,signature};this.entries.set(id,entry);membership=true;}
-   else{entry.signature=signature;entry.localId=d.metadata.gloss.localId;entry.setData(data);}
+   const parsed=parseGloss(d.value??''),data=this.policy?this.policy.describe(d):{raw:d.value,type:parsed.type,body:parsed.text,alias:String(d.metadata.gloss.alias??''),source:d.metadata.tei};
+   if(!entry){const [read,setData]=createSignal(data),[occ,setOccurrences]=createSignal<GlossOccurrence[]>([]);entry={definitionId:id,localId:this.policy?id:d.metadata.gloss.localId,data:read,setData,occurrences:occ,setOccurrences,signature};this.entries.set(id,entry);membership=true;}
+   else{entry.signature=signature;entry.localId=this.policy?id:d.metadata.gloss.localId;entry.setData(data);if(this.policy)membership=true;}
   }
   for(const id of this.entries.keys())if(!keep.has(id)){this.entries.delete(id);membership=true;}
   return membership;
@@ -52,7 +58,7 @@ export class GlossSessionIndex {
  private readSegments(contentKey:string){
   this.diagnostics.segmentReads++;
   const props=this.editor.repository.readState().contents[contentKey]?.payload.standoffProperties as any[]??[];
-  const next=props.filter(p=>p.type===GLOSS&&!p.isDeleted&&typeof p.annotationId==='string').sort((a,b)=>Number(a.start)-Number(b.start)).map(p=>({contentKey,segmentId:String(p.id),definitionId:p.annotationId}));
+  const next=props.filter(p=>p.type===(this.policy?.type??GLOSS)&&!p.isDeleted&&typeof p.annotationId==='string').sort((a,b)=>Number(a.start)-Number(b.start)).map(p=>({contentKey,segmentId:String(p.id),definitionId:p.annotationId,...(p.metadata?.tei?.role?{role:p.metadata.tei.role}:{})}));
   const prior=this.segments.get(contentKey)??[];
   if(JSON.stringify(prior)===JSON.stringify(next))return false;
   this.segments.set(contentKey,next);return true;
@@ -73,10 +79,11 @@ export class GlossSessionIndex {
   const groups=new Map<string,GlossOccurrence[]>();
   for(const [key,segments]of this.segments)for(const segment of segments)for(const occurrence of this.occurrences.get(key)??[]){const a=groups.get(segment.definitionId)??[];a.push({...segment,...occurrence});groups.set(segment.definitionId,a);}
   for(const [id,entry]of this.entries){const next=(groups.get(id)??[]).sort((a,b)=>a.order-b.order||(this.range(a)?.start??0)-(this.range(b)?.start??0));if(JSON.stringify(entry.occurrences())!==JSON.stringify(next))entry.setOccurrences(next);}
-  const next=[...this.entries.values()].sort((a,b)=>(a.occurrences()[0]?.order??Infinity)-(b.occurrences()[0]?.order??Infinity)||(this.range(a.occurrences()[0])?.start??Infinity)-(this.range(b.occurrences()[0])?.start??Infinity)||a.definitionId.localeCompare(b.definitionId));
+  const registry=this.editor.repository.readState().contents[this.owner]?.payload.linkedAnnotations as Record<string,any>??{};
+  const next=[...this.entries.values()].sort((a,b)=>(this.policy?.order?.(registry[a.definitionId])??0)-(this.policy?.order?.(registry[b.definitionId])??0)||(a.occurrences()[0]?.order??Infinity)-(b.occurrences()[0]?.order??Infinity)||(this.range(a.occurrences()[0])?.start??Infinity)-(this.range(b.occurrences()[0])?.start??Infinity)||a.definitionId.localeCompare(b.definitionId));
   const old=this.rows[0]();if(next.length!==old.length||next.some((v,i)=>old[i]!==v)){this.diagnostics.rowPublications++;this.rows[1](next);}
  }
- range(anchor?:GlossAnchor){if(!anchor)return;const p=(this.editor.repository.readState().contents[anchor.contentKey]?.payload.standoffProperties as any[]??[]).find(p=>p.id===anchor.segmentId&&p.annotationId===anchor.definitionId&&!p.isDeleted);return p&&Number.isInteger(p.start)&&Number.isInteger(p.end)?{start:p.start as number,end:(p.end as number)+1}:undefined;}
+ range(anchor?:GlossAnchor){if(!anchor)return;const p=(this.editor.repository.readState().contents[anchor.contentKey]?.payload.standoffProperties as any[]??[]).find(p=>p.id===anchor.segmentId&&p.annotationId===anchor.definitionId&&!p.isDeleted);return p&&Number.isInteger(p.start)&&Number.isInteger(p.end)?{start:p.start as number,end:p.isZeroWidth?p.start as number:(p.end as number)+1}:undefined;}
  private changed(change:RepositoryChange){
   if(!this.alive||change.structural?.gloss?.linksOnly&&change.structural.gloss.owner===this.owner)return;const state=this.editor.repository.readState(),affected=new Set<string>();let structure=false,membership=false;
   batch(()=>{

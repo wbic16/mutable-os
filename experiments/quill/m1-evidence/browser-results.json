@@ -1,0 +1,2146 @@
+{
+  "checks": [
+    {
+      "name": "Flint benchmark records all insert and delete samples",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark typing retains text and caret",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark has bounded canonical work",
+      "passed": true,
+      "details": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 40,
+        "rangeRects": 20
+      }
+    },
+    {
+      "name": "contextual opening preserves the source native Document",
+      "passed": true
+    },
+    {
+      "name": "Flint and Quill coexist with separate commands and managed windows",
+      "passed": true
+    },
+    {
+      "name": "confirmed conversion keeps native identity and annotations",
+      "passed": true
+    },
+    {
+      "name": "conversion uses bounded structural admission",
+      "passed": true,
+      "details": {
+        "fullValidation": 0,
+        "broadPlanning": 0
+      }
+    },
+    {
+      "name": "real application renders ordinary Blocks beside composition",
+      "passed": true
+    },
+    {
+      "name": "trusted click on curved text selects canonical boundary",
+      "passed": true,
+      "details": {
+        "anchor": 10,
+        "head": 10
+      }
+    },
+    {
+      "name": "trusted input inserts directly on curved SVG",
+      "passed": true
+    },
+    {
+      "name": "trusted deletion keeps canonical identity",
+      "passed": true
+    },
+    {
+      "name": "shift selection and replacement use the native range",
+      "passed": true
+    },
+    {
+      "name": "native keyboard Undo reverses SVG edit",
+      "passed": true
+    },
+    {
+      "name": "native keyboard Redo restores SVG edit",
+      "passed": true
+    },
+    {
+      "name": "three linked sine paths render continuous canonical text",
+      "passed": true,
+      "details": {
+        "config": {
+          "version": 1,
+          "viewport": {
+            "width": 760,
+            "height": 252
+          },
+          "sources": [
+            {
+              "role": "body"
+            }
+          ],
+          "paths": [
+            {
+              "id": "wave-1",
+              "kind": "sine",
+              "x": 20,
+              "y": 50,
+              "width": 400,
+              "amplitude": 20,
+              "cycles": 1,
+              "phase": 0
+            },
+            {
+              "id": "wave-2",
+              "kind": "sine",
+              "x": 20,
+              "y": 126,
+              "width": 400,
+              "amplitude": 20,
+              "cycles": 1,
+              "phase": 0
+            },
+            {
+              "id": "wave-3",
+              "kind": "sine",
+              "x": 20,
+              "y": 202,
+              "width": 400,
+              "amplitude": 20,
+              "cycles": 1,
+              "phase": 0
+            }
+          ],
+          "flows": [
+            {
+              "id": "body",
+              "sourceRole": "body",
+              "pathIds": [
+                "wave-1",
+                "wave-2",
+                "wave-3"
+              ]
+            }
+          ],
+          "pathSpacing": 76
+        },
+        "fragments": 3,
+        "text": "The raven NEWreplacementsses the quiet garden, carrying stories through the evening air. Each word follows the turning wave, and every annotation keeps its place as the sentence grows.",
+        "buttons": [
+          "Text",
+          "Paths",
+          "Three linked waves",
+          "Add linked path",
+          "Italic",
+          "Entity",
+          "Gloss",
+          "Annotations",
+          "Native text",
+          "Undo",
+          "Redo",
+          "Cancel preview",
+          "⠿"
+        ],
+        "status": "Text\nPaths\nThree linked waves\nAdd linked path\nLatin\nItalic\nEntity\nGloss\nAnnotations\nNative text\nUndo\nRedo\nPath\nwave-1\nwave-2\nwave-3\nShape\nStraight\nSine wave\nX\nY\nLength\nAmplitude\nFrequency\nPhase\nSpacing\nCancel preview\nT\nh\ne\nr\na\nv\ne\nn\nN\nE\nW\nr\ne\np\nl\na\nc\ne\nm\ne\nn\nt\ns\ns\ne\ns\nt\nh\ne\nq\nu\ni\ne\nt\ng\na\nr\nd\ne\nn\n,\nc\na\nr\nr\ny\ni\nn\ng\ns\nt\no\nr\ni\ne\ns\nt\nh\nr\no\nu\ng\nh\nt\nh\ne\ne\nv\ne\nn\ni\nn\ng\na\ni\nr\n.\nE\na\nc\nh\nw\no\nr\nd\nf\no\nl\nl\no\nw\ns\nt\nh\ne\nt\nu\nr\nn\ni\nn\ng\nw\na\nv\ne\n,\na\nn\nd\n\n55 characters overflow the final path. Add paths or increase their length. Text is retained.\n\n⠿"
+      }
+    },
+    {
+      "name": "inspector commits native amplitude and frequency",
+      "passed": true
+    },
+    {
+      "name": "handle drag previews without canonical mutation",
+      "passed": true
+    },
+    {
+      "name": "handle release commits one undoable geometry edit",
+      "passed": true
+    },
+    {
+      "name": "geometry Undo restores original length",
+      "passed": true
+    },
+    {
+      "name": "geometry Redo restores handle result",
+      "passed": true
+    },
+    {
+      "name": "trusted insertion reflows downstream linked paths",
+      "passed": true
+    },
+    {
+      "name": "deletion reverses downstream reflow",
+      "passed": true
+    },
+    {
+      "name": "trusted pointer drag maps the native selected range",
+      "passed": true,
+      "details": {
+        "anchor": 4,
+        "head": 9
+      }
+    },
+    {
+      "name": "curved range opens the native Gloss editor",
+      "passed": true
+    },
+    {
+      "name": "native Gloss commit and overlapping entity annotation display on the curve",
+      "passed": true,
+      "details": {
+        "properties": [
+          {
+            "end": 8,
+            "id": "entity-raven",
+            "start": 4,
+            "type": "codex/entity-reference",
+            "value": "raven-entity"
+          },
+          {
+            "annotationId": "raven-gloss-definition",
+            "end": 27,
+            "id": "gloss-raven",
+            "start": 4,
+            "type": "mutable/gloss"
+          },
+          {
+            "end": 31,
+            "id": "overlap",
+            "start": 0,
+            "type": "style/italics"
+          },
+          {
+            "id": "edd763c0-6cf2-4272-96d5-227cb08c726e",
+            "type": "style/italics",
+            "start": 4,
+            "end": 8
+          },
+          {
+            "id": "179d53c4-83bb-4a3a-9153-5dc2f69e0079",
+            "type": "mutable/gloss",
+            "annotationId": "e6f0eb17-d23b-4050-a5a2-db2fd314c480",
+            "start": 4,
+            "end": 8
+          }
+        ],
+        "notice": "",
+        "effects": [
+          "codex/entity-reference",
+          "codex/entity-reference",
+          "mutable/gloss",
+          "mutable/gloss",
+          "mutable/gloss",
+          "mutable/gloss",
+          "editor/temporary-range",
+          "editor/temporary-range"
+        ]
+      }
+    },
+    {
+      "name": "native popup range geometry follows SVG coordinates",
+      "passed": true,
+      "details": [
+        {
+          "x": 312.18857471270303,
+          "y": 559.4630115980202,
+          "w": 24.114009194659445,
+          "h": 29.974642073017662
+        },
+        {
+          "x": 328.18830286981995,
+          "y": 562.8679178476565,
+          "w": 19.127577772273185,
+          "h": 30.615998368753026
+        },
+        {
+          "x": 340.0866154025174,
+          "y": 561.9970423701959,
+          "w": 20.227849434509608,
+          "h": 30.870441047286363
+        },
+        {
+          "x": 346.1346675973612,
+          "y": 557.9597216792017,
+          "w": 25.243553880464162,
+          "h": 29.79111588309013
+        },
+        {
+          "x": 352.2760722205128,
+          "y": 550.5041572987406,
+          "w": 29.972780332137404,
+          "h": 30.002411505182863
+        }
+      ]
+    },
+    {
+      "name": "SVG clipboard contains canonical selected text",
+      "passed": true
+    },
+    {
+      "name": "unsupported Unicode input leaves native bytes intact",
+      "passed": true
+    },
+    {
+      "name": "Escape cancels numeric preview without a geometry commit",
+      "passed": true
+    },
+    {
+      "name": "scaled SVG hit testing retains canonical coordinates",
+      "passed": true
+    },
+    {
+      "name": "scrolling moves text and local range geometry together",
+      "passed": true
+    },
+    {
+      "name": "font invalidation refreshes metrics while retaining path geometry",
+      "passed": true
+    },
+    {
+      "name": "return preserves the original Flint composition position and native state",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark records all insert and delete samples",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark typing retains text and caret",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark has bounded canonical work",
+      "passed": true,
+      "details": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 0,
+        "rangeRects": 0
+      }
+    },
+    {
+      "name": "reopen continues editing the same native source",
+      "passed": true
+    },
+    {
+      "name": "reopened SVG accepts trusted input",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark records all insert and delete samples",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark typing retains text and caret",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark has bounded canonical work",
+      "passed": true,
+      "details": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 1860,
+        "rangeRects": 1800
+      }
+    },
+    {
+      "name": "Flint benchmark records all insert and delete samples",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark typing retains text and caret",
+      "passed": true
+    },
+    {
+      "name": "Flint benchmark has bounded canonical work",
+      "passed": true,
+      "details": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 0,
+        "rangeRects": 0
+      }
+    },
+    {
+      "name": "stress fixture retains multiple independent SVG compositions",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/157.0.8103.80",
+    "revision": "@5cb0fce6746acfc926045c45b23d811d479c49b9",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+    "jsVersion": "15.7.112.43"
+  },
+  "typingBefore": {
+    "handlers": {
+      "samples": [
+        {
+          "handlerMs": 5.299999997019768,
+          "afterQueuedCaretMs": 10.5,
+          "caretExecutionMs": 5.100000001490116,
+          "firstFrameMs": 18.5
+        },
+        {
+          "handlerMs": 5.600000001490116,
+          "afterQueuedCaretMs": 11.399999998509884,
+          "caretExecutionMs": 5.799999997019768,
+          "firstFrameMs": 17.299999997019768
+        },
+        {
+          "handlerMs": 2,
+          "afterQueuedCaretMs": 7.100000001490116,
+          "caretExecutionMs": 5.100000001490116,
+          "firstFrameMs": 13.200000002980232
+        },
+        {
+          "handlerMs": 2,
+          "afterQueuedCaretMs": 7.600000001490116,
+          "caretExecutionMs": 5.5,
+          "firstFrameMs": 13.299999997019768
+        },
+        {
+          "handlerMs": 1.8000000044703484,
+          "afterQueuedCaretMs": 6.899999998509884,
+          "caretExecutionMs": 5.0999999940395355,
+          "firstFrameMs": 14.100000001490116
+        },
+        {
+          "handlerMs": 2,
+          "afterQueuedCaretMs": 7.799999997019768,
+          "caretExecutionMs": 5.699999995529652,
+          "firstFrameMs": 16.899999998509884
+        },
+        {
+          "handlerMs": 1.8999999985098839,
+          "afterQueuedCaretMs": 7.100000001490116,
+          "caretExecutionMs": 5.100000001490116,
+          "firstFrameMs": 15.399999998509884
+        },
+        {
+          "handlerMs": 1.9000000059604645,
+          "afterQueuedCaretMs": 7.600000001490116,
+          "caretExecutionMs": 5.699999995529652,
+          "firstFrameMs": 15.400000005960464
+        },
+        {
+          "handlerMs": 1.6999999955296516,
+          "afterQueuedCaretMs": 6.699999995529652,
+          "caretExecutionMs": 5,
+          "firstFrameMs": 17.19999999552965
+        },
+        {
+          "handlerMs": 1.8999999985098839,
+          "afterQueuedCaretMs": 7.5,
+          "caretExecutionMs": 5.600000001490116,
+          "firstFrameMs": 17.5
+        },
+        {
+          "handlerMs": 1.6000000014901161,
+          "afterQueuedCaretMs": 6.600000001490116,
+          "caretExecutionMs": 5,
+          "firstFrameMs": 16.899999998509884
+        },
+        {
+          "handlerMs": 1.7000000029802322,
+          "afterQueuedCaretMs": 7.300000004470348,
+          "caretExecutionMs": 5.600000001490116,
+          "firstFrameMs": 16.600000001490116
+        },
+        {
+          "handlerMs": 1.5,
+          "afterQueuedCaretMs": 6.600000001490116,
+          "caretExecutionMs": 5.100000001490116,
+          "firstFrameMs": 15.700000002980232
+        },
+        {
+          "handlerMs": 1.6999999955296516,
+          "afterQueuedCaretMs": 7.299999997019768,
+          "caretExecutionMs": 5.600000001490116,
+          "firstFrameMs": 16.799999997019768
+        },
+        {
+          "handlerMs": 1.5,
+          "afterQueuedCaretMs": 6.700000002980232,
+          "caretExecutionMs": 5.100000001490116,
+          "firstFrameMs": 15.800000004470348
+        },
+        {
+          "handlerMs": 1.6999999955296516,
+          "afterQueuedCaretMs": 7.399999998509884,
+          "caretExecutionMs": 5.700000002980232,
+          "firstFrameMs": 17.5
+        },
+        {
+          "handlerMs": 1.5,
+          "afterQueuedCaretMs": 6.5,
+          "caretExecutionMs": 5,
+          "firstFrameMs": 16.19999999552965
+        },
+        {
+          "handlerMs": 1.7000000029802322,
+          "afterQueuedCaretMs": 7.399999998509884,
+          "caretExecutionMs": 5.699999995529652,
+          "firstFrameMs": 18
+        },
+        {
+          "handlerMs": 1.6000000014901161,
+          "afterQueuedCaretMs": 6.5,
+          "caretExecutionMs": 4.899999998509884,
+          "firstFrameMs": 14.899999998509884
+        },
+        {
+          "handlerMs": 1.7000000029802322,
+          "afterQueuedCaretMs": 7.4000000059604645,
+          "caretExecutionMs": 5.700000002980232,
+          "firstFrameMs": 18.5
+        }
+      ],
+      "restored": true
+    },
+    "trusted": {
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 40,
+        "rangeRects": 20
+      },
+      "marks": [
+        {
+          "start": 6792.60000000149,
+          "key": "x",
+          "firstFrameMs": 13.5,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 6823.89999999851,
+          "key": "Backspace",
+          "firstFrameMs": 13.5,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 6855.39999999851,
+          "key": "x",
+          "firstFrameMs": 15.600000001490116,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 6890.5,
+          "key": "Backspace",
+          "firstFrameMs": 15.5,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 6923.79999999702,
+          "key": "x",
+          "firstFrameMs": 15.600000001490116,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 6957.10000000149,
+          "key": "Backspace",
+          "firstFrameMs": 13.799999997019768,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 6990.39999999851,
+          "key": "x",
+          "firstFrameMs": 15.700000002980232,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 7023.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 15.600000001490116,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 7057,
+          "key": "x",
+          "firstFrameMs": 14.799999997019768,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 7090.60000000149,
+          "key": "Backspace",
+          "firstFrameMs": 13.899999998509884,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 7122.60000000149,
+          "key": "x",
+          "firstFrameMs": 16.69999999552965,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 7155.19999999553,
+          "key": "Backspace",
+          "firstFrameMs": 17,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 7188.69999999553,
+          "key": "x",
+          "firstFrameMs": 17.100000001490116,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 7223,
+          "key": "Backspace",
+          "firstFrameMs": 14.799999997019768,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 7256,
+          "key": "x",
+          "firstFrameMs": 15,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 7289.79999999702,
+          "key": "Backspace",
+          "firstFrameMs": 16.200000002980232,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 7323.60000000149,
+          "key": "x",
+          "firstFrameMs": 13.899999998509884,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 7355.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 17,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 7390,
+          "key": "x",
+          "firstFrameMs": 14.299999997019768,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 7428.5,
+          "key": "Backspace",
+          "firstFrameMs": 10,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        }
+      ],
+      "events": [
+        {
+          "start": 6792.60000000149,
+          "duration": 48,
+          "processing": 1.2000000029802322
+        },
+        {
+          "start": 6823.89999999851,
+          "duration": 48,
+          "processing": 8.599999994039536
+        },
+        {
+          "start": 6855.39999999851,
+          "duration": 48,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 6890.5,
+          "duration": 48,
+          "processing": 8.399999998509884
+        },
+        {
+          "start": 6923.79999999702,
+          "duration": 48,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 6957.10000000149,
+          "duration": 48,
+          "processing": 8.399999998509884
+        },
+        {
+          "start": 6990.39999999851,
+          "duration": 48,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 7023.69999999553,
+          "duration": 48,
+          "processing": 8.100000001490116
+        },
+        {
+          "start": 7057,
+          "duration": 48,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 7090.60000000149,
+          "duration": 48,
+          "processing": 8.300000004470348
+        },
+        {
+          "start": 7122.60000000149,
+          "duration": 48,
+          "processing": 0.10000000149011612
+        },
+        {
+          "start": 7155.19999999553,
+          "duration": 48,
+          "processing": 8.100000001490116
+        },
+        {
+          "start": 7188.69999999553,
+          "duration": 48,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 7223,
+          "duration": 48,
+          "processing": 8.200000002980232
+        },
+        {
+          "start": 7256,
+          "duration": 48,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 7289.79999999702,
+          "duration": 48,
+          "processing": 8.199999995529652
+        },
+        {
+          "start": 7323.60000000149,
+          "duration": 48,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 7355.69999999553,
+          "duration": 48,
+          "processing": 8.100000001490116
+        },
+        {
+          "start": 7390,
+          "duration": 48,
+          "processing": 0.10000000149011612
+        },
+        {
+          "start": 7428.5,
+          "duration": 40,
+          "processing": 8.100000001490116
+        }
+      ],
+      "domRetained": true
+    }
+  },
+  "typingAfter": {
+    "handlers": {
+      "samples": [
+        {
+          "handlerMs": 3.2000000029802322,
+          "afterQueuedCaretMs": 3.2000000029802322,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.900000005960464
+        },
+        {
+          "handlerMs": 2.9000000059604645,
+          "afterQueuedCaretMs": 2.9000000059604645,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.80000000447035
+        },
+        {
+          "handlerMs": 3,
+          "afterQueuedCaretMs": 3.100000001490116,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 20.69999999552965
+        },
+        {
+          "handlerMs": 3,
+          "afterQueuedCaretMs": 3,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.5
+        },
+        {
+          "handlerMs": 3,
+          "afterQueuedCaretMs": 3,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.900000005960464
+        },
+        {
+          "handlerMs": 2.899999998509884,
+          "afterQueuedCaretMs": 2.899999998509884,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.799999997019768
+        },
+        {
+          "handlerMs": 2.7999999970197678,
+          "afterQueuedCaretMs": 2.7999999970197678,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.799999997019768
+        },
+        {
+          "handlerMs": 2.7000000029802322,
+          "afterQueuedCaretMs": 2.7000000029802322,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.400000005960464
+        },
+        {
+          "handlerMs": 3,
+          "afterQueuedCaretMs": 3,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 20
+        },
+        {
+          "handlerMs": 2.899999998509884,
+          "afterQueuedCaretMs": 2.899999998509884,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 22.299999997019768
+        },
+        {
+          "handlerMs": 2.899999998509884,
+          "afterQueuedCaretMs": 2.899999998509884,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 20.600000001490116
+        },
+        {
+          "handlerMs": 2.7999999970197678,
+          "afterQueuedCaretMs": 2.7999999970197678,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 20.299999997019768
+        },
+        {
+          "handlerMs": 2.899999998509884,
+          "afterQueuedCaretMs": 2.899999998509884,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 20.200000002980232
+        },
+        {
+          "handlerMs": 3,
+          "afterQueuedCaretMs": 3.100000001490116,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.799999997019768
+        },
+        {
+          "handlerMs": 2.899999998509884,
+          "afterQueuedCaretMs": 2.899999998509884,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.80000000447035
+        },
+        {
+          "handlerMs": 2.7999999970197678,
+          "afterQueuedCaretMs": 2.7999999970197678,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.599999994039536
+        },
+        {
+          "handlerMs": 2.8000000044703484,
+          "afterQueuedCaretMs": 2.8000000044703484,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 20
+        },
+        {
+          "handlerMs": 2.8000000044703484,
+          "afterQueuedCaretMs": 2.8000000044703484,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.600000001490116
+        },
+        {
+          "handlerMs": 4.899999998509884,
+          "afterQueuedCaretMs": 4.899999998509884,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 22
+        },
+        {
+          "handlerMs": 2.899999998509884,
+          "afterQueuedCaretMs": 3,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 19.600000001490116
+        }
+      ],
+      "restored": true
+    },
+    "trusted": {
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 0,
+        "rangeRects": 0
+      },
+      "marks": [
+        {
+          "start": 10634.60000000149,
+          "key": "x",
+          "firstFrameMs": 14.899999998509884,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 10673.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 18.700000002980232,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 10705.5,
+          "key": "x",
+          "firstFrameMs": 19,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 10738.60000000149,
+          "key": "Backspace",
+          "firstFrameMs": 20.299999997019768,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 10773.60000000149,
+          "key": "x",
+          "firstFrameMs": 18.19999999552965,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 10806.89999999851,
+          "key": "Backspace",
+          "firstFrameMs": 18.899999998509884,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 10839,
+          "key": "x",
+          "firstFrameMs": 20,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 10872.60000000149,
+          "key": "Backspace",
+          "firstFrameMs": 19,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 10906.79999999702,
+          "key": "x",
+          "firstFrameMs": 18.399999998509884,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 10940,
+          "key": "Backspace",
+          "firstFrameMs": 18.299999997019768,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 10972.69999999553,
+          "key": "x",
+          "firstFrameMs": 18.100000001490116,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11006.19999999553,
+          "key": "Backspace",
+          "firstFrameMs": 19.5,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11040.10000000149,
+          "key": "x",
+          "firstFrameMs": 18.899999998509884,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11073.79999999702,
+          "key": "Backspace",
+          "firstFrameMs": 17,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11106.89999999851,
+          "key": "x",
+          "firstFrameMs": 17.700000002980232,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11139.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 19.30000000447035,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11173.60000000149,
+          "key": "x",
+          "firstFrameMs": 18.799999997019768,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11206.89999999851,
+          "key": "Backspace",
+          "firstFrameMs": 17,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 11238.60000000149,
+          "key": "x",
+          "firstFrameMs": 19.5,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 11273.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 18.80000000447035,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        }
+      ],
+      "events": [
+        {
+          "start": 10634.60000000149,
+          "duration": 24,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 10673.69999999553,
+          "duration": 32,
+          "processing": 3.100000001490116
+        },
+        {
+          "start": 10705.5,
+          "duration": 32,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 10738.60000000149,
+          "duration": 32,
+          "processing": 3.100000001490116
+        },
+        {
+          "start": 10773.60000000149,
+          "duration": 32,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 10806.89999999851,
+          "duration": 32,
+          "processing": 3.0999999940395355
+        },
+        {
+          "start": 10839,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 10872.60000000149,
+          "duration": 32,
+          "processing": 3.3000000044703484
+        },
+        {
+          "start": 10906.79999999702,
+          "duration": 32,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 10940,
+          "duration": 32,
+          "processing": 3.100000001490116
+        },
+        {
+          "start": 10972.69999999553,
+          "duration": 32,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 11006.19999999553,
+          "duration": 32,
+          "processing": 3.2000000029802322
+        },
+        {
+          "start": 11040.10000000149,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 11073.79999999702,
+          "duration": 32,
+          "processing": 3.2000000029802322
+        },
+        {
+          "start": 11106.89999999851,
+          "duration": 32,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 11139.69999999553,
+          "duration": 32,
+          "processing": 3
+        },
+        {
+          "start": 11173.60000000149,
+          "duration": 32,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 11206.89999999851,
+          "duration": 32,
+          "processing": 3.0999999940395355
+        },
+        {
+          "start": 11238.60000000149,
+          "duration": 32,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 11273.69999999553,
+          "duration": 32,
+          "processing": 2.899999998509884
+        }
+      ],
+      "domRetained": true
+    }
+  },
+  "stress": {
+    "characters": 5184,
+    "paths": 40,
+    "annotations": 90,
+    "otherCompositions": 3,
+    "unrelatedParagraphs": 200,
+    "decorativePaths": 1200,
+    "mountedOccurrences": 3
+  },
+  "typingStressNative": {
+    "handlers": {
+      "samples": [
+        {
+          "handlerMs": 98.79999999701977,
+          "afterQueuedCaretMs": 147.5,
+          "caretExecutionMs": 48.70000000298023,
+          "firstFrameMs": 333.5
+        },
+        {
+          "handlerMs": 95.59999999403954,
+          "afterQueuedCaretMs": 148.19999999552965,
+          "caretExecutionMs": 52.5,
+          "firstFrameMs": 328.09999999403954
+        },
+        {
+          "handlerMs": 92.5,
+          "afterQueuedCaretMs": 134.70000000298023,
+          "caretExecutionMs": 42.20000000298023,
+          "firstFrameMs": 321.70000000298023
+        },
+        {
+          "handlerMs": 96.70000000298023,
+          "afterQueuedCaretMs": 146.10000000149012,
+          "caretExecutionMs": 49.30000000447035,
+          "firstFrameMs": 324.79999999701977
+        },
+        {
+          "handlerMs": 87.30000000447035,
+          "afterQueuedCaretMs": 129,
+          "caretExecutionMs": 41.69999999552965,
+          "firstFrameMs": 309.40000000596046
+        },
+        {
+          "handlerMs": 95.79999999701977,
+          "afterQueuedCaretMs": 144.5,
+          "caretExecutionMs": 48.600000001490116,
+          "firstFrameMs": 324.09999999403954
+        },
+        {
+          "handlerMs": 87.40000000596046,
+          "afterQueuedCaretMs": 133,
+          "caretExecutionMs": 45.599999994039536,
+          "firstFrameMs": 317.40000000596046
+        },
+        {
+          "handlerMs": 94.79999999701977,
+          "afterQueuedCaretMs": 145.09999999403954,
+          "caretExecutionMs": 50.29999999701977,
+          "firstFrameMs": 323.79999999701977
+        },
+        {
+          "handlerMs": 90.39999999850988,
+          "afterQueuedCaretMs": 131.29999999701977,
+          "caretExecutionMs": 40.899999998509884,
+          "firstFrameMs": 312.3999999985099
+        },
+        {
+          "handlerMs": 92.60000000149012,
+          "afterQueuedCaretMs": 143.5,
+          "caretExecutionMs": 50.79999999701977,
+          "firstFrameMs": 322.30000000447035
+        },
+        {
+          "handlerMs": 87.59999999403954,
+          "afterQueuedCaretMs": 128.19999999552965,
+          "caretExecutionMs": 40.600000001490116,
+          "firstFrameMs": 310.09999999403954
+        },
+        {
+          "handlerMs": 97,
+          "afterQueuedCaretMs": 145.90000000596046,
+          "caretExecutionMs": 48.900000005960464,
+          "firstFrameMs": 323.90000000596046
+        },
+        {
+          "handlerMs": 85.5,
+          "afterQueuedCaretMs": 126.59999999403954,
+          "caretExecutionMs": 41.099999994039536,
+          "firstFrameMs": 307.29999999701977
+        },
+        {
+          "handlerMs": 96.89999999850988,
+          "afterQueuedCaretMs": 147.20000000298023,
+          "caretExecutionMs": 50.20000000298023,
+          "firstFrameMs": 325.8999999985099
+        },
+        {
+          "handlerMs": 90.10000000149012,
+          "afterQueuedCaretMs": 133.30000000447035,
+          "caretExecutionMs": 43.20000000298023,
+          "firstFrameMs": 318.30000000447035
+        },
+        {
+          "handlerMs": 95.59999999403954,
+          "afterQueuedCaretMs": 146.29999999701977,
+          "caretExecutionMs": 50.600000001490116,
+          "firstFrameMs": 324.3999999985099
+        },
+        {
+          "handlerMs": 90.19999999552965,
+          "afterQueuedCaretMs": 132.29999999701977,
+          "caretExecutionMs": 42.100000001490116,
+          "firstFrameMs": 315.1000000014901
+        },
+        {
+          "handlerMs": 93,
+          "afterQueuedCaretMs": 143.09999999403954,
+          "caretExecutionMs": 50.099999994039536,
+          "firstFrameMs": 321.69999999552965
+        },
+        {
+          "handlerMs": 89.80000000447035,
+          "afterQueuedCaretMs": 131.10000000149012,
+          "caretExecutionMs": 41.20000000298023,
+          "firstFrameMs": 327.80000000447035
+        },
+        {
+          "handlerMs": 112.39999999850988,
+          "afterQueuedCaretMs": 168.5,
+          "caretExecutionMs": 56.100000001490116,
+          "firstFrameMs": 363
+        }
+      ],
+      "restored": true
+    },
+    "trusted": {
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 1860,
+        "rangeRects": 1800
+      },
+      "marks": [
+        {
+          "start": 22336,
+          "key": "x",
+          "firstFrameMs": 171.79999999701977,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 22706,
+          "key": "Backspace",
+          "firstFrameMs": 164.10000000149012,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 23055.79999999702,
+          "key": "x",
+          "firstFrameMs": 146.10000000149012,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 23388.60000000149,
+          "key": "Backspace",
+          "firstFrameMs": 161,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 23739.79999999702,
+          "key": "x",
+          "firstFrameMs": 146.10000000149012,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 24089.60000000149,
+          "key": "Backspace",
+          "firstFrameMs": 161.69999999552965,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 24439.10000000149,
+          "key": "x",
+          "firstFrameMs": 152.39999999850988,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 24788.19999999553,
+          "key": "Backspace",
+          "firstFrameMs": 174.30000000447035,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 25155.79999999702,
+          "key": "x",
+          "firstFrameMs": 148.10000000149012,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 25506.5,
+          "key": "Backspace",
+          "firstFrameMs": 162.39999999850988,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 25854.69999999553,
+          "key": "x",
+          "firstFrameMs": 147.20000000298023,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 26221.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 163.30000000447035,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 26572.89999999851,
+          "key": "x",
+          "firstFrameMs": 146.60000000149012,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 26906.60000000149,
+          "key": "Backspace",
+          "firstFrameMs": 163.59999999403954,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 27256,
+          "key": "x",
+          "firstFrameMs": 143.89999999850988,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 27589.39999999851,
+          "key": "Backspace",
+          "firstFrameMs": 173.39999999850988,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 27956.19999999553,
+          "key": "x",
+          "firstFrameMs": 147.80000000447035,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 28322.79999999702,
+          "key": "Backspace",
+          "firstFrameMs": 160.60000000149012,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 28672.89999999851,
+          "key": "x",
+          "firstFrameMs": 146.89999999850988,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 29037.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 162.30000000447035,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        }
+      ],
+      "events": [
+        {
+          "start": 22336,
+          "duration": 368,
+          "processing": 0.4000000059604645
+        },
+        {
+          "start": 22706,
+          "duration": 352,
+          "processing": 153.70000000298023
+        },
+        {
+          "start": 23055.79999999702,
+          "duration": 344,
+          "processing": 0.09999999403953552
+        },
+        {
+          "start": 23388.60000000149,
+          "duration": 352,
+          "processing": 151.20000000298023
+        },
+        {
+          "start": 23739.79999999702,
+          "duration": 344,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 24089.60000000149,
+          "duration": 360,
+          "processing": 151.20000000298023
+        },
+        {
+          "start": 24439.10000000149,
+          "duration": 352,
+          "processing": 0.19999999552965164
+        },
+        {
+          "start": 24788.19999999553,
+          "duration": 376,
+          "processing": 163.10000000149012
+        },
+        {
+          "start": 25155.79999999702,
+          "duration": 344,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 25506.5,
+          "duration": 360,
+          "processing": 151.70000000298023
+        },
+        {
+          "start": 25854.69999999553,
+          "duration": 336,
+          "processing": 0.10000000149011612
+        },
+        {
+          "start": 26221.69999999553,
+          "duration": 360,
+          "processing": 152.89999999850988
+        },
+        {
+          "start": 26572.89999999851,
+          "duration": 344,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 26906.60000000149,
+          "duration": 360,
+          "processing": 153.70000000298023
+        },
+        {
+          "start": 27256,
+          "duration": 344,
+          "processing": 0.10000000149011612
+        },
+        {
+          "start": 27589.39999999851,
+          "duration": 368,
+          "processing": 163.19999999552965
+        },
+        {
+          "start": 27956.19999999553,
+          "duration": 344,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 28322.79999999702,
+          "duration": 352,
+          "processing": 150.39999999850988
+        },
+        {
+          "start": 28672.89999999851,
+          "duration": 344,
+          "processing": 0.19999999552965164
+        },
+        {
+          "start": 29037.69999999553,
+          "duration": 352,
+          "processing": 152
+        }
+      ],
+      "domRetained": true
+    }
+  },
+  "typingStress": {
+    "handlers": {
+      "samples": [
+        {
+          "handlerMs": 76.69999999552965,
+          "afterQueuedCaretMs": 76.89999999850988,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 287
+        },
+        {
+          "handlerMs": 77,
+          "afterQueuedCaretMs": 77.10000000149012,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 288.29999999701977
+        },
+        {
+          "handlerMs": 78.70000000298023,
+          "afterQueuedCaretMs": 78.89999999850988,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 282.70000000298023
+        },
+        {
+          "handlerMs": 77.59999999403954,
+          "afterQueuedCaretMs": 77.79999999701977,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 279.79999999701977
+        },
+        {
+          "handlerMs": 77.20000000298023,
+          "afterQueuedCaretMs": 77.20000000298023,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 282.79999999701977
+        },
+        {
+          "handlerMs": 75.60000000149012,
+          "afterQueuedCaretMs": 75.80000000447035,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 277
+        },
+        {
+          "handlerMs": 76.20000000298023,
+          "afterQueuedCaretMs": 76.30000000447035,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 277.70000000298023
+        },
+        {
+          "handlerMs": 81.5,
+          "afterQueuedCaretMs": 81.70000000298023,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 290.70000000298023
+        },
+        {
+          "handlerMs": 77.69999999552965,
+          "afterQueuedCaretMs": 77.89999999850988,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 286.29999999701977
+        },
+        {
+          "handlerMs": 74.79999999701977,
+          "afterQueuedCaretMs": 74.89999999850988,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 278.6000000014901
+        },
+        {
+          "handlerMs": 77.5,
+          "afterQueuedCaretMs": 77.60000000149012,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 279.69999999552965
+        },
+        {
+          "handlerMs": 74.70000000298023,
+          "afterQueuedCaretMs": 75,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 277.40000000596046
+        },
+        {
+          "handlerMs": 77.79999999701977,
+          "afterQueuedCaretMs": 77.89999999850988,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 284.59999999403954
+        },
+        {
+          "handlerMs": 77.5,
+          "afterQueuedCaretMs": 77.70000000298023,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 279.30000000447035
+        },
+        {
+          "handlerMs": 74.10000000149012,
+          "afterQueuedCaretMs": 74.29999999701977,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 276.19999999552965
+        },
+        {
+          "handlerMs": 76.20000000298023,
+          "afterQueuedCaretMs": 76.30000000447035,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 278
+        },
+        {
+          "handlerMs": 76.40000000596046,
+          "afterQueuedCaretMs": 76.5,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 282.6000000014901
+        },
+        {
+          "handlerMs": 76.60000000149012,
+          "afterQueuedCaretMs": 76.80000000447035,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 277.3999999985099
+        },
+        {
+          "handlerMs": 75.10000000149012,
+          "afterQueuedCaretMs": 75.10000000149012,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 275.90000000596046
+        },
+        {
+          "handlerMs": 77.69999999552965,
+          "afterQueuedCaretMs": 77.79999999701977,
+          "caretExecutionMs": 0,
+          "firstFrameMs": 279.79999999701977
+        }
+      ],
+      "restored": true
+    },
+    "trusted": {
+      "counts": {
+        "paragraphTextWalks": 0,
+        "fullValidation": 0,
+        "broadPlanning": 0,
+        "unrelatedGeometry": 0,
+        "unrelatedMutations": 0,
+        "workers": 0,
+        "requests": 0,
+        "snapshots": 0,
+        "commits": 20,
+        "inlineCommits": 20,
+        "projectionBuilds": 0,
+        "elementRects": 0,
+        "rangeRects": 0
+      },
+      "marks": [
+        {
+          "start": 35810.29999999702,
+          "key": "x",
+          "firstFrameMs": 118.39999999850988,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 36106.19999999553,
+          "key": "Backspace",
+          "firstFrameMs": 114.40000000596046,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 36393,
+          "key": "x",
+          "firstFrameMs": 112,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 36689.29999999702,
+          "key": "Backspace",
+          "firstFrameMs": 114.30000000447035,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 36976,
+          "key": "x",
+          "firstFrameMs": 111.29999999701977,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 37270.79999999702,
+          "key": "Backspace",
+          "firstFrameMs": 116,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 37572.60000000149,
+          "key": "x",
+          "firstFrameMs": 114.19999999552965,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 37858.89999999851,
+          "key": "Backspace",
+          "firstFrameMs": 113.5,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 38155.89999999851,
+          "key": "x",
+          "firstFrameMs": 113.29999999701977,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 38455.79999999702,
+          "key": "Backspace",
+          "firstFrameMs": 113.70000000298023,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 38742.5,
+          "key": "x",
+          "firstFrameMs": 113.89999999850988,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 39038.89999999851,
+          "key": "Backspace",
+          "firstFrameMs": 111.39999999850988,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 39323.79999999702,
+          "key": "x",
+          "firstFrameMs": 112.5,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 39622.5,
+          "key": "Backspace",
+          "firstFrameMs": 113.79999999701977,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 39907.79999999702,
+          "key": "x",
+          "firstFrameMs": 113.5,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 40205.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 116.20000000298023,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 40506,
+          "key": "x",
+          "firstFrameMs": 114.69999999552965,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 40805.69999999553,
+          "key": "Backspace",
+          "firstFrameMs": 114.80000000447035,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        },
+        {
+          "start": 41105.60000000149,
+          "key": "x",
+          "firstFrameMs": 112.59999999403954,
+          "caret": {
+            "anchor": 101,
+            "head": 101
+          }
+        },
+        {
+          "start": 41392.10000000149,
+          "key": "Backspace",
+          "firstFrameMs": 114.29999999701977,
+          "caret": {
+            "anchor": 100,
+            "head": 100
+          }
+        }
+      ],
+      "events": [
+        {
+          "start": 35810.29999999702,
+          "duration": 296,
+          "processing": 4
+        },
+        {
+          "start": 36106.19999999553,
+          "duration": 288,
+          "processing": 77.10000000149012
+        },
+        {
+          "start": 36393,
+          "duration": 288,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 36689.29999999702,
+          "duration": 288,
+          "processing": 77.20000000298023
+        },
+        {
+          "start": 36976,
+          "duration": 288,
+          "processing": 0.30000000447034836
+        },
+        {
+          "start": 37270.79999999702,
+          "duration": 296,
+          "processing": 78.30000000447035
+        },
+        {
+          "start": 37572.60000000149,
+          "duration": 288,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 37858.89999999851,
+          "duration": 288,
+          "processing": 77.09999999403954
+        },
+        {
+          "start": 38155.89999999851,
+          "duration": 288,
+          "processing": 0.19999999552965164
+        },
+        {
+          "start": 38455.79999999702,
+          "duration": 288,
+          "processing": 75.70000000298023
+        },
+        {
+          "start": 38742.5,
+          "duration": 288,
+          "processing": 0.29999999701976776
+        },
+        {
+          "start": 39038.89999999851,
+          "duration": 288,
+          "processing": 74.10000000149012
+        },
+        {
+          "start": 39323.79999999702,
+          "duration": 288,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 39622.5,
+          "duration": 288,
+          "processing": 76.79999999701977
+        },
+        {
+          "start": 39907.79999999702,
+          "duration": 288,
+          "processing": 0.20000000298023224
+        },
+        {
+          "start": 40205.69999999553,
+          "duration": 296,
+          "processing": 79.39999999850988
+        },
+        {
+          "start": 40506,
+          "duration": 288,
+          "processing": 0.3999999985098839
+        },
+        {
+          "start": 40805.69999999553,
+          "duration": 288,
+          "processing": 76.70000000298023
+        },
+        {
+          "start": 41105.60000000149,
+          "duration": 288,
+          "processing": 0.19999999552965164
+        },
+        {
+          "start": 41392.10000000149,
+          "duration": 288,
+          "processing": 77.60000000149012
+        }
+      ],
+      "domRetained": true
+    }
+  },
+  "note": "M1 checkpoints 1–3: actual SVG input, linked geometry, native ranges and round-trip. Persistence is independently tested with mounted SVG input against a real temporary native store. Headless Chromium timings are diagnostics, not user-visible latency guarantees."
+}

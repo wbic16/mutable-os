@@ -18,11 +18,25 @@ interface FocusState {
 }
 
 export class FocusService {
+  private renderers = new Set<(key: NodeKey, current: () => boolean) => Promise<boolean> | undefined>();
+  /** A native flow may materialise an already chosen destination. No navigation policy. */
+  registerRenderer(render: (key: NodeKey, current: () => boolean) => Promise<boolean> | undefined) {
+    this.renderers.add(render);
+    return () => { this.renderers.delete(render); };
+  }
+  async ensureRendered(key: NodeKey, current: () => boolean = () => true): Promise<boolean> {
+    if (!current()) return false;
+    for (const render of this.renderers) {
+      const result = render(key, current);
+      if (result) return result;
+    }
+    return !!this.mounts.get(key);
+  }
   readonly state: FocusState;
   permit?: (nodeKey: NodeKey) => boolean;
   cancelPending(): void { this.pending = undefined; }
   private readonly setState: (...args: any[]) => void;
-  private pending?: { nodeKey: NodeKey; request: FocusRequest; token: number };
+  private pending?: { nodeKey: NodeKey; request: FocusRequest; token: number; rendering?: boolean };
   private readonly unsubscribe: () => void;
 
   constructor(private readonly mounts: MountRegistry) {
@@ -30,20 +44,28 @@ export class FocusService {
     this.state = state;
     this.setState = setState;
     this.unsubscribe = mounts.subscribe((nodeKey) => {
-      if (this.pending?.nodeKey === nodeKey) this.applyPending();
+      if (this.pending?.nodeKey === nodeKey) {
+        this.applyPending();
+        // A retained outlet registers its view before attaching its host slot.
+        if (this.pending) queueMicrotask(() => this.applyPending());
+      }
     });
   }
 
   request(nodeKey: NodeKey, request: FocusRequest = {}): void {
     if (request.valid?.() === false || this.permit?.(nodeKey) === false) return;
     const token = this.state.requestToken + 1;
+    const rendering = !this.mounts.get(nodeKey) && this.renderers.size > 0;
+    this.pending = { nodeKey, request, token, rendering };
     this.setState({
       lastFocusedKey: this.state.focusedKey,
       focusedKey: nodeKey,
       requestToken: token,
     });
-    this.pending = { nodeKey, request, token };
     this.applyPending();
+    void this.ensureRendered(nodeKey, () => this.state.requestToken === token && request.valid?.() !== false).then(() => {
+      if (this.pending?.token === token) { this.pending.rendering = false; this.applyPending(); }
+    });
   }
 
   adopt(nodeKey: NodeKey): void {
@@ -64,9 +86,9 @@ export class FocusService {
 
   private applyPending(): void {
     const pending = this.pending;
-    if (!pending || pending.token !== this.state.requestToken) return;
+    if (!pending || pending.rendering || pending.token !== this.state.requestToken) return;
     const handle = this.mounts.get(pending.nodeKey);
-    if (!handle) return;
+    if (!handle?.root.isConnected) return;
     if (pending.request.valid?.() === false || this.permit?.(pending.nodeKey) === false) { this.pending = undefined; return; }
     handle.focus();
     const caret = pending.request.caret;
@@ -93,6 +115,7 @@ export class FocusService {
 
   dispose(): void {
     this.unsubscribe();
+    this.renderers.clear();
     this.pending = undefined;
   }
 }

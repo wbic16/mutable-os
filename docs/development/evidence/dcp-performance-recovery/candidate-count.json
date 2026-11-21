@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "inputTokens": 5343,
+  "candidateOnly": true,
+  "schemaUnchanged": true,
+  "liveQualified": false,
+  "localContractTokens": 1252,
+  "compositionKinds": [
+    "paragraph",
+    "group",
+    "list",
+    "table",
+    "heading",
+    "code",
+    "grid",
+    "video",
+    "youtube",
+    "surface",
+    "tabs",
+    "external-image",
+    "embed",
+    "sticky-note"
+  ],
+  "standoff": [
+    "style/italics",
+    "style/bold",
+    "style/underline",
+    "dialectic/claim",
+    "dialectic/question",
+    "dialectic/speculation",
+    "dialectic/suggestion",
+    "dialectic/objection",
+    "dialectic/qualification",
+    "mutable/entity-reference",
+    "style/strikethrough",
+    "style/highlight",
+    "reference/url"
+  ]
+}

@@ -1,0 +1,34 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+stdout | docs/development/evidence/dcp-performance-recovery/live.test.ts > bounded A, B and ten-contribution C through retained conversation and native admission
+{"id":"A1","admitted":true,"timings":{"assemblyMs":76.8525840000002,"continuityMs":3993.5382500000014,"admissionMs":68.87975000000006,"persistenceMs":39.96720899999491,"totalMs":16587.375750000003},"usage":[{"input_tokens":12929,"output_tokens":548,"total_tokens":13477,"reasoning_tokens":208,"cached_input_tokens":0}],"entities":1,"relationships":0}
+
+stdout | docs/development/evidence/dcp-performance-recovery/live.test.ts > bounded A, B and ten-contribution C through retained conversation and native admission
+{"id":"B","error":"Error: Provider stream exceeded its byte budget.","timings":{"assemblyMs":51.72729100000288,"continuityMs":2178.2820829999982,"totalMs":61064.779583},"usage":[]}
+
+ ❯ docs/development/evidence/dcp-performance-recovery/live.test.ts (1 test | 1 failed) 77888ms
+   × bounded A, B and ten-contribution C through retained conversation and native admission 77887ms
+     → expected [ { id: 'A1', …(18) }, …(1) ] to have a length of 6 but got 2
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  docs/development/evidence/dcp-performance-recovery/live.test.ts > bounded A, B and ten-contribution C through retained conversation and native admission
+AssertionError: expected [ { id: 'A1', …(18) }, …(1) ] to have a length of 6 but got 2
+
+- Expected
++ Received
+
+- 6
++ 2
+
+ ❯ docs/development/evidence/dcp-performance-recovery/live.test.ts:70:18
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  19:04:22
+   Duration  108.18s (transform 24.20s, setup 0ms, collect 28.48s, tests 77.89s, environment 660ms, prepare 116ms)
+

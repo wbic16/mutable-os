@@ -1,0 +1,95 @@
+{
+  "all": [
+    {
+      "mounted": false,
+      "loadEditorMs": 105.59999996423721,
+      "contributions": 4,
+      "cells": 2709,
+      "xmlBytes": 1241,
+      "manifestMs": 9,
+      "requestBuildMs": 2.5,
+      "workspaceMs": 6.5,
+      "xmlProjectionMs": 1.2999999523162842,
+      "historyColdMs": 6.800000011920929,
+      "historyWarmMs": 0.19999998807907104,
+      "xmlLowerMs": 3.5,
+      "nativePrepareMs": 7,
+      "definitions": 8,
+      "addedAnnotations": 9,
+      "admitMs": 80.30000001192093,
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [],
+      "responseRect": null,
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 0.6000000238418579,
+      "saveCaptureMs": 160.5999999642372,
+      "saveEncodeMs": 65.80000001192093,
+      "saveBytes": 414854,
+      "fullSaveWithInMemoryAdapterMs": 257.89999997615814,
+      "domNodes": 0
+    },
+    {
+      "mounted": true,
+      "loadEditorMs": 153.89999997615814,
+      "mountMs": 2314.400000035763,
+      "contributions": 4,
+      "cells": 2709,
+      "xmlBytes": 1241,
+      "manifestMs": 2.200000047683716,
+      "requestBuildMs": 0.3999999761581421,
+      "workspaceMs": 8,
+      "xmlProjectionMs": 1.399999976158142,
+      "historyColdMs": 1.5,
+      "historyWarmMs": 0.10000002384185791,
+      "xmlLowerMs": 0.800000011920929,
+      "nativePrepareMs": 1.5,
+      "definitions": 8,
+      "addedAnnotations": 9,
+      "controllerValidateMs": 2,
+      "controllerExchangeMs": 115.20000004768372,
+      "autosaveMs": 124.90000003576279,
+      "nextTwoFramesMs": 326.89999997615814,
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [
+        {
+          "ms": 104.80000001192093,
+          "key": "node:eaaa05f0-5093-4ea2-9cf7-cccfac4aed4e"
+        }
+      ],
+      "responseRect": {
+        "x": 306,
+        "y": 369.5,
+        "width": 816,
+        "height": 267.5,
+        "top": 369.5,
+        "right": 1122,
+        "bottom": 637,
+        "left": 306
+      },
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 0.7000000476837158,
+      "saveCaptureMs": 86.29999995231628,
+      "saveEncodeMs": 20.200000047683716,
+      "saveBytes": 447646,
+      "fullSaveWithInMemoryAdapterMs": 100.39999997615814,
+      "domNodes": 3956
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ],
+  "fixtureSha256": "0cbb354d3ed58929a038609ea72776aa2face04513d7bacca319e175e405c1d3",
+  "diagnosticDelayMs": 0
+}

@@ -63,10 +63,11 @@ it('name lookup and selection make no document reads or boundary audits, even wi
  try{
   expect((await f.query('Rome','name')).candidates.map(c=>c.name)).toEqual(['Rome']);
   expect((await f.service.get(f.entityId))?.name).toBe('Rome');
+  expect(await f.service.documentAssociation!({resourceId:'a',entityId:randomUUID()},new AbortController().signal)).toEqual({link:undefined,entity:undefined});
   expect((await f.query('Rome','name')).candidates).toHaveLength(1);
   for(const spy of spies)expect(spy).not.toHaveBeenCalled();
   const requests=fetch.mock.calls.filter(([url])=>String(url).includes('/sqlite/')).map(([url])=>String(url));
-  expect(requests).toEqual(Array(3).fill('/api/sqlite/knowledge/entity-lookup'));
+  expect(requests).toEqual(Array(4).fill('/api/sqlite/knowledge/entity-lookup'));
  }finally{fetch.mockRestore();for(const spy of spies)spy.mockRestore();}
 },30000);
 it('All publishes canonical matches then merges indexed mentions without preparing document Facts',async()=>{
@@ -225,4 +226,9 @@ it('listing reads only names and indexed segment counts without Vault discovery 
   expect(ops).toEqual(['names','db-mentions']);
   const aborted=new AbortController();aborted.abort();await expect(service.names([f.entityId],aborted.signal)).rejects.toThrow();
  }finally{service.dispose();discovery.mockRestore();facts.mockRestore();fetch.mockRestore();serverDiscovery.mockRestore();serverFence.mockRestore();}
+},30000);
+
+it('exposes a durable Vault GUID independently of its directory without discovery',async()=>{
+ const f=await fixture();const discovery=vi.spyOn(f.native,'discoverVault').mockRejectedValue(Error('No discovery for identity'));
+ const id=await f.service.scopeIdentity!();expect(id).toMatch(/^[0-9a-f-]{36}$/i);expect(id).not.toBe(await f.service.historyScope!());expect(await f.service.scopeIdentity!()).toBe(id);expect(discovery).not.toHaveBeenCalled();
 },30000);

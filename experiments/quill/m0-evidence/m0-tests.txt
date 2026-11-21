@@ -1,0 +1,14 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ src/features/quill/model.test.ts (10 tests) 940ms
+   ✓ Quill native M0 contract > ordinary edits/undo/redo read no unrelated payloads with 500 extra Blocks 575ms
+ ✓ src/application/quill.test.tsx (9 tests) 1809ms
+   ✓ hands off Textual invocation to the desktop and returns to the same native source 671ms
+ ✓ src/features/quill/persistence.test.ts (1 test) 237ms
+
+ Test Files  3 passed (3)
+      Tests  20 passed (20)
+   Start at  14:46:19
+   Duration  11.75s (transform 6.88s, setup 0ms, collect 10.12s, tests 2.99s, environment 1.64s, prepare 161ms)
+

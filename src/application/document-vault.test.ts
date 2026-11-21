@@ -65,3 +65,13 @@ it('verification waits for a running background listing so stale results cannot 
  const native={establishVault:async()=>({}),browseVault:vi.fn(async(_r:string,mode:string)=>mode==='cached'?initial:new Promise(r=>finish=r)),discoverVault:vi.fn(async()=>({...scan('vault'),documents:initial.documents})),pendingVaultRelocations:()=>[]};
  const vaults=createDocumentVaults(native as unknown as NativeDocumentSession,undefined,true),lease=await vaults.acquire('vault');const verified=lease.ensureVerified();expect(native.discoverVault).not.toHaveBeenCalled();finish({...initial,cached:false});await verified;expect(lease.snapshot().complete).toBe(true);lease.release();
 });
+it('exact selected activation tolerates unrelated malformed files but rejects stale, duplicate and pending evidence',async()=>{
+ const row={resourceId:'a',location:{folder:'vault',filename:'a.ink'},title:'A',state:'paired'};
+ const value={...scan('vault'),complete:false,documents:[row],diagnostics:[{path:'vault/bad.ink',message:'Malformed native file'}]};
+ const native={establishVault:async()=>({}),discoverVault:vi.fn(async()=>value),pendingVaultRelocations:()=>[]};
+ const vaults=createDocumentVaults(native as unknown as NativeDocumentSession),lease=await vaults.acquire('vault');
+ expect(lease.requireSelectedFile(row.location).resourceId).toBe('a');expect(()=>lease.requireFile(row.location)).toThrow('incomplete');
+ native.discoverVault.mockResolvedValue({...value,documents:[row,{...row,location:{folder:'vault',filename:'duplicate.ink'}}]});await lease.refresh();expect(()=>lease.requireSelectedFile(row.location)).toThrow('ambiguous');
+ native.discoverVault.mockResolvedValue({...value,documents:[{...row,state:'pending'}]});await lease.refresh();expect(()=>lease.requireSelectedFile(row.location)).toThrow('pending');
+ native.discoverVault.mockResolvedValue(value);await lease.refresh();native.discoverVault.mockRejectedValue(Error('offline'));await expect(lease.refresh()).rejects.toThrow();expect(()=>lease.requireSelectedFile(row.location)).toThrow('Refresh');vaults.dispose();
+});

@@ -1,3 +1,6 @@
+import {contentLength,contentSlice} from '../block-tree/inline-sequence';
+import {policyKey} from '../knowledge/policy';
+import {retrievalRequest} from './retrieval-client';
 import {graphemeBoundaries} from '../input/graphemes';
 import type { FactsQueryProvider, SavedSourceEvidence } from './facts-query-provider';
 import type { ReactiveEditor } from '../reactive-editor/editor';
@@ -106,7 +109,7 @@ export class VaultKnowledge implements ApplicationKnowledge {
         if(doc.title.length>10000)diagnostics.push(`${doc.title.slice(0,40)}: title truncated to 10,000 characters.`);
         const titleKey=`title:${doc.contentKey}`;inputs.push({contentKey:titleKey,version:stamp.revision,coordinate:'utf16',runs:[{text:doc.title.slice(0,10000)}]});locators.set(titleKey,{target:doc});
         for(const c of await this.blocks(doc,diagnostics,controller.signal)){
-          cells+=c.inlineContent.length;if(++blocks>5000||cells>250000){diagnostics.push('Search limited to 5,000 text Blocks / 250,000 Cells.');break outer;}
+          cells+=contentLength(c);if(++blocks>5000||cells>250000){diagnostics.push('Search limited to 5,000 text Blocks / 250,000 Cells.');break outer;}
           let input:SearchSource;try{input=await canonicalSearchSource(this.editor.repository.readState(),c.key,stamp.revision,controller.signal,2_000_000-units);}catch(e){if((e as Error).message.includes('budget')){diagnostics.push('Native text exceeds the 2,000,000-character search budget.');break outer;}throw e;}
           units+=input.runs.reduce((n,r)=>n+r.text.length,0);inputs.push(input);locators.set(c.key,{target:doc,content:c});
         }
@@ -144,6 +147,24 @@ export class VaultKnowledge implements ApplicationKnowledge {
     await this.refresh(hit.stamp);if(this.hits.get(id)!==hit)throw new Error('Search result expired');
     const target=this.target(hit.target,hit.stamp.vault);if(target.blockId!==hit.target.blockId||target.location!==hit.target.location)throw new Error('Search target identity or location changed');
     await this.host.navigate(target,hit.passage,()=>{try{return this.hits.get(id)===hit&&this.valid(hit.stamp);}catch{return false;}});
+  };
+  /** Saved retrieval carries evidence only; reuse verified Open and native reveal. */
+  activateRetrieval=async(hit:any,current:()=>boolean)=>{
+    const selected=current;current=()=>selected()&&this.live&&(!this.native.knowledgeEvidence(hit?.source?.resourceId).location||!this.native.isDirty(hit.source.resourceId));
+    this.host.guard();if(!this.live||!current()||!this.host.activateSaved)throw Error('Retrieval navigation unavailable');
+    const source=hit?.source,span=source?.spans?.[0];if(!span||span.resourceId!==source.resourceId||!source.path||!source.rootBlockId)throw Error('Invalid retrieved passage');
+    if(source.format&&source.format!=='mutable-document')throw Error('Open this legacy source manually before navigating');
+    const native=this.native.knowledgeEvidence(source.resourceId);
+    if(native.pending||native.location&&(this.native.isDirty(source.resourceId)||native.byteHash!==source.sourceHash))throw Error('Saved passage differs from the live Document; save or use live search');
+    await retrievalRequest('verify',{vaultGuid:source.vaultGuid,resourceId:source.resourceId,stamp:hit.stamp});
+    if(!current())throw Error('Retrieval navigation superseded');
+    const parts=source.path.split('/'),filename=parts.pop(),location={folder:parts.join('/')||'.',filename};
+    const target={documentId:source.resourceId,blockId:source.rootBlockId,title:filename,location:source.path};
+    const prefix='mutable-saved-sql-v3:';if(typeof source.extractionProfile!=='string'||!source.extractionProfile.startsWith(prefix))throw Error('Unsupported saved extraction profile');
+    const policy=policyKey(JSON.parse(source.extractionProfile.slice(prefix.length)));
+    const evidence={resourceId:source.resourceId,rootBlockId:source.rootBlockId,location,byteHash:source.sourceHash,policy};
+    const exact=hit.text.slice(span.chunkStart,span.chunkEnd);
+    await this.host.activateSaved(target,{blockId:span.blockGuid,start:span.start,end:span.end,coordinate:span.coordinate},evidence,current,exact);
   };
   /** Explicit lookup pool; consumers filter this bounded pool without rescanning on typing. */
   completionTargets=async()=>{this.host.guard();const vault=this.host.vault();await vault.ensureVerified();this.host.guard();if(!this.live||this.host.vault()!==vault)throw Error("Document picker context changed");return this.scope(vault);};
@@ -191,7 +212,7 @@ export class VaultKnowledge implements ApplicationKnowledge {
       else if(typeof p.value!=='string'||!p.value){diagnostic='Unsupported native reference target preserved';removable=false;}
       else {const docId=(p.metadata as any)?.documentId;const candidates=scope.sources.filter(s=>(docId===undefined||s.documentId===docId)&&s.blockId===p.value);if(candidates.length===1)target=candidates[0];else diagnostic='Target missing, unopened, ambiguous, or not a supported Document target';}
       const mentionKey=raw.annotationId?`${owner?.key}:${raw.annotationId}`:`${c.key}:${index}`;if(seen.has(mentionKey))continue;seen.add(mentionKey);
-      this.mentions.set(id,{...stamp,source,contentKey:c.key,property:raw,index,target,removable});items.push({id,label:c.inlineContent.slice(Number(p.start),Number(p.end)+1).map(k=>state.contents[state.placements[k]?.contentKey]?.payload.text??'[inline object]').join('').slice(0,100),target,diagnostic,removable});
+      this.mentions.set(id,{...stamp,source,contentKey:c.key,property:raw,index,target,removable});items.push({id,label:contentSlice(state,c,Number(p.start),Number(p.end)+1).map(a=>a.kind==='text'?a.text:'[inline object]').join('').slice(0,100),target,diagnostic,removable});
     }
     this.require(stamp);if(this.host.active()?.documentId!==source.documentId)throw new Error('Active Document changed');
     const token=crypto.randomUUID();if(this.referenceToken)this.batches.delete(this.referenceToken);this.referenceToken=token;this.referenceDocument=source.documentId;this.batches.set(token,stamp);return {token,items,diagnostics:[...new Set(diagnostics)]};

@@ -1,0 +1,15 @@
+:root { --quill-art-ink:#ece6db; --quill-accent:#dfb96a; --quill-guide:#69716c; --quill-paper:#161d20; }
+.quill-light { --quill-art-ink:#232c30; --quill-accent:#805310; --quill-guide:#777e78; --quill-paper:#f6f1e6; }
+body { margin:0; background:#242b2f; }
+.quill-test-header { position:fixed; inset:0 0 auto; height:64px; padding:8px 20px; z-index:100000; background:#182126; color:#eee; display:flex; gap:18px; align-items:center; font:14px system-ui; }
+.quill-test-header span { max-width:470px; font-size:12px; }
+.quill-test-header button,.quill-studio button { background:#29363d; color:#f5eee1; border:1px solid #64727a; padding:9px 12px; border-radius:4px; cursor:pointer; }
+.quill-test-header button:focus-visible,.quill-studio button:focus-visible,.quill-studio input:focus-visible { outline:3px solid #ebc778; outline-offset:2px; }
+.quill-studio { position:fixed; z-index:100001; top:105px; right:25px; width:290px; background:#182126; color:#eee9dd; padding:22px; border:1px solid #74817e; border-radius:6px; box-shadow:0 16px 50px #0008; font:14px/1.5 system-ui; }
+.quill-studio header { display:flex; justify-content:space-between; align-items:center; }
+.quill-studio label { display:block; margin:18px 0; }.quill-studio input { display:block; width:100%; }.quill-studio button { margin:5px 4px 5px 0; }
+.quill-studio p:last-child { color:#c2c9cb; font-size:12px; }
+.quill-inline { margin:20px 0; max-width:800px; }.quill-canvas { background:var(--quill-paper); border:1px solid var(--quill-guide); border-radius:5px; padding:12px; }
+.quill-canvas svg { display:block; width:100%; height:auto; }.quill-canvas p { color:var(--quill-art-ink); font:12px system-ui; }
+.quill-inline details { margin-top:16px; background:#fff; padding:12px; color:#202a2c; }.quill-inline summary { font:12px system-ui; margin-bottom:16px; }
+.quill-native { position:absolute; top:85px; left:25px; width:950px; padding:30px; background:white; }

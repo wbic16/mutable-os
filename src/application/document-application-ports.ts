@@ -12,6 +12,11 @@ export interface DocumentApplicationPort {
   application: DocumentApplicationInstance;
   windowId(): string | undefined;
   tabs(): readonly { key: string; title: string; documentId?: string; dirty: boolean }[];
+  /** Identity-only membership, independent of titles and dirty state. */
+  documentTabs?():readonly {key:string;documentId?:string}[];
+  closeTab?(key:string):void;
+  setTabActivity?(activity:(id:string)=>string):()=>void;
+  setCloseGuard?(guard:(ids:readonly string[],signal?:AbortSignal,keys?:readonly string[])=>boolean|Promise<boolean>):()=>void;
   activeTab(): string | undefined;
   selectTab(key: string): void;
   session(): RetainedDocumentSession | undefined;

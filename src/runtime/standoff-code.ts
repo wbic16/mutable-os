@@ -6,10 +6,8 @@ import type { ReactiveEditor } from '../reactive-editor/editor';
 import type { NodeKey } from '../block-tree/types';
 import type { TemporaryRangeCollection } from './session-decorations';
 
-export const STANDOFF_CODE = 'standoff-code-block';
-export function standoffCodeDto(language = 'javascript') {
-  return { id: crypto.randomUUID(), type: STANDOFF_CODE, metadata: { markdownCode: { language } }, children: [{ id: crypto.randomUUID(), type: 'standoff-editor-block', text: '' }] };
-}
+import {STANDOFF_CODE} from '../block-tree/literal-authoring';
+export {STANDOFF_CODE,standoffCodeDto} from '../block-tree/literal-authoring';
 export function codeLanguage(metadata: any): string {
   return String(metadata?.markdownCode?.language ?? 'javascript').toLowerCase();
 }

@@ -1,0 +1,20 @@
+<!-- Invented qualification fixture; not a historical source. -->
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader><fileDesc><titleStmt><title>Operational semantics</title></titleStmt></fileDesc>
+    <profileDesc><particDesc><listPerson>
+      <person xml:id="ada"><persName>Ada</persName></person>
+      <person xml:id="bea"><persName>Bea</persName></person>
+      <person xml:id="empty"/>
+    </listPerson></particDesc></profileDesc>
+    <listRelation><relation xml:id="r1" name="knows" active="#ada" passive="#bea" source="#evidence"/>
+      <relation name="knows" mutual="#ada #bea"/>
+      <relation name="knows" active="#ada" passive="#absent"/>
+    </listRelation>
+  </teiHeader>
+  <text><body>
+    <p xml:id="evidence"><persName ref="#ada">Ada</persName> met <persName ref="#bea">Bea</persName>.<pb n="2" facs="https://example.invalid/page2"/> End.<anchor xml:id="eof"/></p>
+    <p><anchor xml:id="empty-boundary"/></p>
+    <p>Before <choice><orig>olde</orig><reg>modern<choice><abbr><cb n="hidden"/></abbr><expan>expanded</expan></choice></reg></choice> after.</p>
+    <p>Unrelated text.</p>
+  </body></text>
+</TEI>

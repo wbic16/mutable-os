@@ -1,0 +1,167 @@
+{
+  "exchange": "EXAMPLE_EXCHANGE_N_PLUS_1",
+  "semanticWorkspace": {
+    "version": 1,
+    "scope": "current-document",
+    "forParticipant": "agent-A",
+    "authority": "current-exchange-only",
+    "coverage": {
+      "status": "selected",
+      "completeRegistry": false,
+      "omitted": "Additional objects remain discoverable; previews do not authorize source ranges."
+    },
+    "entities": [
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:e1",
+        "name": "Authenticity",
+        "typename": "Concept",
+        "description": "Criteria under which an object is regarded as genuine.",
+        "aliases": [],
+        "identity": {
+          "scope": "document",
+          "resourceId": "EXAMPLE_DOCUMENT",
+          "entityId": "EXAMPLE_ENTITY_1"
+        },
+        "revision": 0
+      },
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:e2",
+        "name": "Provenance",
+        "typename": "Concept",
+        "description": "Documented history of ownership and transmission.",
+        "aliases": [],
+        "identity": {
+          "scope": "document",
+          "resourceId": "EXAMPLE_DOCUMENT",
+          "entityId": "EXAMPLE_ENTITY_2"
+        },
+        "revision": 0
+      },
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:e3",
+        "name": "Artistic intention",
+        "typename": "Concept",
+        "description": "Purposes attributed to the maker of a work.",
+        "aliases": [
+          "Artist’s intention"
+        ],
+        "identity": {
+          "scope": "document",
+          "resourceId": "EXAMPLE_DOCUMENT",
+          "entityId": "EXAMPLE_ENTITY_3"
+        },
+        "revision": 0
+      },
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:e4",
+        "name": "Historical continuity",
+        "typename": "Concept",
+        "description": "Continuity of an object through its history.",
+        "aliases": [],
+        "identity": {
+          "scope": "document",
+          "resourceId": "EXAMPLE_DOCUMENT",
+          "entityId": "EXAMPLE_ENTITY_4"
+        },
+        "revision": 0
+      },
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:e5",
+        "name": "Restoration",
+        "typename": "Concept",
+        "description": "Intervention in a surviving object to recover condition or legibility.",
+        "aliases": [],
+        "identity": {
+          "scope": "document",
+          "resourceId": "EXAMPLE_DOCUMENT",
+          "entityId": "EXAMPLE_ENTITY_5"
+        },
+        "revision": 0
+      },
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:e6",
+        "name": "Reconstruction",
+        "typename": "Concept",
+        "description": "Recreation of an inferred earlier form.",
+        "aliases": [],
+        "identity": {
+          "scope": "document",
+          "resourceId": "EXAMPLE_DOCUMENT",
+          "entityId": "EXAMPLE_ENTITY_6"
+        },
+        "revision": 0
+      }
+    ],
+    "arguments": [
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:arg7",
+        "excerpt": "Authenticity depends on historical continuity.",
+        "textRole": "preview",
+        "source": "src:AAAAAAAAAAAAAAAAAAAAAA:b10",
+        "author": "human-A",
+        "nativeId": "EXAMPLE_ARGUMENT_1"
+      },
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:arg8",
+        "excerpt": "Continuity is one dimension rather than the sole criterion.",
+        "textRole": "preview",
+        "source": "src:AAAAAAAAAAAAAAAAAAAAAA:b11",
+        "author": "agent-A",
+        "nativeId": "EXAMPLE_ARGUMENT_2"
+      }
+    ],
+    "relations": [
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:ar9",
+        "kind": "argument",
+        "type": "qualifies",
+        "from": "src:AAAAAAAAAAAAAAAAAAAAAA:arg8",
+        "to": "src:AAAAAAAAAAAAAAAAAAAAAA:arg7",
+        "author": "agent-A",
+        "nativeId": "EXAMPLE_RELATION_1"
+      }
+    ],
+    "classifications": [
+      {
+        "source": "src:AAAAAAAAAAAAAAAAAAAAAA:b10",
+        "propertyId": "EXAMPLE_NATIVE_PROPERTY_ID",
+        "type": "dialectic/claim",
+        "excerpt": "Authenticity depends on historical continuity.",
+        "textRole": "preview",
+        "interpretedBy": "agent-A",
+        "sourceAuthor": "human-A",
+        "argument": "src:AAAAAAAAAAAAAAAAAAAAAA:arg7"
+      }
+    ],
+    "glosses": [
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:g12",
+        "type": "qualification",
+        "excerpt": "Evidence of intention does not establish intention as the sole criterion.",
+        "textRole": "preview",
+        "author": "agent-A",
+        "source": "src:AAAAAAAAAAAAAAAAAAAAAA:b11",
+        "nativeId": "EXAMPLE_GLOSS_1"
+      }
+    ],
+    "sourceLocations": [
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:b10",
+        "contributionOrdinal": 7,
+        "readRequired": true,
+        "blockId": "EXAMPLE_BLOCK_1"
+      },
+      {
+        "handle": "src:AAAAAAAAAAAAAAAAAAAAAA:b11",
+        "contributionOrdinal": 8,
+        "readRequired": true,
+        "blockId": "EXAMPLE_BLOCK_2"
+      }
+    ],
+    "workingNotes": {
+      "status": "not-enabled",
+      "items": []
+    },
+    "documentId": "EXAMPLE_DOCUMENT"
+  }
+}

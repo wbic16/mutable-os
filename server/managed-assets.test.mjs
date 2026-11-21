@@ -1,6 +1,6 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm, cp, readdir, symlink, readFile, mkdir } from 'node:fs/promises';
+import { mkdtemp, rm, cp, readdir, symlink, readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';import os from 'node:os';import {createHash} from 'node:crypto';import sharp from 'sharp';import express from 'express';
 import { ManagedAssetStore } from './managed-assets.mjs';
 import { validateImportedImage } from './asset-image-validation.mjs';
@@ -92,4 +92,27 @@ test('generic original store admits a 50 MiB PDF without broadening image admiss
  const {store}=await fixture(),lease=await store.begin(),bytes=Buffer.alloc(50*1024*1024,32);bytes.write('%PDF-1.7');
  const m=await store.stage(lease,bytes,{mediaType:'application/pdf'});await store.publish(lease);await store.finish(lease);const loaded=await store.get(m.assetId,'cavern');assert.equal(loaded.bytes.length,bytes.length);assert.equal(createHash('sha256').update(loaded.bytes).digest('hex'),m.assetId.slice(7));
  const imageLease=await store.begin();await assert.rejects(store.stage(imageLease,Buffer.alloc(10*1024*1024+1),{mediaType:'image/png'}),/limit/);await store.abort(imageLease);
+});
+
+
+test('existing binding verification rejects missing and corrupted originals without reacquisition',async()=>{
+ const {root,store}=await fixture(),bytes=await png(),lease=await store.begin(),asset=await store.stage(lease,bytes,await validateImportedImage(bytes));
+ await store.publish(lease);await store.finish(lease);
+ assert.equal((await store.get(asset.assetId,'cavern')).manifest.assetId,asset.assetId);
+ const digest=asset.assetId.slice(7),original=path.join(root,'.mutable/assets/objects',digest.slice(0,2),digest,'original');
+ const damaged=Buffer.from(bytes);damaged[damaged.length-1]^=1;await writeFile(original,damaged);
+ await assert.rejects(store.get(asset.assetId,'cavern'),/integrity|mismatch|corrupt/i);
+ await rm(original);await assert.rejects(store.get(asset.assetId,'cavern'));
+ await assert.rejects(store.get('sha256:'+'f'.repeat(64),'cavern'));
+});
+
+test('Quill SVG admission is feature-gated, sanitised, lease-bound and content-addressed',async()=>{
+ for(const enabled of [false,true]){
+  const {root}=await fixture(),service=createManagedAssetService({root,cavernId:'cavern',session:'session',quillEnabled:enabled}),app=express();app.use(express.json());app.use('/api/assets',service.router);const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base=`http://127.0.0.1:${server.address().port}/api/assets`;
+  try{const lease=await service.store.begin(),upload=async(svg,token=lease.token)=>{const form=new FormData();form.append('asset',new Blob([svg],{type:'image/svg+xml'}),'art.svg');return (await fetch(`${base}/${lease.id}/images/svg`,{method:'POST',headers:{'X-Mutable-Asset-Lease':token},body:form})).json();};
+   const safe='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0 0L100 100"/></svg>';
+   assert.equal((await upload(safe,'wrong')).Success,false);assert.equal((await upload('<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>')).Success,false);
+   const result=await upload(safe);assert.equal(result.Success,enabled,result.Error);if(enabled){assert.equal(result.Data.mediaType,'image/svg+xml');await service.store.publish(lease);const stored=await service.store.get(result.Data.assetId,'cavern');assert.equal(result.Data.assetId,'sha256:'+createHash('sha256').update(stored.bytes).digest('hex'));assert.match(stored.bytes.toString(),/<path d="M0 0L100 100"><\/path>/);await service.store.finish(lease);}else await service.store.abort(lease);
+  }finally{await service.close();await new Promise(r=>server.close(r));}
+ }
 });

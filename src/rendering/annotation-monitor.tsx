@@ -5,6 +5,7 @@ import { ApplicationSurfacePortal, useManagedWindowOwner, useManagedViewActivity
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import type { OverlayDescriptor } from "../runtime/overlays";
 import type { AnnotationAction, AnnotationPatch } from "../block-tree/annotation-commands";
+import { inlineSlice, inlineText, logicalInline } from "../block-tree/inline-sequence";
 import { createFloatingWindowResize, FloatingWindowResizeHandle, type FloatingWindowSize } from "./floating-window-resize";
 import "./annotation-monitor.css";
 
@@ -23,8 +24,7 @@ function Monitor(props: { editor: ReactiveEditor; overlay: OverlayDescriptor }) 
     return new Map([...ids].map(id => {
       const segments = editor.linkedAnnotations.segments(id, visible().find(item => item.property.annotationId === id)?.property, node()?.contentKey).map(segment => {
         const state = editor.repository.state, content = state.contents[segment.contentKey];
-        const text = content.inlineContent.slice(Number(segment.property.start), Number(segment.property.end) + 1)
-          .map(key => String(state.contents[state.placements[key].contentKey].payload.text ?? "\uFFFC")).join("");
+        const text = segment.property.isZeroWidth ? "" : inlineText(inlineSlice(logicalInline(state, content), Number(segment.property.start), Number(segment.property.end) + 1));
         return { ...segment, text, current: segment.contentKey === node()?.contentKey && segment.index === selected()?.index };
       });
       return [id, { segments, blocks: new Set(segments.map(segment => segment.contentKey)).size }] as const;
@@ -104,7 +104,7 @@ function Monitor(props: { editor: ReactiveEditor; overlay: OverlayDescriptor }) 
     const p = resolvedProperty();
     setStart(String(p?.start ?? "")); setEnd(String(p?.end ?? "")); setValue(String(p?.value ?? ""));
     setMetadata(JSON.stringify(p?.metadata ?? {}, null, 2)); setAttributes(JSON.stringify(p?.attributes ?? {}, null, 2)); setError("");
-    editor.overlays.previewAnnotation(overlay.key, p ? { start: Number(p.start), end: Number(p.end) } : undefined);
+    editor.overlays.previewAnnotation(overlay.key, p && !p.isZeroWidth ? { start: Number(p.start), end: Number(p.end) } : undefined);
     queueMicrotask(clamp);
   });
   const apply = (action: AnnotationAction | AnnotationPatch, item = selected()) => {
@@ -170,7 +170,7 @@ function Monitor(props: { editor: ReactiveEditor; overlay: OverlayDescriptor }) 
   };
   const excerpt = () => {
     const p = selected()?.property;
-    return p ? node()?.inlineContent.slice(Number(p.start), Number(p.end) + 1).map(key => String(editor.node(key)?.payload.text ?? "\uFFFC")).join("") : "";
+    return p && !p.isZeroWidth ? node()?.inlineContent.slice(Number(p.start), Number(p.end) + 1).map(key => String(editor.node(key)?.payload.text ?? "\uFFFC")).join("") : "";
   };
   return <div ref={root} class="reactive-annotation-monitor" role="dialog" aria-label="Annotations at caret" tabIndex={-1}
     data-session-overlay={overlay.key} data-native-context-menu onKeyDown={keys} onClick={keys} onDblClick={keys} onContextMenu={keys}
@@ -185,6 +185,7 @@ function Monitor(props: { editor: ReactiveEditor; overlay: OverlayDescriptor }) 
         <strong>{details().blocks > 1 ? `Cross-Block annotation · ${details().blocks} Blocks` : "Linked annotation · 1 Block"}</strong>
         <div>{details().segments.length} linked ranges. The highlighted text and range controls below describe only the current range in this Block.</div>
       </div>}</Show>
+      <Show when={selected()?.property.isZeroWidth}><p>Point annotation at boundary {start()}.</p></Show>
       <blockquote>{excerpt()}</blockquote>
       <label>Annotation ID<input readOnly value={String(selected()?.property.id ?? "Not supplied")} /></label>
       <Show when={selected()?.property.annotationId}>{id => <fieldset><legend>Linked annotation</legend>
@@ -205,8 +206,8 @@ function Monitor(props: { editor: ReactiveEditor; overlay: OverlayDescriptor }) 
       <div class="annotation-actions"><For each={[
         "left", "right", "previous-word", "next-word", "expand", "contract", "delete",
       ] as const}>{action => <span class="annotation-action"><kbd>{editor.bindings.label(`annotation.${action}`)}</kbd><button type="button" onClick={() => apply(action)}>{editor.bindings.get(`annotation.${action}`)!.name}</button></span>}</For></div>
-        <div class="annotation-range"><label>Start (inclusive)<input type="number" step="1" value={start()} onInput={event => setStart(event.currentTarget.value)} /></label><label>End (inclusive)<input type="number" step="1" value={end()} onInput={event => setEnd(event.currentTarget.value)} /></label></div>
-        <small>Length: {Number(end()) - Number(start()) + 1} Cells. Previous/next annotation: {editor.bindings.label("monitor.previous")} / {editor.bindings.label("monitor.next")}. Controls: {editor.bindings.label("monitor.controls")}. Tab: next field; Enter/Space activates. Editing shortcuts apply outside text fields.</small>
+        <div class="annotation-range"><label>{selected()?.property.isZeroWidth ? "Boundary" : "Start (inclusive)"}<input type="number" step="1" value={start()} onInput={event => setStart(event.currentTarget.value)} /></label><label>{selected()?.property.isZeroWidth ? "Stored endpoint" : "End (inclusive)"}<input type="number" step="1" value={end()} onInput={event => setEnd(event.currentTarget.value)} /></label></div>
+        <small>Length: {selected()?.property.isZeroWidth ? 0 : Number(end()) - Number(start()) + 1} Cells. Previous/next annotation: {editor.bindings.label("monitor.previous")} / {editor.bindings.label("monitor.next")}. Controls: {editor.bindings.label("monitor.controls")}. Tab: next field; Enter/Space activates. Editing shortcuts apply outside text fields.</small>
         <label>Value<input value={value()} onInput={event => setValue(event.currentTarget.value)} /></label>
       </section>
       <section class="annotation-settings" aria-label="Annotation settings">

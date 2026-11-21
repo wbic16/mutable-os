@@ -1,0 +1,135 @@
+{
+  "all": [
+    {
+      "mounted": true,
+      "loadEditorMs": 276.39999997615814,
+      "mountMs": 1251.5,
+      "contributions": 6,
+      "cells": 5376,
+      "xmlBytes": 2804,
+      "manifestMs": 4.200000047683716,
+      "requestBuildMs": 2.699999988079071,
+      "workspaceMs": 12.800000011920929,
+      "xmlProjectionMs": 1.5,
+      "historyColdMs": 11.300000011920929,
+      "historyWarmMs": 0.19999998807907104,
+      "xmlLowerMs": 6.199999988079071,
+      "nativePrepareMs": 12.100000023841858,
+      "definitions": 10,
+      "addedAnnotations": 8,
+      "controllerValidateMs": 2.800000011920929,
+      "lastProviderPanelMs": 304.19999998807907,
+      "controllerExchangeMs": 302.2000000476837,
+      "autosaveMs": 723.4000000357628,
+      "nextTwoFramesMs": 1568.0999999642372,
+      "visibility": [
+        {
+          "ms": 1874.7999999523163,
+          "key": "node:14757013-b880-4946-b7ef-9bc2dc396d62",
+          "intersecting": true,
+          "ratio": 0.9609517455101013
+        }
+      ],
+      "longAnimationFrames": [
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 8755.200000047684,
+          "duration": 550.6999999880791,
+          "navigationId": 8480,
+          "paintTime": 9305.900000035763,
+          "presentationTime": 12200,
+          "renderStart": 9285.700000047684,
+          "styleAndLayoutStart": 9288.800000011921,
+          "firstUIEventTimestamp": 9226.700000047684,
+          "blockingDuration": 494.7,
+          "scripts": [
+            {}
+          ]
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 9322.5,
+          "duration": 110.80000001192093,
+          "navigationId": 8480,
+          "paintTime": 9433.300000011921,
+          "presentationTime": 12704,
+          "renderStart": 9324.800000011921,
+          "styleAndLayoutStart": 9425.700000047684,
+          "firstUIEventTimestamp": 9402.700000047684,
+          "blockingDuration": 58.6,
+          "scripts": [
+            {}
+          ]
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 9442.100000023842,
+          "duration": 2350.899999976158,
+          "navigationId": 8480,
+          "paintTime": 11793,
+          "presentationTime": 14048,
+          "renderStart": 11787.600000023842,
+          "styleAndLayoutStart": 11792.700000047684,
+          "firstUIEventTimestamp": 0,
+          "blockingDuration": 0,
+          "scripts": []
+        },
+        {
+          "name": "long-animation-frame",
+          "entryType": "long-animation-frame",
+          "startTime": 12205,
+          "duration": 1861.300000011921,
+          "navigationId": 8480,
+          "paintTime": 14066.300000011921,
+          "presentationTime": 14416,
+          "renderStart": 14059.100000023842,
+          "styleAndLayoutStart": 14061.5,
+          "firstUIEventTimestamp": 12209.900000035763,
+          "blockingDuration": 903.9,
+          "scripts": [
+            {},
+            {}
+          ]
+        }
+      ],
+      "work": {
+        "snapshots": 0,
+        "commits": 1
+      },
+      "reveals": [
+        {
+          "ms": 274.89999997615814,
+          "key": "node:14757013-b880-4946-b7ef-9bc2dc396d62"
+        }
+      ],
+      "responseRect": {
+        "x": 170,
+        "y": 207.328125,
+        "width": 816,
+        "height": 549,
+        "top": 207.328125,
+        "right": 986,
+        "bottom": 756.328125,
+        "left": 170
+      },
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "historyAfterMs": 2.300000011920929,
+      "saveCaptureMs": 253.69999998807907,
+      "saveEncodeMs": 44.5,
+      "saveBytes": 559713,
+      "fullSaveWithInMemoryAdapterMs": 265.5,
+      "domNodes": 7912
+    }
+  ],
+  "blockedCalls": [
+    "/api/native/vault/default"
+  ],
+  "fixtureSha256": "9f5655fe8c24dad1d084dde7acc1f525fedfcfd174bfeeaf37c0897293867820",
+  "diagnosticDelayMs": 0
+}

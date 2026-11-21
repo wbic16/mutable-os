@@ -1,3 +1,4 @@
+import {contentUnits,contentLength} from "../block-tree/inline-sequence";
 import type { CanonicalRepository } from '../block-tree/repository';
 import type { CanonicalResourceBoundaryResult } from '../block-tree/resource-boundary';
 import type { RepositoryState, ContentRecord } from '../block-tree/types';
@@ -86,10 +87,11 @@ export async function observeLive(repository: BoundaryRepository, id: string, po
             throw Error('Missing canonical inline source');
         const runs: TextRun[] = [], parts: string[] = [];
         let run: string[] = [], boundaries = [0], units = 0, used = 0;
-        for (let i = 0; i < c.inlineContent.length; i++) {
+        let i=-1;
+        for (const cell of contentUnits(state,c)) {
+            i++;
             await work.step();
-            const cell = state.contents[state.placements[c.inlineContent[i]].contentKey];
-            if (cell.viewType !== 'text-cell') {
+            if (cell.kind !== 'text') {
                 runs.push({ text: run.join(''), boundaries });
                 parts.push('[inline object]');
                 run = [];
@@ -97,7 +99,7 @@ export async function observeLive(repository: BoundaryRepository, id: string, po
                 units = 0;
                 continue;
             }
-            const text = String(cell.payload.text ?? '');
+            const text = cell.text;
             used += text.length;
             if (used > 2000000)
                 throw Error('Native text exceeds the bounded search budget');
@@ -114,7 +116,7 @@ export async function observeLive(repository: BoundaryRepository, id: string, po
         }
         runs.push({ text: run.join(''), boundaries });
         checked();
-        return { length: c.inlineContent.length, text: { coordinate: 'cell', runs }, async snippet(start, end) { const result: string[] = []; for (let i = start; i < end; i++) {
+        return { length: contentLength(c), text: { coordinate: 'cell', runs }, async snippet(start, end) { const result: string[] = []; for (let i = start; i < end; i++) {
                 await work.step();
                 result.push(parts[i]);
             } return result.join(''); } };

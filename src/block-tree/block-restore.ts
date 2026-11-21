@@ -22,6 +22,7 @@ const check = (ok: unknown, message: string): void => { if (!ok) throw Error(mes
 const keysOnly = (value: object, keys: string[]) => Object.keys(value).every(key => keys.includes(key));
 
 export function leafAuthoredState(content: DeepReadonly<ContentRecord>, graph: DeepReadonly<Pick<RepositoryState, "contents" | "placements">>): DeepReadonly<LeafAuthoredState> {
+  check(!content.compactInline,"Historical Block restore is not yet qualified for compact text; nothing has been changed.");
   check(["standoff-editor-block", "plain-text-block"].includes(content.viewType), "This first restore supports text Blocks only.");
   check(!content.children.length && !Object.keys(content.ownedRelations).length && !Object.keys(content.opaqueRelations).length,
     "Descendants and relations require Restore subtree; nothing has been changed.");

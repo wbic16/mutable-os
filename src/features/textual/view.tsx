@@ -1,3 +1,6 @@
+import {RetrievalControls} from '../../application/retrieval-controls';
+import {featureFlags} from '../../configuration';
+import {useCurrentCavern} from '../../application/cavern-startup';
 import {TextualCommandMenu} from './command-menu';
 import {notifyFontLayoutChange} from '../../rendering/font-layout';
 import {TextualFontSettingsPanel} from './font-settings';
@@ -10,6 +13,7 @@ import './textual.css';
 
 /** Dedicated presentation; no editor/repository dependencies or global input bindings. */
 export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:boolean; notice?: string; application?: import("solid-js").Component<{grid:TextualGrid}>; beforeZoom?():void; ownSurface?(element:HTMLElement):()=>void }) {
+  const cavern=useCurrentCavern();let launchRetrieval:(()=>void)|undefined;
   let root!: HTMLDivElement, probe!: HTMLSpanElement, menuAnchor!:HTMLButtonElement;
   const [preferences, setPreferences] = createSignal(loadPreferences());
   const [grid, setGrid] = createSignal<TextualGrid>();
@@ -87,6 +91,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:b
   };
   const actions = () => [
     { label: 'Return to Desktop', run: props.returnDesktop },
+    ...(featureFlags.semanticRetrieval&&cavern?[{label:'Index Cavern…',run:()=>launchRetrieval?.()}]:[]),
     { label: 'Zoom in', run: () => zoom(.1) },
     { label: 'Zoom out', run: () => zoom(-.1) },
     { label: `Reading width: ${preferences().readingWidth||'Full'}${preferences().readingWidth?' cells':''}`, run:()=>preference({readingWidth:preferences().readingWidth?0:88}) },
@@ -100,7 +105,7 @@ export function TextualWorkspace(props: { returnDesktop(): void; fontSettings?:b
     {/* Match the per-Cell inline fragments: Chrome rounds their advances differently from one long Text node. */}
     <span ref={probe} class="tw-font-probe" aria-hidden="true">{Array.from({length:256},()=> <span>M</span>)}</span>
     <Show when={grid() && columns() >= 20 && rows() >= 8} fallback={<div class="tw-small"><p>{error() || 'Enlarge the window or reduce font zoom to show the grid.'}</p><button onClick={() => zoom(-.1)}>Zoom out</button><button onClick={props.returnDesktop}>Return to Desktop</button></div>}>
-      <nav class="tw-cell tw-menu-bar" aria-label="Workspace menu">
+      <RetrievalControls launcher={open=>{launchRetrieval=open;}}/><nav class="tw-cell tw-menu-bar" aria-label="Workspace menu">
         <button ref={menuAnchor} style={{width: `${11*(grid()?.cellWidthPx??0)}px`}} aria-haspopup="true" aria-expanded={menu()} onClick={() => setMenu(!menu())}>Workspace</button>
       </nav>
       <Show when={props.application} fallback={<>

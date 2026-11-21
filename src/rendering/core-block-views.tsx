@@ -1,3 +1,6 @@
+import { activeViewChild } from '../runtime/presentation-eligibility';
+import {observeContributionImage} from '../features/dialectic/image-load';
+import {ImageSizeGate} from '../features/dialectic/image-size-gate';
 import { tabOrientation } from '../block-tree/tab-orientation';
 import './tab-orientation.css';
 import { TableControl, CellControls } from './table-controls';
@@ -34,14 +37,14 @@ import { WindowIcon, resolvedWindowIcon, resolvedWindowState } from "./window-ic
 import { RetainedInkDocument } from "./retained-document-view";
 
 function useContainerMount(nodeKey: NodeKey, root: () => HTMLElement) {
-  const { editor } = useReactiveView();
+  const { editor, passive } = useReactiveView();
   let dispose: (() => void) | undefined;
   onMount(() => {
     const element = root();
     dispose = editor.mounts.register(nodeKey, {
       root: element,
       focusElement: element,
-      inputPolicy: "container",
+      inputPolicy: passive ? "opaque-widget" : "container",
       focus: () => element.focus({ preventScroll: true }),
     });
   });
@@ -141,11 +144,12 @@ export function ListView(props: BlockViewProps) {
 }
 
 function ListItem(props: { nodeKey: NodeKey; marker: string }) {
-  const { editor, projection } = useReactiveView();
+  const { editor, projection, passive } = useReactiveView();
   const children = createMemo(() => listItemChildren(projection, props.nodeKey));
   const task = () => (editor.features.taskLists || projection.state.nodes[props.nodeKey]?.viewType === "checkbox-block") && taskState(projection.state.nodes[props.nodeKey]) !== undefined;
   const collapsed = () => !!(projection.state.nodes[props.nodeKey]?.payload.metadata as any)?.listCollapsed;
   const toggle = () => {
+    if(passive||!editor.canEditText(props.nodeKey))return;
     const next = !collapsed();
     let focused = editor.focus.state.focusedKey && projection.state.nodes[editor.focus.state.focusedKey];
     let hidesFocus = false;
@@ -163,7 +167,7 @@ function ListItem(props: { nodeKey: NodeKey; marker: string }) {
   };
   return <div role="listitem" class="reactive-imported-list-item" classList={{ "reactive-task-list-item": task() }} data-list-item={props.nodeKey}>
     <Show when={children().length} fallback={<span class="reactive-imported-list-marker" contentEditable={false} aria-hidden="true">{task() ? "" : props.marker}</span>}>
-      <button type="button" class="reactive-imported-list-marker reactive-list-toggle" classList={{ 'reactive-list-toggle--collapsed': collapsed() }}
+      <button disabled={passive||!editor.canEditText(props.nodeKey)} type="button" class="reactive-imported-list-marker reactive-list-toggle" classList={{ 'reactive-list-toggle--collapsed': collapsed() }}
         contentEditable={false} data-native-context-menu aria-expanded={!collapsed()} aria-controls={children().map(k => `list-${k}`).join(' ')}
         aria-label={collapsed() ? 'Expand child list' : 'Collapse child list'} title={collapsed() ? 'Expand child list' : 'Collapse child list'}
         onPointerDown={e => { e.preventDefault(); e.stopPropagation(); }} onClick={e => { e.stopPropagation(); toggle(); }}
@@ -178,7 +182,7 @@ function ListItem(props: { nodeKey: NodeKey; marker: string }) {
 }
 
 export function TableView(props: BlockViewProps) {
-  const { editor, projection } = useReactiveView();
+  const { editor, projection, passive } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
   let root!: HTMLDivElement;
   let scroll!: HTMLDivElement;
@@ -186,7 +190,7 @@ export function TableView(props: BlockViewProps) {
   useContainerMount(props.nodeKey, () => root);
   const columns = () => projection.state.nodes[node()?.children[0]]?.children.length ?? 1;
   return <div ref={root} class="abstract-block reactive-table-viewport" tabIndex={-1} {...data(props.nodeKey, node)}>
-    <Show when={editor.features.tableLayouts}><div class="table-layout-toolbar" contentEditable={false}>
+    <Show when={!passive && editor.features.tableLayouts}><div class="table-layout-toolbar" contentEditable={false}>
       <TableControl nodeKey={props.nodeKey} label="Table controls" />
       <button type="button" data-table-controls aria-pressed={editor.tables.guides(projection.viewId)} onClick={() => editor.tables.toggleGuides(projection.viewId)}>Show table guides</button>
     </div></Show>
@@ -205,12 +209,12 @@ export function TableRowView(props: BlockViewProps) {
 }
 
 export function TableCellView(props: BlockViewProps) {
-  const { editor, projection } = useReactiveView();
+  const { editor, projection, passive } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
   let root!: HTMLDivElement;
   useContainerMount(props.nodeKey, () => root);
   return <div ref={root} class="abstract-block reactive-table-cell" classList={{ 'table-guides-hidden': !editor.tables.guides(projection.viewId), 'table-controls-enabled': editor.features.tableLayouts }} role={(node()?.payload.metadata as any)?.htmlTableCell?.header ? 'columnheader' : 'cell'} tabIndex={-1} {...data(props.nodeKey, node)}>
-    <Show when={editor.features.tableLayouts}><CellControls nodeKey={props.nodeKey} /></Show>
+    <Show when={!passive && editor.features.tableLayouts}><CellControls nodeKey={props.nodeKey} /></Show>
     <ChildBlocks parentKey={props.nodeKey} />
   </div>;
 }
@@ -228,12 +232,10 @@ export function CheckboxView(props: BlockViewProps) {
 }
 
 export function TabRowView(props: BlockViewProps) {
-  const { editor, projection } = useReactiveView();
+  const { editor, projection, passive } = useReactiveView();
   const documents = useDocumentTabHost();
   const node = () => projection.state.nodes[props.nodeKey];
-  const initial = node()?.children.find((key) => Boolean(projection.state.nodes[key]?.payload.metadata && (projection.state.nodes[key].payload.metadata as any).active)) ?? node()?.children[0];
-  const [active, setActive] = createSignal<NodeKey | undefined>(initial);
-  createEffect(() => { const key = editor.viewChildren[props.nodeKey]; if (key && node()?.children.includes(key)) setActive(key); });
+  const active = () => node() && activeViewChild(editor, node()!);
   let previousFlags = "";
   let root!: HTMLDivElement;
   useContainerMount(props.nodeKey, () => root);
@@ -242,10 +244,11 @@ export function TabRowView(props: BlockViewProps) {
     // Reordering labels is not a change to authored active flags.
     const flags = JSON.stringify([...children].sort().map(key => [key, (projection.state.nodes[key]?.payload.metadata as any)?.active]));
     if (flags !== previousFlags) {
-      const revealed = !previousFlags ? untrack(() => editor.viewChildren[props.nodeKey]) : undefined;
+      if (previousFlags) {
+        const current = untrack(active), marked = children.find(key => (projection.state.nodes[key]?.payload.metadata as any)?.active);
+        editor.setViewChild(props.nodeKey, marked ?? (current && children.includes(current) ? current : node()?.viewType === 'sticky-tab-row-block' ? '' : children[0]));
+      }
       previousFlags = flags;
-      const marked = children.find(key => (projection.state.nodes[key]?.payload.metadata as any)?.active);
-      setActive((revealed && children.includes(revealed) ? revealed : undefined) ?? marked ?? (children.includes(untrack(active)!) ? untrack(active) : children[0]));
     }
   });
   return (
@@ -256,7 +259,7 @@ export function TabRowView(props: BlockViewProps) {
             const child = () => projection.state.nodes[key];
             const metadata = () => child()?.payload.metadata as Record<string, unknown> | undefined;
             const title = () => { const id = tabDocumentTarget(metadata()); return (id && documents?.title(id)) || metadata()?.name || metadata()?.text || `Tab ${index() + 1}`; };
-            return <button type="button" role="tab" data-context-target={key} aria-selected={active() === key} onClick={() => { editor.setViewChild(props.nodeKey, key); setActive(key); if (!tabDocumentTarget(metadata())) { const target = child()?.children[0] ?? key; editor.focus.request(target, { reason: "activate-tab" }); } }}>{String(title())}</button>;
+            return <button type="button" role="tab" data-context-target={key} aria-selected={active() === key} onClick={() => { editor.setViewChild(props.nodeKey, key); if (!passive && !tabDocumentTarget(metadata())) { const target = child()?.children[0] ?? key; editor.focus.request(target, { reason: "activate-tab" }); } }}>{String(title())}</button>;
           }}
         </For>
       </div>
@@ -266,10 +269,9 @@ export function TabRowView(props: BlockViewProps) {
 }
 
 export function StickyTabRowView(props: BlockViewProps) {
-  const { editor, projection } = useReactiveView();
+  const { editor, projection, passive } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
-  const [active, setActive] = createSignal<NodeKey>();
-  createEffect(() => { const key = editor.viewChildren[props.nodeKey]; if (key && node()?.children.includes(key)) setActive(key); });
+  const active = () => node() && activeViewChild(editor, node()!);
   let previousFlags = "";
   let root!: HTMLElement;
   useContainerMount(props.nodeKey, () => root);
@@ -278,10 +280,11 @@ export function StickyTabRowView(props: BlockViewProps) {
     // Reordering labels is not a change to authored active flags.
     const flags = JSON.stringify([...children].sort().map(key => [key, (projection.state.nodes[key]?.payload.metadata as any)?.active]));
     if (flags !== previousFlags) {
-      const revealed = !previousFlags ? untrack(() => editor.viewChildren[props.nodeKey]) : undefined;
+      if (previousFlags) {
+        const current = untrack(active), marked = children.find(key => (projection.state.nodes[key]?.payload.metadata as any)?.active);
+        editor.setViewChild(props.nodeKey, marked ?? (current && children.includes(current) ? current : node()?.viewType === 'sticky-tab-row-block' ? '' : children[0]));
+      }
       previousFlags = flags;
-      const marked = children.find(key => (projection.state.nodes[key]?.payload.metadata as any)?.active);
-      setActive((revealed && children.includes(revealed) ? revealed : undefined) ?? marked ?? (children.includes(untrack(active)!) ? untrack(active) : undefined));
     }
   });
   return (
@@ -302,9 +305,8 @@ export function StickyTabRowView(props: BlockViewProps) {
               }}
               onClick={() => {
                 const next = active() === key ? undefined : key;
-                editor.setViewChild(props.nodeKey, next);
-                setActive(next);
-                if (next) {
+                editor.setViewChild(props.nodeKey, next ?? "");
+                if (next && !passive) {
                   const target = child()?.children[0] ?? key;
                   queueMicrotask(() => editor.focus.request(target, { reason: "activate-sticky-tab", caret: "start" }));
                 }
@@ -452,7 +454,7 @@ export function TabPanelView(props: BlockViewProps) {
 }
 
 export function ImageView(props: BlockViewProps) {
-  const { editor, projection } = useReactiveView();
+  const { editor, projection, passive } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
   const metadata = () => node()?.payload.metadata as Record<string, unknown> | undefined;
   const appearance = createMemo(() => blockAppearance(node()));
@@ -460,10 +462,10 @@ export function ImageView(props: BlockViewProps) {
   useContainerMount(props.nodeKey, () => root);
   return (
     <figure ref={root} class={`abstract-block reactive-image ${appearance().classes.join(" ")}`} style={appearance().style} tabIndex={-1} {...data(props.nodeKey, node)}>
-      <img ref={image => createEffect(() => {
+      <ImageSizeGate editor={editor} projection={projection} nodeKey={props.nodeKey} source={()=>managedAsset(node()?.payload.asset)?'':String(metadata()?.url??node()?.payload.filename??'')} enabled={!passive&&editor.features.dialectic}>{source=><img ref={image => {createEffect(() => {
         const asset = managedAsset(node()?.payload.asset);
         if (asset) { const release = editor.assets.bind(image, asset); onCleanup(release); }
-      })} src={managedAsset(node()?.payload.asset) ? undefined : String(metadata()?.url ?? node()?.payload.filename ?? "") || undefined} alt={String(metadata()?.alt ?? "")} />
+      });if(!passive)observeContributionImage(editor,projection,props.nodeKey,image,source);}} src={source()||undefined} alt={String(metadata()?.alt ?? "")} />}</ImageSizeGate>
       <ChildBlocks parentKey={props.nodeKey} />
     </figure>
   );

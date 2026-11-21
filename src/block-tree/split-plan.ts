@@ -1,3 +1,4 @@
+import {contentLength} from "./inline-sequence";
 import { isTextLeaf } from "./inline-plan";
 import type { ContentRecord, RepositoryOperation, RepositoryState } from "./types";
 
@@ -37,7 +38,7 @@ export function emptyParagraphChangeFor(
   if (put.length !== (inserting && !retaining ? 2 : 1) || new Set(put.map(c => c.key)).size !== put.length) return;
   const child = inserting && !retaining ? put.find(c => c.key === placement.contentKey) : state.contents[placement.contentKey];
   if (!child || child.inlineKind !== "standoff" || child.viewType !== "standoff-editor-block" ||
-    child.children.length || child.inlineContent.length || Object.keys(child.ownedRelations).length) return;
+    child.children.length || contentLength(child) || Object.keys(child.ownedRelations).length) return;
   if (child.definitionOwnerKey !== undefined && state.contents[child.definitionOwnerKey]?.viewType !== "document-block") return;
   if (retaining) {
     if (!child.definitionOwnerKey || inserting && (references.get(child.key) ?? 0) !== 0) return;

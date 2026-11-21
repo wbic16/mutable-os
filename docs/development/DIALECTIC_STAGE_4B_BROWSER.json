@@ -1,0 +1,136 @@
+{
+  "cancelledWithoutCommit": true,
+  "exchange": {
+    "observedMs": 221.10000002384186,
+    "commitMs": 30.69999998807907,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "sameMount": true,
+    "sameSession": true,
+    "replies": [
+      {
+        "kind": "contribution",
+        "resourceId": "7ebe959a-5873-4cd6-9d37-7a516dcf70e9",
+        "blockId": "3bdfb56a-d3fa-415d-bcf5-74d668179a30"
+      }
+    ],
+    "discursiveReferences": [
+      {
+        "kind": "argument",
+        "resourceId": "7ebe959a-5873-4cd6-9d37-7a516dcf70e9",
+        "argumentId": "62206260-6ef9-41b9-897d-a812349cf73e"
+      }
+    ],
+    "tools": 2,
+    "sourceAnnotations": [
+      {
+        "id": "dd24be25-1a9d-4d8f-b635-3f28fb998e3f",
+        "type": "dialectic/range-anchor",
+        "annotationId": "3e5901e8-7548-407d-99e2-ffeaac9b2ab3",
+        "start": 0,
+        "end": 50
+      },
+      {
+        "id": "c159acf0-b2b4-4151-ac58-e9419ec0064e",
+        "type": "dialectic/claim",
+        "metadata": {
+          "dcp": {
+            "version": 1,
+            "actor": "mock",
+            "exchangeId": "ee85b5c8-33e7-49ff-8f6c-222bb8c8d798",
+            "protocol": "dcp/1.0",
+            "sourceResourceId": "7ebe959a-5873-4cd6-9d37-7a516dcf70e9",
+            "appliedTo": "existing-source",
+            "sourceAuthor": "human",
+            "participantId": "7ebe959a-5873-4cd6-9d37-7a516dcf70e9:ai"
+          }
+        },
+        "start": 0,
+        "end": 50
+      }
+    ],
+    "definitions": [
+      "mutable/entity",
+      "dialectic/range-anchor",
+      "dialectic/range-anchor",
+      "dialectic/argument",
+      "dialectic/argument",
+      "dialectic/argument-relation"
+    ],
+    "dirty": true
+  },
+  "firstNativeInteractionMs": 238.30000001192093,
+  "undoRedo": true,
+  "editing": {
+    "text": "Form can carry an argument, not merely decorate it.Still editable. ",
+    "sameMount": true,
+    "snapshots": 0,
+    "rebuilds": 0
+  },
+  "unrelatedDocuments": {
+    "observedMs": 256.60000002384186,
+    "commitMs": 29.100000023841858,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "unchanged": true,
+    "paragraphs": 300
+  },
+  "registryScaling": [
+    {
+      "pairs": 100,
+      "definitions": 218,
+      "commitMs": 40.19999998807907,
+      "observedMs": 228,
+      "snapshots": 0,
+      "rebuilds": 0,
+      "definitionUpdates": 6,
+      "unrelatedUnchanged": true
+    },
+    {
+      "pairs": 1000,
+      "definitions": 2024,
+      "commitMs": 159.5,
+      "observedMs": 344,
+      "snapshots": 0,
+      "rebuilds": 0,
+      "definitionUpdates": 6,
+      "unrelatedUnchanged": true
+    }
+  ],
+  "submitAndAsk": {
+    "human": {
+      "version": 1,
+      "kind": "contribution",
+      "state": "committed",
+      "author": "human",
+      "replies": [],
+      "participant": {
+        "id": "7ebe959a-5873-4cd6-9d37-7a516dcf70e9:human",
+        "kind": "human",
+        "name": "Local author"
+      },
+      "ordinal": 6,
+      "createdUtc": "2026-11-07T08:42:20.860Z",
+      "replyExcerpts": []
+    },
+    "ai": {
+      "id": "7ebe959a-5873-4cd6-9d37-7a516dcf70e9:ai",
+      "kind": "ai",
+      "name": "Mock assistant"
+    },
+    "reply": {
+      "kind": "contribution",
+      "resourceId": "7ebe959a-5873-4cd6-9d37-7a516dcf70e9",
+      "blockId": "ff841ffd-b2e0-40c0-b814-ecaa65549bcc"
+    },
+    "humanId": "ff841ffd-b2e0-40c0-b814-ecaa65549bcc"
+  },
+  "argumentNavigation": true,
+  "presentationRoundTrip": true,
+  "persistence": {
+    "dcp": 5,
+    "definitions": 2030,
+    "tools": 2
+  },
+  "reloadedArgumentNavigation": true
+}

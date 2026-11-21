@@ -1,3 +1,4 @@
+import {glossPresentationControls} from './presentation-context';
 import {applicationPresentationSurface} from '../../rendering/application-presentation-surface';
 import {createSignal} from 'solid-js';
 import {clone} from '../../block-tree/clone';
@@ -135,6 +136,13 @@ export class GlossController {
   const buttons=doc.createElement('div');buttons.className='gloss-buttons';
   const cancel=doc.createElement('button');cancel.textContent='Close / Cancel';cancel.onclick=()=>this.cancel();buttons.append(cancel);
   if(d.id){const del=doc.createElement('button');del.textContent='Delete Gloss';del.onclick=()=>{if(!this.commit(input.value,true))status.textContent=this.notice();};buttons.append(del);}
+  if(d.id&&this.editor.features.teiOperationalSemantics){
+   const definition=(this.editor.repository.readState().contents[d.owner]?.payload.linkedAnnotations as any)?.[d.id];
+   const session=this.editor.documentSessions?.forNode(d.key),controls=session&&glossPresentationControls(session);
+   if(definition?.metadata?.tei?.type==='tei/entity'&&controls?.inspectDefinition){
+    const inspect=doc.createElement('button');inspect.textContent='Definition and mentions';inspect.onclick=()=>{const id=d.id!;this.cancel();controls.inspectDefinition!(id);};buttons.append(inspect);
+   }
+  }
   if(d.id&&d.range){
    const activeRange=d.range;const props=(this.editor.node(d.key)?.payload.standoffProperties as any[]??[]).filter(p=>p.type===GLOSS&&!this.resolve(p,d.key).isDeleted&&p.start<activeRange.end&&p.end>=activeRange.start);
    const ids=[...new Set(props.map(p=>p.annotationId))];

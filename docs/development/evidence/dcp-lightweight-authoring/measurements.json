@@ -1,0 +1,260 @@
+{
+  "tokenizer": "js-tiktoken o200k_base; local estimates, NOT verified GPT-6.1 Sol billing",
+  "paidCalls": 0,
+  "measurements": [
+    {
+      "name": "palimpsest",
+      "source": "dcp-performance-recovery/A1.json",
+      "admitted": true,
+      "repaired": false,
+      "persistenceVerified": null,
+      "proseTokens": 56,
+      "semanticDefinitionTextTokens": 29,
+      "counts": {
+        "textBlocks": 1,
+        "entities": 1,
+        "sourceAnchors": 1,
+        "interpretations": 1,
+        "arguments": 0,
+        "glosses": 0,
+        "relations": 0,
+        "inlineMentions": 2
+      },
+      "formats": {
+        "current-json": {
+          "tokens": 329,
+          "bytes": 1136,
+          "tokensAboveProse": 273
+        },
+        "current-pretty-json": {
+          "tokens": 442,
+          "bytes": 1434,
+          "tokensAboveProse": 386
+        },
+        "compact-intent-json": {
+          "tokens": 192,
+          "bytes": 731,
+          "tokensAboveProse": 136
+        },
+        "xml": {
+          "tokens": 182,
+          "bytes": 704,
+          "tokensAboveProse": 126
+        },
+        "markdown-xml": {
+          "tokens": 179,
+          "bytes": 709,
+          "tokensAboveProse": 123
+        },
+        "yaml": {
+          "tokens": 204,
+          "bytes": 727,
+          "tokensAboveProse": 148
+        },
+        "sexp": {
+          "tokens": 198,
+          "bytes": 690,
+          "tokensAboveProse": 142
+        }
+      }
+    },
+    {
+      "name": "leonardo",
+      "source": "dcp-scholarly-authoring/after-A.json",
+      "admitted": true,
+      "repaired": false,
+      "persistenceVerified": true,
+      "proseTokens": 139,
+      "semanticDefinitionTextTokens": 238,
+      "counts": {
+        "textBlocks": 2,
+        "entities": 9,
+        "sourceAnchors": 4,
+        "interpretations": 19,
+        "arguments": 1,
+        "glosses": 1,
+        "relations": 6,
+        "inlineMentions": 13
+      },
+      "formats": {
+        "current-json": {
+          "tokens": 2703,
+          "bytes": 8668,
+          "tokensAboveProse": 2564
+        },
+        "current-pretty-json": {
+          "tokens": 3754,
+          "bytes": 11857,
+          "tokensAboveProse": 3615
+        },
+        "compact-intent-json": {
+          "tokens": 1567,
+          "bytes": 5582,
+          "tokensAboveProse": 1428
+        },
+        "xml": {
+          "tokens": 1489,
+          "bytes": 5111,
+          "tokensAboveProse": 1350
+        },
+        "markdown-xml": {
+          "tokens": 1480,
+          "bytes": 5103,
+          "tokensAboveProse": 1341
+        },
+        "yaml": {
+          "tokens": 1769,
+          "bytes": 5746,
+          "tokensAboveProse": 1630
+        },
+        "sexp": {
+          "tokens": 1760,
+          "bytes": 5273,
+          "tokensAboveProse": 1621
+        }
+      }
+    },
+    {
+      "name": "mercury",
+      "source": "dcp-scholarly-authoring/after-B.json",
+      "admitted": true,
+      "repaired": false,
+      "persistenceVerified": true,
+      "proseTokens": 168,
+      "semanticDefinitionTextTokens": 146,
+      "counts": {
+        "textBlocks": 4,
+        "entities": 6,
+        "sourceAnchors": 2,
+        "interpretations": 13,
+        "arguments": 0,
+        "glosses": 0,
+        "relations": 3,
+        "inlineMentions": 10
+      },
+      "formats": {
+        "current-json": {
+          "tokens": 1975,
+          "bytes": 6421,
+          "tokensAboveProse": 1807
+        },
+        "current-pretty-json": {
+          "tokens": 2716,
+          "bytes": 8882,
+          "tokensAboveProse": 2548
+        },
+        "compact-intent-json": {
+          "tokens": 1123,
+          "bytes": 3994,
+          "tokensAboveProse": 955
+        },
+        "xml": {
+          "tokens": 1062,
+          "bytes": 3693,
+          "tokensAboveProse": 894
+        },
+        "markdown-xml": {
+          "tokens": 1047,
+          "bytes": 3703,
+          "tokensAboveProse": 879
+        },
+        "yaml": {
+          "tokens": 1260,
+          "bytes": 4130,
+          "tokensAboveProse": 1092
+        },
+        "sexp": {
+          "tokens": 1225,
+          "bytes": 3757,
+          "tokensAboveProse": 1057
+        }
+      }
+    },
+    {
+      "name": "reuse",
+      "source": "dcp-scholarly-authoring/after-C.json",
+      "admitted": true,
+      "repaired": false,
+      "persistenceVerified": true,
+      "proseTokens": 111,
+      "semanticDefinitionTextTokens": 0,
+      "counts": {
+        "textBlocks": 1,
+        "entities": 0,
+        "sourceAnchors": 1,
+        "interpretations": 11,
+        "arguments": 1,
+        "glosses": 0,
+        "relations": 0,
+        "inlineMentions": 9
+      },
+      "formats": {
+        "current-json": {
+          "tokens": 1591,
+          "bytes": 4418,
+          "tokensAboveProse": 1480
+        },
+        "current-pretty-json": {
+          "tokens": 2026,
+          "bytes": 5770,
+          "tokensAboveProse": 1915
+        },
+        "compact-intent-json": {
+          "tokens": 657,
+          "bytes": 2197,
+          "tokensAboveProse": 546
+        },
+        "xml": {
+          "tokens": 593,
+          "bytes": 1966,
+          "tokensAboveProse": 482
+        },
+        "markdown-xml": {
+          "tokens": 590,
+          "bytes": 1971,
+          "tokensAboveProse": 479
+        },
+        "yaml": {
+          "tokens": 723,
+          "bytes": 2266,
+          "tokensAboveProse": 612
+        },
+        "sexp": {
+          "tokens": 708,
+          "bytes": 2088,
+          "tokensAboveProse": 597
+        }
+      }
+    }
+  ],
+  "contractSections": {
+    "authoring": 416,
+    "grammar": 372,
+    "examples": 232,
+    "scholarly": 162
+  },
+  "contractTotal": 1182,
+  "existingRequestLocal": {
+    "contract": 8760,
+    "responseSchema": 3536,
+    "tools": 612,
+    "dynamicInput": 1143,
+    "dynamicContent": 1091,
+    "responseInstructions": 48
+  },
+  "checks": [
+    "Four saved unrepaired admitted responses",
+    "All semantic record counts retained in common intent ledger",
+    "XML specimens parsed with existing saxes",
+    "Composition text exactly equal after XML decoding",
+    "YAML specimens parse back to the intent ledger",
+    "Every prior-source selector retains historical revision in host binding evidence"
+  ],
+  "notVerified": [
+    "No candidate native compiler implemented",
+    "No S-expression or hybrid parser round trip",
+    "No live generation, reliability, latency or billed-token measurement",
+    "No Claims/Traits admission added"
+  ],
+  "proposedRequestLocal": 167
+}

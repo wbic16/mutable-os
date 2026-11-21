@@ -5,7 +5,7 @@ export const IMAGE_LIMITS = { bytes: 10 * 1024 * 1024, batchBytes: 40 * 1024 * 1
 let active = 0;
 /** Decode in a disposable process. Its output is metadata, never replacement bytes. */
 export function validateImportedImage(bytes, signal, profile) {
-  const limits=profile==='iiif-tile'?{...IMAGE_LIMITS,bytes:2*1024*1024,pixels:512*512,dimension:512}:IMAGE_LIMITS;
+  const limits=profile==='iiif-tile'?{...IMAGE_LIMITS,bytes:2*1024*1024,pixels:512*512,dimension:512}:profile==='dialectic-generated'?{...IMAGE_LIMITS,bytes:20000000}:IMAGE_LIMITS;
   if (!bytes.length || bytes.length > limits.bytes) return Promise.reject(Error('Image exceeds the byte limit.'));
   if (active >= 2) return Promise.reject(Error('Image validation is busy; retry.'));
   signal?.throwIfAborted(); active++;
@@ -20,7 +20,7 @@ export function validateImportedImage(bytes, signal, profile) {
     child.once('exit', () => { release(); finish(Error('Image validator exited.')); });
     child.once('error', error => { release(); finish(error); });
     child.once('message', result => result.error ? finish(Error(result.error)) : finish(undefined, result));
-    child.send(profile==='iiif-tile'?{bytes,limits}:bytes);
+    child.send(profile==='iiif-tile'||profile==='dialectic-generated'?{bytes,limits}:bytes);
   });
 }
 

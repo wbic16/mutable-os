@@ -1,4 +1,5 @@
 import type { BlockTypeRegistration, CommandDefinition, CommandContext } from "./types";
+import type { BlockRegistrationInfo } from "./type-declarations";
 
 export class BlockRegistry {
   private registrations = new Map<string, BlockTypeRegistration>();
@@ -10,6 +11,17 @@ export class BlockRegistry {
   }
   private notify() { for (const listener of this.listeners) listener(); }
   private aliases = new Map<string, string>();
+
+  /** Active registrations only; aliases stay with their primary registration.
+   * No views, factories or document state are evaluated during discovery. */
+  list(): readonly BlockRegistrationInfo[] {
+    return Object.freeze([...this.registrations].map(([type, registration]) => Object.freeze({
+      type,
+      capabilities: Object.freeze([...registration.capabilities]),
+      aliases: Object.freeze([...(registration.aliases ?? [])]),
+      owner: this.owners.get(type)!,
+    })));
+  }
 
   register(registration: BlockTypeRegistration, owner = "legacy"): () => void {
     const names = [registration.type, ...(registration.aliases ?? [])];
@@ -45,6 +57,8 @@ export class BlockRegistry {
 
 export class CommandRegistry {
   permit?: (targetKey:string,commandId:string)=>boolean;
+  /** Independent of the owning window lifecycle permit. */
+  authoringAllowed?: (targetKey:string,commandId:string)=>boolean;
   private commands = new Map<string, CommandDefinition<any>>();
   private owners = new Map<string, string>();
 
@@ -59,7 +73,7 @@ export class CommandRegistry {
   owner(id: string): string | undefined { return this.owners.get(id); }
 
   canExecute<TArgs>(id: string, context: CommandContext<TArgs>): boolean {
-    return this.permit?.(context.targetKey,id) !== false && (this.commands.get(id)?.canExecute(context) ?? false);
+    return this.authoringAllowed?.(context.targetKey,id) !== false && this.permit?.(context.targetKey,id) !== false && (this.commands.get(id)?.canExecute(context) ?? false);
   }
 
   execute<TArgs>(id: string, context: CommandContext<TArgs>): void | Promise<void> {

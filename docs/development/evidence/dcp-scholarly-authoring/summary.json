@@ -1,0 +1,1371 @@
+[
+  {
+    "variant": "before",
+    "id": "A",
+    "prompt": "Discuss this supplied account without adding biographical facts: \"Leonardo da Vinci moved from Florence to Milan to work for Ludovico Sforza. Ludovico commissioned The Last Supper from Leonardo. Leonardo painted Cecilia Gallerani. French forces under Louis XII conquered Milan in 1499, disrupting Ludovico's court and Leonardo's employment.\" What does this show about patronage? Keep your reply to about 120 words.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:48:30.215Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 88949,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:49:10.694Z",
+    "usage": [
+      {
+        "input_tokens": 13344,
+        "output_tokens": 287,
+        "total_tokens": 13631
+      },
+      {
+        "input_tokens": 13836,
+        "output_tokens": 36,
+        "total_tokens": 13872
+      },
+      {
+        "input_tokens": 14077,
+        "output_tokens": 32,
+        "total_tokens": 14109
+      },
+      {
+        "input_tokens": 14314,
+        "output_tokens": 871,
+        "total_tokens": 15185
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Patronage",
+        "typename": "Concept",
+        "description": "Support and commissions connecting artistic work to a patron, examined here through the supplied account.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Leonardo da Vinci",
+        "typename": "Person",
+        "description": "Artist whose move, commission and disrupted employment are described in the supplied account.",
+        "aliases": [
+          "Leonardo"
+        ]
+      },
+      {
+        "id": "new:e3",
+        "name": "Ludovico Sforza",
+        "typename": "Person",
+        "description": "Patron who commissioned The Last Supper from Leonardo in the supplied account.",
+        "aliases": [
+          "Ludovico"
+        ]
+      },
+      {
+        "id": "new:e4",
+        "name": "The Last Supper",
+        "typename": "Artwork",
+        "description": "Work commissioned by Ludovico Sforza from Leonardo in the supplied account.",
+        "aliases": []
+      }
+    ],
+    "relations": [
+      {
+        "id": "new:rel1",
+        "type": "commissioned",
+        "from": "new:e3",
+        "to": "new:e4",
+        "kind": "entity"
+      }
+    ],
+    "interpretations": [],
+    "glosses": [],
+    "tools": [
+      "search_entities",
+      "search_entities",
+      "search_entities"
+    ]
+  },
+  {
+    "variant": "before",
+    "id": "B",
+    "prompt": "Mercury can mean the Roman god, a planet or a chemical element. The god was identified with Hermes; the planet was named after the god; the element was associated with the planet in alchemy. Explain these distinctions briefly. In \"Mercury fascinated Alex; it was dazzling\", can we tell which Mercury is meant?",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:49:10.731Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 190369,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:49:34.731Z",
+    "usage": [
+      {
+        "input_tokens": 14219,
+        "output_tokens": 31,
+        "total_tokens": 14250
+      },
+      {
+        "input_tokens": 14456,
+        "output_tokens": 44,
+        "total_tokens": 14500
+      },
+      {
+        "input_tokens": 14706,
+        "output_tokens": 976,
+        "total_tokens": 15682
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Mercury (Roman god)",
+        "typename": "Deity",
+        "description": "Roman deity associated with commerce, travellers and messages, identified with the Greek Hermes.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Mercury (planet)",
+        "typename": "Planet",
+        "description": "Innermost planet of the Solar System, named after the Roman god Mercury.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Mercury (chemical element)",
+        "typename": "Chemical element",
+        "description": "Element Hg, also called quicksilver; a metal liquid at ordinary room temperature and associated with the planet Mercury in alchemy.",
+        "aliases": [
+          "Quicksilver",
+          "Hg"
+        ]
+      },
+      {
+        "id": "new:e4",
+        "name": "Hermes",
+        "typename": "Deity",
+        "description": "Greek deity identified with the Roman god Mercury.",
+        "aliases": []
+      }
+    ],
+    "relations": [
+      {
+        "id": "new:rel1",
+        "type": "identified-with",
+        "from": "new:e1",
+        "to": "new:e4",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel2",
+        "type": "named-after",
+        "from": "new:e2",
+        "to": "new:e1",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel3",
+        "type": "alchemically-associated-with",
+        "from": "new:e3",
+        "to": "new:e2",
+        "kind": "entity"
+      }
+    ],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r1",
+        "type": "dialectic/question",
+        "ref": null,
+        "attributes": []
+      }
+    ],
+    "glosses": [],
+    "tools": [
+      "search_entities",
+      "search_entities"
+    ]
+  },
+  {
+    "variant": "before",
+    "id": "C",
+    "prompt": "Returning to Leonardo and Ludovico: Leonardo depended on Ludovico, but Leonardo's skills were portable. Ludovico lost Milan. Does that make Leonardo less vulnerable than Ludovico? Keep the response to about 90 words.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:49:34.762Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 278509,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:49:52.071Z",
+    "usage": [
+      {
+        "input_tokens": 15431,
+        "output_tokens": 132,
+        "total_tokens": 15563
+      },
+      {
+        "input_tokens": 16527,
+        "output_tokens": 541,
+        "total_tokens": 17068
+      }
+    ],
+    "entities": [],
+    "relations": [
+      {
+        "id": "new:rel1",
+        "type": "qualifies",
+        "from": "new:arg1",
+        "to": "src:RxGXbdW6kiglx0kMEVRSmw:arg20",
+        "kind": "argument"
+      }
+    ],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r1",
+        "type": "dialectic/question",
+        "ref": null,
+        "attributes": []
+      }
+    ],
+    "glosses": [],
+    "tools": [
+      "read_source"
+    ]
+  },
+  {
+    "variant": "before",
+    "id": "D",
+    "prompt": "Compare these readings of the supplied account: \"Ludovico's patronage caused Leonardo's engineering advances\" versus \"Ludovico's court provided opportunities, but opportunities do not establish completed engineering work.\" Which inference is better supported, and what would distinguish them? Keep your answer concise.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:49:52.106Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 371845,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:50:09.242Z",
+    "usage": [
+      {
+        "input_tokens": 16020,
+        "output_tokens": 39,
+        "total_tokens": 16059
+      },
+      {
+        "input_tokens": 18188,
+        "output_tokens": 36,
+        "total_tokens": 18224
+      },
+      {
+        "input_tokens": 19201,
+        "output_tokens": 635,
+        "total_tokens": 19836
+      }
+    ],
+    "entities": [],
+    "relations": [],
+    "interpretations": [],
+    "glosses": [],
+    "tools": [
+      "list_text_blocks",
+      "read_source"
+    ]
+  },
+  {
+    "variant": "before",
+    "id": "E",
+    "prompt": "I'm planning a weekend in Brisbane with Sam. We might visit the Queensland Art Gallery on Saturday and watch Spirited Away at home on Sunday. What would make this relaxed? Keep it friendly and brief.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:50:09.272Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 468140,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:50:26.358Z",
+    "usage": [
+      {
+        "input_tokens": 15781,
+        "output_tokens": 673,
+        "total_tokens": 16454
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Sam",
+        "typename": "Person",
+        "description": "The participant’s companion for the proposed weekend.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Queensland Art Gallery",
+        "typename": "Art gallery",
+        "description": "The Brisbane gallery the participant is considering visiting on Saturday.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Spirited Away",
+        "typename": "Film",
+        "description": "The film the participant is considering watching at home on Sunday.",
+        "aliases": []
+      }
+    ],
+    "relations": [],
+    "interpretations": [],
+    "glosses": [],
+    "tools": []
+  },
+  {
+    "variant": "after",
+    "id": "A",
+    "prompt": "Discuss this supplied account without adding biographical facts: \"Leonardo da Vinci moved from Florence to Milan to work for Ludovico Sforza. Ludovico commissioned The Last Supper from Leonardo. Leonardo painted Cecilia Gallerani. French forces under Louis XII conquered Milan in 1499, disrupting Ludovico's court and Leonardo's employment.\" What does this show about patronage? Keep your reply to about 120 words.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:50:26.430Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 167449,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:51:07.779Z",
+    "usage": [
+      {
+        "input_tokens": 13924,
+        "output_tokens": 31,
+        "total_tokens": 13955
+      },
+      {
+        "input_tokens": 14161,
+        "output_tokens": 3151,
+        "total_tokens": 17312
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Leonardo da Vinci",
+        "typename": "Person",
+        "description": "Artist identified in the supplied account.",
+        "aliases": [
+          "Leonardo"
+        ]
+      },
+      {
+        "id": "new:e2",
+        "name": "Florence",
+        "typename": "Place",
+        "description": "Place from which Leonardo moves in the supplied account.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Milan",
+        "typename": "Place",
+        "description": "Destination of Leonardo's move and location conquered in the supplied account.",
+        "aliases": []
+      },
+      {
+        "id": "new:e4",
+        "name": "Ludovico Sforza",
+        "typename": "Person",
+        "description": "Leonardo's employer and commissioner of The Last Supper in the supplied account.",
+        "aliases": [
+          "Ludovico"
+        ]
+      },
+      {
+        "id": "new:e5",
+        "name": "The Last Supper",
+        "typename": "Artwork",
+        "description": "Work commissioned from Leonardo by Ludovico in the supplied account.",
+        "aliases": []
+      },
+      {
+        "id": "new:e6",
+        "name": "Cecilia Gallerani",
+        "typename": "Person",
+        "description": "Person whom Leonardo painted in the supplied account.",
+        "aliases": []
+      },
+      {
+        "id": "new:e7",
+        "name": "French forces under Louis XII",
+        "typename": "Military force",
+        "description": "Forces described as conquering Milan in 1499 in the supplied account.",
+        "aliases": [
+          "French forces"
+        ]
+      },
+      {
+        "id": "new:e8",
+        "name": "Louis XII",
+        "typename": "Person",
+        "description": "Leader under whom the French forces act in the supplied account.",
+        "aliases": []
+      },
+      {
+        "id": "new:e9",
+        "name": "Artistic patronage",
+        "typename": "Concept",
+        "description": "Support of artistic work through a patron, considered here in relation to opportunity and political dependence.",
+        "aliases": [
+          "patronage"
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "id": "new:rel1",
+        "type": "employed-by",
+        "from": "new:e1",
+        "to": "new:e4",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel2",
+        "type": "commissioned",
+        "from": "new:e4",
+        "to": "new:e5",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel3",
+        "type": "commissioned-from",
+        "from": "new:e5",
+        "to": "new:e1",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel4",
+        "type": "painted",
+        "from": "new:e1",
+        "to": "new:e6",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel5",
+        "type": "under-command-of",
+        "from": "new:e7",
+        "to": "new:e8",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel6",
+        "type": "conquered",
+        "from": "new:e7",
+        "to": "new:e3",
+        "kind": "entity"
+      }
+    ],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r1",
+        "type": "dialectic/claim",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m2",
+        "target": "new:r2",
+        "type": "dialectic/claim",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m3",
+        "target": "new:r3",
+        "type": "dialectic/claim",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m4",
+        "target": "new:r4",
+        "type": "dialectic/claim",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m5",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Leonardo da Vinci",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m6",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Florence",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e2",
+        "attributes": []
+      },
+      {
+        "id": "new:m7",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Milan",
+          "prefix": "from Florence to ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m8",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Ludovico Sforza",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e4",
+        "attributes": []
+      },
+      {
+        "id": "new:m9",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Ludovico",
+          "prefix": "",
+          "suffix": " commissioned"
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e4",
+        "attributes": []
+      },
+      {
+        "id": "new:m10",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "The Last Supper",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e5",
+        "attributes": []
+      },
+      {
+        "id": "new:m11",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Leonardo",
+          "prefix": "The Last Supper from ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m12",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Leonardo",
+          "prefix": "",
+          "suffix": " painted"
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m13",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Cecilia Gallerani",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e6",
+        "attributes": []
+      },
+      {
+        "id": "new:m14",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "French forces",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e7",
+        "attributes": []
+      },
+      {
+        "id": "new:m15",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Louis XII",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e8",
+        "attributes": []
+      },
+      {
+        "id": "new:m16",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Milan",
+          "prefix": "conquered ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m17",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Ludovico's",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e4",
+        "attributes": []
+      },
+      {
+        "id": "new:m18",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "Leonardo's",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m19",
+        "target": {
+          "block": "src:bphTTFTQc0pBMo3IcbvfqA:b2",
+          "revision": "93d6d258-5dd4-43ea-8949-0de3f72185fe",
+          "quote": "patronage",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e9",
+        "attributes": []
+      }
+    ],
+    "glosses": [
+      {
+        "id": "new:g1",
+        "target": "new:r4",
+        "type": "scope",
+        "text": "The relationships recorded here represent the supplied account, not independent historical verification. Its conquest is dated 1499; the interpretation concerns the dependence exposed by the stated disruption, not a claim that all patronage arrangements function identically."
+      }
+    ],
+    "tools": [
+      "search_entities"
+    ]
+  },
+  {
+    "variant": "after",
+    "id": "B",
+    "prompt": "Mercury can mean the Roman god, a planet or a chemical element. The god was identified with Hermes; the planet was named after the god; the element was associated with the planet in alchemy. Explain these distinctions briefly. In \"Mercury fascinated Alex; it was dazzling\", can we tell which Mercury is meant?",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:51:07.816Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 320098,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:51:44.295Z",
+    "usage": [
+      {
+        "input_tokens": 16310,
+        "output_tokens": 31,
+        "total_tokens": 16341
+      },
+      {
+        "input_tokens": 16546,
+        "output_tokens": 31,
+        "total_tokens": 16577
+      },
+      {
+        "input_tokens": 16782,
+        "output_tokens": 71,
+        "total_tokens": 16853
+      },
+      {
+        "input_tokens": 17058,
+        "output_tokens": 30,
+        "total_tokens": 17088
+      },
+      {
+        "input_tokens": 17293,
+        "output_tokens": 2217,
+        "total_tokens": 19510
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Mercury (Roman god)",
+        "typename": "Deity",
+        "description": "Roman deity associated with commerce, travellers and messages, identified with Hermes; distinct from the planet and element.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Mercury (planet)",
+        "typename": "Planet",
+        "description": "Innermost planet, named after the Roman god Mercury.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Mercury (chemical element)",
+        "typename": "Chemical element",
+        "description": "Metallic element Hg, also called quicksilver; symbolically associated with the planet Mercury in alchemy.",
+        "aliases": [
+          "quicksilver",
+          "Hg"
+        ]
+      },
+      {
+        "id": "new:e4",
+        "name": "Hermes",
+        "typename": "Deity",
+        "description": "Greek god identified with the Roman god Mercury.",
+        "aliases": []
+      },
+      {
+        "id": "new:e5",
+        "name": "Alchemy",
+        "typename": "Tradition",
+        "description": "Historical tradition in which metals and planets were linked through symbolic correspondences.",
+        "aliases": []
+      },
+      {
+        "id": "new:e6",
+        "name": "Alex (example sentence)",
+        "typename": "Person",
+        "description": "Person mentioned in the illustrative sentence about an unresolved referent of Mercury; no further identity is supplied.",
+        "aliases": []
+      }
+    ],
+    "relations": [
+      {
+        "id": "new:rel1",
+        "type": "identified-with",
+        "from": "new:e1",
+        "to": "new:e4",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel2",
+        "type": "named-after",
+        "from": "new:e2",
+        "to": "new:e1",
+        "kind": "entity"
+      },
+      {
+        "id": "new:rel3",
+        "type": "symbolically-associated-in-alchemy-with",
+        "from": "new:e3",
+        "to": "new:e2",
+        "kind": "entity"
+      }
+    ],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r1",
+        "type": "dialectic/claim",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m2",
+        "target": "new:r2",
+        "type": "dialectic/question",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m3",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "the Roman god",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m4",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "a planet",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e2",
+        "attributes": []
+      },
+      {
+        "id": "new:m5",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "a chemical element",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m6",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "The god",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m7",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "Hermes",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e4",
+        "attributes": []
+      },
+      {
+        "id": "new:m8",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "the planet",
+          "prefix": "Hermes; ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e2",
+        "attributes": []
+      },
+      {
+        "id": "new:m9",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "the god",
+          "prefix": "named after ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m10",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "the element",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m11",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "the planet",
+          "prefix": "associated with ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e2",
+        "attributes": []
+      },
+      {
+        "id": "new:m12",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "alchemy",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e5",
+        "attributes": []
+      },
+      {
+        "id": "new:m13",
+        "target": {
+          "block": "src:s6cHMACgcSz707Y_XRNnsw:b2",
+          "revision": "f64dbbb7-13d2-42a1-bb0a-0fe2414742c7",
+          "quote": "Alex",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e6",
+        "attributes": []
+      }
+    ],
+    "glosses": [],
+    "tools": [
+      "search_entities",
+      "search_entities",
+      "search_entities",
+      "search_entities"
+    ]
+  },
+  {
+    "variant": "after",
+    "id": "C",
+    "prompt": "Returning to Leonardo and Ludovico: Leonardo depended on Ludovico, but Leonardo's skills were portable. Ludovico lost Milan. Does that make Leonardo less vulnerable than Ludovico? Keep the response to about 90 words.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:51:44.327Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 444276,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:52:12.090Z",
+    "usage": [
+      {
+        "input_tokens": 16493,
+        "output_tokens": 2318,
+        "total_tokens": 18811
+      }
+    ],
+    "entities": [],
+    "relations": [],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r1",
+        "type": "dialectic/question",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m2",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Leonardo depended on Ludovico, but Leonardo's skills were portable.",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "dialectic/claim",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m3",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Leonardo",
+          "prefix": "Returning to ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m4",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Ludovico",
+          "prefix": "Returning to Leonardo and ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+        "attributes": []
+      },
+      {
+        "id": "new:m5",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Leonardo",
+          "prefix": "Ludovico: ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m6",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Ludovico",
+          "prefix": "depended on ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+        "attributes": []
+      },
+      {
+        "id": "new:m7",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Leonardo",
+          "prefix": "but ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m8",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Ludovico",
+          "prefix": "",
+          "suffix": " lost Milan."
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+        "attributes": []
+      },
+      {
+        "id": "new:m9",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Milan",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e7",
+        "attributes": []
+      },
+      {
+        "id": "new:m10",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Leonardo",
+          "prefix": "Does that make ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m11",
+        "target": {
+          "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+          "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+          "quote": "Ludovico",
+          "prefix": "less vulnerable than ",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+        "attributes": []
+      }
+    ],
+    "glosses": [],
+    "tools": []
+  },
+  {
+    "variant": "after",
+    "id": "D",
+    "prompt": "Compare these readings of the supplied account: \"Ludovico's patronage caused Leonardo's engineering advances\" versus \"Ludovico's court provided opportunities, but opportunities do not establish completed engineering work.\" Which inference is better supported, and what would distinguish them? Keep your answer concise.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:52:12.141Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 557704,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:52:46.124Z",
+    "usage": [
+      {
+        "input_tokens": 16483,
+        "output_tokens": 34,
+        "total_tokens": 16517
+      },
+      {
+        "input_tokens": 23854,
+        "output_tokens": 248,
+        "total_tokens": 24102
+      },
+      {
+        "input_tokens": 24309,
+        "output_tokens": 1412,
+        "total_tokens": 25721
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Engineering work",
+        "typename": "Concept",
+        "description": "Technical design, testing or construction, distinguished here from opportunities to undertake it and from demonstrated technical advances.",
+        "aliases": []
+      }
+    ],
+    "relations": [],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r2",
+        "type": "dialectic/claim",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m2",
+        "target": "new:r3",
+        "type": "dialectic/qualification",
+        "ref": null,
+        "attributes": []
+      },
+      {
+        "id": "new:m3",
+        "target": {
+          "block": "src:J-gg_-J634_sl0XHGMyKxQ:b2",
+          "revision": "acaa2bdd-5524-43c8-8d10-7549b6ab5073",
+          "quote": "Ludovico",
+          "prefix": "\"",
+          "suffix": "'s patronage"
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:J-gg_-J634_sl0XHGMyKxQ:e7",
+        "attributes": []
+      },
+      {
+        "id": "new:m4",
+        "target": {
+          "block": "src:J-gg_-J634_sl0XHGMyKxQ:b2",
+          "revision": "acaa2bdd-5524-43c8-8d10-7549b6ab5073",
+          "quote": "patronage",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:J-gg_-J634_sl0XHGMyKxQ:e9",
+        "attributes": []
+      },
+      {
+        "id": "new:m5",
+        "target": {
+          "block": "src:J-gg_-J634_sl0XHGMyKxQ:b2",
+          "revision": "acaa2bdd-5524-43c8-8d10-7549b6ab5073",
+          "quote": "Leonardo",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:J-gg_-J634_sl0XHGMyKxQ:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m6",
+        "target": {
+          "block": "src:J-gg_-J634_sl0XHGMyKxQ:b2",
+          "revision": "acaa2bdd-5524-43c8-8d10-7549b6ab5073",
+          "quote": "Ludovico",
+          "prefix": "\"",
+          "suffix": "'s court"
+        },
+        "type": "mutable/entity-reference",
+        "ref": "src:J-gg_-J634_sl0XHGMyKxQ:e7",
+        "attributes": []
+      },
+      {
+        "id": "new:m7",
+        "target": {
+          "block": "src:J-gg_-J634_sl0XHGMyKxQ:b2",
+          "revision": "acaa2bdd-5524-43c8-8d10-7549b6ab5073",
+          "quote": "engineering work",
+          "prefix": "",
+          "suffix": ""
+        },
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      }
+    ],
+    "glosses": [],
+    "tools": [
+      "read_source",
+      "search_entities"
+    ]
+  },
+  {
+    "variant": "after",
+    "id": "E",
+    "prompt": "I'm planning a weekend in Brisbane with Sam. We might visit the Queensland Art Gallery on Saturday and watch Spirited Away at home on Sunday. What would make this relaxed? Keep it friendly and brief.",
+    "maxOutputTokens": 4096,
+    "continuity": false,
+    "startedUtc": "2026-11-11T06:52:46.199Z",
+    "admitted": true,
+    "persistenceVerified": true,
+    "nativeBytes": 666660,
+    "repaired": false,
+    "completedUtc": "2026-11-11T06:53:12.654Z",
+    "usage": [
+      {
+        "input_tokens": 16661,
+        "output_tokens": 31,
+        "total_tokens": 16692
+      },
+      {
+        "input_tokens": 16900,
+        "output_tokens": 30,
+        "total_tokens": 16930
+      },
+      {
+        "input_tokens": 17138,
+        "output_tokens": 33,
+        "total_tokens": 17171
+      },
+      {
+        "input_tokens": 17379,
+        "output_tokens": 33,
+        "total_tokens": 17412
+      },
+      {
+        "input_tokens": 17620,
+        "output_tokens": 1047,
+        "total_tokens": 18667
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "Brisbane",
+        "typename": "Place",
+        "description": "Australian city where the participant is planning a weekend with Sam.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "Sam",
+        "typename": "Person",
+        "description": "The participant's companion for the proposed Brisbane weekend.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "Queensland Art Gallery",
+        "typename": "Institution",
+        "description": "Art gallery in Brisbane proposed for a Saturday visit.",
+        "aliases": []
+      },
+      {
+        "id": "new:e4",
+        "name": "Spirited Away",
+        "typename": "Film",
+        "description": "Animated film proposed for viewing at home on Sunday.",
+        "aliases": []
+      }
+    ],
+    "relations": [],
+    "interpretations": [
+      {
+        "id": "new:m1",
+        "target": "new:r1",
+        "type": "mutable/entity-reference",
+        "ref": "new:e1",
+        "attributes": []
+      },
+      {
+        "id": "new:m2",
+        "target": "new:r2",
+        "type": "mutable/entity-reference",
+        "ref": "new:e2",
+        "attributes": []
+      },
+      {
+        "id": "new:m3",
+        "target": "new:r3",
+        "type": "mutable/entity-reference",
+        "ref": "new:e3",
+        "attributes": []
+      },
+      {
+        "id": "new:m4",
+        "target": "new:r4",
+        "type": "mutable/entity-reference",
+        "ref": "new:e4",
+        "attributes": []
+      }
+    ],
+    "glosses": [],
+    "tools": [
+      "search_entities",
+      "search_entities",
+      "search_entities",
+      "search_entities"
+    ]
+  }
+]

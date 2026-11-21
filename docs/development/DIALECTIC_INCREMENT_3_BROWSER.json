@@ -1,0 +1,64 @@
+{
+  "authoring": {
+    "observedMs": 55.39999997615814,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "sameMount": true
+  },
+  "open": {
+    "observedUntilUsableMs": 68.19999998807907,
+    "mountWorkMs": [
+      9.300000011920929,
+      6.100000023841858
+    ],
+    "snapshots": 0,
+    "rebuilds": 0,
+    "revisionUnchanged": true,
+    "passiveViews": 2,
+    "newSessions": 0,
+    "sameSession": true,
+    "sameMount": true,
+    "observedFirstSuccessfulNativeInteractionMs": 94.5
+  },
+  "interactions": {
+    "independentTabs": true,
+    "independentFaces": true,
+    "unavailable": "unqualified-widgetThis Block family is not available in native read-only presentation.Open source",
+    "mediaPlayback": "HTMLMediaElement in isolated native iframe; external provider not exercised",
+    "links": true,
+    "nativeSelectionAndCopy": true
+  },
+  "passiveInput": {
+    "undoCutPasteDeleteTypingAndIMEBlocked": true
+  },
+  "sourcePropagation": {
+    "mutationMs": 6.400000035762787,
+    "bothOccurrencesUpdated": true,
+    "sameMount": true
+  },
+  "unrelated": {
+    "updates": 0,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "twentyEditsMs": 25.900000035762787,
+    "documents": 3,
+    "paragraphs": 300,
+    "passiveLayoutReads": 0
+  },
+  "textual": {
+    "sameSession": true,
+    "sameMount": true,
+    "independentStateRestored": true
+  },
+  "sourceEditing": {
+    "observedMs": 33.09999996423721,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "sameMount": true
+  },
+  "persistence": {
+    "sequences": 1,
+    "members": 2,
+    "reloaded": true
+  }
+}

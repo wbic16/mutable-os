@@ -1,9 +1,10 @@
 /** History-independent native resource codec/admission. Reuses the accepted resource graph and preserves its guards. */
 import { clone } from "../block-tree/clone";
+import { INLINE_ALTERNATIVES_CAPABILITY, validateCapabilities, NATIVE_CAPABILITIES } from '../interchange/capabilities';
 import { freeze, type DeepReadonly } from "../block-tree/commit-capture";
 import { externalDefinitionLink } from "../block-tree/external-reference";
 import { linkedDefinitionOwner, definitionProvenance } from "../block-tree/linked-annotations";
-import { resourceOwner, resourceSource, sameResource, findResource } from "../block-tree/resource-identity";
+import { resourceOwner, resourceSource, sameResource, findResource, type ResourceOwnershipLookup } from "../block-tree/resource-identity";
 import { documentRootPlacements, resourceOwnership } from "../block-tree/resource-registration";
 import type { ExternalTarget } from "../block-tree/external-reference";
 import { viewTypeFor } from "../block-tree/codecs";
@@ -61,35 +62,64 @@ export function captureNative(state: DeepReadonly<RepositoryState>, resourceId: 
   }
   check([...ownerCounts.values()].every(count => count <= 1), "multiple canonical owners for one content record");
   // Implicit Workspace-root registries cannot silently become Document-owned.
+  // Capture is synchronous over one consistent state. Resolve each resource
+  // identity once, not once per annotation. Keep ambiguity/ownership checks;
+  // discard this memo after capture so later captures always revalidate.
+  const resources = new Map<string, ContentRecord | undefined>();
+  const parents = new Map<string, Set<string>>();
+  for (const content of Object.values(state.contents)) for (const key of slots(content)) {
+    const placement = state.placements[key];
+    if (!placement || placement.kind === 'reference') continue;
+    const owners = parents.get(placement.contentKey) ?? new Set<string>();
+    owners.add(content.key); parents.set(placement.contentKey, owners);
+  }
+  const lookup: ResourceOwnershipLookup = {
+    parents: key => parents.get(key) ?? [],
+    find: source => {
+      const key = JSON.stringify([source.scope, source.resourceId]);
+      if (!resources.has(key)) resources.set(key, findResource(state as RepositoryState, source));
+      return resources.get(key);
+    },
+  };
   const dependencies = new Map<string, unknown[]>();
   for (const key of membership.keys()) {
     const c = state.contents[key];
-    if (Array.isArray(c.payload.standoffProperties)) dependencies.set(key, c.payload.standoffProperties.map(property => {
-      if (!id(property.annotationId) || externalDefinitionLink(property)) return clone(property);
-      const owner = linkedDefinitionOwner(state as RepositoryState, property, key);
-      check(owner, `linked annotation ${property.annotationId} lacks Document ownership or explicit foreign provenance`);
-      return owner.key === root.key ? clone(property) : { ...clone(property), externalDefinition: definitionProvenance(owner, property.annotationId) };
-    }));
+    if (Array.isArray(c.payload.standoffProperties)) {
+      let rewritten = false;
+      const properties = c.payload.standoffProperties.map(property => {
+        if (!id(property.annotationId) || externalDefinitionLink(property)) return property;
+        const owner = linkedDefinitionOwner(state as RepositoryState, property, key, lookup);
+        check(owner, `linked annotation ${property.annotationId} lacks Document ownership or explicit foreign provenance`);
+        if (owner.key === root.key) return property;
+        rewritten = true;
+        return { ...property, externalDefinition: definitionProvenance(owner, property.annotationId) };
+      });
+      if (rewritten) dependencies.set(key, properties);
+    }
     for (const slot of slots(c)) {
       const p = state.placements[slot];
       if (!p.resolvedReference) continue;
-      const source = p.resolvedReference.source, owner = resourceOwner(state as RepositoryState, p.contentKey);
+      const source = p.resolvedReference.source, owner = resourceOwner(state as RepositoryState, p.contentKey, lookup);
       check(source.scope !== "unknown" && owner && sameResource(resourceSource(owner)!, source) &&
         p.resolvedReference.targetId === state.contents[p.contentKey]?.payload.id, "stale or ambiguous foreign binding provenance");
     }
   }
   const parent = Object.values(state.contents).find(c => slots(c).includes(owners[0].key));
-  const nestedRoot = parent && resourceOwner(state as RepositoryState, parent.key)?.viewType === "document-block";
+  const nestedRoot = parent && resourceOwner(state as RepositoryState, parent.key, lookup)?.viewType === "document-block";
   const rootPlacementId = nestedRoot ? `resource-root:${resourceId}` : durablePlacementId(owners[0], resourceId);
-  const projected = clone(projectOwned(state as RepositoryState, resourceId, {
+  const projected = projectOwned(state as RepositoryState, resourceId, {
     contents: membership,
     placementIds: new Map(Object.values(state.placements).map(p => [p.key, durablePlacementId(p, resourceId)])),
     externalTargets, // Only actual authored nested ownership; reference provenance is never guessed.
     root: { key: owners[0].key, contentKey: root.key, placementId: rootPlacementId },
-  }, 0)) as ResourceSnapshot;
-  for (const [key, properties] of dependencies) projected.contents[key].payload.standoffProperties = properties;
-  validateResource(projected);
-  return freeze(projected);
+  }, 0);
+  // projectOwned already owns, validates and freezes this exact graph. No second
+  // materialisation/proof is needed unless canonical provenance was transformed.
+  if (!dependencies.size) return projected;
+  const transformed = clone(projected) as ResourceSnapshot;
+  for (const [key, properties] of dependencies) transformed.contents[key].payload.standoffProperties = clone(properties);
+  validateResource(transformed);
+  return freeze(transformed);
 }
 
 export interface NativeDocument {
@@ -98,12 +128,14 @@ export interface NativeDocument {
   valueEncoding?: "codex-authored-value-v1";
   document: GateDocument;
   definitionOwnerBlockIds: string[];
+  requiredCapabilities?: string[];
 }
 export function nativeEnvelope(resource: DeepReadonly<ResourceSnapshot>): NativeDocument {
   for (const c of Object.values(resource.contents)) if (!["text-cell", "image-cell"].includes(c.viewType)) {
     check(typeof c.payload.type === "string" && viewTypeFor(c.payload.type) === c.viewType, "missing/mismatched authored type");
   }
   return { format: "mutable-document", version: 1, resourceId: resource.resourceId, valueEncoding: "codex-authored-value-v1",
+    ...(Object.values(resource.contents).some(c=>c.compactInline?.spans.some(a=>a.kind==='alternative'))?{requiredCapabilities:[INLINE_ALTERNATIVES_CAPABILITY]}:{}),
     document: encodeGateDocument(resource, "native"), definitionOwnerBlockIds: Object.values(resource.contents)
       .filter(c => c.definitionOwnerKey !== undefined).map(c => c.payload.id as string).sort() };
 }
@@ -130,10 +162,11 @@ function target(value: any) {
   fields(value.version, value.version?.kind === "unpinned" ? ["kind"] : ["kind", "memoirId", "segmentId", "revisionId"]);
 }
 /** Parse reserved wire shape only; callers still require semantic resource validation. */
-export function parseNativeEnvelope(bytes: Uint8Array): NativeDocument {
+export function parseNativeEnvelope(bytes: Uint8Array, supported: ReadonlySet<string> = NATIVE_CAPABILITIES): NativeDocument {
   const value = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) as NativeDocument;
   assertPortableJson(value);
-  fields(value, ["format", "version", "resourceId", "document", "definitionOwnerBlockIds", "valueEncoding"]);
+  fields(value, ["format", "version", "resourceId", "document", "definitionOwnerBlockIds", "valueEncoding", "requiredCapabilities"]);
+  validateCapabilities(value.requiredCapabilities,supported);
   check(value.valueEncoding === undefined || value.valueEncoding === "codex-authored-value-v1", "unsupported authored value encoding");
   check(value.format === "mutable-document" && value.version === 1 && id(value.resourceId), "unsupported native envelope/version");
   const doc = value.document;
@@ -163,9 +196,12 @@ export function parseNativeEnvelope(bytes: Uint8Array): NativeDocument {
   return value;
 }
 
-export function decodeNative(bytes: Uint8Array): DeepReadonly<ResourceSnapshot> {
+export function decodeNative(bytes: Uint8Array, timings?: Record<string, number>, compact = false): DeepReadonly<ResourceSnapshot> {
+  let last = timings ? performance.now() : 0;
   const value = parseNativeEnvelope(bytes), doc = value.document;
-  let resource = decodeGateDocument(doc, value.valueEncoding ? "native" : "legacy");
+  if (timings) { timings.nativeWireParsing = performance.now() - last; }
+  let resource = decodeGateDocument(doc, value.valueEncoding ? "native" : "legacy", timings, compact);
+  if (timings) last = performance.now();
   const root = resource.placements[resource.rootPlacementKey]; check(root.target.kind === "local", "external root");
   const rootContent = resource.contents[root.target.contentKey];
   check(identity(rootContent) === value.resourceId, "root identity disagrees with resource identity");
@@ -179,6 +215,7 @@ export function decodeNative(bytes: Uint8Array): DeepReadonly<ResourceSnapshot> 
     resource = freeze({ ...resource, contents });
   }
   validateNativeOwnership(resource, root.target.contentKey);
+  if (timings) timings.nativeOwnershipValidation = performance.now() - last;
   return resource;
 }
 
@@ -213,7 +250,7 @@ function validateNativeOwnership(resource: DeepReadonly<ResourceSnapshot>, rootK
   const registry = (resource.contents[rootKey].payload.linkedAnnotations ?? {}) as object;
   for (const c of Object.values(resource.contents)) {
     if (c.definitionOwnerKey === rootKey) visit(c.key);
-    if (Array.isArray(c.payload.standoffProperties)) for (const property of c.payload.standoffProperties) {
+    for(const properties of [c.payload.standoffProperties,...c.compactInline?.spans.flatMap(a=>a.kind==='image'?[a.properties.standoffProperties]:[])??[]]) if (Array.isArray(properties)) for (const property of properties) {
       if (!id(property.annotationId) || externalDefinitionLink(property)) continue;
       check(Object.hasOwn(registry, property.annotationId), `linked annotation ${property.annotationId} lacks Document ownership or explicit foreign provenance`);
     }
@@ -223,15 +260,19 @@ function validateNativeOwnership(resource: DeepReadonly<ResourceSnapshot>, rootK
 
 /** Admission into an EXISTING repository/object bank, never a new editor or DTO.
  * Detached decode + collision/ownership checks precede the one atomic commit. */
-export function admitNative(repository: CanonicalRepository, bytes: Uint8Array, bankContentKey: string) {
-  const {placementKey,reused}=admitNativeWithResource(repository,bytes,bankContentKey);
+export function admitNative(repository: CanonicalRepository, bytes: Uint8Array, bankContentKey: string, timings?: Record<string, number>) {
+  const {placementKey,reused}=admitNativeWithResource(repository,bytes,bankContentKey,undefined,timings);
   return {placementKey,reused};
 }
 /** Admission result also exposes the immutable validated source and exact membership. */
-export function admitNativeWithResource(repository: CanonicalRepository, bytes: Uint8Array, bankContentKey: string, expectedResourceId?: string) {
-  const resource = decodeNative(bytes);
+export function admitNativeWithResource(repository: CanonicalRepository, bytes: Uint8Array, bankContentKey: string, expectedResourceId?: string, timings?: Record<string, number>) {
+  let last = timings ? performance.now() : 0;
+  const stage = (name: string) => { if (timings) { const now = performance.now(); timings[name] = now - last; last = now; } };
+  const resource = decodeNative(bytes, timings, repository.compactCanonicalText);
+  stage('nativeDecodeAndValidation');
   check(expectedResourceId === undefined || resource.resourceId === expectedResourceId, 'Open response identity mismatch');
   const incoming = resourceToRepository(resource), before = repository.readState();
+  stage('canonicalStaging');
   const bank = before.contents[bankContentKey];
   check(bank?.viewType === "workspace-object-bank-block", "native admission requires the existing object bank");
   const existing = Object.values(before.contents).filter(c => c.viewType === "document-block" && identity(c) === resource.resourceId);
@@ -265,11 +306,11 @@ export function admitNativeWithResource(repository: CanonicalRepository, bytes: 
     const { externalReference: _external, ...record } = p;
     bindings.push({ ...record, contentKey: target.key, resolvedReference: clone(external) });
   }
+  stage('identityAndBindings');
   repository.commit("B1 admit native Document", [
-    ...Object.values(incoming.contents).map(record => ({ kind: "put-content" as const, record })),
-    ...Object.values(incoming.placements).map(record => ({ kind: "put-placement" as const, record })),
-    ...bindings.map(record => ({ kind: "put-placement" as const, record })),
-    { kind: "put-content", record: updatedBank },
-  ]);
+    { kind: "record-batch", contents: { ...incoming.contents, [bank.key]: updatedBank },
+      placements: { ...incoming.placements, ...Object.fromEntries(bindings.map(record => [record.key, record])) } },
+  ], true, {}, timings);
+  stage('repositoryCommit');
   return { placementKey: incoming.rootPlacementKey, reused: false, resource, members: Object.keys(incoming.contents) };
 }

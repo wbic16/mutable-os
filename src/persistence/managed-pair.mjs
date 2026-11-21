@@ -7,16 +7,16 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { promisify } from "node:util";
 import { flockDescriptor } from "../../scripts/stage-c-gates/flock.mjs";
-let nativeLock;
-try { nativeLock = promisify(createRequire(import.meta.url)("fs-ext").flock); } catch { /* optional native capability */ }
-// When the fs-ext binding is absent, route through the stage-C gates
-// fallback (scripts/stage-c-gates/flock.mjs): a token lock keyed by the
-// descriptor's dev+ino identity, contention reported with code
-// EWOULDBLOCK — the same contract the call sites already handle from the
-// native path. The helper's release function replaces the native 'un'
-// call; releases are tracked per descriptor because the native-vault
-// store drops its lock by closing the handle, and its explicit unlock
-// (like ManagedPair's) lands here first.
+let nativeLock, nativeLockLoaded=false;
+// Read-only worker consumers use hashing/path verification, never file locks.
+// fs-ext is not context-aware: importing it eagerly in several workers can crash Node,
+// so the native binding loads lazily on first use. When the binding is absent, route
+// through the stage-C gates fallback (scripts/stage-c-gates/flock.mjs): a token lock
+// keyed by the descriptor's dev+ino identity, contention reported with code
+// EWOULDBLOCK — the same contract the call sites already handle from the native path.
+// The helper's release function replaces the native 'un' call; releases are tracked
+// per descriptor because the native-vault store drops its lock by closing the handle,
+// and its explicit unlock (like ManagedPair's) lands here first.
 const fallbackReleases = new Map();
 async function fallbackFlock(fd, operation) {
   if (operation === "un") {
@@ -30,7 +30,10 @@ async function fallbackFlock(fd, operation) {
     operation === "sh" || operation === "shnb");
   fallbackReleases.set(fd, release);
 }
-export const nativeFlock = nativeLock ? (...args) => nativeLock(...args) : fallbackFlock;
+export const nativeFlock = (...args) => {
+ if(!nativeLockLoaded){nativeLockLoaded=true;try{nativeLock=promisify(createRequire(import.meta.url)("fs-ext").flock);}catch{/* optional native capability */}}
+ return nativeLock ? nativeLock(...args) : fallbackFlock(...args);
+};
 const flock = nativeFlock;
 import { createHash, randomUUID } from "node:crypto";
 import { decodeNative } from "./native-resource";

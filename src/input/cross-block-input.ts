@@ -1,8 +1,11 @@
+import { passiveElement } from '../runtime/passive-presentation';
+import { normalizeInlineSelection } from '../runtime/inline-alternatives';
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import type { ViewPosition } from "../block-tree/types";
 import { graphemeBoundaries } from "./graphemes";
 import { createEffect, createRoot } from "solid-js";
 import { wordSelection } from './word-selection';
+import { presentationEligible } from '../runtime/presentation-eligibility';
 
 /** Model-owned selection across separate contenteditables. Installed before InputGateway. */
 export class CrossBlockInput {
@@ -13,6 +16,7 @@ export class CrossBlockInput {
   private pointer?: { x: number; y: number };
   private frame = 0;
   private preferredX?: number;
+  private navigation = 0;
   private capture?: { element: Element; pointerId: number };
   private observer: MutationObserver;
   private listeners: Array<[string, EventListener]> = [];
@@ -35,7 +39,15 @@ export class CrossBlockInput {
       if (capture?.element === event.target && capture.pointerId === event.pointerId && !capture.element.hasPointerCapture?.(capture.pointerId)) this.up();
     });
     document.defaultView?.addEventListener('blur', this.up);
-    listen("keydown", this.key); listen("selectionchange", event => { if (editor.crossText.range()) event.stopImmediatePropagation(); });
+    listen("keydown", this.key); listen("selectionchange", event => {
+      if (editor.crossText.range()) { event.stopImmediatePropagation(); return; }
+      const selection = document.getSelection();
+      const element = (node: Node | null | undefined) => node instanceof Element ? node : node?.parentElement ?? null;
+      if (editor.mounts.resolveElement(element(selection?.anchorNode))?.nodeKey === editor.mounts.resolveElement(element(selection?.focusNode))?.nodeKey) return;
+      const native = this.native(); if (!native) return;
+      const normalized = normalizeInlineSelection(editor, native.anchor, native.head);
+      if (normalized) { this.select(normalized.anchor, normalized.head); event.stopImmediatePropagation(); }
+    });
     for (const name of ["beforeinput", "input", "compositionstart", "compositionupdate", "compositionend", "copy", "cut", "paste", "contextmenu", "click", "drop", "dragstart"]) listen(name, this.guard);
     listen("focusin", event => {
       if (!editor.crossText.range()) return;
@@ -46,7 +58,6 @@ export class CrossBlockInput {
       if (!resolved || !editor.crossText.segments[resolved.nodeKey]) editor.crossText.clear();
     });
     this.observer = new MutationObserver(() => {
-      if (editor.crossText.range()) editor.crossText.validate();
       const root = this.drag && editor.mounts.get(this.drag.occurrenceKey)?.root;
       if (this.drag && (!root?.isConnected || root.closest('[hidden], [inert], [aria-hidden="true"]'))) this.up();
     });
@@ -57,6 +68,8 @@ export class CrossBlockInput {
         if (!range) this.removeInput();
         else this.bindInputOwner();
       });
+      // Selection validity follows native structure/presentation, not viewport DOM churn.
+      createEffect(() => { if (editor.crossText.range()) editor.crossText.validate(); });
       return dispose;
     });
   }
@@ -114,6 +127,8 @@ export class CrossBlockInput {
     return anchor && head ? { anchor, head } : undefined;
   }
   private select(anchor: ViewPosition, head: ViewPosition) {
+    const normalized = normalizeInlineSelection(this.editor, anchor, head);
+    if (normalized) { anchor = normalized.anchor; head = normalized.head; }
     try {
       if (anchor.occurrenceKey === head.occurrenceKey) {
         this.editor.crossText.clear();
@@ -142,6 +157,7 @@ export class CrossBlockInput {
     this.begin(event, event.pointerId);
   };
   private begin = (event: MouseEvent, pointerId?: number) => {
+    if(passiveElement(event.target))return;
     const byWord = event.detail === 2 && !event.ctrlKey && !event.shiftKey;
     if ((!byWord && !this.editor.crossText.enabled() && !this.editor.selectionGestures.selecting("pointer")) || event.button !== 0 || event.metaKey || event.altKey) return;
     const target = event.target instanceof Element ? event.target : undefined;
@@ -248,8 +264,7 @@ export class CrossBlockInput {
   private cancel = () => { this.up(); this.editor.crossText.clear(); };
   private collapse(point: ViewPosition) {
     this.editor.crossText.clear(); this.up();
-    const mount = this.editor.mounts.get(point.occurrenceKey);
-    mount?.focus(); mount?.restoreInlineSelection?.({ anchor: point.boundary.index, head: point.boundary.index });
+    this.editor.focus.request(point.occurrenceKey, { caret: { start: point.boundary.index, end: point.boundary.index, direction: 'none' } });
     const node = this.editor.node(point.occurrenceKey);
     if (node) this.editor.selections.setPrimary(node.key, node.contentKey, node.viewId, point.boundary.index);
   }
@@ -260,6 +275,7 @@ export class CrossBlockInput {
     return range.getClientRects()[0] ?? mount!.focusElement.getBoundingClientRect();
   }
   private extend(direction: string) {
+    const navigation = ++this.navigation;
     const range = this.editor.crossText.range() ?? this.native(); if (!range) return false;
     const { anchor, head } = range, node = this.editor.node(head.occurrenceKey)!;
     const backwards = direction === "Left" || direction === "Up";
@@ -284,11 +300,29 @@ export class CrossBlockInput {
     }
     if (!next) {
       const siblings = this.editor.crossText.siblings(node.key), key = siblings[siblings.indexOf(node.key) + (backwards ? -1 : 1)], sibling = key ? this.editor.node(key) : undefined;
-      if (sibling?.viewType === "standoff-editor-block") {
+      if (sibling?.viewType === "standoff-editor-block" && presentationEligible(this.editor, sibling.key)) {
         next = this.editor.crossText.position(sibling.key, backwards ? sibling.inlineContent.length : 0);
         if (this.preferredX !== undefined) {
-          const rect = this.editor.mounts.get(sibling.key)?.focusElement.getBoundingClientRect();
-          if (rect) { const hit = this.at(this.preferredX, backwards ? rect.bottom - 2 : rect.top + 2); if (hit?.occurrenceKey === sibling.key) next = hit; }
+          if (!this.editor.mounts.get(sibling.key)) {
+            if (!this.editor.crossText.enabled()) return true;
+            const x = this.preferredX;
+            const current = () => {
+              const actual = this.editor.crossText.range() ?? this.native();
+              return navigation === this.navigation && actual?.head.occurrenceKey === head.occurrenceKey && actual.head.boundary.index === head.boundary.index && presentationEligible(this.editor, sibling.key);
+            };
+            void this.editor.focus.ensureRendered(sibling.key, current).then(found => {
+              if (!found || !current()) return;
+              const handle = this.editor.mounts.get(sibling.key), rect = handle?.focusElement.getBoundingClientRect();
+              const index = rect && handle?.inlinePointAt?.(x, backwards ? rect.bottom - 2 : rect.top + 2);
+              if (index !== undefined) this.select(anchor, this.editor.crossText.position(sibling.key, index));
+            });
+            return true;
+          }
+          const handle = this.editor.mounts.get(sibling.key), rect = handle?.focusElement.getBoundingClientRect();
+          // The editor has already chosen the sibling. Its line geometry is
+          // usable outside the scrollport; viewport hit-testing is not authority.
+          const index = rect && handle?.inlinePointAt?.(this.preferredX, backwards ? rect.bottom - 2 : rect.top + 2);
+          if (index !== undefined) next = this.editor.crossText.position(sibling.key, index);
         }
       }
     }
@@ -300,6 +334,10 @@ export class CrossBlockInput {
     // native; the DOM selection still represents the local part of this gesture.
     if (!this.editor.selectionGestures.selecting("keyboard") && !this.editor.crossText.range() && next.occurrenceKey === anchor.occurrenceKey && direction !== "Left" && direction !== "Right") return false;
     this.select(anchor, next);
+    if (!this.editor.mounts.get(next.occurrenceKey)) {
+      const key = next.occurrenceKey;
+      void this.editor.focus.ensureRendered(key, () => navigation === this.navigation && this.editor.crossText.range()?.head.occurrenceKey === key);
+    }
     this.editor.mounts.get(next.occurrenceKey)?.root.scrollIntoView?.({ block: "nearest" });
     return true;
   }
@@ -381,6 +419,7 @@ export class CrossBlockInput {
     }
   };
   private guard = (event: Event) => {
+    if(passiveElement(event.target))return;
     if (event.type === "dragstart" && this.drag) { this.stop(event); return; }
     if (!this.editor.crossText.range()) return;
     const target = event.target instanceof Element ? event.target : undefined;

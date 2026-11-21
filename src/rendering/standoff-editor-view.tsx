@@ -1,3 +1,9 @@
+import { QuillSurface } from '../features/quill/surface';
+import { QUILL_TYPE, validQuill, sourceRole } from '../features/quill/model';
+import {Dynamic,render} from 'solid-js/web';
+import {InlineAlternativeView} from './inline-alternative-view';
+import {InlineReadingLayout} from './inline-alternative-context';
+import {compactComposition} from "./compact-composition";
 import {observeFontLayout} from './font-layout';
 import { CharacterSurfaceHost, type CharacterSurfaceRequest } from './character-surface-host';
 import { TaskControl, StandaloneTaskDisclosure } from './task-control';
@@ -9,7 +15,7 @@ import { allocateUnderlineLane, type UnderlineLane } from "./standoff-styles";
 import type { AnnotationRange } from "../runtime/annotation-range-events";
 import { localFragment } from "../runtime/local-coordinates";
 import { immutable } from "../runtime/effect-contributions";
-import { For, Show, createEffect, createRenderEffect, createMemo, createSignal, untrack, onCleanup, onMount } from "solid-js";
+import { For, Show, useContext, getOwner, runWithOwner, createEffect, createRenderEffect, createMemo, createSignal, untrack, onCleanup, onMount } from "solid-js";
 import type { BlockNode, BlockViewProps, NodeKey } from "../block-tree/types";
 import { useReactiveView } from "../reactive-editor/context";
 import { BlockOutlet, ChildBlocks, RelationBlocks } from "./block-outlet";
@@ -49,11 +55,13 @@ function pointBoundary(root: HTMLElement, node: Node | null, offset: number): nu
       }, 0);
   }
   const element = node instanceof Element ? node : node.parentElement;
-  const cell = element?.closest<HTMLElement>("[data-inline-index]");
+  let cell = element?.closest<HTMLElement>("[data-inline-index]");
+  while(cell&&cell.parentElement!==root)cell=cell.parentElement?.closest<HTMLElement>("[data-inline-index]")??undefined;
   if (cell && root.contains(cell)) {
     const index = Number(cell.dataset.inlineIndex ?? 0);
     const projectedEnd = Number(cell.dataset.superpositionEnd);
     if (Number.isInteger(projectedEnd)) return offset > 0 ? projectedEnd + 1 : index;
+    if (cell.classList.contains("reactive-inline-alternative-cell")) return index+(offset>0?1:0);
     if (cell.classList.contains("reactive-inline-image")) return index + (offset > 0 ? 1 : 0);
     if (node.nodeType === Node.TEXT_NODE) {
       return index + [...(node.textContent ?? "").slice(0, offset)].length;
@@ -327,9 +335,22 @@ function ProjectedAlternative(props: { nodeKey: NodeKey; sourceIndex: number; so
   }}</For></span>;
 }
 
-export function StandoffEditorView(props: BlockViewProps) {
-  const { editor, projection, coordinates, activity } = useReactiveView();
+export function StandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
+  const {editor,projection}=useReactiveView();
+  const [nativeMode,setNativeMode]=createSignal(false);
+  const composition=createMemo(()=>{
+    if(!editor.features.quill)return;
+    const parent=projection.parentOf(props.nodeKey),data=parent?.payload.quill;
+    return parent?.viewType===QUILL_TYPE && validQuill(data) && Array.isArray(parent.payload.blockProperties) && parent.payload.blockProperties.some(p=>data.sources.some(s=>s.role===sourceRole(p))&&p.value===projection.state.nodes[props.nodeKey]?.payload.id) ? parent.key : undefined;
+  });
+  return <Show when={composition()} fallback={<NativeStandoffEditorView {...props}/>} keyed>{key=><Show when={!nativeMode()} fallback={<><button onClick={()=>setNativeMode(false)}>Return to SVG</button><NativeStandoffEditorView {...props}/></>}><QuillSurface nodeKey={props.nodeKey} compositionKey={key} onNative={()=>setNativeMode(true)}/></Show>}</Show>;
+}
+function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
+  const inlineParentLayout=useContext(InlineReadingLayout),viewOwner=getOwner();
+  const { editor, projection, coordinates, activity, passive } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
+  const releaseCompact = untrack(()=>projection.acquireCompactInline(props.nodeKey));
+  onCleanup(releaseCompact);
   const [draft,setDraft]=createSignal<ProvisionalCells>();
   const logical=(at:number)=>draft()?.fromPresentation(at)??at;
   const presented=(at:number)=>draft()?.toPresentation(at)??at;
@@ -341,7 +362,7 @@ export function StandoffEditorView(props: BlockViewProps) {
   const annotationKey = (annotation: StandoffAnnotation, index: number) => identities?.keys()[index]
     ? JSON.stringify([props.nodeKey,identities.keys()[index]])
     : `${props.nodeKey}:${annotation.id ?? annotation.type ?? "property"}:${index}`;
-  const rendering = createRangeRendering({registry:editor.visualEffects, events:editor.annotationEvents, nodeKey:props.nodeKey, eventsEnabled:editor.features.annotationRangeEvents, visible:source=>source.owner.kind==='annotation'||searchVisible,
+  const rendering = createRangeRendering({registry:editor.visualEffects, events:editor.annotationEvents, nodeKey:props.nodeKey, eventsEnabled:!passive && editor.features.annotationRangeEvents, visible:source=>source.owner.kind==='annotation'||searchVisible,
     sources:()=>{
       if(!editor.features.standoffPropertyRendering)return [];
       const count=node()?.inlineContent.length??0;
@@ -397,9 +418,9 @@ export function StandoffEditorView(props: BlockViewProps) {
     equals: (previous, next) => JSON.stringify(previous) === JSON.stringify(next),
   });
   const appearance = createMemo(() => blockAppearance(node()));
-  let root!: HTMLDivElement;
-  let surface!: HTMLDivElement;
-  let flow!: HTMLDivElement;
+  let root!: HTMLElement;
+  let surface!: HTMLElement;
+  let flow!: HTMLElement;
   let disposeMount: (() => void) | undefined;
   let observer: ResizeObserver | undefined;
   let visibilityObserver: IntersectionObserver | undefined;
@@ -453,6 +474,7 @@ export function StandoffEditorView(props: BlockViewProps) {
     }
   };
 
+  let inlineOverlayOffset = "";
   const measure = () => {
     frame = 0;
     if(disposed || !editor.visualEffects.alive() || activity && !activity().visible)return;
@@ -506,6 +528,7 @@ export function StandoffEditorView(props: BlockViewProps) {
     });
     const superpositionRegions: SuperpositionAnchor[] = [];
     const surfaceRect = surface.getBoundingClientRect();
+    const inlineOrigin = props.inline ? surface.getClientRects()[0] : undefined;
     for (const property of superpositions()) {
       if (property.visible === false) continue;
       const alternativeKey = node()?.ownedRelations[property.alternatives[0]];
@@ -562,6 +585,12 @@ export function StandoffEditorView(props: BlockViewProps) {
       if (position) controls.push({ owner: decoration.owner,id: decoration.id,label: decoration.excludeLabel,title: decoration.excludeTitle,...position,active: decoration.active,fragments });
     }
     rendering.measure(fragmentsFor,(start,end,height)=>allocateUnderlineLane(occupied,start,end,height));
+    // An inline containing block anchors absolutely positioned overlays at its
+    // first fragment; shared range geometry uses the union's bounding origin.
+    if (inlineOrigin) {
+      const x = `${(surfaceRect.left - inlineOrigin.left) / scale}px`, y = `${(surfaceRect.top - inlineOrigin.top) / scale}px`;
+      if (inlineOverlayOffset !== `${x},${y}`) { inlineOverlayOffset = `${x},${y}`; surface.style.setProperty('--inline-overlay-x', x); surface.style.setProperty('--inline-overlay-y', y); }
+    }
     setHighlighterShapes(highlighters);
     setForegroundShapes(foreground);
     setRegionEffects(regions);
@@ -570,10 +599,17 @@ export function StandoffEditorView(props: BlockViewProps) {
     setSelectionShapes(selected);
     setSearchShapes(search);
     setExclusions(controls);
+    // Reading text can reflow later inline readings even when their canonical
+    // content is unchanged. Reuse their existing layout owners and caches.
+    for(const cellKey of node()?.inlineContent??[]){const cell=projection.node(cellKey);if(cell?.viewType!=='inline-alternative-cell')continue;
+      for(const name of cell.payload.readings as string[])editor.mounts.get(node()!.ownedRelations[name])?.invalidateInlineLayout?.();
+    }
   };
 
   let caretSurface: ReturnType<typeof editor.caretModes.mount> | undefined;
-  const scheduleMeasure = () => {
+  const scheduleMeasure = (bubble=true) => {
+    if(bubble)inlineParentLayout?.();
+    if(props.inline)editor.measurements.invalidateRanges(props.nodeKey);
     if(disposed || !editor.visualEffects.alive())return;
     untrack(() => editor.caretModes.invalidateLayout(props.nodeKey));
     if (frame) {
@@ -616,14 +652,18 @@ export function StandoffEditorView(props: BlockViewProps) {
       });
     });
     document.addEventListener("scroll",onCandidateScroll,true);
+    const composition=projection.isCompact(props.nodeKey)?compactComposition(editor,props.nodeKey,flow,captureSelection,restoreSelection):undefined;
+    onCleanup(()=>composition?.dispose());
     disposeMount = editor.mounts.register(props.nodeKey, {
+      compactComposition:composition?.phase,
       root,
       focusElement: flow,
-      inputPolicy: "standoff",
+      inputPolicy: passive ? "opaque-widget" : "standoff",
+      invalidateInlineLayout:()=>scheduleMeasure(false),
       focus: () => flow.focus({ preventScroll: true }),
       captureInlineSelection: captureSelection,
       restoreInlineSelection: restoreSelection,
-      presentProvisional: value=>{setDraft(value);scheduleMeasure();},
+      presentProvisional: value=>{if(value&&!editor.canEditText(props.nodeKey))throw Error('Base text is protected; annotate the existing selection instead.');setDraft(value);scheduleMeasure();},
       finishProvisionalComposition:()=>{
         // Native composition can insert unowned Text nodes or alter an existing
         // text span. Reconcile within the character owner before applying the
@@ -661,19 +701,20 @@ export function StandoffEditorView(props: BlockViewProps) {
         return restoreBoundary(flow, index);
       },
       captureText: () => draft()?.text() ?? (node()?.inlineContent ?? []).map((cellKey, index) => {
+        if (projection.state.nodes[cellKey]?.viewType === 'inline-alternative-cell') return '\uFFFC';
         const projected = superpositions().some(property => property.active !== "source" && property.start <= index && property.end >= index);
         return projected
           ? String(projection.state.nodes[cellKey]?.payload.text ?? "")
           : String(flow.children[index]?.textContent ?? projection.state.nodes[cellKey]?.payload.text ?? "");
       }).join(""),
     });
-    if (editor.features.caretModes) {
+    if (!passive && editor.features.caretModes) {
       caretSurface = editor.caretModes.mount(props.nodeKey, flow, root.closest('[data-block-type="document-block"], [data-block-type="main-list-block"], [data-block-type="membrane-block"]') ?? root.parentElement ?? root, () => coordinates?.scale() ?? 1);
       caretSurface.visible((!activity || activity().visible) && typeof IntersectionObserver === "undefined");
     }
     onCleanup(observeFontLayout(surface,()=>{editor.measurements.invalidateRanges(props.nodeKey);scheduleMeasure();}));
     if (typeof ResizeObserver !== "undefined") {
-      observer = new ResizeObserver(scheduleMeasure);
+      observer = new ResizeObserver(() => scheduleMeasure());
       observer.observe(surface);
     }
     if (typeof IntersectionObserver !== "undefined") {
@@ -717,7 +758,6 @@ export function StandoffEditorView(props: BlockViewProps) {
     disposed = true;
     if(!projection.state.nodes[props.nodeKey])editor.decorations.removeOccurrence(props.nodeKey);
     document.removeEventListener("scroll",onCandidateScroll,true);
-    if (editor.crossText.segments[props.nodeKey]) queueMicrotask(() => editor.crossText.validate());
     characterHost?.dispose();
     caretSurface?.dispose();
     editor.measurements.releaseCaret(props.nodeKey);
@@ -735,13 +775,14 @@ export function StandoffEditorView(props: BlockViewProps) {
   // created after the flow element so initial cells exist before mount/selection
   // restoration, without a reactive owner for each character.
   const CharacterFlow = () => {
-    const element = (
-        <div
-          ref={flow}
+    let element!: HTMLElement;
+    const output = (
+        <Dynamic component={props.inline?'span':'div'}
+          ref={(el: HTMLElement) => { flow = el; element = el; }}
           class="reactive-standoff-flow"
-          contentEditable={!editor.crossText.segments[props.nodeKey]}
+          contentEditable={!passive && editor.canEditText(props.nodeKey) && !editor.crossText.segments[props.nodeKey]}
           tabIndex={0}
-          aria-readonly={!!editor.crossText.segments[props.nodeKey]}
+          aria-readonly={passive || !editor.canEditText(props.nodeKey) || !!editor.crossText.segments[props.nodeKey]}
           role="textbox"
           aria-multiline="true"
           spellcheck={true}
@@ -761,7 +802,7 @@ export function StandoffEditorView(props: BlockViewProps) {
                   data-inline-index={index()}
                   aria-hidden="true"
                 >{String(cell()?.payload.text ?? "")}</span>}>
-                  <Show when={projected()} fallback={<Show
+                  <Show when={projected()} fallback={<Show when={cell()?.viewType==='inline-alternative-cell'} fallback={<Show
                     when={cell()?.viewType === "image-cell"}
                     fallback={<span
                       data-inline-key={provisional()?undefined:cellKey}
@@ -793,15 +834,15 @@ export function StandoffEditorView(props: BlockViewProps) {
                           if (managedAsset(cell()?.payload.asset)) { scheduleMeasure(); return; }
                           // A cached image can finish after its transient view is disposed.
                           if (!event.currentTarget.isConnected || !cell()?.payload.src || !editor.node(cellKey)) return;
-                          editor.commands.updateInlineImage(cellKey, { status: "ready" });
+                          if(!passive)editor.commands.updateInlineImage(cellKey, { status: "ready" });
                           scheduleMeasure();
                         }}
                         onError={event => {
-                          if (event.currentTarget.isConnected && cell()?.payload.src && editor.node(cellKey)) editor.commands.updateInlineImage(cellKey, { status: "failed" });
+                          if (event.currentTarget.isConnected && cell()?.payload.src && editor.node(cellKey)) if(!passive)editor.commands.updateInlineImage(cellKey, { status: "failed" });
                         }}
                       />
                     </span>
-                  </Show>}>{property => <ProjectedAlternative
+                  </Show>}><span class="reactive-inline-alternative-cell" data-inline-key={cellKey} data-inline-index={index()} contentEditable={false} style={cellStyleAt(cellStyles(),sourceIndex())}><InlineAlternativeView hostKey={props.nodeKey} cellKey={cellKey} invalidate={scheduleMeasure}/></span></Show>}>{property => <ProjectedAlternative
                     nodeKey={node()!.ownedRelations[property().active]}
                     sourceIndex={index()}
                     sourceEnd={property().end}
@@ -812,15 +853,16 @@ export function StandoffEditorView(props: BlockViewProps) {
               );
             }}
           </For>}
-        </div>
-    ) as HTMLDivElement;
+        </Dynamic>
+    );
     if (editor.features.directDomCharacterCells) {
       const cells = new DirectCharacterCells(element, (key, status) => {
         if (managedAsset(editor.node(key)?.payload.asset)) { if (status === "ready") scheduleMeasure(); return; }
         if (!editor.node(key)?.payload.src) return;
-        editor.commands.updateInlineImage(key, { status });
+        if(!passive)editor.commands.updateInlineImage(key, { status });
         if (status === "ready") scheduleMeasure();
-      }, (image, asset) => editor.clipboard.assets.bind(image, asset));
+      }, (image, asset) => editor.clipboard.assets.bind(image, asset),
+        (element,key)=>render(()=>runWithOwner(viewOwner,()=> <InlineAlternativeView hostKey={props.nodeKey} cellKey={key} invalidate={scheduleMeasure}/>),element));
       createRenderEffect(() => {
         const owner = node();
         const styles = cellStyles();
@@ -845,6 +887,7 @@ export function StandoffEditorView(props: BlockViewProps) {
           if (property) return { key, index, classes, text: String(cell?.payload.text ?? ""),
             hiddenSource: index !== property.start,
             alternative: index === property.start ? alternatives.get(property.id) : undefined };
+          if(cell?.viewType==='inline-alternative-cell')return {key,index,text:'',slot:true,classes,style:cellStyleAt(styles,index)};
           if (cell?.viewType === "image-cell") return { key, index, classes, text: "", image: {
             asset: managedAsset(cell.payload.asset), src: String(cell.payload.src ?? ""), alt: String(cell.payload.alt ?? ""), label: String(cell.payload.alt ?? "Inline image"),
             width: cell.payload.width as number | undefined, height: cell.payload.height as number | undefined,
@@ -856,13 +899,13 @@ export function StandoffEditorView(props: BlockViewProps) {
       });
       onCleanup(() => cells.dispose());
     }
-    return element;
+    return output;
   };
 
   return (
-    <div
+    <Dynamic component={props.inline?'span':'div'}
       ref={root}
-      class={`abstract-block reactive-standoff-block ${appearance().classes.join(" ")}`}
+      class={`abstract-block reactive-standoff-block ${props.inline?'native-inline-reading':''} ${appearance().classes.join(" ")}`}
       style={appearance().style}
       classList={{ "reactive-block--focused": editor.focus.state.focusedKey === props.nodeKey, "reactive-task-row": editor.features.taskLists && taskState(node()) !== undefined, "reactive-task-row--checked": editor.features.taskLists && taskState(node()) === true }}
       data-block-id={(node()?.payload.id as string | undefined) ?? ""}
@@ -872,7 +915,13 @@ export function StandoffEditorView(props: BlockViewProps) {
       data-block-type="standoff-editor-block"
     >
       <Show when={editor.features.taskLists && taskState(node()) !== undefined}><StandaloneTaskDisclosure nodeKey={props.nodeKey} /><TaskControl nodeKey={props.nodeKey} /></Show>
-      <div ref={surface} class="reactive-standoff-surface" onClick={event => editor.gloss.click(props.nodeKey,event)} onPointerMove={hoverCandidate} onPointerLeave={() => setHovered(undefined)}>
+      <Dynamic component={props.inline?'span':'div'} ref={surface} class="reactive-standoff-surface" onClick={(event:MouseEvent) => {
+        if(editor.mounts.resolveEvent(event)?.nodeKey!==props.nodeKey)return;
+        if(!passive){editor.gloss.click(props.nodeKey,event);return;}
+        const index=Number((event.target as Element).closest<HTMLElement>('[data-inline-index]')?.dataset.inlineIndex);
+        const link=annotations().find(p=>p.type==='reference/url'&&!p.isDeleted&&p.start!==undefined&&p.end!==undefined&&p.start<=index&&p.end>=index);
+        if(link){try{const url=new URL(String(link.value));if(['http:','https:','mailto:'].includes(url.protocol)){event.preventDefault();window.open(url.href,'_blank','noopener,noreferrer');}}catch{/* Invalid links remain inert. */}}
+      }} onPointerMove={hoverCandidate} onPointerLeave={() => setHovered(undefined)}>
         <DecorationLayer class="reactive-annotation-layer reactive-annotation-layer--foreground" shapes={highlighterShapes().filter(shape=>!shape.annotationKey||legacySvgKeys().has(shape.annotationKey))} blendMode="color-dodge" />
         <DecorationLayer class="reactive-selection-layer" shapes={selectionShapes()} />
         <DecorationLayer class="reactive-selection-layer reactive-search-layer" shapes={searchShapes()} />
@@ -888,9 +937,9 @@ export function StandoffEditorView(props: BlockViewProps) {
         <RegionEffectLayer regions={regionEffects().filter(region=>activeVisualKeys().has(region.annotationKey))} />
         <NoiseLayer regions={noiseRegions().filter(region=>activeVisualKeys().has(region.annotationKey))} />
         <DecorationLayer class="reactive-annotation-layer reactive-annotation-layer--foreground" shapes={foregroundShapes().filter(shape=>!shape.annotationKey||legacySvgKeys().has(shape.annotationKey))} active={key => editor.annotationEvents.isActive(props.nodeKey,key)} />
-      </div>
+      </Dynamic>
       <RelationBlocks parentKey={props.nodeKey} />
       <ChildBlocks parentKey={props.nodeKey} />
-    </div>
+    </Dynamic>
   );
 }

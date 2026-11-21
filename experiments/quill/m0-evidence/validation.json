@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-21",
+  "milestone": "Quill M0",
+  "focusedTests": {
+    "command": "npx vitest run --maxWorkers=2 --minWorkers=1 src/features/quill src/application/quill.test.tsx",
+    "exitCode": 0,
+    "passed": 20,
+    "failed": 0,
+    "log": "m0-tests.txt"
+  },
+  "regressionTests": {
+    "command": "npx vitest run --maxWorkers=2 --minWorkers=1 src/features/quill src/application/quill.test.tsx src/application/flint-lifecycle.test.tsx src/application/flint-vault.test.tsx src/application/document-host-presentations.test.tsx src/application/desktop-applications.test.tsx src/interchange/clipboard.test.ts src/persistence/managed-desktop.test.ts src/qualification/quill",
+    "exitCode": 1,
+    "passed": 137,
+    "failed": 1,
+    "log": "tests.txt",
+    "knownBaselineFailure": {
+      "test": "flint-lifecycle.test.tsx: closes a Flint window without changing Documents or History and keeps it closed after saving",
+      "observation": "Expected zero transient projections immediately after close; observed one.",
+      "reproducedWithAllTrackedFilesAtHead": "7cabf8444f73cafd62a27cc062aba062460437f5",
+      "log": "baseline-flint-close.txt"
+    }
+  },
+  "typecheck": {
+    "command": "npm run typecheck",
+    "exitCode": 0,
+    "projects": ["tsconfig.reactive.json", "tsconfig.server.json"],
+    "log": "typecheck.txt"
+  },
+  "browser": {
+    "command": "node experiments/quill/run-m0.mjs",
+    "exitCode": 0,
+    "passed": 18,
+    "failed": 0,
+    "runtimeErrors": 0,
+    "results": "browser-results.json",
+    "screenshots": ["confirmation.png", "native-foundation.png", "textual-return.png"]
+  },
+  "newRuntimeDependencies": []
+}

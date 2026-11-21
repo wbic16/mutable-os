@@ -1,4 +1,6 @@
+import {taskChecked} from '../block-tree/layout-authoring';
 import type { BlockNode, NodeKey } from '../block-tree/types';
+import { hasBlockMode } from '../block-tree/mode-editing';
 import type { ReactiveEditor } from '../reactive-editor/editor';
 import { changeTextList, exitEmptyListItem } from './text-lists';
 
@@ -23,13 +25,14 @@ export function taskOwner(editor: ReactiveEditor, key: NodeKey): BlockNode | und
 
 export function setTaskState(editor: ReactiveEditor, key: NodeKey, checked: boolean | undefined): void {
   const node = taskOwner(editor, key) ?? editor.node(key);
-  if (!node || !['standoff-editor-block', 'container-block', 'checkbox-block'].includes(node.viewType)) return;
+  if (!node || !['standoff-editor-block', 'container-block', 'checkbox-block'].includes(node.viewType)||!editor.canEditText(node.key)) return;
+  if(checked!==undefined)taskChecked(checked);
   editor.commands.setPayloadField(node.key, 'checked', checked, checked === undefined ? 'Remove task state' : 'Toggle task completion');
 }
 
 export function toggleTask(editor: ReactiveEditor, key: NodeKey): boolean {
   const owner = taskOwner(editor, key);
-  if (!owner) return false;
+  if (!owner || !editor.canEditText(owner.key)) return false;
   setTaskState(editor, owner.key, !taskState(owner));
   return true;
 }
@@ -40,6 +43,9 @@ export function enterTask(editor: ReactiveEditor, key: NodeKey, start: number, e
   if (!editor.features.taskLists) return false;
   const source = editor.node(key), owner = taskOwner(editor, key);
   if (!source || !owner || source.viewType !== 'standoff-editor-block') return false;
+  // Task continuation can consume a compound owner or manufacture an unrelated
+  // paragraph. Let the ordinary mode-preserving Enter path handle these Blocks.
+  if (hasBlockMode(source.payload) || hasBlockMode(owner.payload)) return false;
   const projection = editor.projections.get(source.viewId)!;
   const direct = owner.key === source.key;
   if (!direct && owner.children.length === 1 && !Object.keys(owner.ownedRelations).length &&

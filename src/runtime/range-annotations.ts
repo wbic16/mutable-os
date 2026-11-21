@@ -1,5 +1,6 @@
 import type { NodeKey } from "../block-tree/types";
 import { exactTextRangeKey, type TextRangeSnapshot, type TextRanges } from "./text-ranges";
+import {standoffStyleSchema} from '../rendering/standoff-styles';
 
 export interface AnnotationReference { nodeKey: NodeKey; id: string | number }
 export interface AnnotationApplication { type: string; added: number; references: readonly AnnotationReference[] }
@@ -15,6 +16,8 @@ export class RangeAnnotations {
   constructor(private readonly ports: RangeAnnotationPorts, private readonly applied: (result: AnnotationApplication) => void = () => {}) {}
   apply(ranges: readonly TextRangeSnapshot[], type: string, value?: string, attributes: Readonly<Record<string, number | string>> = {}): AnnotationApplication {
     this.ports.ranges.validate(ranges, "cell"); // validate the whole batch before any mutation
+    const authoring=standoffStyleSchema(type)?.authoring;
+    if(authoring)value=authoring.prepare({...attributes,...(value===undefined?{}:{value})},'standoff-editor-block').value;
     const updates = new Map<string, { key: NodeKey; properties: Record<string, unknown>[]; origins:(number|null)[] }>();
     const seen = new Set<string>(), references: AnnotationReference[] = [];
     let added = 0;

@@ -1,0 +1,49 @@
+{
+  "typing": {
+    "virtualTextFlows": false,
+    "virtualItemKeysDuringTyping": 0,
+    "blockHeight": 30.296875,
+    "blockStep": 42.296875,
+    "mountMs": 6035.5,
+    "mountedElements": 29272,
+    "characterSpans": 25000,
+    "dialecticRanges": false,
+    "codeMode": "",
+    "structuredMode": "",
+    "structuredWorkersDuringTyping": 0,
+    "pdfMode": "",
+    "pdfCallsDuringTyping": 0,
+    "iiifMode": "",
+    "iiifCallsDuringTyping": 0,
+    "academicMode": "",
+    "academicRequests": 0,
+    "backlinks": false,
+    "markdownExperiment": false,
+    "presentation": "flint",
+    "sceneFramesDuringTyping": 0,
+    "characters": 25000,
+    "paragraphCharacters": 100,
+    "paragraphs": 250,
+    "edits": 40,
+    "meanMs": 5.157500000298024,
+    "medianMs": 4,
+    "p95Ms": 17.30000001192093,
+    "maxMs": 20.30000001192093,
+    "snapshots": 0,
+    "restored": true,
+    "unrelatedCellStable": true
+  },
+  "structural": {
+    "split": {
+      "splitMs": 35.59999996423721,
+      "frameMs": 145.69999998807907,
+      "undoMs": 59.60000002384186,
+      "splitSnapshots": 0,
+      "added": true,
+      "focusedRight": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    }
+  },
+  "trustedChromeInputPassed": true
+}

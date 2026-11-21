@@ -31,6 +31,7 @@ const cancelled = (signal?: AbortSignal) => { if (signal?.aborted) throw new DOM
 export async function createDurableHistorySource(repository: CanonicalRepository,
   file: { folder: string; filename: string }, identity: { resourceId: string; memoirId?: string }): Promise<DurableHistorySource> {
   const live = repository.readState();
+  if(repository.compactCanonicalText||Object.values(live.contents).some(c=>c.compactInline))throw Error('Persistent compact History enrollment is not yet qualified. Native Save and session Undo/Redo remain available.');
   if (Object.keys(live.contents).length + Object.keys(live.placements).length > DURABLE_LIMITS.maxGraphRecords) {
     throw new Error("Document graph exceeds the admitted bounded history reader size.");
   }

@@ -19,7 +19,9 @@ export function inspectCollectionNative(native:string,cavernId:string){
  const snapshot=decodeNative(bytes(native)),fragment=packageFragment(snapshot,cavernId);
  const root=fragment.blocks.find(b=>b.type==='document-block')!;
  const sources=fragment.blocks.filter(b=>isSourceType(b.type));
- const source=sources.length===1&&fragment.blocks.length===2?sources[0]:undefined;
+ // Full-document conversion now inserts one Page; retain legacy source-only Documents too.
+ const wrappers=fragment.blocks.filter(b=>b.type==='document-block'||b.type==='page-block');
+ const source=sources.length===1&&wrappers.length<=2&&fragment.blocks.length===wrappers.length+1?sources[0]:undefined;
  const assets=new Map<string,AssetManifest>();
  for(const e of fragment.embeds){const a=managedAsset(e.data.asset);if(a)assets.set(assetKey(a),a as AssetManifest);}
  const collection=(root.data.metadata as any)?.collection;

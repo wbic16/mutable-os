@@ -1,0 +1,11 @@
+.tei-milestones { padding: .4rem; border-bottom: 1px solid currentColor; }
+.tei-milestones > ol { max-height: 16rem; overflow: auto; padding-left: 1.5rem; }
+.tei-milestones li { padding: .25rem 0; }
+.tei-milestones button, .tei-definition-details button { margin: .15rem .25rem; }
+.tei-source-facts { overflow-wrap: anywhere; font-size: .9em; }
+.tei-definition-details { margin: .5rem 0; }
+/* The narrow References pane cannot reserve separate fixed heights for an
+ * expanded inventory, filters and entity rows. Keep all TEI controls reachable. */
+.gloss-reference-content.tei-reference-content { display: block; min-height: 0; overflow: auto; }
+.gloss-reference-content.tei-reference-content[hidden] { display: none; }
+.tei-reference-content .gloss-register-rows { overflow: visible; }

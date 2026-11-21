@@ -1,21 +1,26 @@
 import { registerStaticCharacterSurface } from './static-character-surface';
-import { For } from 'solid-js';
-import { rectanglePath, underlineShapes, outlineShapes } from './decorations';
+import { For, Show } from 'solid-js';
+import { rectanglePath, underlineShapes, outlineShapes, transformedUnderlinePath, transformedRegionPath } from './decorations';
 import type { EffectParams, VisualEffectRegistry, VisualEffectProps } from '../runtime/visual-effect-registry';
 
 /** Source-neutral SVG: the host supplies geometry, regardless of how its region was identified. */
 function Underline(props:VisualEffectProps){
-  return <For each={props.geometry().fragments.map((_,index)=>index)}>{index=><path
+  return <Show when={props.geometry().fragments.some(f=>!!f.matrix)} fallback={<For each={props.geometry().fragments.map((_,index)=>index)}>{index=><path
     data-property-type={props.tag}
     data-decoration-key={`${props.identity}:${index}`}
     d={(()=>{const f=props.geometry().fragments[index];return f?underlineShapes(props.identity,[f],String(props.params().color),props.geometry().offset+Number(props.params().offset)-1.5)[0].path:'';})()}
     fill="none" stroke={String(props.params().color)} stroke-width={Number(props.params().thickness)} opacity={Number(props.params().opacity)}
     stroke-dasharray={props.params().lineStyle==='dashed'?'6 3':props.params().lineStyle==='dotted'?'1 3':undefined}
     stroke-linecap={props.params().lineStyle==='dotted'?'round':'butt'}
-  />}</For>;
+  />}</For>}><path
+    data-property-type={props.tag} data-decoration-key={props.identity}
+    d={transformedUnderlinePath(props.geometry().fragments,props.geometry().offset+Number(props.params().offset))}
+    fill="none" stroke={String(props.params().color)} stroke-width={Number(props.params().thickness)} opacity={Number(props.params().opacity)}
+    stroke-dasharray={props.params().lineStyle==='dashed'?'6 3':props.params().lineStyle==='dotted'?'1 3':undefined}
+    stroke-linecap={props.params().lineStyle==='dotted'?'round':'butt'}/></Show>;
 }
 function Region(props:VisualEffectProps) {
-  return <For each={props.geometry().fragments.map((_,index)=>index)}>{index=><path
+  return <Show when={props.geometry().fragments.some(f=>!!f.matrix)} fallback={<For each={props.geometry().fragments.map((_,index)=>index)}>{index=><path
     data-property-type={props.tag}
     data-decoration-key={`${props.identity}:${index}`}
     d={props.geometry().fragments[index] ? (props.params().outline ? outlineShapes(props.identity,[props.geometry().fragments[index]],String(props.params().color))[0].path : rectanglePath(props.geometry().fragments[index])) : ''}
@@ -23,7 +28,11 @@ function Region(props:VisualEffectProps) {
     stroke={props.params().outline ? String(props.params().color) : 'none'}
     stroke-dasharray={props.params().outline?'10 10':undefined} classList={{'reactive-decoration--marching':!!props.params().outline}}
     stroke-width={Number(props.params().thickness)} opacity={Number(props.params().opacity)}
-  />}</For>;
+  />}</For>}><path
+    data-property-type={props.tag} data-decoration-key={props.identity} d={transformedRegionPath(props.geometry().fragments)}
+    fill={props.params().outline?'none':String(props.params().color)} stroke={props.params().outline?String(props.params().color):'none'}
+    stroke-width={Number(props.params().thickness)} opacity={Number(props.params().opacity)}
+    stroke-dasharray={props.params().outline?'10 10':undefined} classList={{'reactive-decoration--marching':!!props.params().outline}}/></Show>;
 }
 function finite(params:EffectParams,key:string,min:number,max:number){const n=params[key];if(typeof n!=='number'||!Number.isFinite(n)||n<min||n>max)throw Error(`Invalid renderer parameter ${key}`);}
 export function registerVisualEffectRenderers(registry:VisualEffectRegistry){

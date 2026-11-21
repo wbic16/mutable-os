@@ -1,0 +1,23 @@
+{
+  "model": "text-embedding-3-small",
+  "dimensions": 1536,
+  "endpoint": "https://api.openai.com/v1/embeddings",
+  "manifestHash": "12ffb3e0c587d91542c36a0463ef68bea60eeb21c6de8d0d61f1a8e32295fbe3",
+  "cap": 50000,
+  "reservedTokens": 10027,
+  "receipts": [
+    {
+      "httpStatus": 200,
+      "requestId": "req_be995754156a48dc81a9b8fca45d24af",
+      "durationMs": 3378.488167,
+      "usage": {
+        "prompt_tokens": 10027,
+        "total_tokens": 10027
+      },
+      "model": "text-embedding-3-small"
+    }
+  ],
+  "status": "complete",
+  "actualTokens": 10027,
+  "estimatedActualUsd": 0.00020054
+}

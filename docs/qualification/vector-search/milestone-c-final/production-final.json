@@ -1,0 +1,69 @@
+{
+  "utc": "2026-11-14T05:27:53.153Z",
+  "webStatus": 200,
+  "cavern": {
+    "Success": true,
+    "Data": {
+      "current": {
+        "path": "/Users/iianneill/Documents/GitHub/speedy-ts-reactive/vaults/imported",
+        "name": "imported",
+        "cavernGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "session": "0c0f9927-c95f-4f76-acf6-a7745caad66b"
+      },
+      "recentCaverns": [
+        {
+          "path": "/Users/iianneill/Documents/GitHub/speedy-ts-reactive/vaults/imported",
+          "name": "imported",
+          "cavernGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024"
+        }
+      ],
+      "index": {
+        "session": "5b87beee-63de-44ff-b87d-909394e806d7",
+        "vault": ".",
+        "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "epoch": 1,
+        "readOnly": false,
+        "pending": true,
+        "coverage": {
+          "state": "unknown",
+          "complete": false,
+          "diagnostics": [
+            "Saved reconciliation pending"
+          ]
+        }
+      }
+    }
+  },
+  "retrieval": {
+    "Success": true,
+    "Data": {
+      "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+      "decision": "enabled",
+      "provider": {
+        "kind": "hosted",
+        "name": "OpenAI",
+        "model": "text-embedding-3-small",
+        "configured": true,
+        "localAvailable": false
+      },
+      "documents": true,
+      "queries": true,
+      "documentTokens": 50000,
+      "queryTokens": 5000,
+      "documentTokensUsed": 50000,
+      "queryTokensUsed": 0,
+      "index": {
+        "complete": false,
+        "state": "indexing",
+        "total": 2314,
+        "processed": 853,
+        "failed": 514
+      },
+      "indexed": 347,
+      "known": 2314,
+      "error": "",
+      "coverage": "Saved Documents only; unsaved content is not covered",
+      "reauthorizationRequired": false
+    }
+  }
+}

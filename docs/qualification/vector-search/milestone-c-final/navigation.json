@@ -1,0 +1,77 @@
+{
+  "results": [
+    {
+      "query": "Prince Prospero",
+      "navigationError": "",
+      "error": "",
+      "phase": "cancelled",
+      "alive": false,
+      "opened": true,
+      "mountedTarget": true,
+      "visible": true,
+      "selection": {
+        "anchor": 0,
+        "head": 178
+      },
+      "expected": {
+        "runOrdinal": 0,
+        "blockGuid": "d08e16ea-478e-4137-9068-189d7b75330b",
+        "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+        "coordinate": "cell",
+        "occurrence": [
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:0740ac5a-6122-4147-bcf9-05310afd4e72"
+        ],
+        "contribution": null,
+        "start": 0,
+        "end": 178,
+        "runStart": 0,
+        "runEnd": 178,
+        "chunkStart": 0,
+        "chunkEnd": 178,
+        "textHash": "e7ac005e4c88ac027c3bfe89904be19a09f615b021744dd8f411b4fd62429652"
+      },
+      "ms": 6131.900000095367
+    },
+    {
+      "query": "dominion",
+      "navigationError": "",
+      "error": "",
+      "phase": "cancelled",
+      "alive": false,
+      "opened": true,
+      "mountedTarget": true,
+      "visible": true,
+      "selection": {
+        "anchor": 0,
+        "head": 419
+      },
+      "expected": {
+        "runOrdinal": 0,
+        "blockGuid": "a3e823e6-47cd-43d3-99e8-af223ba7f42a",
+        "resourceId": "5de5c3e7-983d-4467-829e-46cbdbe52b53",
+        "coordinate": "cell",
+        "occurrence": [
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:07912934-22fd-4bb0-ad76-9f0a736d739c",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:b25c6194-293a-4f3d-8a4c-ed3fb7e1d77b",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:a100bdc3-cbf9-432b-bd4c-047fbc2de2d3",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:428d9332-7c75-4e4d-b964-491bb3e2a3a7",
+          "legacy:5de5c3e7-983d-4467-829e-46cbdbe52b53:placement:e84a94ce-3e40-4a52-92c2-412b623a533e"
+        ],
+        "contribution": null,
+        "start": 0,
+        "end": 419,
+        "runStart": 0,
+        "runEnd": 419,
+        "chunkStart": 0,
+        "chunkEnd": 419,
+        "textHash": "02761ca251c8abd9563be9feb555b2d0290d5ca75d9fca9295f1a3ec0f379726"
+      },
+      "ms": 2306.7000000476837
+    }
+  ],
+  "errors": []
+}

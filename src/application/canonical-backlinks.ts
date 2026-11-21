@@ -1,3 +1,4 @@
+import {contentLength,contentSlice} from "../block-tree/inline-sequence";
 import { createEffect, createRoot, untrack } from 'solid-js';
 import type { CanonicalRepository, RepositoryChange } from '../block-tree/repository';
 import { documentRootPlacements } from '../block-tree/resource-registration';
@@ -126,7 +127,7 @@ export class CanonicalBacklinks implements BacklinksService {
         if (resolved.type !== 'codex/block-reference') continue;
         if (typeof property.annotationId === 'string' && (!owner || owner.key !== source.key || !linkedRegistry(state, owner.key)[property.annotationId])) { warn('Foreign or unresolved linked reference omitted.'); continue; }
         const start = Number(resolved.start), end = Number(resolved.end) + 1;
-        if (typeof resolved.start !== 'number' || typeof resolved.end !== 'number' || c.inlineKind !== 'standoff' || !blockId || typeof resolved.value !== 'string' || !resolved.value || !Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end <= start || end > c.inlineContent.length || typeof property.id !== 'string' || !property.id) { warn('Unsupported reference form/range omitted.'); continue; }
+        if (typeof resolved.start !== 'number' || typeof resolved.end !== 'number' || c.inlineKind !== 'standoff' || !blockId || typeof resolved.value !== 'string' || !resolved.value || !Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end <= start || end > contentLength(c) || typeof property.id !== 'string' || !property.id) { warn('Unsupported reference form/range omitted.'); continue; }
         const docId = (resolved.metadata as any)?.documentId;
         if (docId !== undefined && typeof docId !== 'string') { warn('Unsupported Document identity omitted.'); continue; }
         const id = JSON.stringify([source.documentId, property.annotationId ? 'linked' : blockId, property.annotationId ?? property.id]);
@@ -135,9 +136,9 @@ export class CanonicalBacklinks implements BacklinksService {
         if (mention && (mention.value !== resolved.value || mention.documentId !== docId || !property.annotationId)) { warn('Ambiguous mention identity omitted.'); groups.delete(id); invalidMentions.add(id); continue; }
         if (!mention) { mention = {id, value: resolved.value, documentId: docId, ranges: [], snippet: ''}; groups.set(id, mention); }
         // Bound snippets without rebuilding whole paragraphs or touching editable DOM.
-        const from = Math.max(0, start - 20), to = Math.min(c.inlineContent.length, end + 35, start + 120);
+        const from = Math.max(0, start - 20), to = Math.min(contentLength(c), end + 35, start + 120);
         cells += to - from; if (cells > 250000) { warn('Snippet inspection limited to 250,000 Cells.'); break traversal; }
-        const snippet = c.inlineContent.slice(from, to).map(k => state.contents[state.placements[k]?.contentKey]?.payload.text ?? '[inline object]').join('');
+        const snippet = contentSlice(state,c,from,to).map(a=>a.kind==='text'?a.text:'[inline object]').join('');
         if (!mention.snippet) mention.snippet = snippet;
         if (!mention.ranges.some(r => r.contentKey === c.key && r.start === start && r.end === end)) mention.ranges.push({blockId, contentKey: c.key, start, end});
         if (groups.size >= 1000) { warn('Mention inspection limited to 1,000 entries.'); break traversal; }

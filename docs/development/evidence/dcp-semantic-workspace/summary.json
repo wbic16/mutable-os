@@ -1,0 +1,419 @@
+[
+  {
+    "exchange": 1,
+    "participant": "agent-A",
+    "prompt": "What makes a historical object authentic? I am especially interested in whether original material or continuity of history matters more. Keep your answer concise.",
+    "continuity": false,
+    "started": 1794360015796,
+    "identityMap": {},
+    "annotationRefs": [
+      {
+        "blockId": "0bdb89e8-f97f-4577-8ff7-b9fc02ae188a",
+        "propertyId": "762f3be2-a62d-41dd-8c7f-993237bee09c"
+      },
+      {
+        "blockId": "0bdb89e8-f97f-4577-8ff7-b9fc02ae188a",
+        "propertyId": "31b11433-a04e-4c4f-bf0e-a8bfbffe1e0c"
+      },
+      {
+        "blockId": "0bdb89e8-f97f-4577-8ff7-b9fc02ae188a",
+        "propertyId": "e72a28b0-44f1-4c73-81f0-2b6eefba9154"
+      },
+      {
+        "blockId": "0bdb89e8-f97f-4577-8ff7-b9fc02ae188a",
+        "propertyId": "b5554e54-1a15-4aee-8a6c-b97e680b7c31"
+      }
+    ],
+    "admitted": true,
+    "elapsedMs": 5787,
+    "repaired": false,
+    "diagnostics": {
+      "visited": 0,
+      "characters": 0,
+      "reads": 0,
+      "searches": 0,
+      "inventories": 0,
+      "inventoryVisited": 0,
+      "inventoryPreviewCells": 0,
+      "entitySearches": 0,
+      "entityCandidates": 0,
+      "workspaceBytes": 514
+    },
+    "workspace": {
+      "version": 1,
+      "scope": "current-document",
+      "resourceId": "11111111-1111-4111-8111-111111111111",
+      "forParticipant": "agent-A",
+      "authority": "current-exchange-only",
+      "coverage": {
+        "status": "partial",
+        "completeRegistry": false,
+        "candidates": 0,
+        "projected": 0,
+        "unavailable": 0,
+        "bytes": 514,
+        "limit": 8192
+      },
+      "entities": [],
+      "arguments": [],
+      "relationships": [],
+      "glosses": [],
+      "classifications": [],
+      "sourceLocations": [],
+      "omissions": [
+        "Selected working set; discover additional identities with search_entities and passages with native source tools."
+      ]
+    },
+    "usage": [
+      {
+        "input_tokens": 16346,
+        "output_tokens": 239,
+        "total_tokens": 16585
+      }
+    ],
+    "entities": [],
+    "glosses": [],
+    "tools": []
+  },
+  {
+    "exchange": 2,
+    "participant": "agent-A",
+    "prompt": "Suppose a museum restores a damaged object using some modern material, but has an excellent record of where it came from. How would you assess that case?",
+    "continuity": false,
+    "started": 1794360021607,
+    "identityMap": {
+      "new:e1": {
+        "kind": "entity",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "entity": {
+          "scope": "document",
+          "resourceId": "11111111-1111-4111-8111-111111111111",
+          "entityId": "43080803-b114-4f6e-be44-d5ffad2714f8"
+        }
+      },
+      "new:e2": {
+        "kind": "entity",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "entity": {
+          "scope": "document",
+          "resourceId": "11111111-1111-4111-8111-111111111111",
+          "entityId": "c0460c37-c282-42c0-99c0-743db3141fe6"
+        }
+      },
+      "new:e3": {
+        "kind": "entity",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "entity": {
+          "scope": "document",
+          "resourceId": "11111111-1111-4111-8111-111111111111",
+          "entityId": "bf576b73-612d-4e45-9636-4bdc784ed0c9"
+        }
+      },
+      "new:e4": {
+        "kind": "entity",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "entity": {
+          "scope": "document",
+          "resourceId": "11111111-1111-4111-8111-111111111111",
+          "entityId": "581ee0ee-6379-43eb-8db3-76fe55f69394"
+        }
+      },
+      "new:rel1": {
+        "kind": "entity-relation",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "definitionId": "37c87fbb-653c-486a-a963-7cc0714f4cad"
+      },
+      "new:rel2": {
+        "kind": "entity-relation",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "definitionId": "3a88a9b1-5bd2-43af-9619-18877fa644b8"
+      },
+      "new:rel3": {
+        "kind": "entity-relation",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "definitionId": "5599e9e9-e7e0-4af6-9b1d-f7a522ed4db1"
+      }
+    },
+    "annotationRefs": [
+      {
+        "blockId": "817f3e40-3431-467f-8beb-f78fd39c22ae",
+        "propertyId": "17912b5d-959d-483d-b0ee-5e9aee6d2038"
+      },
+      {
+        "blockId": "c282d3a2-8129-4e3a-ba87-b523eabe1d1b",
+        "propertyId": "1d8782d4-6301-43c0-a718-27f94926c8be"
+      }
+    ],
+    "admitted": true,
+    "elapsedMs": 11707,
+    "repaired": false,
+    "diagnostics": {
+      "visited": 0,
+      "characters": 0,
+      "reads": 0,
+      "searches": 0,
+      "inventories": 0,
+      "inventoryVisited": 0,
+      "inventoryPreviewCells": 0,
+      "entitySearches": 0,
+      "entityCandidates": 0,
+      "workspaceBytes": 514
+    },
+    "workspace": {
+      "version": 1,
+      "scope": "current-document",
+      "resourceId": "11111111-1111-4111-8111-111111111111",
+      "forParticipant": "agent-A",
+      "authority": "current-exchange-only",
+      "coverage": {
+        "status": "partial",
+        "completeRegistry": false,
+        "candidates": 0,
+        "projected": 0,
+        "unavailable": 0,
+        "bytes": 514,
+        "limit": 8192
+      },
+      "entities": [],
+      "arguments": [],
+      "relationships": [],
+      "glosses": [],
+      "classifications": [],
+      "sourceLocations": [],
+      "omissions": [
+        "Selected working set; discover additional identities with search_entities and passages with native source tools."
+      ]
+    },
+    "usage": [
+      {
+        "input_tokens": 16323,
+        "output_tokens": 529,
+        "total_tokens": 16852
+      }
+    ],
+    "entities": [
+      {
+        "id": "new:e1",
+        "name": "authenticity",
+        "typename": "Concept",
+        "description": "The quality of an object being genuine or faithful to its historical identity, which may involve material, historical and interpretive dimensions.",
+        "aliases": []
+      },
+      {
+        "id": "new:e2",
+        "name": "provenance",
+        "typename": "Concept",
+        "description": "The documented history of ownership, custody or origin of an object.",
+        "aliases": []
+      },
+      {
+        "id": "new:e3",
+        "name": "material authenticity",
+        "typename": "Concept",
+        "description": "Authenticity assessed in terms of the survival and integrity of an object's original material substance.",
+        "aliases": []
+      },
+      {
+        "id": "new:e4",
+        "name": "documentary authenticity",
+        "typename": "Concept",
+        "description": "Authenticity grounded in reliable records and documentation about an object's history and identity.",
+        "aliases": []
+      }
+    ],
+    "glosses": [],
+    "tools": []
+  },
+  {
+    "exchange": 3,
+    "participant": "agent-B",
+    "prompt": "Could a reconstruction ever preserve something important that the original material no longer does? Relate that to the criteria we have been discussing.",
+    "continuity": false,
+    "started": 1794360033340,
+    "identityMap": {
+      "new:r100001": {
+        "kind": "range",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "anchorId": "2ff97466-c033-436d-8b57-448653f5e9c4"
+      },
+      "new:arg1": {
+        "kind": "argument",
+        "resourceId": "11111111-1111-4111-8111-111111111111",
+        "argumentId": "e1009a92-d70f-4085-96eb-9de353805a36"
+      }
+    },
+    "annotationRefs": [
+      {
+        "blockId": "6b706387-ec46-424e-ad56-4a260cac4e56",
+        "propertyId": "61b94415-1a14-441f-990b-589b256fb332"
+      },
+      {
+        "blockId": "6b706387-ec46-424e-ad56-4a260cac4e56",
+        "propertyId": "b0dcf4c8-bc13-4f90-91ae-c31f1ae7e11a"
+      },
+      {
+        "blockId": "99665919-9ccb-4be1-92f2-fb5b4331dace",
+        "propertyId": "aada1df8-988d-439b-ba55-9a3ffdda0060"
+      },
+      {
+        "blockId": "99665919-9ccb-4be1-92f2-fb5b4331dace",
+        "propertyId": "391d0914-b183-4ee3-9832-bd2e5e171127"
+      },
+      {
+        "blockId": "99665919-9ccb-4be1-92f2-fb5b4331dace",
+        "propertyId": "974f4ed2-c276-4598-b32b-925121d620d0"
+      },
+      {
+        "blockId": "4a60abf2-fed8-4fd6-a986-c90319536740",
+        "propertyId": "a1f3b5d1-54a6-474a-b417-ebc22e2f74fe"
+      },
+      {
+        "blockId": "d12a85cf-6159-46b9-87ea-fac326eb066b",
+        "propertyId": "1482a210-eb65-4f3f-a0fd-d0808323931e"
+      },
+      {
+        "blockId": "353fb5f2-caf4-4a1e-8410-c5ae4cf8d437",
+        "propertyId": "e64f5bf6-8e6b-476b-a13f-d8d46d1ee209"
+      },
+      {
+        "blockId": "353fb5f2-caf4-4a1e-8410-c5ae4cf8d437",
+        "propertyId": "7d9972c6-07fa-4331-8aee-d4af56e33be6"
+      }
+    ],
+    "admitted": true,
+    "elapsedMs": 13512,
+    "repaired": false,
+    "diagnostics": {
+      "visited": 0,
+      "characters": 0,
+      "reads": 0,
+      "searches": 0,
+      "inventories": 0,
+      "inventoryVisited": 0,
+      "inventoryPreviewCells": 0,
+      "entitySearches": 0,
+      "entityCandidates": 0,
+      "workspaceBytes": 2767
+    },
+    "workspace": {
+      "version": 1,
+      "scope": "current-document",
+      "resourceId": "11111111-1111-4111-8111-111111111111",
+      "forParticipant": "agent-B",
+      "authority": "current-exchange-only",
+      "coverage": {
+        "status": "partial",
+        "completeRegistry": false,
+        "candidates": 7,
+        "projected": 7,
+        "unavailable": 0,
+        "bytes": 2767,
+        "limit": 8192
+      },
+      "entities": [
+        {
+          "handle": "src:v_IZJhGeHf6k50xssxrMtA:e3",
+          "identity": {
+            "scope": "document",
+            "resourceId": "11111111-1111-4111-8111-111111111111",
+            "entityId": "43080803-b114-4f6e-be44-d5ffad2714f8"
+          },
+          "revision": 0,
+          "name": "authenticity",
+          "typename": "Concept",
+          "description": "The quality of an object being genuine or faithful to its historical identity, which may involve material, historical and interpretive dimensions.",
+          "aliases": [],
+          "omissions": []
+        },
+        {
+          "handle": "src:v_IZJhGeHf6k50xssxrMtA:e4",
+          "identity": {
+            "scope": "document",
+            "resourceId": "11111111-1111-4111-8111-111111111111",
+            "entityId": "581ee0ee-6379-43eb-8db3-76fe55f69394"
+          },
+          "revision": 0,
+          "name": "documentary authenticity",
+          "typename": "Concept",
+          "description": "Authenticity grounded in reliable records and documentation about an object's history and identity.",
+          "aliases": [],
+          "omissions": []
+        },
+        {
+          "handle": "src:v_IZJhGeHf6k50xssxrMtA:e6",
+          "identity": {
+            "scope": "document",
+            "resourceId": "11111111-1111-4111-8111-111111111111",
+            "entityId": "bf576b73-612d-4e45-9636-4bdc784ed0c9"
+          },
+          "revision": 0,
+          "name": "material authenticity",
+          "typename": "Concept",
+          "description": "Authenticity assessed in terms of the survival and integrity of an object's original material substance.",
+          "aliases": [],
+          "omissions": []
+        },
+        {
+          "handle": "src:v_IZJhGeHf6k50xssxrMtA:e8",
+          "identity": {
+            "scope": "document",
+            "resourceId": "11111111-1111-4111-8111-111111111111",
+            "entityId": "c0460c37-c282-42c0-99c0-743db3141fe6"
+          },
+          "revision": 0,
+          "name": "provenance",
+          "typename": "Concept",
+          "description": "The documented history of ownership, custody or origin of an object.",
+          "aliases": [],
+          "omissions": []
+        }
+      ],
+      "arguments": [],
+      "relationships": [
+        {
+          "handle": "src:v_IZJhGeHf6k50xssxrMtA:er5",
+          "nativeId": "5599e9e9-e7e0-4af6-9b1d-f7a522ed4db1",
+          "kind": "entity",
+          "relation": "includes-dimension",
+          "from": "src:v_IZJhGeHf6k50xssxrMtA:e3",
+          "to": "src:v_IZJhGeHf6k50xssxrMtA:e4",
+          "author": "agent-A"
+        },
+        {
+          "handle": "src:v_IZJhGeHf6k50xssxrMtA:er7",
+          "nativeId": "3a88a9b1-5bd2-43af-9619-18877fa644b8",
+          "kind": "entity",
+          "relation": "includes-dimension",
+          "from": "src:v_IZJhGeHf6k50xssxrMtA:e3",
+          "to": "src:v_IZJhGeHf6k50xssxrMtA:e6",
+          "author": "agent-A"
+        },
+        {
+          "handle": "src:v_IZJhGeHf6k50xssxrMtA:er9",
+          "nativeId": "37c87fbb-653c-486a-a963-7cc0714f4cad",
+          "kind": "entity",
+          "relation": "distinguishes",
+          "from": "src:v_IZJhGeHf6k50xssxrMtA:e3",
+          "to": "src:v_IZJhGeHf6k50xssxrMtA:e8",
+          "author": "agent-A"
+        }
+      ],
+      "glosses": [],
+      "classifications": [],
+      "sourceLocations": [],
+      "omissions": [
+        "Selected working set; discover additional identities with search_entities and passages with native source tools."
+      ]
+    },
+    "usage": [
+      {
+        "input_tokens": 17090,
+        "output_tokens": 808,
+        "total_tokens": 17898
+      }
+    ],
+    "entities": [],
+    "glosses": [],
+    "tools": []
+  }
+]

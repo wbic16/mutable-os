@@ -1,0 +1,324 @@
+{
+  "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(report.remark.tools.some(t=>t.call.tool==='read_source'))\n",
+  "correctEarlierBlockIds": 11,
+  "remark": {
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "18b08b28-ac3e-4128-9100-bfc380433468",
+      "intent": "reply",
+      "replyTargets": [
+        "source-25f64acc-3e72-457a-b23c-c9de1a3a6cd1"
+      ],
+      "composition": [
+        {
+          "id": "p1",
+          "kind": "paragraph",
+          "markup": "Done.",
+          "ranges": []
+        }
+      ],
+      "anchors": [
+        {
+          "id": "a1",
+          "source": "source-25f64acc-3e72-457a-b23c-c9de1a3a6cd1",
+          "revision": "9b4d8a00-f19c-4975-9005-fb533b8d83ed",
+          "selector": {
+            "exact": "Attach a remark to my first TextBlock: \"This is a test remark from OpenAI.\" Use a Gloss of type remark on its original text, and a discursive reference to that Block. Keep the response short.",
+            "prefix": "",
+            "suffix": ""
+          }
+        }
+      ],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [
+        {
+          "id": "g1",
+          "target": "a1",
+          "type": "remark",
+          "text": "This is a test remark from OpenAI."
+        }
+      ],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "tools": [],
+    "receipt": {
+      "version": 1,
+      "binding": "52ef0610b492ed2bd217a6173e8b5c3cf2fed8c6fbfe9b7bb8ddacc464fb986e",
+      "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+      "generation": 1,
+      "conversationId": "conv_6aefb96f9c888195bc705547bc0d0ad50aedff2355f37a1a",
+      "exchangeId": "18b08b28-ac3e-4128-9100-bfc380433468"
+    },
+    "attempts": [
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0aedff2355f37a1a006aefb97c660881959f2727fea0f5c834",
+          "startedUtc": "2026-11-07T23:51:23.401Z",
+          "completedUtc": "2026-11-07T23:51:27.077Z",
+          "usage": {
+            "input_tokens": 16300,
+            "output_tokens": 234,
+            "total_tokens": 16534
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": [],
+        "repair": "Error: Unauthorized source handle",
+        "rejectedResponse": "{\"protocol\":\"dcp/1.0\",\"kind\":\"contribution\",\"exchange\":\"18b08b28-ac3e-4128-9100-bfc380433468\",\"intent\":\"reply\",\"replyTargets\":[\"source-25f64acc-3e72-457a-b23c-c9de1a3a6cd1\"],\"composition\":[{\"id\":\"p1\",\"kind\":\"paragraph\",\"markup\":\"Done.\",\"ranges\":[]}],\"anchors\":[{\"id\":\"a1\",\"source\":\"source-2929d779-e0fe-42b3-9e53-3c790cf0aa3c\",\"revision\":\"c41fe6b5-e2eb-458f-b7a8-ea707781204f\",\"selector\":{\"exact\":\"Our first sample concerns a garden.\",\"prefix\":\"\",\"suffix\":\"\"}}],\"entities\":[],\"interpretations\":[],\"arguments\":[],\"glosses\":[{\"id\":\"g1\",\"target\":\"a1\",\"type\":\"remark\",\"text\":\"This is a test remark from OpenAI.\"}],\"relations\":[],\"suggestions\":[],\"promotionRecommendations\":[]}"
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0aedff2355f37a1a006aefb97f8710819590803ecd50401818",
+          "startedUtc": "2026-11-07T23:51:27.205Z",
+          "completedUtc": "2026-11-07T23:51:29.981Z",
+          "usage": {
+            "input_tokens": 16637,
+            "output_tokens": 273,
+            "total_tokens": 16910
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": []
+      }
+    ],
+    "sourceId": "630c9d7b-1001-4e43-8e26-7098b2efe212",
+    "sourceText": "Our first sample concerns a garden.",
+    "sourceProtected": true,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "elapsedMs": 8932.199999988079,
+    "commitMs": 16.899999976158142
+  },
+  "outgoingBytes": 112689,
+  "unauthorizedReadWithoutRecovery": {
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "ccad88e8-c9be-497a-b51c-fc667a8c1dc4",
+      "intent": "reply",
+      "replyTargets": [
+        "source-77c881f4-fc9d-44a1-b79a-88018c1905ac"
+      ],
+      "composition": [
+        {
+          "id": "p1",
+          "kind": "paragraph",
+          "markup": "I can\u2019t attach that remark to the first TextBlock from here because the required fresh source handle for that block isn\u2019t available in this exchange.",
+          "ranges": []
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "tools": [
+      {
+        "call": {
+          "id": "provider-1-0",
+          "tool": "read_source",
+          "arguments": {
+            "handle": "source-6fb65316-b17d-4e64-a99a-a6123ebe6521"
+          }
+        },
+        "result": {
+          "status": "unauthorized",
+          "handle": "source-6fb65316-b17d-4e64-a99a-a6123ebe6521"
+        }
+      }
+    ],
+    "receipt": {
+      "version": 1,
+      "binding": "fcb6eefcb4a60adfdc6b024d1dd860cf483fb5a12acb75331001603cb84a5392",
+      "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+      "generation": 1,
+      "conversationId": "conv_6aefb9ef1a508197811ef7571edc880b080aa129fa7f7df7",
+      "exchangeId": "ccad88e8-c9be-497a-b51c-fc667a8c1dc4"
+    },
+    "attempts": [
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_080aa129fa7f7df7006aefb9fa55108197898d28625899eba3",
+          "startedUtc": "2026-11-07T23:53:30.036Z",
+          "completedUtc": "2026-11-07T23:53:32.229Z",
+          "usage": {
+            "input_tokens": 16768,
+            "output_tokens": 39,
+            "total_tokens": 16807
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [
+          {
+            "id": "call_mX2jiqzz9FAZxMQufDwVZf1P",
+            "tool": "read_source",
+            "arguments": {
+              "handle": "source-6fb65316-b17d-4e64-a99a-a6123ebe6521"
+            }
+          }
+        ],
+        "toolResultIds": [
+          "provider-1-0"
+        ]
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_080aa129fa7f7df7006aefb9fc918c8197a5ba661601bcdade",
+          "startedUtc": "2026-11-07T23:53:32.232Z",
+          "completedUtc": "2026-11-07T23:53:35.205Z",
+          "usage": {
+            "input_tokens": 16849,
+            "output_tokens": 160,
+            "total_tokens": 17009
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": []
+      }
+    ],
+    "sourceId": "ee16b895-e53b-4c7a-bfd0-0c65e5d0e763",
+    "sourceText": "Our first sample concerns a garden.",
+    "sourceProtected": true,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "elapsedMs": 7827.399999976158,
+    "commitMs": 46.09999996423721
+  },
+  "relativeTargetOmission": {
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "e7cefb80-e92e-4308-be45-b7aaac4111d1",
+      "intent": "reply",
+      "replyTargets": [
+        "source-0b17bc4c-02f0-4f67-a410-6ed52fd75b03"
+      ],
+      "composition": [
+        {
+          "id": "p1",
+          "kind": "paragraph",
+          "markup": "Noted.",
+          "ranges": []
+        }
+      ],
+      "anchors": [
+        {
+          "id": "a1",
+          "source": "source-46b13ec0-8dec-428a-bef4-a958a460ea41",
+          "revision": "7c757b72-7017-430d-8e18-c036b61af883",
+          "selector": {
+            "exact": "Attach a remark to my first TextBlock: \"This is a test remark from OpenAI.\" Use a Gloss of type remark on its original text, and a discursive reference to that Block. Keep the response short.",
+            "prefix": "",
+            "suffix": ""
+          }
+        }
+      ],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [
+        {
+          "id": "g1",
+          "target": "a1",
+          "type": "remark",
+          "text": "This is a test remark from OpenAI."
+        }
+      ],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "tools": [],
+    "receipt": {
+      "version": 1,
+      "binding": "0bd6740d572a5395694f769ead214e15123356310ddc684ec04c93f94be6169c",
+      "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+      "generation": 1,
+      "conversationId": "conv_6aefba667f508190b54f74c6ce8706070eeace7d6badeda9",
+      "exchangeId": "e7cefb80-e92e-4308-be45-b7aaac4111d1"
+    },
+    "attempts": [
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0eeace7d6badeda9006aefba718870819081d264a907a4db78",
+          "startedUtc": "2026-11-07T23:55:29.239Z",
+          "completedUtc": "2026-11-07T23:55:31.570Z",
+          "usage": {
+            "input_tokens": 16528,
+            "output_tokens": 248,
+            "total_tokens": 16776
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": [],
+        "repair": "Error: Unauthorized source handle",
+        "rejectedResponse": "{\"protocol\":\"dcp/1.0\",\"kind\":\"contribution\",\"exchange\":\"e7cefb80-e92e-4308-be45-b7aaac4111d1\",\"intent\":\"reply\",\"replyTargets\":[\"source-0b17bc4c-02f0-4f67-a410-6ed52fd75b03\"],\"composition\":[{\"id\":\"p1\",\"kind\":\"paragraph\",\"markup\":\"Noted.\",\"ranges\":[]}],\"anchors\":[{\"id\":\"a1\",\"source\":\"source-2dfe19be-5bd9-46f3-be80-e32a382363c1\",\"revision\":\"cf43f5f6-2224-4b92-bb14-6b72620cb88b\",\"selector\":{\"exact\":\"Tell me what text blocks you can see. List the starting few words and block GUID.\",\"prefix\":\"\",\"suffix\":\"\"}}],\"entities\":[],\"interpretations\":[],\"arguments\":[],\"glosses\":[{\"id\":\"g1\",\"target\":\"a1\",\"type\":\"remark\",\"text\":\"This is a test remark from OpenAI.\"}],\"relations\":[],\"suggestions\":[],\"promotionRecommendations\":[]}"
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17",
+          "responseId": "resp_0eeace7d6badeda9006aefba741f6081908bdc651ddaae5e61",
+          "startedUtc": "2026-11-07T23:55:31.734Z",
+          "completedUtc": "2026-11-07T23:55:34.317Z",
+          "usage": {
+            "input_tokens": 16918,
+            "output_tokens": 269,
+            "total_tokens": 17187
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": []
+      }
+    ],
+    "sourceId": "0d03aa7d-06a2-4289-b158-c11e35909722",
+    "sourceText": "Our first sample concerns a garden.",
+    "sourceProtected": true,
+    "snapshots": 0,
+    "rebuilds": 0,
+    "elapsedMs": 7838.600000023842,
+    "commitMs": 18.80000001192093
+  }
+}

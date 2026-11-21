@@ -25,3 +25,12 @@ test('reviewed identity import, aliases, cross-session reconciliation, conflicts
   assert.equal((await c.entityLookup({op:'authority-lookup',record:third})).entity.id,local.entity.id);
  } finally {await c?.close();await rm(dir,{recursive:true,force:true});}
 });
+
+test('authority reuse follows canonical renames and rejects deleted targets until restored',async()=>{
+ const dir=await mkdtemp(path.join(os.tmpdir(),'authority-lifecycle-')),vault=path.join(dir,'vault');let c;
+ try{await mkdir(vault);c=await openSqliteFoundation({vault,initialize:true});const record={provider:'wikidata',id:'Q762',name:'Leonardo',description:'Italian artist',aliases:[],url:'https://www.wikidata.org/wiki/Q762',retrievedAt:'2026-11-16T00:00:00Z'},imported=await c.entities({op:'authority-import',id:uuid(),operationId:uuid(),record});
+ const renamed=await c.entities({op:'rename',id:imported.entity.id,name:'Leonardo da Vinci',expected:imported.entity.revision,operationId:uuid()});assert.equal((await c.entityLookup({op:'authority-lookup',record})).entity.name,'Leonardo da Vinci');
+ const deleted=await c.cardex({op:'delete',id:renamed.entity.id,expected:renamed.entity.revision,confirmation:renamed.entity.id,operationId:uuid()});assert.equal((await c.entityLookup({op:'authority-lookup',record})).entity,undefined);await assert.rejects(c.entities({op:'authority-import',id:uuid(),operationId:uuid(),record}),/deleted Entity/);
+ await c.cardex({op:'restore',id:deleted.entity.id,expected:deleted.entity.revision,confirmation:deleted.entity.id,operationId:uuid()});assert.equal((await c.entityLookup({op:'authority-lookup',record})).entity.id,imported.entity.id);
+ }finally{await c?.close();await rm(dir,{recursive:true,force:true});}
+});

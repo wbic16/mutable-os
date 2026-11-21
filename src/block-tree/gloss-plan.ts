@@ -1,3 +1,4 @@
+import {contentLength} from './inline-sequence';
 import type {ContentRecord, RepositoryOperation, RepositoryState} from './types';
 import type {StructuralEvidence} from './structural-plan';
 import {GLOSS,glossDefinition} from '../features/gloss/model';
@@ -42,7 +43,7 @@ export function glossChangeFor(state:RepositoryState,ops:RepositoryOperation[],e
   const prior=state.contents[r.key];if(!prior||r.inlineKind!=='standoff'||glossOwner(state,r.key,e)!==root.key||!same(strip(prior,'standoffProperties'),strip(r,'standoffProperties')))return;
   const p=prior.payload.standoffProperties??[],q=r.payload.standoffProperties??[];if(!Array.isArray(p)||!Array.isArray(q))return;
   if(!same(p.filter(x=>x.type!==GLOSS),q.filter(x=>x.type!==GLOSS)))return;
-  for(const x of q.filter(x=>x.type===GLOSS))if(!glossDefinition(next[x.annotationId])||!Number.isInteger(x.start)||!Number.isInteger(x.end)||x.start<0||x.end<x.start||x.end>=r.inlineContent.length)return;
+  for(const x of q.filter(x=>x.type===GLOSS))if(!glossDefinition(next[x.annotationId])||!Number.isInteger(x.start)||!Number.isInteger(x.end)||x.start<0||x.end<x.start||x.end>=contentLength(r))return;
   if(!same(p,q))texts.push(r.key);
  }
  if(!definitions.length&&!texts.length)return;

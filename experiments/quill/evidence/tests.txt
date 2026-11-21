@@ -1,0 +1,13 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ src/qualification/quill/persistence.test.ts (1 test) 481ms
+   ✓ uses the real native coordinator to save in place only on request, including geometry, text and new annotations 479ms
+ ✓ src/qualification/quill/quill.test.ts (10 tests) 1434ms
+   ✓ Quill qualification — native boundaries > typing touches no unrelated payloads or snapshots with 500 extra Blocks 858ms
+
+ Test Files  2 passed (2)
+      Tests  11 passed (11)
+   Start at  12:57:29
+   Duration  8.10s (transform 4.11s, setup 0ms, collect 8.95s, tests 1.92s, environment 2.43s, prepare 386ms)
+

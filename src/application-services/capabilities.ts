@@ -5,6 +5,8 @@ import type {ManagedAssetReference} from '../interchange/managed-asset';
 import type {PublicationProfile} from './publication-contracts';
 import type {Projection} from '../publication/projection';
 export type ExecutionTask =
+ | {kind:'attachment-pdf';text:string;title:string}
+ | {kind:'attachment-pdf-inspect';bytes:Uint8Array}
  | import('./web-contracts').WebTask
  | import('./deterministic-contracts').DeterministicTask
  | {kind:'academic-original-inspect';bytes:Uint8Array;mediaType:string}

@@ -20,7 +20,7 @@ function setup(children: ExistingBlockDto[]) {
   cleanup.push(() => { dispose(); editor.dispose(); });
   const node = (id: string) => Object.values(projection.state.nodes).find(item => item.payload.id === id)!;
   const timers = () => Object.values(projection.state.nodes).filter(item => item.viewType === "timer-block");
-  const timerElement = (key: string) => document.querySelector<HTMLElement>(`[data-client-id="${key}"][data-block-type="timer-block"]`)!;
+  const timerElement = (key: string) => document.querySelector<HTMLElement>(`[data-client-id="${key}"].reactive-timer`)!;
   const trigger = (target: Element) => {
     const prefix = new KeyboardEvent("keydown", { key: ";", ctrlKey: true, bubbles: true, cancelable: true }); target.dispatchEvent(prefix);
     const finish = new KeyboardEvent("keydown", { key: "t", bubbles: true, cancelable: true }); target.dispatchEvent(finish);
@@ -157,7 +157,7 @@ describe("Timer feature activation and disposal", () => {
     editor.dispose(); await tick();
     expect(vi.getTimerCount()).toBe(0);
     expect(audioCloses.map(close => close.mock.calls.length)).toEqual([1, 1, 1]);
-    keys.slice(1).forEach(key => expect(editor.mounts.get(key)).toBeUndefined());
+    keys.slice(1).forEach(key => expect(editor.mounts.get(key)?.root.classList.contains("reactive-timer")).not.toBe(true));
   });
 
   it("owns all registrations and releases mounted resources on repeated editor teardown", async () => {
@@ -171,7 +171,7 @@ describe("Timer feature activation and disposal", () => {
       expect(editor.commandRegistry.owner("timer.create")).toBe("timer");
       expect(editor.bindings.owner("timer.create")).toBe("timer");
       expect(editor.bindings.owner("cross.timerCreate")).toBe("timer");
-      expect(editor.featureActions.list("document-actions")[0].owner).toBe("timer");
+      expect(editor.featureActions.list("document-actions").find(action=>action.id==="timer.toolbar")?.owner).toBe("timer");
       expect(timerElement(key)).toBeTruthy();
       expect(vi.getTimerCount()).toBeGreaterThan(0);
       const revision = editor.repository.state.revision;
@@ -181,7 +181,7 @@ describe("Timer feature activation and disposal", () => {
       expect(editor.commandRegistry.list().some(command => command.id.startsWith("timer."))).toBe(false);
       expect(editor.bindings.get("timer.create")).toBeUndefined();
       expect(editor.bindings.get("cross.timerCreate")).toBeUndefined();
-      expect(editor.mounts.get(key)).toBeUndefined();
+      expect(editor.mounts.get(key)?.root.classList.contains("reactive-timer")).not.toBe(true);
       expect(editor.featureActions.list("document-actions")).toEqual([]);
       expect(editor.featureActions.list("add-block-menu")).toEqual([]);
       expect(timerElement(key)).toBeNull();
@@ -203,8 +203,22 @@ describe("Timer feature activation and disposal", () => {
         expect(!!editor.registry.resolve("timer-block")).toBe(enabled);
         expect(encodeDocument(editor.repository.readState())).toEqual(unknownFeatureDocument);
         expect(!!document.querySelector(".reactive-timer")).toBe(enabled);
-        expect(editor.featureActions.list("document-actions")).toHaveLength(enabled ? 1 : 0);
+        expect(editor.featureActions.list("document-actions").filter(action=>action.owner==="timer")).toHaveLength(enabled ? 1 : 0);
       } finally { dispose(); editor.dispose(); host.remove(); }
     }
   });
+});
+
+it('keeps submitted timer operations local, protects settings and clears operational state on remount',async()=>{
+ const dto={...timerBlockDto(undefined,2),id:'protected-timer'},f=setup([dto]),n=f.node(dto.id),e=f.editor;
+ const release=e.textProtection.protect(n.contentKey);await tick();
+ const root=()=>f.timerElement(n.key),button=(name:string)=>[...root().querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent===name)!;
+ const before=e.encodeDocument(),revision=e.repository.state.revision,snapshot=vi.spyOn(e.repository,'snapshot');
+ expect(root().querySelector<HTMLInputElement>('input')!.disabled).toBe(true);expect(root().querySelector<HTMLButtonElement>('[aria-label="Close timer"]')!.disabled).toBe(true);expect(root().querySelector('.reactive-timer__resize')).toBeNull();
+ const enter=new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true});button('Start').dispatchEvent(enter);expect(enter.defaultPrevented).toBe(false);
+ button('Start').click();const unrelated=e.textProtection.register(()=>false);await tick();expect(button('Pause')).toBeTruthy();unrelated();await vi.advanceTimersByTimeAsync(1000);expect(root().querySelector('output')!.textContent).toBe('00:01');button('Pause').click();await vi.advanceTimersByTimeAsync(3000);expect(root().querySelector('output')!.textContent).toBe('00:01');button('Resume').click();await vi.advanceTimersByTimeAsync(1000);expect(root().textContent).toContain('Time’s up');button('Reset').click();expect(root().querySelector('output')!.textContent).toBe('00:02');
+ expect(e.repository.state.revision).toBe(revision);expect(snapshot).not.toHaveBeenCalled();expect(e.encodeDocument()).toEqual(before);
+ expect(()=>e.commands.setPayloadField(n.key,'timer',{durationSeconds:9,mode:'idle'})).toThrow(/protected/);
+ button('Start').click();const loaded=setup(before.children!);expect(loaded.timerElement(loaded.node(dto.id).key).querySelector('output')!.textContent).toBe('00:02');
+ release();await tick();expect(root().querySelector<HTMLInputElement>('input')!.disabled).toBe(false);expect(root().querySelector('output')!.textContent).toBe('00:02');
 });

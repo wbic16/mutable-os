@@ -7,7 +7,7 @@ import {documentApplicationPorts,type DocumentApplicationPort} from './document-
 export function registerDocumentPresentations(editor:ReactiveEditor,scope:FeatureScope,id:string){
  const key=applicationKey<DocumentApplicationPort>(id),registry=applicationPresentations(editor);
  scope.own(registry.registerApplication(key,{
-  name:id==='flint'?'Flint':id,instances:()=>documentApplicationPorts(editor).ports().filter(p=>p.applicationId===id),key:p=>p.key,windowId:p=>p.windowId(),
+  name:id==='flint'?'Flint':id==='quill'?'Quill':id,instances:()=>documentApplicationPorts(editor).ports().filter(p=>p.applicationId===id),key:p=>p.key,windowId:p=>p.windowId(),
   open:()=>editor.commandRegistry.execute(`${id}.open`,{targetKey:[...editor.projections.values()][0].state.rootKey,args:undefined}),
   checkTransition:(p,from,to)=>{if(from!=='textual'&&to!=='textual')return;try{const s=p.session();if(s)editor.documentSessions?.presentations.check(s);}catch(e){return String(e);}},
   remember:p=>{const s=p.session();if(s)editor.documentSessions?.presentations.remember(s);},

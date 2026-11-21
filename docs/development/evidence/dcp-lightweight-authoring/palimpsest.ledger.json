@@ -1,0 +1,31 @@
+{
+  "intent": "answer",
+  "content": [
+    {
+      "tag": "p",
+      "id": "b1",
+      "markup": "A <e ref=\"e1\"><b>palimpsest</b></e> is a manuscript page whose original writing has been scraped or washed away so it can be written on again, often leaving traces of the earlier text. Figuratively, a <e ref=\"e1\">palimpsest</e> is something whose earlier forms or history remain visible beneath its present appearance."
+    }
+  ],
+  "definitions": [
+    {
+      "tag": "passage",
+      "id": "r1",
+      "target": "@b1",
+      "quote": "palimpsest"
+    },
+    {
+      "tag": "entity",
+      "id": "e1",
+      "name": "Palimpsest",
+      "type": "Concept",
+      "description": "A manuscript surface reused after earlier writing was erased; figuratively, something retaining traces of earlier layers or forms."
+    },
+    {
+      "tag": "mention",
+      "id": "m1",
+      "target": "r1",
+      "ref": "e1"
+    }
+  ]
+}

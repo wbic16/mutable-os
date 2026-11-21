@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { lookup } from 'node:dns/promises';
 import { request } from 'node:https';
+import { request as httpRequest } from 'node:http';
 import ipaddr from 'ipaddr.js';
 import { IMAGE_LIMITS } from './asset-image-validation.mjs';
 export function remoteAssetUrl(value) {
@@ -16,25 +17,33 @@ export async function acquireRemoteAsset(value, signal, dependencies = {}) {
   return (await acquire(value, signal, dependencies, {accept:'image/png, image/jpeg', bytes:IMAGE_LIMITS.bytes})).bytes;
 }
 async function acquire(value, signal, dependencies, policy) {
-  const origin = remoteAssetUrl(value).origin, resolve = dependencies.lookup ?? lookup, connect = dependencies.request ?? request;
+  const parse=policy.head?imageReferenceUrl:remoteAssetUrl;
+  const origin = parse(value).origin, resolve = dependencies.lookup ?? lookup;
   const controller = new AbortController(), cancel = () => controller.abort();
   signal?.throwIfAborted(); signal?.addEventListener('abort', cancel, { once: true });
-  const timer = setTimeout(cancel, 15000);
+  const timer = setTimeout(cancel, policy.head?5000:15000);
   try {
-    let url = remoteAssetUrl(value);
+    let url = parse(value);
     for (let hop = 0; hop <= 3; hop++) {
       controller.signal.throwIfAborted();
-      if (url.origin !== origin) throw Error('A different image origin requires new consent.');
+      if (!policy.head && url.origin !== origin) throw Error('A different image origin requires new consent.');
       const host = url.hostname.replace(/^\[|\]$/g, '');
       const answers = await Promise.race([resolve(host, { all: true, verbatim: true }), new Promise((_, reject) => controller.signal.addEventListener('abort', () => reject(Error('Image download cancelled or timed out.')), { once: true }))]);
       controller.signal.throwIfAborted();
       if (!answers.length || answers.some(a => !publicAddress(a.address))) throw Error('Remote image address is not public.');
       const address = answers[0];
+      const connect=dependencies.request??(url.protocol==='http:'?httpRequest:request);
       const result = await new Promise((resolve, reject) => {
         // Some hosts reject anonymous clients. Identify the application without impersonating a browser or sending user data.
-        const req = connect(url, { agent: false, signal: controller.signal, headers: { Accept: policy.accept, 'Accept-Encoding': 'identity', 'User-Agent': 'MutableOS/0.0.0 (Flint; user-requested resource import)' }, lookup: (_host, options, cb) => options?.all ? cb(null, [address]) : cb(null, address.address, address.family) }, res => {
+        const req = connect(url, { ...(policy.head?{method:'HEAD'}:{}),agent: false, signal: controller.signal, headers: { Accept: policy.accept, 'Accept-Encoding': 'identity', 'User-Agent': 'MutableOS/0.0.0 (Flint; user-requested resource import)' }, lookup: (_host, options, cb) => options?.all ? cb(null, [address]) : cb(null, address.address, address.family) }, res => {
           if ([301,302,303,307,308].includes(res.statusCode)) { const redirect = res.headers.location; res.destroy(); resolve({ redirect }); return; }
           if (res.statusCode !== 200) { res.destroy(); reject(Error(`Remote server refused the download (HTTP ${res.statusCode}).`)); return; }
+          if(policy.head){
+            const length=res.headers['content-length'],mediaType=String(res.headers['content-type']??'').split(';')[0].trim().toLowerCase();
+            const size=typeof length==='string'&&/^\d+$/.test(length)?Number(length):NaN;
+            const byteLength=Number.isSafeInteger(size)&&size>=0&&mediaType.startsWith('image/')&&(!res.headers['content-encoding']||res.headers['content-encoding']==='identity')?size:null;
+            res.destroy();resolve({byteLength,mediaType,url:url.href});return;
+          }
           if (res.headers['content-encoding'] && res.headers['content-encoding'] !== 'identity' || Number(res.headers['content-length'] ?? 0) > policy.bytes) { res.destroy(); reject(Error('Remote image response was rejected.')); return; }
           const chunks = []; let size = 0;
           res.on('data', chunk => { size += chunk.length; if (size > policy.bytes) { req.destroy(Error('Remote image exceeds the byte limit.')); return; } chunks.push(chunk); });
@@ -42,11 +51,24 @@ async function acquire(value, signal, dependencies, policy) {
         });
         req.on('error', reject); req.end();
       });
-      if (result.bytes) return result;
+      if (result.bytes || policy.head&&Object.hasOwn(result,'byteLength')) return result;
       if (!result.redirect || hop === 3) throw Error('Remote image redirect limit exceeded.');
-      url = remoteAssetUrl(new URL(result.redirect, url).href);
+      url = parse(new URL(result.redirect, url).href);
     }
   } finally { clearTimeout(timer); signal?.removeEventListener('abort', cancel); }
+}
+
+function imageReferenceUrl(value){
+ if(typeof value!=='string'||value.length>4096)throw Error('Invalid image reference');
+ const url=new URL(value);
+ if(!['http:','https:'].includes(url.protocol)||url.port||url.username||url.password)throw Error('Image references require public HTTP(S) URLs on standard ports');
+ url.hash='';return url;
+}
+/** Metadata only. Redirects may cross public origins (e.g. Commons → Upload),
+ * with fresh DNS validation/pinning at every hop. Never reads an image body. */
+export async function inspectImageReference(url,signal,dependencies={}){
+ const result=await acquire(url,signal,dependencies,{head:true,accept:'image/*'});
+ return {byteLength:result.byteLength};
 }
 
 /** Internal DOI adapters only; callers cannot choose an arbitrary API endpoint. */

@@ -1,13 +1,15 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it, vi } from 'vitest';
 import { render } from 'solid-js/web';
-import { CavernStartup } from './cavern-startup';
+import { onCleanup } from 'solid-js';
+import { CavernStartup, useCurrentCavern } from './cavern-startup';
 
 const disposers: Array<() => void> = [];
 afterEach(() => {
   while (disposers.length) disposers.pop()?.();
   document.body.replaceChildren();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), {
   status, headers: { 'Content-Type': 'application/json' },
@@ -73,4 +75,62 @@ it('retains the server explanation when the system picker cannot open', async ()
   button('Open').click();
   await vi.waitFor(() => expect(document.querySelector('[role="alert"]')?.textContent).toContain(message));
   expect(button('Browse…').disabled).toBe(false);
+});
+
+it.each(['missing', 'new-session', 'other-cavern'] as const)('retains the exact workspace when status reports %s and reconnects only to the same Cavern', async kind => {
+  vi.useFakeTimers();
+  const selected = { path: '/original', name: 'Original', cavernGuid: 'original-guid', session: 'old-session' };
+  const next = { ...selected, session: 'new-session' };
+  let server: typeof selected | undefined = selected;
+  let startupError = false, mounted = 0, disposed = 0;
+  let context: ReturnType<typeof useCurrentCavern>;
+  const fetch = vi.fn(async (address: string, _init?: RequestInit) => {
+    if (address.endsWith('/startup') && startupError) throw new TypeError('Failed to fetch');
+    return json({ Success: true, Data: { current: server, recentCaverns: [] } });
+  });
+  vi.stubGlobal('fetch', fetch);
+  const Workspace = () => {
+    context = useCurrentCavern(); mounted++;
+    onCleanup(() => disposed++);
+    return <textarea aria-label="Unsaved document" />;
+  };
+  disposers.push(render(() => <CavernStartup>{() => <Workspace />}</CavernStartup>, document.body));
+  await vi.advanceTimersByTimeAsync(0);
+  const textarea = document.querySelector('textarea')!;
+  textarea.value = 'Unsaved test6 edits';
+  // Ordinary status polling performs only its one status request: no Save,
+  // serialization, admission or workspace rebuild is triggered.
+  fetch.mockClear();
+  await vi.advanceTimersByTimeAsync(3000);
+  expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/api/cavern/status']);
+  server = kind === 'missing' ? undefined : kind === 'new-session' ? next : { ...next, path: '/other', cavernGuid: 'other-guid' };
+  await vi.advanceTimersByTimeAsync(3000);
+  expect(document.querySelector('textarea')).toBe(textarea);
+  expect(textarea.value).toBe('Unsaved test6 edits');
+  expect(mounted).toBe(1); expect(disposed).toBe(0);
+  expect(document.querySelector('[role="alert"]')?.textContent).toContain('unsaved edits are still open');
+  fetch.mockClear();
+  await expect(window.fetch('/api/native/save', { method: 'POST' })).rejects.toThrow('Retry connection');
+  await vi.advanceTimersByTimeAsync(9000);
+  expect(fetch).not.toHaveBeenCalled();
+
+  startupError = true;
+  button('Retry connection').click(); await vi.advanceTimersByTimeAsync(0);
+  expect(document.querySelector('[role="alert"]')?.textContent).toContain('cannot reach');
+  startupError = false;
+  for (const different of [{ ...next, cavernGuid: 'replacement-guid' }, { ...next, path: '/other-path' }]) {
+    server = different; button('Retry connection').click(); await vi.advanceTimersByTimeAsync(0);
+    expect(document.querySelector('[role="alert"]')?.textContent).toContain('not using this Cavern');
+    expect(context!.current()!.session).toBe('old-session');
+  }
+  server = next; button('Retry connection').click(); await vi.advanceTimersByTimeAsync(0);
+  expect(document.querySelector('[role="alert"]')).toBeNull();
+  expect(context!.current()).toEqual(next);
+  expect(document.querySelector('textarea')).toBe(textarea);
+  expect(textarea.value).toBe('Unsaved test6 edits');
+  expect(mounted).toBe(1); expect(disposed).toBe(0);
+  // Reconnection changes request fencing, but never replays an authored Save.
+  expect(fetch.mock.calls.every(([url]) => url === '/api/cavern/startup')).toBe(true);
+  await window.fetch('/api/native/list');
+  expect(new Headers(fetch.mock.calls.at(-1)![1]?.headers).get('X-Mutable-Cavern')).toBe('new-session');
 });

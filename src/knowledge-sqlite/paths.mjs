@@ -32,14 +32,15 @@ export function prepareHome({ vault, readOnly = false, initialize = false } = {}
   directory(home);
   return { root, home };
 }
-export function writerLock(home) {
+export function writerLock(home, name = 'writer.lock') {
+  if (!['writer.lock','retrieval.lock'].includes(name)) throw Error('Invalid writer lease name');
   // fs-ext 2.1.1 uses process-global native state and is not safe across worker isolates.
   if (!isMainThread) throw Error('The host thread must own the SQLite writer lease');
   directory(home);
-  const file = path.join(home, 'writer.lock'); regularFile(file, true);
+  const file = path.join(home, name); regularFile(file, true);
   const fd = fs.openSync(file, fs.constants.O_CREAT | fs.constants.O_RDWR | fs.constants.O_NOFOLLOW, 0o600);
   // flockExclusiveSync prefers the native binding and falls back to a portable
-  // token lock (writer.lock.holder) when fs-ext is unavailable; the rendezvous
+  // token lock (<name>.holder) when fs-ext is unavailable; the rendezvous
   // inode itself is still never unlinked.
   let releaseLock;
   try { releaseLock = flockExclusiveSync(fd, `${file}.holder`); }

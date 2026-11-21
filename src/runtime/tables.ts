@@ -1,3 +1,5 @@
+import {prepareLayout} from '../block-tree/layout-authoring';
+import {contentLength} from "../block-tree/inline-sequence";
 import { holdStructuralMedia } from './structural-media';
 import { createStore } from 'solid-js/store';
 import { clone } from '../block-tree/clone';
@@ -191,7 +193,7 @@ export class TableOperations {
     }
   }
   private empty(n: BlockNode): boolean {
-    return n.viewType === 'standoff-editor-block' && this.editor.repository.contentReferenceCount(n.contentKey) === 1 && !n.inlineContent.length && !n.children.length &&
+    return n.viewType === 'standoff-editor-block' && this.editor.repository.contentReferenceCount(n.contentKey) === 1 && !contentLength(this.editor.repository.readState().contents[n.contentKey]) && !n.children.length &&
       !Object.keys(n.ownedRelations).length && !Object.keys(this.editor.repository.readState().contents[n.contentKey].opaqueRelations).length &&
       Object.entries(n.payload).every(([k, value]) => ['id', 'type', 'text'].includes(k) ? k !== 'text' || value === '' :
         ['standoffProperties', 'blockProperties'].includes(k) && Array.isArray(value) && !value.length);
@@ -210,9 +212,9 @@ export class TableOperations {
       const nodes = this.targets(request.targets); target = nodes[0]; moving = nodes; affectedBlocks = nodes.length;
       const count = request.columns;
       apply = () => {
-        const rows = Array.from({ length: Math.ceil(nodes.length / count) }, (_, r) => dto('table-row-block',
-          Array.from({ length: count }, (_, col) => dto('table-cell-block', r * count + col < nodes.length ? [] : [emptyText()]))));
-        const table = c.insert(dto('table-block', rows), { kind: 'before', anchorKey: target.placementKey });
+        const rows = Array.from({ length: Math.ceil(nodes.length / count) }, (_, r) =>
+          Array.from({ length: count }, (_, col) => r * count + col < nodes.length ? [] : [emptyText()]));
+        const table = c.insert(prepareLayout('table', rows), { kind: 'before', anchorKey: target.placementKey });
         const cells = c.childrenOf(table).flatMap(row => c.childrenOf(row));
         nodes.forEach((n, i) => c.move(n.placementKey, { kind: 'at', parentKey: cells[i], index: 0 }));
         return [target.placementKey];

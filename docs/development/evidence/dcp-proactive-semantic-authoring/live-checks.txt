@@ -1,0 +1,26 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+stdout | docs/development/evidence/dcp-proactive-semantic-authoring/live.test.ts > small GPT-6.1 Sol baseline and A–D native semantic exercise
+{"id":"baseline-A","admitted":true,"entities":3,"glosses":0,"usage":[{"input_tokens":12053,"output_tokens":31,"total_tokens":12084},{"input_tokens":12287,"output_tokens":32,"total_tokens":12319},{"input_tokens":12522,"output_tokens":609,"total_tokens":13131}]}
+
+stdout | docs/development/evidence/dcp-proactive-semantic-authoring/live.test.ts > small GPT-6.1 Sol baseline and A–D native semantic exercise
+{"id":"A","admitted":true,"entities":5,"arguments":1,"relations":0,"glosses":0,"usage":[{"input_tokens":13236,"output_tokens":66,"total_tokens":13302},{"input_tokens":13506,"output_tokens":1050,"total_tokens":14556}]}
+
+stdout | docs/development/evidence/dcp-proactive-semantic-authoring/live.test.ts > small GPT-6.1 Sol baseline and A–D native semantic exercise
+{"id":"B","admitted":true,"entities":0,"arguments":1,"relations":0,"glosses":0,"usage":[{"input_tokens":14405,"output_tokens":1202,"total_tokens":15607}]}
+
+stdout | docs/development/evidence/dcp-proactive-semantic-authoring/live.test.ts > small GPT-6.1 Sol baseline and A–D native semantic exercise
+{"id":"C","admitted":true,"entities":10,"arguments":0,"relations":4,"glosses":0,"usage":[{"input_tokens":13293,"output_tokens":119,"total_tokens":13412},{"input_tokens":13620,"output_tokens":1352,"total_tokens":14972}]}
+
+stdout | docs/development/evidence/dcp-proactive-semantic-authoring/live.test.ts > small GPT-6.1 Sol baseline and A–D native semantic exercise
+{"id":"D","admitted":true,"entities":0,"arguments":0,"relations":0,"glosses":0,"usage":[{"input_tokens":13192,"output_tokens":116,"total_tokens":13308}]}
+
+ ✓ docs/development/evidence/dcp-proactive-semantic-authoring/live.test.ts (1 test) 94706ms
+   ✓ small GPT-6.1 Sol baseline and A–D native semantic exercise 94705ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  15:49:12
+   Duration  107.79s (transform 9.28s, setup 0ms, collect 11.37s, tests 94.71s, environment 871ms, prepare 97ms)
+

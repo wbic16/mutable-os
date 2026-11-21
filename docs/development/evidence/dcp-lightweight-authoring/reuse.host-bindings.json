@@ -1,0 +1,36 @@
+{
+  "exchange": "5e9da7c1-84bd-418d-8164-5686bca52fd9",
+  "bindings": {
+    "@e1": {
+      "handle": "src:QJ2jkgJnbMXeH431dUMOiQ:e3"
+    },
+    "@e2": {
+      "handle": "src:QJ2jkgJnbMXeH431dUMOiQ:e8"
+    },
+    "@e3": {
+      "handle": "src:QJ2jkgJnbMXeH431dUMOiQ:e7"
+    },
+    "@b1": {
+      "handle": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+      "revision": "b6934a95-8316-497e-ad14-99205a96df79"
+    }
+  },
+  "local": {
+    "b1": "new:b1",
+    "s1": "new:s1",
+    "r1": "new:r1",
+    "m1": "new:m1",
+    "m2": "new:m2",
+    "m3": "new:m3",
+    "m4": "new:m4",
+    "m5": "new:m5",
+    "m6": "new:m6",
+    "m7": "new:m7",
+    "m8": "new:m8",
+    "m9": "new:m9",
+    "m10": "new:m10",
+    "m11": "new:m11",
+    "arg1": "new:arg1"
+  },
+  "comment": "Offline historical bindings, never usable as live authority. Current occurrence and revision must be reissued."
+}

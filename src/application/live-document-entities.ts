@@ -1,3 +1,4 @@
+import {contentLength,inlineSlice,inlineText} from "../block-tree/inline-sequence";
 import type { ReactiveEditor } from '../reactive-editor/editor';
 import type { ContentRecord, JsonObject } from '../block-tree/types';
 import type { RepositoryChange } from '../block-tree/repository';
@@ -121,6 +122,7 @@ class Inventory {
     this.clearCells(key);const linkedCells=new Set<string>();
     let invalid = 0;
     for (const [index,p] of properties(content).entries()) {
+      if(p.type==='dialectic/range-anchor')continue; // passive reply identity, never an Entity mention
       if (p.type !== 'codex/entity-reference' && !p.annotationId) continue;
       const localId = String(p.id ?? `index:${index}`), prior = old.get(localId);
       const {start,end,...identity} = p, signature = JSON.stringify(identity);
@@ -138,11 +140,12 @@ class Inventory {
       if (typeof resolved.value !== 'string' || !resolved.value.trim() || p.annotationId && !definitionOwner) { invalid++; continue; }
       const block = content.viewType !== 'standoff-editor-block';
       const from = Number(start), to = Number(end)+1;
-      if (!block && (!Number.isInteger(from)||!Number.isInteger(to)||from<0||to<=from||to>content.inlineContent.length)) { invalid++; continue; }
+      if (!block && (!Number.isInteger(from)||!Number.isInteger(to)||from<0||to<=from||to>contentLength(content))) { invalid++; continue; }
       const cells = block ? [] : content.inlineContent.slice(from,to);
-      const sameCells = prior && cells.length === prior.cells.length && cells.every((id,i) => id === prior.cells[i] && !this.changedCells.has(state.placements[id]?.contentKey));
+      const sameCells = !content.compactInline && prior && cells.length === prior.cells.length && cells.every((id,i) => id === prior.cells[i] && !this.changedCells.has(state.placements[id]?.contentKey));
       let surface = prior && sameCells ? prior.surface : '';
-      if (!block && !sameCells) {
+      if (!block && content.compactInline) {const atoms=inlineSlice(content.compactInline.spans,from,to);if(atoms.some(a=>a.kind==='image')){invalid++;continue;}surface=inlineText(atoms);}
+      else if (!block && !sameCells) {
         let plain = true;
         for (const id of cells) { const c=state.contents[state.placements[id]?.contentKey]; if(c?.viewType!=='text-cell'){plain=false;break;} surface+=String(c.payload.text??''); }
         if (!plain) { invalid++; continue; }

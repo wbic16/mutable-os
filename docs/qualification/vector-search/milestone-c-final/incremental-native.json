@@ -1,0 +1,555 @@
+{
+  "incremental": [
+    {
+      "phase": "added",
+      "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "passages": 2,
+      "embedded": 0,
+      "reused": 2,
+      "planningMs": 73.66991700000017,
+      "providerMs": 0,
+      "publicationMs": 6.900124999999662,
+      "usage": 0
+    },
+    {
+      "phase": "edited",
+      "oldReferenceRejected": true,
+      "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "passages": 2,
+      "embedded": 0,
+      "reused": 2,
+      "planningMs": 52.35899999999947,
+      "providerMs": 0,
+      "publicationMs": 2.086124999999811,
+      "usage": 0
+    },
+    {
+      "phase": "removed",
+      "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "passages": 2,
+      "embedded": 0,
+      "reused": 2,
+      "planningMs": 46.60370800000055,
+      "providerMs": 0,
+      "publicationMs": 4.117666000000099,
+      "usage": 0
+    },
+    {
+      "phase": "removed-confirmed",
+      "obsoleteLexicalHits": 0,
+      "unchanged": {
+        "unchanged": true,
+        "embedded": 0,
+        "projectionReads": 0
+      }
+    }
+  ],
+  "queries": [
+    {
+      "label": "disposable-added",
+      "results": [
+        {
+          "text": "The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. \n\nAt the violet harbour, the Zephyr archival vessel carries ceramic astrolabes to the moonlit island.",
+          "signals": {
+            "rrf": 0.03278688524590164,
+            "cosineDistance": 0.516140878200531,
+            "bm25": -3.7213487272416073
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "path": "acceptance-disposable.ink",
+            "format": "mutable-document",
+            "rootBlockId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "sourceHash": "0e90d460a0d5c03e43dd9c96e82f39bfbe4b8ed8467e7d32e266d7a07bdb68c4",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:fb7d0bed-e6f0-43e4-a164-d6340c0f622b",
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:d1bb05c2-3ce1-478a-96a1-8c90ac6b8609"
+                ],
+                "contribution": null,
+                "start": 2346,
+                "end": 4140,
+                "runStart": 2346,
+                "runEnd": 4140,
+                "chunkStart": 0,
+                "chunkEnd": 1794,
+                "textHash": "9eac97cab3e32c0d4d0605683ee418c1a84aca7afb79f9cf7c775fa52fef38e9"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:fb7d0bed-e6f0-43e4-a164-d6340c0f622b",
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:6c671437-ee59-4c14-bcdd-2efc2441a6cb"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 99,
+                "runStart": 0,
+                "runEnd": 99,
+                "chunkStart": 1796,
+                "chunkEnd": 1895,
+                "textHash": "cb783b22b85aaecede041099212e03e76f65494b5a71f7d9d0526227251fdd14"
+              }
+            ]
+          },
+          "stamp": "8f81aa4a0f4c28a46b0c61808ea64716186d0689fb55d3e7260697e6bbc033ff"
+        },
+        {
+          "text": "The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. ",
+          "signals": {
+            "rrf": 0.014705882352941176,
+            "cosineDistance": 0.7261677980422974
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "path": "acceptance-disposable.ink",
+            "format": "mutable-document",
+            "rootBlockId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "sourceHash": "0e90d460a0d5c03e43dd9c96e82f39bfbe4b8ed8467e7d32e266d7a07bdb68c4",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:fb7d0bed-e6f0-43e4-a164-d6340c0f622b",
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:d1bb05c2-3ce1-478a-96a1-8c90ac6b8609"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 2346,
+                "runStart": 0,
+                "runEnd": 2346,
+                "chunkStart": 0,
+                "chunkEnd": 2346,
+                "textHash": "4747abce3e79721247090b674dd086f431a66e28404447ddc1f3a49cdfc5d49a"
+              }
+            ]
+          },
+          "stamp": "8f81aa4a0f4c28a46b0c61808ea64716186d0689fb55d3e7260697e6bbc033ff"
+        }
+      ],
+      "evidence": "incomplete-evidence",
+      "answerability": "not-assessed",
+      "coverage": {
+        "complete": false,
+        "candidateLimit": 100,
+        "candidateLimitReached": false,
+        "staleCandidates": 0,
+        "contextSufficiency": "not-assessed",
+        "indexedResources": 3,
+        "knownSavedResources": 2318,
+        "sourceVerification": "exact-saved-file",
+        "unverifiedCandidates": 0,
+        "verifiedResources": 1,
+        "verificationBytes": 6211
+      },
+      "timing": {
+        "providerMs": 738.937167,
+        "localMs": 27.5409580000005
+      },
+      "usage": 10,
+      "profile": {
+        "version": 2,
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "metric": "cosine",
+        "chunking": "structure",
+        "chunkVersion": 1,
+        "tokenizer": "cl100k_base",
+        "chunkSize": 128,
+        "extension": "0.1.9"
+      },
+      "provenance": {
+        "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "profileKey": "2458a973ba33cefb3309b1d15f9cc90a80f3267cfc194437600bc62ba796a61e"
+      }
+    },
+    {
+      "label": "disposable-edited",
+      "results": [
+        {
+          "text": "The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. ",
+          "signals": {
+            "rrf": 0.03252247488101534,
+            "cosineDistance": 0.6450808644294739,
+            "bm25": -5.175521149446833
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "path": "acceptance-disposable.ink",
+            "format": "mutable-document",
+            "rootBlockId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "sourceHash": "0b149c1478f7094fffa4a5b9ebdfbe3541fb5c138fcaae33c6b445404662e141",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:e3eacc0a-ef6b-45cc-9993-da12328c78b9",
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:15c285d9-d95a-4859-9876-761fbea72c1b"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 2346,
+                "runStart": 0,
+                "runEnd": 2346,
+                "chunkStart": 0,
+                "chunkEnd": 2346,
+                "textHash": "4747abce3e79721247090b674dd086f431a66e28404447ddc1f3a49cdfc5d49a"
+              }
+            ]
+          },
+          "stamp": "0f53a73ba82bc9accfe5d5dc62aacc31104e937a40c1a476ed6d868528d3c760"
+        },
+        {
+          "text": "The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. The amber observatory keeps a ledger of seasonal cloud patterns. Its instruments measure humidity without changing the historical record. \n\nThe Zephyr archival vessel is retired. The copper airship now carries carved sundials to a mountain station.",
+          "signals": {
+            "rrf": 0.03252247488101534,
+            "cosineDistance": 0.5195148587226868,
+            "bm25": -5.116484789158904
+          },
+          "source": {
+            "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+            "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "path": "acceptance-disposable.ink",
+            "format": "mutable-document",
+            "rootBlockId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            "sourceHash": "0b149c1478f7094fffa4a5b9ebdfbe3541fb5c138fcaae33c6b445404662e141",
+            "saveGeneration": null,
+            "extractionProfile": "mutable-saved-sql-v3:{\"version\":1,\"opaqueTypes\":[]}",
+            "currency": "verified-saved-projection",
+            "liveCurrency": "unknown",
+            "spans": [
+              {
+                "runOrdinal": 0,
+                "blockGuid": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:e3eacc0a-ef6b-45cc-9993-da12328c78b9",
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:15c285d9-d95a-4859-9876-761fbea72c1b"
+                ],
+                "contribution": null,
+                "start": 2346,
+                "end": 4140,
+                "runStart": 2346,
+                "runEnd": 4140,
+                "chunkStart": 0,
+                "chunkEnd": 1794,
+                "textHash": "9eac97cab3e32c0d4d0605683ee418c1a84aca7afb79f9cf7c775fa52fef38e9"
+              },
+              {
+                "runOrdinal": 0,
+                "blockGuid": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+                "resourceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                "coordinate": "cell",
+                "occurrence": [
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:e3eacc0a-ef6b-45cc-9993-da12328c78b9",
+                  "legacy:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa:placement:93cc0b5d-98f8-4f9f-a6d7-af14607bcda2"
+                ],
+                "contribution": null,
+                "start": 0,
+                "end": 108,
+                "runStart": 0,
+                "runEnd": 108,
+                "chunkStart": 1796,
+                "chunkEnd": 1904,
+                "textHash": "ae9057f6cab27009dc85c20bd7c4f00e7babaf6d5b0ea5af357868997b8f064b"
+              }
+            ]
+          },
+          "stamp": "0f53a73ba82bc9accfe5d5dc62aacc31104e937a40c1a476ed6d868528d3c760"
+        }
+      ],
+      "evidence": "incomplete-evidence",
+      "answerability": "not-assessed",
+      "coverage": {
+        "complete": false,
+        "candidateLimit": 100,
+        "candidateLimitReached": false,
+        "staleCandidates": 0,
+        "contextSufficiency": "not-assessed",
+        "indexedResources": 3,
+        "knownSavedResources": 2318,
+        "sourceVerification": "exact-saved-file",
+        "unverifiedCandidates": 0,
+        "verifiedResources": 1,
+        "verificationBytes": 6220
+      },
+      "timing": {
+        "providerMs": 154.65158399999927,
+        "localMs": 11.413499999999658
+      },
+      "usage": 11,
+      "profile": {
+        "version": 2,
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "metric": "cosine",
+        "chunking": "structure",
+        "chunkVersion": 1,
+        "tokenizer": "cl100k_base",
+        "chunkSize": 128,
+        "extension": "0.1.9"
+      },
+      "provenance": {
+        "vaultGuid": "b6850bc3-715c-4317-a0be-3da0cd37c024",
+        "profileKey": "2458a973ba33cefb3309b1d15f9cc90a80f3267cfc194437600bc62ba796a61e"
+      }
+    }
+  ],
+  "status": {
+    "profile": {
+      "version": 2,
+      "provider": "openai",
+      "model": "text-embedding-3-small",
+      "dimensions": 1536,
+      "metric": "cosine",
+      "chunking": "structure",
+      "chunkVersion": 1,
+      "tokenizer": "cl100k_base",
+      "chunkSize": 128,
+      "extension": "0.1.9"
+    },
+    "indexId": "cf923a62-28ee-4bf3-abd3-6bc04bfa8393",
+    "usage": [
+      {
+        "grantId": "acceptance-saved-vault-maintenance",
+        "fingerprint": "356327740f6d05be65133d24686895ff92b078528fb3b2376f5837f4028ac11a",
+        "reserved": 7899,
+        "actual": 7899
+      },
+      {
+        "grantId": "acceptance-interactive-queries",
+        "fingerprint": "f964ca24308e055c53287c2300e88a243ab47a7605408d53a97e203fb70d2ec9",
+        "reserved": 102,
+        "actual": 102
+      }
+    ],
+    "knownResources": 2315,
+    "resources": 3,
+    "passages": 37,
+    "embeddings": 41,
+    "receipts": [
+      {
+        "id": 19,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "2e65e7affd11b1db66ea17f2d90df8d01fac70453ef7c5d57e76ff45e9ec49d9",
+        "reserved": 11,
+        "actual": 11,
+        "providerMs": 154.65158399999927,
+        "requestId": "req_2fd7aa888b054e18b8acc7f34b53313b",
+        "status": "complete"
+      },
+      {
+        "id": 18,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "93f61e06b9b6132cd49fe99d186dacfea0ada93993734482fd65c5ae19c10276",
+        "reserved": 10,
+        "actual": 10,
+        "providerMs": 738.937167,
+        "requestId": "req_d5211756a4624e30b4df20e1bbf1f89a",
+        "status": "complete"
+      },
+      {
+        "id": 17,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "025e6ad03dc7c461ba7a76c5c86fafbeabef582d5cb2afb044e6338f0b76d483",
+        "reserved": 3,
+        "actual": 3,
+        "providerMs": 169.47787499999686,
+        "requestId": "req_b0791f085de546cb899222baa78f5702",
+        "status": "complete"
+      },
+      {
+        "id": 16,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "dffd935127c498cf1d201da40d1e28a0d8f6e9b098c22408fc90e84d2cda17bd",
+        "reserved": 49,
+        "actual": 49,
+        "providerMs": 888.7717499999999,
+        "requestId": "req_42e7fd3b983b4a1b9da5b2d792e5a9a6",
+        "status": "complete"
+      },
+      {
+        "id": 15,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "43fcd22a38f69edf28b9fd12bcb20a0ae33f0cfe2038f971e3862486f8205085",
+        "reserved": 13,
+        "actual": 13,
+        "providerMs": 222.46658300000126,
+        "requestId": "req_da06f459d1be49d8a91d58298685166b",
+        "status": "complete"
+      },
+      {
+        "id": 14,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "72c46b6a75eb62f463ce9e43f4138bfdb338f01deb8a8b7e05b96e171db8be7a",
+        "reserved": 3,
+        "actual": 3,
+        "providerMs": 682.625208999998,
+        "requestId": "req_cee9c00799864e61b215e0ffecf44133",
+        "status": "complete"
+      },
+      {
+        "id": 13,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "72c46b6a75eb62f463ce9e43f4138bfdb338f01deb8a8b7e05b96e171db8be7a",
+        "reserved": 3,
+        "actual": 3,
+        "providerMs": 875.4382089999999,
+        "requestId": "req_d8b6b0f3c0d7482f81c336d92372d841",
+        "status": "complete"
+      },
+      {
+        "id": 12,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "42638afbd867c659f11679855eeba8d086e08f8f5c21a398e5ab81cc2b5e4f39",
+        "reserved": 287,
+        "actual": 287,
+        "providerMs": 171.90575000000035,
+        "requestId": "req_6d82eb570f394f20a2f3887479f0c251",
+        "status": "complete"
+      },
+      {
+        "id": 11,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "2e65e7affd11b1db66ea17f2d90df8d01fac70453ef7c5d57e76ff45e9ec49d9",
+        "reserved": 11,
+        "actual": 11,
+        "providerMs": 184.89204199999995,
+        "requestId": "req_42dafa8d660f4b469b91a7df239c3806",
+        "status": "complete"
+      },
+      {
+        "id": 10,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "f940297faf80bc666292fb3cf0f0d3364b97651347434432067f05d82906ae93",
+        "reserved": 310,
+        "actual": 310,
+        "providerMs": 189.59062499999982,
+        "requestId": "req_84707ede6c044c7d85bf8c90f804eedd",
+        "status": "complete"
+      },
+      {
+        "id": 9,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "93f61e06b9b6132cd49fe99d186dacfea0ada93993734482fd65c5ae19c10276",
+        "reserved": 10,
+        "actual": 10,
+        "providerMs": 201.32008299999984,
+        "requestId": "req_dc01491a82694a17826c6bcc23913110",
+        "status": "complete"
+      },
+      {
+        "id": 8,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "05dd7654ddaecc0e3885ca444c3edc925c66dda4e0c194a0c60aac6ba87e2ef3",
+        "reserved": 685,
+        "actual": 685,
+        "providerMs": 671.3529169999999,
+        "requestId": "req_8e048a42fd5346949b2dad8c082f3a96",
+        "status": "complete"
+      },
+      {
+        "id": 7,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "8c83feb6bd9701370c7415283e2874189555b8bc05fb9fca913c22ed745b807e",
+        "reserved": 178,
+        "actual": 178,
+        "providerMs": 170.91237499999988,
+        "requestId": "req_d7d46f11f3854fcbb7a6bf7921196a72",
+        "status": "complete"
+      },
+      {
+        "id": 6,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "93f61e06b9b6132cd49fe99d186dacfea0ada93993734482fd65c5ae19c10276",
+        "reserved": 10,
+        "actual": 10,
+        "providerMs": 141.0895419999997,
+        "requestId": "req_a83e3aa584ff4d07bb4f498104e53821",
+        "status": "complete"
+      },
+      {
+        "id": 5,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "87a2661fac06c96567b298f5bdbf57d8ac0ffbe9293a6ad8a8f5b851ce2d4fb9",
+        "reserved": 178,
+        "actual": 178,
+        "providerMs": 194.2072909999997,
+        "requestId": "req_a6a1b87b2b2d4a2496cbe53d8ab8296b",
+        "status": "complete"
+      },
+      {
+        "id": 4,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "a4920e25d80e637fba0932fc9ecee6cc637cf3c22943a9068b50eb8264ac5837",
+        "reserved": 15,
+        "actual": 15,
+        "providerMs": 142.6057090000004,
+        "requestId": "req_22201c186d224812a14d1da388843841",
+        "status": "complete"
+      },
+      {
+        "id": 3,
+        "grantId": "acceptance-interactive-queries",
+        "inputKey": "43fcd22a38f69edf28b9fd12bcb20a0ae33f0cfe2038f971e3862486f8205085",
+        "reserved": 13,
+        "actual": 13,
+        "providerMs": 592.7102080000004,
+        "requestId": "req_8088c895b41b4c8e912a93b4a3a37033",
+        "status": "complete"
+      },
+      {
+        "id": 2,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "60f4ab75ca47b3d50d19374497d2fcd6b71d20627a42e617762af32604041ddf",
+        "reserved": 2727,
+        "actual": 2727,
+        "providerMs": 276.85620800000015,
+        "requestId": "req_ed749feb7db2443dbb69a0add3618554",
+        "status": "complete"
+      },
+      {
+        "id": 1,
+        "grantId": "acceptance-saved-vault-maintenance",
+        "inputKey": "7b864be87a6db93bff55c75401af885b04f336eabe45c146f3cbcf0f83398130",
+        "reserved": 3485,
+        "actual": 3485,
+        "providerMs": 2255.4694160000004,
+        "requestId": "req_eb37858778a9414ab9f4c27d243bb9de",
+        "status": "complete"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ src/features/dialectic/dcp/xml-authoring.test.ts (17 tests) 440ms
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  20:53:53
+   Duration  9.49s (transform 6.48s, setup 0ms, collect 7.96s, tests 440ms, environment 510ms, prepare 50ms)
+

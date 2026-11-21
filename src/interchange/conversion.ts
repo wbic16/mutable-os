@@ -1,4 +1,5 @@
 import { deriveLocations } from '../block-tree/repository';
+import { hasBlockMode } from '../block-tree/mode-editing';
 import { clone } from '../block-tree/clone';
 import type { RepositoryState, JsonObject } from '../block-tree/types';
 import type { CrossTextSegment } from '../block-tree/cross-text-edit';
@@ -6,6 +7,7 @@ import { includesPoint } from './ranges';
 import { diagnostic } from './diagnostics';
 /** Trim source annotations before the existing insertion planner rebases survivors. */
 export function conversionSource(state:RepositoryState,segments:CrossTextSegment[]) {
+ if(segments.some(s=>{const c=state.contents[state.placements[s.placementKey]?.contentKey];return c&&hasBlockMode(c.payload);}))throw Error('Conversion of mode-bearing text needs an explicit semantic policy; nothing was changed.');
  const locations=deriveLocations(state),first=locations.get(segments[0]?.placementKey);
  if(!first||first.slot.kind!=='children')throw Error('Conversion requires an ordinary paragraph list.');
  const parent=state.contents[first.ownerContentKey],index=parent.children.indexOf(segments[0].placementKey);

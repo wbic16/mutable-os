@@ -1,0 +1,12 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ src/features/quill/layout.test.ts (5 tests) 26ms
+ ✓ src/features/quill/input.test.tsx (5 tests) 281ms
+ ✓ src/features/quill/geometry-session.test.ts (2 tests) 6ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  15:07:34
+   Duration  11.99s (transform 7.42s, setup 0ms, collect 9.15s, tests 314ms, environment 3.41s, prepare 238ms)
+

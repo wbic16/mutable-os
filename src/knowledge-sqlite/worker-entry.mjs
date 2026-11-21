@@ -69,6 +69,7 @@ if (store) {
           case 'package-data': value=store.readKnowledge(db=>extractPackageData(db,payload,check));break;
           case 'entity-lookup': value=store.readKnowledge(db=>lookup(db,payload,check));break;
           case 'entities': { const {cancellation,...input}=payload; value=store.entities(input,check);break; }
+          case 'cache': {const {cancellation,...input}=payload;value=store.cache(input,check);break;}
           case 'cardex': {const {cancellation,...input}=payload;value=store.cardex(input,check);break;}
           case 'propositions': { const {cancellation,...input}=payload; value=store.propositions(input,check);break; }
           case 'semantics': { const {cancellation,...input}=payload; value=store.semantics(input,check);break; }

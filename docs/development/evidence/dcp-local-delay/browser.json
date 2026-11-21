@@ -1,0 +1,53 @@
+{
+  "all": [
+    {
+      "mounted": false,
+      "loadEditorMs": 318.2999999523163,
+      "contributions": 8,
+      "cells": 8635,
+      "xmlBytes": 3222,
+      "manifestMs": 4.400000035762787,
+      "requestBuildMs": 2.5,
+      "workspaceMs": 14.300000011920929,
+      "xmlProjectionMs": 1.2000000476837158,
+      "historyColdMs": 12.199999988079071,
+      "historyWarmMs": 0.20000004768371582,
+      "xmlLowerMs": 5.5,
+      "nativePrepareMs": 10.700000047683716,
+      "definitions": 12,
+      "addedAnnotations": 11,
+      "admitMs": 320.2999999523163,
+      "historyAfterMs": 1.100000023841858,
+      "saveCaptureMs": 609.6000000238419,
+      "saveEncodeMs": 132.30000001192093,
+      "saveBytes": 777793,
+      "domNodes": 0
+    },
+    {
+      "mounted": true,
+      "loadEditorMs": 331.5999999642372,
+      "mountMs": 237,
+      "contributions": 8,
+      "cells": 8635,
+      "xmlBytes": 3222,
+      "manifestMs": 1.5999999642372131,
+      "requestBuildMs": 0.5,
+      "workspaceMs": 26.600000023841858,
+      "xmlProjectionMs": 0.800000011920929,
+      "historyColdMs": 4.199999988079071,
+      "historyWarmMs": 0.19999998807907104,
+      "xmlLowerMs": 1.300000011920929,
+      "nativePrepareMs": 3.400000035762787,
+      "definitions": 12,
+      "addedAnnotations": 11,
+      "admitMs": 254.10000002384186,
+      "nextTwoFramesMs": 47.39999997615814,
+      "historyAfterMs": 1,
+      "saveCaptureMs": 574.6000000238419,
+      "saveEncodeMs": 93.80000001192093,
+      "saveBytes": 777793,
+      "domNodes": 11084
+    }
+  ],
+  "blockedCalls": []
+}

@@ -1,0 +1,277 @@
+{
+  "draftIme": true,
+  "protectedTyping": true,
+  "selected": "Rain",
+  "copyStatus": "",
+  "annotationAllowed": true,
+  "pasteStatus": "Preparing paste…",
+  "draftPaste": true,
+  "protectedPasteCutIme": true,
+  "firstReceipt": {
+    "version": 1,
+    "binding": "f81de5674a60a8310a159af271c4877a55b912d3c8ee359f223bdb789bed82be",
+    "connection": "97f79691d698d1070dfec6a39da7f80c3a6d517bef492f3c437dcd450477d70e",
+    "generation": 1,
+    "conversationId": "conv_1",
+    "exchangeId": "e545ebf2-adb6-4309-afe3-c4d13e6d7ddb"
+  },
+  "recall": {
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "409eea58-6d66-4fb8-84a2-c587f121ea23",
+      "intent": "reply",
+      "replyTargets": [],
+      "composition": [
+        {
+          "id": "p",
+          "kind": "paragraph",
+          "markup": "The picnic code is cobalt cedar 42.",
+          "ranges": []
+        }
+      ],
+      "anchors": [],
+      "entities": [],
+      "interpretations": [],
+      "arguments": [],
+      "glosses": [],
+      "relations": [],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "selected": [],
+    "receipt": {
+      "version": 1,
+      "binding": "f81de5674a60a8310a159af271c4877a55b912d3c8ee359f223bdb789bed82be",
+      "connection": "97f79691d698d1070dfec6a39da7f80c3a6d517bef492f3c437dcd450477d70e",
+      "generation": 1,
+      "conversationId": "conv_1",
+      "exchangeId": "409eea58-6d66-4fb8-84a2-c587f121ea23"
+    },
+    "usage": [
+      {
+        "provider": "openai",
+        "model": "fixture-openai",
+        "responseId": "response-fixture",
+        "startedUtc": "2026-11-07T22:48:18.547Z",
+        "completedUtc": "2026-11-07T22:48:18.548Z",
+        "usage": {
+          "input_tokens": 50,
+          "output_tokens": 20,
+          "total_tokens": 70
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "snapshots": 0,
+    "rebuilds": 0,
+    "commitMs": 6,
+    "elapsed": 465.9000000357628
+  },
+  "structural": {
+    "receipt": {
+      "version": 1,
+      "binding": "f81de5674a60a8310a159af271c4877a55b912d3c8ee359f223bdb789bed82be",
+      "connection": "97f79691d698d1070dfec6a39da7f80c3a6d517bef492f3c437dcd450477d70e",
+      "generation": 1,
+      "conversationId": "conv_1",
+      "exchangeId": "14604ce2-d193-4761-80ea-2de32139855d"
+    },
+    "response": {
+      "protocol": "dcp/1.0",
+      "kind": "contribution",
+      "exchange": "14604ce2-d193-4761-80ea-2de32139855d",
+      "intent": "reply",
+      "replyTargets": [
+        "source-8b91bc4b-d885-49bd-b1bc-efe49d272ccf"
+      ],
+      "composition": [
+        {
+          "id": "reply",
+          "kind": "paragraph",
+          "markup": "<annotation type=\"dialectic/suggestion\" id=\"proposal\">Let us meet indoors.</annotation>",
+          "ranges": []
+        }
+      ],
+      "anchors": [
+        {
+          "id": "passage",
+          "source": "source-8b91bc4b-d885-49bd-b1bc-efe49d272ccf",
+          "revision": "4636449c-fc39-48be-81b8-b0b31127ee82",
+          "selector": {
+            "exact": "Rain is forecast.",
+            "prefix": "",
+            "suffix": ""
+          }
+        }
+      ],
+      "entities": [],
+      "interpretations": [
+        {
+          "id": "classification",
+          "target": "passage",
+          "type": "dialectic/claim",
+          "ref": null,
+          "attributes": []
+        }
+      ],
+      "arguments": [
+        {
+          "id": "forecast",
+          "anchor": "passage"
+        },
+        {
+          "id": "plan",
+          "anchor": "proposal"
+        }
+      ],
+      "glosses": [],
+      "relations": [
+        {
+          "id": "reason",
+          "kind": "argument",
+          "type": "supports",
+          "from": "forecast",
+          "to": "plan"
+        }
+      ],
+      "suggestions": [],
+      "promotionRecommendations": []
+    },
+    "annotations": [
+      {
+        "blockId": "0efa04fd-8f45-42ea-b938-35f79e91ad4e",
+        "propertyId": "8927a9b8-40be-400a-ae83-853e9556b7ec"
+      },
+      {
+        "blockId": "e4005ef4-6ee9-41b8-9db8-12acd12ce72f",
+        "propertyId": "cc121cd5-c269-4caa-bc00-7dcb39d76dd8"
+      }
+    ],
+    "references": [
+      {
+        "kind": "block",
+        "resourceId": "cf339f79-c1a0-49f1-8323-d73d84102c20",
+        "blockId": "e4005ef4-6ee9-41b8-9db8-12acd12ce72f"
+      }
+    ],
+    "tools": [
+      "search_symposium"
+    ],
+    "usage": [
+      {
+        "provider": "openai",
+        "model": "fixture-openai",
+        "responseId": "response-fixture",
+        "startedUtc": "2026-11-07T22:48:19.580Z",
+        "completedUtc": "2026-11-07T22:48:19.581Z",
+        "usage": {
+          "input_tokens": 50,
+          "output_tokens": 20,
+          "total_tokens": 70
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      },
+      {
+        "provider": "openai",
+        "model": "fixture-openai",
+        "responseId": "response-fixture",
+        "startedUtc": "2026-11-07T22:48:19.583Z",
+        "completedUtc": "2026-11-07T22:48:19.584Z",
+        "usage": {
+          "input_tokens": 50,
+          "output_tokens": 20,
+          "total_tokens": 70
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      }
+    ],
+    "repairs": 0,
+    "attempts": [
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "fixture-openai",
+          "responseId": "response-fixture",
+          "startedUtc": "2026-11-07T22:48:19.580Z",
+          "completedUtc": "2026-11-07T22:48:19.581Z",
+          "usage": {
+            "input_tokens": 50,
+            "output_tokens": 20,
+            "total_tokens": 70
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [
+          {
+            "id": "search",
+            "tool": "search_symposium",
+            "arguments": {
+              "query": "Rain is forecast.",
+              "limit": 5
+            }
+          }
+        ],
+        "toolResultIds": [
+          "provider-1-0"
+        ]
+      },
+      {
+        "receipt": {
+          "provider": "openai",
+          "model": "fixture-openai",
+          "responseId": "response-fixture",
+          "startedUtc": "2026-11-07T22:48:19.583Z",
+          "completedUtc": "2026-11-07T22:48:19.584Z",
+          "usage": {
+            "input_tokens": 50,
+            "output_tokens": 20,
+            "total_tokens": 70
+          },
+          "stop": "completed",
+          "cost": {
+            "status": "unknown"
+          }
+        },
+        "toolCalls": [],
+        "toolResultIds": []
+      }
+    ],
+    "sourceAnnotation": true
+  },
+  "inspection": "dialectic/claimRain is forecast.Authored by ai · Source author: humanExchange 14604ce2-d193-4761-80ea-2de32139855d. Current native annotation; inspection does not edit it.",
+  "undoRedo": true,
+  "desktopTextual": true,
+  "saveReload": true,
+  "liveProvider": false,
+  "wire": [
+    {
+      "conversation": "conv_1",
+      "inputItems": 1
+    },
+    {
+      "conversation": "conv_1",
+      "inputItems": 1
+    },
+    {
+      "conversation": "conv_1",
+      "inputItems": 1
+    },
+    {
+      "conversation": "conv_1",
+      "inputItems": 1
+    }
+  ]
+}

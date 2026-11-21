@@ -3,6 +3,7 @@ import type { BlockViewProps } from '../block-tree/types';
 import { useReactiveView } from '../reactive-editor/context';
 import { ContainerBlockView } from './container-block-view';
 import { codeLanguage, StandoffCodeSyntax } from '../runtime/standoff-code';
+import {validateCodeLanguage} from '../block-tree/literal-authoring';
 import './standoff-code.css';
 
 export function StandoffCodeView(props: BlockViewProps) {
@@ -12,10 +13,11 @@ export function StandoffCodeView(props: BlockViewProps) {
   onMount(() => { if (editor.features.standoffCodeHighlighting && editor.features.standoffPropertyRendering) syntax = new StandoffCodeSyntax(editor, props.nodeKey); });
   onCleanup(() => syntax?.dispose());
   return <div class="standoff-code">
-    <label class="standoff-code__language">Language <select aria-label="Code language" value={language()} onChange={event => {
+    <label class="standoff-code__language">Language <select aria-label="Code language" value={language()} disabled={!editor.canEditText(props.nodeKey)} onChange={event => {
+      if(!editor.canEditText(props.nodeKey))return;
       const node = editor.node(props.nodeKey)!;
       const metadata = JSON.parse(JSON.stringify(node.payload.metadata ?? {}));
-      editor.commands.setPayloadField(props.nodeKey, 'metadata', { ...metadata, markdownCode: { ...metadata.markdownCode, language: event.currentTarget.value } }, 'Change code language');
+      editor.commands.setPayloadField(props.nodeKey, 'metadata', { ...metadata, markdownCode: { ...metadata.markdownCode, language: validateCodeLanguage(event.currentTarget.value) } }, 'Change code language');
     }}>
       <option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="markdown">Markdown</option><option value="plain">Plain text</option>
       {!['javascript', 'typescript', 'markdown', 'plain'].includes(language()) && <option value={language()}>{language()}</option>}

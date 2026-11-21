@@ -1,3 +1,4 @@
+import {prepareTabs,tabPanel,tabLabel,authoredTabOrientation} from '../block-tree/compound-authoring';
 import { holdStructuralMedia, type StructuralMediaOccurrence } from './structural-media';
 import { unwrap } from 'solid-js/store';
 import type { ReactiveEditor } from '../reactive-editor/editor';
@@ -178,18 +179,17 @@ export class TabOperations {
       e.commands.structuralTransaction(tabCommands.find(c=>c.id===id)!.label, () => {
         if (args?.invocation) e.commands.replaceInlineRange(key,args.invocation.start,args.invocation.end,'');
         if (targets) {
-          const row = e.commands.insert(block('tab-row-block',[block('tab-block',[],{name:'Tab 1',active:true})],{orientation:id.endsWith('vertical')?'vertical':'horizontal'}),{kind:'before',anchorKey:targets[0].key});
+          const row = e.commands.insert(prepareTabs([{label:'Tab 1',content:[]}],id.endsWith('vertical')?'vertical':'horizontal'),{kind:'before',anchorKey:targets[0].key});
           const tab = e.commands.childrenOf(row)[0];
           targets.forEach((node,index)=>e.commands.move(node.key,{kind:'at',parentKey:tab,index}));
         } else if (id.startsWith('tabs.orientation.')) {
-          const orientation = id.endsWith('vertical') ? 'vertical' : 'horizontal';
+          const orientation = authoredTabOrientation(id.endsWith('vertical') ? 'vertical' : 'horizontal');
           if (metadata(at!.row).orientation !== orientation) e.commands.setPayloadField(at!.row.key,'metadata',{...metadata(at!.row),orientation});
-        } else if (id === 'tab.rename') e.commands.setPayloadField(at!.tab!.key,'metadata',{...metadata(at!.tab!),name:args!.name!.trim()});
+        } else if (id === 'tab.rename') e.commands.setPayloadField(at!.tab!.key,'metadata',{...metadata(at!.tab!),name:tabLabel(args!.name)});
         else if (id === 'tab.add') {
           const row = at!.row;
           row.children.forEach(k=>{const n=e.node(k)!;if(metadata(n).active)e.commands.setPayloadField(k,'metadata',{...metadata(n),active:false});});
-          const content = row.viewType === 'document-tab-row-block' ? block('page-block',[paragraph()]) : paragraph();
-          const tab = e.commands.insert(block(row.viewType === 'document-tab-row-block'?'document-tab-block':'tab-block',[content],{name:`Tab ${row.children.length+1}`,active:true}),{kind:'at',parentKey:row.key,index:row.children.length});
+          const tab = e.commands.insert(tabPanel(`Tab ${row.children.length+1}`,[paragraph()],row.viewType === 'document-tab-row-block'),{kind:'at',parentKey:row.key,index:row.children.length});
           focusPlacement = e.commands.childrenOf(tab)[0];
           if (row.viewType === 'document-tab-row-block') focusPlacement=e.commands.childrenOf(focusPlacement)[0];
         } else if (id.startsWith('tab.move.')) {

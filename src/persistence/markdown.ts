@@ -1,3 +1,4 @@
+import {inlineUnits} from "../block-tree/inline-sequence";
 /** Bounded Markdown projection/import, qualified in B2. Native state is always authoritative. */
 import type { ExistingBlockDto, JsonObject } from "../block-tree/types";
 import type { DeepReadonly } from "../block-tree/commit-capture";
@@ -67,7 +68,7 @@ export function importMarkdown(source: string, targets: readonly LinkTarget[] = 
     children.push(block);
   }
   const id = crypto.randomUUID();
-  const document: ExistingBlockDto = { id, type: "document-block", metadata: { documentId: id }, children };
+  const document: ExistingBlockDto = { id, type: "document-block", metadata: { documentId: id }, children: [{ id: crypto.randomUUID(), type: "page-block", children }] };
   return { document, diagnostics };
 }
 export function admitMarkdown(repository: CanonicalRepository, bank: string, source: string, targets: readonly LinkTarget[] = []) {
@@ -77,18 +78,21 @@ export function admitMarkdown(repository: CanonicalRepository, bank: string, sou
 }
 
 export function exportMarkdown(resource: DeepReadonly<ResourceSnapshot>, targets: readonly LinkTarget[] = []) {
+  if (Object.values(resource.contents).some(c => c.compactInline?.spans.some(a => a.kind === "alternative"))) throw Error("Markdown export cannot preserve inline alternatives; save as Mutable JSON");
   const diagnostics: Diagnostic[] = [], seen = new Set<string>(); let budget = 10000;
   const warn = (id: unknown, code: string, detail: string) => diagnostics.push({ blockId: typeof id === "string" ? id : undefined, code, detail });
   const plain = (key: string): string => {
     const c = resource.contents[key];
+    if(c.compactInline)return c.compactInline.spans.map(a=>a.kind==='text'?a.text:String(a.properties.alt??'[image]')).join('');
     return c.inlineContent.map(pk => { const p = resource.placements[pk]; if (p.target.kind !== "local") return ""; const atom = resource.contents[p.target.contentKey]; return atom.viewType === "text-cell" ? String(atom.payload.text) : String(atom.payload.alt ?? "[image]"); }).join("");
   };
   const inline = (key: string) => {
-    const c = resource.contents[key], tokens = c.inlineContent.map(pk => {
-      const p = resource.placements[pk]; if (p.target.kind !== "local") return "";
-      const atom = resource.contents[p.target.contentKey];
+    const c = resource.contents[key];
+    const atoms=c.compactInline ? [...inlineUnits(c.compactInline.spans as any)].map(a=>a.kind==='text'?{viewType:'text-cell',payload:{text:a.text}}:{viewType:'image-cell',payload:a.properties}) : c.inlineContent.map(pk=>{const p=resource.placements[pk];return p.target.kind==='local'?resource.contents[p.target.contentKey]:undefined;});
+    const tokens = atoms.map(atom => {
+      if(!atom)return '';
       if (atom.viewType === "text-cell") return escapeText(String(atom.payload.text));
-      const src = String(atom.payload.src ?? ""), alt = escapeText(String(atom.payload.alt ?? "Image"));
+      const src = String((atom.payload as Record<string, unknown>).src ?? ""), alt = escapeText(String((atom.payload as Record<string, unknown>).alt ?? "Image"));
       warn(c.payload.id, "image-projection", "Image appearance/metadata is not fully represented; no assets copied");
       return /^(https?:|data:image\/|\.\.?\/)/.test(src) && !/[\s()<>]/.test(src) ? `![${alt}](${src})` : `[Image: ${alt}]`;
     });
@@ -130,7 +134,7 @@ export function exportMarkdown(resource: DeepReadonly<ResourceSnapshot>, targets
     seen.add(c.key);
     const children = () => c.children.map(visit).filter(Boolean).join("\n\n");
     let text = "";
-    if (c.viewType === "document-block") text = children();
+    if (c.viewType === "document-block" || c.viewType === "page-block") text = children();
     else if (c.viewType === "standoff-editor-block") {
       const bp = Array.isArray(c.payload.blockProperties) ? c.payload.blockProperties.filter(p => !p.isDeleted) : [];
       const h1 = bp.some(p => p.type === "block/font/size" && p.value === "h1" || p.type === "block/font/size/h1");

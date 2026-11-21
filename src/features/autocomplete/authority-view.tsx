@@ -19,9 +19,9 @@ export function AuthorityPanel(props:{service:EntityService;query:string;guard(f
   cancel();const token=generation,c=controller=new AbortController(),current=()=>alive&&token===generation&&!c.signal.aborted;setBusy(true);setError('');
   try{await fn(c.signal,current);}catch(e){if(current())setError(String(e));}finally{if(current())setBusy(false);}
  };
- const search=()=>void run(async(signal,current)=>{const found=await searchAuthority(provider(),query(),signal);if(current()){setRows(found);setStaged(undefined);setReceipt('');setAttempt(undefined);}});
+ const search=()=>void run(async(signal,current)=>{const vault=await props.service.historyScope?.()??'.',found=await searchAuthority(provider(),query(),signal,vault);if(current()){setRows(found);setStaged(undefined);setReceipt('');setAttempt(undefined);}});
  const stage=(record:AuthorityRecord)=>void run(async(signal,current)=>{
-  const details=await authorityDetails(record,signal);if(!current())return;setStaged(details);setTarget('');setMatches([]);setReceipt('');setAttempt(undefined);
+  const vault=await props.service.historyScope?.()??'.',details=await authorityDetails(record,signal,vault);if(!current())return;setStaged(details);setTarget('');setMatches([]);setReceipt('');setAttempt(undefined);
   if(details.provider!=='wikidata')return;
   const existing=await props.service.authorityLookup?.(details,signal);if(!current())return;
   if(existing){setMatches([existing]);setTarget(existing.id);return;}

@@ -1,5 +1,6 @@
 .cavern-startup,.cavern-overlay{min-height:100dvh;display:grid;place-items:center;padding:28px;box-sizing:border-box;background:linear-gradient(145deg,#dfe8e4,#b9d3d3);color:#273b38;font:15px/1.5 Arial,sans-serif}
 .cavern-overlay{position:fixed;inset:0;z-index:2200;background:#172a3877;overflow:auto}
+.cavern-connection{position:fixed;right:16px;bottom:16px;z-index:2300;max-width:min(440px,90vw);padding:16px;border:1px solid #b6c8c2;border-radius:8px;background:#fff2ed;color:#273b38;box-shadow:0 12px 35px #0003;font:14px/1.5 Arial,sans-serif}.cavern-connection p{margin:0 0 10px}.cavern-connection button{font:inherit;padding:8px 14px;cursor:pointer}
 .cavern-card{width:min(690px,100%);padding:32px;box-sizing:border-box;border:1px solid #b7c8c2;border-radius:14px;background:#fafdfb;box-shadow:0 24px 70px #17373525;max-height:calc(100dvh - 56px);overflow:auto}
 .cavern-card h1{font-size:27px;line-height:1.2;margin:8px 0 20px}.cavern-card h2{font-size:17px;margin:0 0 8px}.cavern-card p{margin:12px 0}.cavern-card small{letter-spacing:.08em}
 .cavern-card button,.cavern-menu button{font:inherit;color:inherit;border:1px solid #b6c8c2;border-radius:5px;background:#f0f6f3;padding:8px 14px;cursor:pointer}.cavern-card button:disabled,.cavern-menu button:disabled{opacity:.55;cursor:default}

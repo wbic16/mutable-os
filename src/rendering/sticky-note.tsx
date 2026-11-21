@@ -1,4 +1,5 @@
-import { For, Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import {noteDimensions} from '../block-tree/note-authoring';
+import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { ApplicationSurfacePortal } from "./window-manager";
 import { unwrap } from "solid-js/store";
 import type { BlockViewProps } from "../block-tree/types";
@@ -13,6 +14,7 @@ export function StickyNoteBlockView(props: BlockViewProps) {
   const { editor, projection } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
   const metadata = () => node()?.payload.metadata as Record<string, unknown> | undefined;
+  const editable=createMemo(()=>editor.canEditText(props.nodeKey));
   const fontScale = createMemo(() => Math.pow(1.125, Math.max(-3, Math.min(5, Number(metadata()?.fontStep) || 0))));
   const [floating, setFloating] = createSignal(false);
   let root!: HTMLDivElement;
@@ -25,9 +27,10 @@ export function StickyNoteBlockView(props: BlockViewProps) {
     element: () => root,
     size: storedSize,
     minimum: { width: 200, height: 160 },
-    enabled: () => !floating(),
-    onCommit: size => editor.commands.setPayloadField(props.nodeKey, "metadata", { ...unwrap(metadata() ?? {}), size }, "Resize Sticky Note"),
+    enabled: () => !floating() && editable(),
+    onCommit: size => {if(editable())editor.commands.setPayloadField(props.nodeKey, "metadata", { ...unwrap(metadata() ?? {}), size:noteDimensions(size) }, "Resize Sticky Note");},
   });
+  createEffect(()=>{if(!editable())resize.cancel();});
   onMount(() => {
     setFloating(!!root.closest(".reactive-window--sticky"));
     dispose = editor.mounts.register(props.nodeKey, { root, focusElement: root, inputPolicy: "container", focus: () => root.focus({ preventScroll: true }) });
@@ -37,7 +40,7 @@ export function StickyNoteBlockView(props: BlockViewProps) {
     data-block-type="sticky-note-block" data-sticky-colour={String(metadata()?.colour ?? "yellow")} data-sticky-material={String(metadata()?.material ?? "paper")}
     style={{ "font-size": `${fontScale()}em`, width: floating() ? "100%" : `min(${resize.dimensions().width}px, 100%)`, height: floating() ? "100%" : `${resize.dimensions().height}px` }} tabIndex={-1}>
     <div class="reactive-sticky-note__content"><ChildBlocks parentKey={props.nodeKey} /></div>
-    <Show when={!floating()}><FloatingWindowResizeHandle controller={resize} class="reactive-sticky-note__resize" label="Resize sticky note" /></Show>
+    <Show when={!floating() && editable()}><FloatingWindowResizeHandle controller={resize} class="reactive-sticky-note__resize" label="Resize sticky note" /></Show>
   </div>;
 }
 

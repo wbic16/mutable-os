@@ -29,6 +29,27 @@ test('fresh/repeated migration preserves identities, checksums and independent d
   assert.ok(verifyDatabase(db,'mutable').ok);
 });
 
+test('version 10 upgrades to the existing version 12 schema and reopens without changing authored associations', t => {
+  const db = new Database(':memory:'); t.after(() => db.close());
+  const prior = migrate(db, 'mutable', { fresh: true, steps: migrations.mutable.slice(0, 10) });
+  db.exec("INSERT INTO Entity(guid,name,nameKey) VALUES('person','Author','author')");
+  const next = migrate(db, 'mutable');
+  assert.equal(next.version, 12); assert.equal(next.vaultGuid, prior.vaultGuid);
+  // These checksums belong to the previously released migrations, not replacements.
+  assert.equal(next['migration:11'], '9240eb0e4c5d5d2ea031122cd442e9835695181e1753e53960c65f0d3ba927ad');
+  assert.equal(next['migration:12'], '94dc3b031dafba77b64420c1a99fafb7cd1582f22263b35441a85858b9bf7a11');
+  db.exec(`INSERT INTO Cache(key,value,createdAt,updatedAt) VALUES('entry','{"value":1}','now','now');
+    INSERT INTO DocumentEntityAssociation(guid,sourceResourceGuid,sourceEntityGuid,entityGuid,sourceFingerprint,attributes)
+    VALUES('association','document','source-person','person','fingerprint','{"reviewed":true}')`);
+  const before = db.serialize();
+  assert.deepEqual(migrate(db, 'mutable'), next);
+  assert.deepEqual(db.serialize(), before);
+  clearDerived(db);
+  assert.equal(db.prepare('SELECT entityGuid FROM DocumentEntityAssociation').get().entityGuid, 'person');
+  assert.equal(db.prepare('SELECT name FROM Entity').get().name, 'Author');
+  assert.equal(db.prepare('SELECT value FROM Cache').get().value, '{"value":1}');
+});
+
 for (const [label, sql, message] of [
   ['future version', "UPDATE SchemaInfo SET value='99' WHERE key='schemaVersion'; PRAGMA user_version=99", /schema version/],
   ['version disagreement', 'PRAGMA user_version=1', /schema version/],

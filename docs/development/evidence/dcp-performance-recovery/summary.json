@@ -1,0 +1,112 @@
+{
+  "input": 26019,
+  "output": 4644,
+  "calls": 2,
+  "results": [
+    {
+      "id": "A1",
+      "prompt": "What is a palimpsest? Two sentences, please.",
+      "timings": {
+        "assemblyMs": 76.8525840000002,
+        "continuityMs": 3993.5382500000014,
+        "admissionMs": 68.87975000000006,
+        "persistenceMs": 39.96720899999491,
+        "totalMs": 16587.375750000003
+      },
+      "startedUtc": "2026-11-11T09:04:52.628Z",
+      "continuity": {
+        "version": 1,
+        "binding": "9d8077f29ddb7aa351339f4f7666a36cabd5b7411d1330fba213917f7c10b7f2",
+        "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+        "generation": 1,
+        "conversationId": "conv_6af42fb69cf48196b28b6667f21a6f090f5b462dbe46facc",
+        "exchangeId": "70aab8f4-e193-4367-8c99-0e93b9974b56",
+        "start": 0,
+        "recovery": false
+      },
+      "nativeBytes": 70805,
+      "admitted": true,
+      "nativeContributions": 2,
+      "repaired": false,
+      "completedUtc": "2026-11-11T09:05:09.222Z",
+      "usage": [
+        {
+          "input_tokens": 12929,
+          "output_tokens": 548,
+          "total_tokens": 13477,
+          "reasoning_tokens": 208,
+          "cached_input_tokens": 0
+        }
+      ],
+      "tools": [],
+      "entities": [
+        {
+          "id": "new:e1",
+          "name": "Palimpsest",
+          "typename": "Concept",
+          "description": "A manuscript surface reused after earlier writing was erased; figuratively, something retaining traces of earlier layers or forms.",
+          "aliases": []
+        }
+      ],
+      "relationships": [],
+      "interpretations": [
+        {
+          "id": "new:m1",
+          "target": "new:r1",
+          "type": "mutable/entity-reference",
+          "ref": "new:e1",
+          "attributes": []
+        }
+      ],
+      "glosses": []
+    },
+    {
+      "id": "B",
+      "prompt": "I've always been fascinated by the relationship between Leonardo da Vinci and the Sforza court in Milan. Ludovico Sforza seems to have valued Leonardo as much for his engineering abilities as for his painting. How did Leonardo first enter Ludovico's service, and what were the major projects he undertook there?",
+      "timings": {
+        "assemblyMs": 51.72729100000288,
+        "continuityMs": 2178.2820829999982,
+        "totalMs": 61064.779583
+      },
+      "startedUtc": "2026-11-11T09:05:09.250Z",
+      "continuity": {
+        "version": 1,
+        "binding": "9d8077f29ddb7aa351339f4f7666a36cabd5b7411d1330fba213917f7c10b7f2",
+        "connection": "f6752f890a90657ddc792a09b7b82c02f318bf08b662f1e0f3f66cadea01fb4c",
+        "generation": 2,
+        "conversationId": "conv_6af42fc6238c8195ab7ff4457f7bbf260b32b4a8da0d45bf",
+        "exchangeId": "02997a55-947e-4f99-b094-757b16511029",
+        "start": 0,
+        "recovery": true
+      },
+      "error": "Error: Provider stream exceeded its byte budget.",
+      "repaired": false,
+      "completedUtc": "2026-11-11T09:06:10.311Z",
+      "usage": [],
+      "tools": []
+    }
+  ],
+  "retainedBReceipt": {
+    "status": "incomplete",
+    "usage": {
+      "input_tokens": 13090,
+      "input_tokens_details": {
+        "cache_write_tokens": 1451,
+        "cached_tokens": 11636
+      },
+      "output_tokens": 4096,
+      "output_tokens_details": {
+        "reasoning_tokens": 516
+      },
+      "total_tokens": 17186
+    },
+    "incomplete_details": {
+      "reason": "max_output_tokens"
+    },
+    "id": "resp_0b32b4a8da0d45bf006af42fc7e2a481958a42bc1014e050da"
+  },
+  "limitations": [
+    "C was not continued after B failed; further paid qualification deferred pending contract reduction.",
+    "B receipt recovered with GET /responses/{id}; no new generation or automatic retry."
+  ]
+}

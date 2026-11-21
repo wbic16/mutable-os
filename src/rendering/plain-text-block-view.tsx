@@ -70,6 +70,7 @@ export function PlainTextBlockView(props: BlockViewProps) {
       <textarea
         ref={textarea}
         data-input-part="plain-text"
+        readOnly={!editor.canEditText(props.nodeKey)}
         value={text()}
         aria-label={(node()?.payload.metadata as Record<string, unknown> | undefined)?.label as string ?? "Plain text Block"}
       />

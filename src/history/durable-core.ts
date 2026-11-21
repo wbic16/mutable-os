@@ -287,7 +287,7 @@ export function compareDurableSubtrees(before: DeepReadonly<SubtreeResult>, afte
   const changes: SubtreeComparison["changes"] = [];
   const authored = (r: DeepReadonly<SubtreeResult>) => Object.values(r.fragment?.contents ?? {}).filter(c => !cell(c)).map(c => ({
     id: c.payload.id, type: c.viewType, payload: c.payload,
-    inline: c.inlineContent.map(pk => r.fragment!.contents[r.fragment!.placements[pk].contentKey]?.payload),
+    inline: c.compactInline ?? c.inlineContent.map(pk => r.fragment!.contents[r.fragment!.placements[pk].contentKey]?.payload),
     children: c.children.map(pk => r.fragment!.placements[pk].placementId),
     relations: Object.fromEntries(Object.entries(c.ownedRelations).map(([name, pk]) => [name, r.fragment!.placements[pk].placementId])),
     opaqueRelations: c.opaqueRelations, wireChildren: c.wireChildren, wireRelation: c.wireRelation,

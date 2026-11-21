@@ -1,7 +1,8 @@
 import {structuredExtensions} from '../structured/model';
-export type ImportFormat = 'html' | 'markdown' | 'text' | 'png' | 'jpeg' | 'structured' | 'academic';
+export type ImportFormat = 'tei' | 'html' | 'markdown' | 'text' | 'png' | 'jpeg' | 'structured' | 'academic';
 export type ExportFormat = 'html' | 'markdown' | 'text';
 export const formats = [
+  {id:'tei',label:'TEI P5 XML',extensions:['tei'],mediaTypes:['application/tei+xml'],operations:['import'],adapter:'tei-native',profile:'tei/milestone-1'},
   {id:'academic',label:'Academic bibliography / OCR / EPUB',extensions:['bib','bibtex','ris','alto','page','epub'],mediaTypes:['application/x-bibtex','application/x-research-info-systems','application/epub+zip'],operations:['import','insert'],adapter:'academic-resource',profile:'mutable-academic-v1'},
   {id:'structured',label:'Read-only code / data / diagram',extensions:structuredExtensions,mediaTypes:['application/json','application/yaml','text/yaml','text/csv','text/tab-separated-values','application/javascript','text/javascript'],operations:['import','insert'],adapter:'structured-resource',profile:'mutable-structured-v1'},
   { id: 'html', label: 'HTML', extensions: ['html', 'htm'], mediaTypes: ['text/html'], operations: ['import', 'insert', 'convert', 'export'], adapter: 'semantic-html', profile: 'mutable-semantic-html-v1' },

@@ -6,6 +6,7 @@ import {existsSync} from 'node:fs';
 import type {Executor,ExecutionTask,Inventory} from '../../src/application-services/capabilities';
 import type {PreparationResult} from '../../src/application-services/contracts';
 import {SERVICE_LIMITS} from '../../src/application-services/validation';
+import {attachmentLimits} from '../../src/features/dialectic/attachments-contract';
 type Result=Awaited<ReturnType<Executor['run']>>;
 type Item={task:ExecutionTask;bytes:number;resolve:(v:Result)=>void;reject:(e:Error)=>void;signal?:AbortSignal;cancel:()=>void;timer:ReturnType<typeof setTimeout>;worker?:Worker;finished:boolean};
 export class NodePreparationExecutor implements Executor {
@@ -21,8 +22,10 @@ export class NodePreparationExecutor implements Executor {
   if(this.closed)return Promise.reject(Error('Preparation executor closed'));
   if(signal?.aborted)return Promise.reject(Error('Preparation cancelled'));
   if(this.queue.length>=SERVICE_LIMITS.queue)return Promise.reject(Error('Preparation queue is full'));
-  const bytes=serialize(task).byteLength;
-  if(bytes>64*1024*1024||this.bytes+bytes>96*1024*1024)return Promise.reject(Error('Preparation input byte budget exceeded'));
+  const largePdf=task.kind==='attachment-pdf-inspect';
+  if(largePdf&&task.bytes.byteLength>attachmentLimits.fileBytes)return Promise.reject(Error('Attachment exceeds 100 MB'));
+  const bytes=largePdf?task.bytes.byteLength+1024:serialize(task).byteLength,limit=largePdf?attachmentLimits.fileBytes+1024:64*1024*1024;
+  if(bytes>limit||this.bytes+bytes>Math.max(96*1024*1024,limit))return Promise.reject(Error('Preparation input byte budget exceeded'));
   const captured=structuredClone(task);this.bytes+=bytes;
   return new Promise((resolve,reject)=>{
    const item:Item={task:captured,bytes,resolve,reject,signal,cancel:()=>void this.finish(item,Error('Preparation cancelled')),timer:undefined!,finished:false};
@@ -38,7 +41,7 @@ export class NodePreparationExecutor implements Executor {
    worker.once('message',message=>void this.finish(item,message.error?Error(message.error):undefined,message.value));
    worker.once('error',error=>void this.finish(item,error instanceof Error?error:Error(String(error))));
    worker.once('exit',()=>{if(!item.finished)void this.finish(item,Error('Preparation worker exited'));});
-   worker.postMessage(item.task);
+   if(item.task.kind==='attachment-pdf-inspect')worker.postMessage(item.task,[item.task.bytes.buffer as ArrayBuffer]);else worker.postMessage(item.task);
   }catch(error){void this.finish(item,error as Error);}
  }
  private async finish(item:Item,error?:Error,value?:Result){

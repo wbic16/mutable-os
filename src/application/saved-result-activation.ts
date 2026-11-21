@@ -10,11 +10,16 @@ export class SavedResultActivation {
  constructor(private editor:ReactiveEditor,private native:NativeDocumentSession,private vault:()=>DocumentVaultLease,private guard:()=>void){}
  dispose(){this.alive=false;this.serial++;}
  async prepare(evidence:SavedSourceEvidence,current:()=>boolean,signal?:AbortSignal){
-  const serial=++this.serial,repository=this.editor.repository,vault=this.vault(),signature=vault.signature();let revision=repository.state.revision;
-  const check=()=>{this.guard();signal?.throwIfAborted();if(!this.alive||serial!==this.serial||this.editor.repository!==repository||repository.state.revision!==revision||this.vault()!==vault||!vault.isAlive()||vault.signature()!==signature||policyKey({version:1,opaqueTypes:this.editor.registry.typesWithCapability('opaque-widget')})!==evidence.policy)throw Error('Selected activation is stale');};
+  const serial=++this.serial,repository=this.editor.repository,vault=this.vault();let revision=repository.state.revision,signature:string|undefined;
+  policyKey(JSON.parse(evidence.policy));
+  // Saved indexing may have a different installed widget vocabulary. The caller
+  // rechecks the selected passage against current native Facts before revealing it.
+  // Fence changes during activation, not unrelated changes since the last index.
+  const policy=policyKey({version:1,opaqueTypes:this.editor.registry.typesWithCapability('opaque-widget')});
+  const check=()=>{this.guard();signal?.throwIfAborted();const reason=!this.alive||serial!==this.serial?'activation superseded':this.editor.repository!==repository||repository.state.revision!==revision?'Document changed':this.vault()!==vault||!vault.isAlive()?'Cavern changed':signature!==undefined&&vault.signature()!==signature?'Cavern discovery changed':policyKey({version:1,opaqueTypes:this.editor.registry.typesWithCapability('opaque-widget')})!==policy?'native vocabulary changed':'';if(reason)throw Error('Selected activation is stale: '+reason);};
   const verifyFile=async()=>{try{await this.native.verifySelected(evidence.location,evidence,signal);}catch(error){throw Error('Selected native file missing or changed: '+String(error));}};
-  check();if(!current())throw Error('Saved result is stale');await vault.refresh();check();if(!current())throw Error('Saved result is stale');
-  const row=vault.requireFile(evidence.location),native=this.native.knowledgeEvidence(evidence.resourceId);
+  check();if(!current())throw Error('Saved result is stale');await vault.refresh();check();if(!current())throw Error('Saved result is stale');signature=vault.signature();
+  const row=vault.requireSelectedFile(evidence.location),native=this.native.knowledgeEvidence(evidence.resourceId);
   if(row.resourceId!==evidence.resourceId||row.baseline?.nativeHash!==evidence.byteHash||!['paired','unenrolled'].includes(row.state)||native.closed||native.admitting||native.pending||native.location&&!sameLocation(native.location,evidence.location))throw Error('Selected identity, binding or storage evidence changed');
   const boundary=await repository.readCanonicalResourceBoundaryCooperative(evidence.resourceId,{signal});check();
   if(boundary.status==='missing'){

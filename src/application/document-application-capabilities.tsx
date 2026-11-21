@@ -3,7 +3,7 @@ import {RegisteredApplicationView,originPresentationHost} from './application-pr
 import { documentApplicationPorts } from './document-application-ports';
 import { tabOrientation } from '../block-tree/tab-orientation';
 import { tabOrientationMenu } from '../runtime/tab-orientation';
-import {registerCompletionDocuments} from './completion-documents';
+import {registerCompletionDocuments,type FlintDocumentChoice} from './completion-documents';
 import { exportDocument } from '../runtime/export-document';
 import { CollectionDialog } from '../rendering/collection-dialog';
 import {createDocumentSave} from './document-save';
@@ -32,7 +32,7 @@ import { createFormattedDocument, documentFormats, readDocumentFormat } from "..
 import type { ApplicationVault } from "../feature-api/document-application";
 import { nativeDocumentSession } from "../persistence/native-session";
 import { documentRootPlacements } from "../block-tree/resource-registration";
-import { Show, For, batch, createMemo, createSignal, createEffect, untrack, onCleanup, onMount } from "solid-js";
+import { Show, For, batch, createMemo, createSignal, createEffect, untrack, onCleanup, onMount, type JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import type { FeatureScope } from "../feature-api";
@@ -59,7 +59,9 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
   };
   return { register(definition) {
     requireActive();
-    const presentationKey=editor.features.applicationPresentations?registerDocumentPresentations(editor,scope,definition.applicationId??definition.type):undefined;
+    const appId = definition.applicationId ?? (definition.type === "flint-application-block" ? "flint" : definition.type);
+    const label = definition.label ?? (appId === "flint" ? "Flint" : appId);
+    const presentationKey=editor.features.applicationPresentations?registerDocumentPresentations(editor,scope,appId):undefined;
     // One launch may request an existing presentation. Never persist that UI mode.
     const launchViews = new Map<string, "graph">();
     const recents = definition.type === 'flint-application-block' && editor.features.flintRecentDocuments ? createRecentDocuments() : undefined;
@@ -112,7 +114,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
       const navigation = navigationTabs.get(props.nodeKey) ?? {tabs: new Map<string, string>()};
       navigationTabs.set(props.nodeKey, navigation);
       const [navigationRevision, setNavigationRevision] = createSignal(0);
-      const detachment = retainedSessions?.detachment;
+      const detachment = appId === "flint" ? retainedSessions?.detachment : undefined;
       const tabSession = (key: string) => detachment?.forSlot(props.nodeKey,key);
       const detachedTab = (key: string) => detachment?.detached(tabSession(key)) ?? false;
       const liveViews = new Map<string, BlockTreeProjection>();
@@ -179,6 +181,9 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
       };
       const tabKeys = createMemo(() => { navigationRevision(); return [...visibleTabs(),...navigation.tabs.keys()]; });
       const tabButtons = new Map<string, HTMLButtonElement>();
+      const [tabActivity,setTabActivity]=createSignal<((id:string)=>string)>();
+      let conversationCloseGuard:((ids:readonly string[],signal?:AbortSignal,keys?:readonly string[])=>boolean|Promise<boolean>)|undefined;
+      const documentTabs=createMemo(()=>tabKeys().map(key=>({key,documentId:tabId(key)})));
       const pendingTabCloses = new Map<string, AbortController>();
       const [tabCloseError, setTabCloseError] = createSignal("");
       const cancelTabCloses = () => { for (const controller of pendingTabCloses.values()) controller.abort(); pendingTabCloses.clear(); };
@@ -201,7 +206,9 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
             if (node && editor.viewVisibility.isClosed(node.placementKey)) closeTab(key, true, keys, active && generation === tabSelectionGeneration, focusCurrent?.() !== false);
           };
           try {
-            const result = editor.closeView(key, controller.signal);
+            const allowed=conversationCloseGuard?.([tabId(key)??''],controller.signal,[key])??true;
+            const perform=(ok:boolean)=>{if(ok&&!controller.signal.aborted)return editor.closeView(key,controller.signal);};
+            const result=allowed instanceof Promise?allowed.then(perform):perform(allowed);
             if (result instanceof Promise) void result.then(finish).catch(error => {
               if (mounted && !controller.signal.aborted) setTabCloseError(String(error));
             }).finally(() => { if (pendingTabCloses.get(key) === controller) pendingTabCloses.delete(key); });
@@ -235,17 +242,17 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
         editor.overlays.open({ ownerKey: props.nodeKey, viewType: "context-menu", data: { documentTab: key },
           anchor: event instanceof MouseEvent ? { x: event.clientX, y: event.clientY } : { x: rect.left, y: rect.bottom } });
       };
-      const tabs = () => <div class="reactive-tabs" data-tab-orientation={tabOrientation(row()?.payload.metadata, editor.features.verticalTabs)}><Show when={tabCloseError()}><p role="alert">{tabCloseError()}</p></Show><div class="reactive-tabs__labels" role="tablist" aria-orientation={tabOrientation(row()?.payload.metadata, editor.features.verticalTabs)} data-cross-text-controls={retainedSessions ? "" : undefined}><For each={tabKeys()}>{key => {
+      const tabs = (tabProps: { afterTabs?: JSX.Element }) => <div class="reactive-tabs" data-tab-orientation={tabOrientation(row()?.payload.metadata, editor.features.verticalTabs)}><Show when={tabCloseError()}><p role="alert">{tabCloseError()}</p></Show><div class="reactive-tabs__labels" role="tablist" aria-orientation={tabOrientation(row()?.payload.metadata, editor.features.verticalTabs)} data-cross-text-controls={retainedSessions ? "" : undefined}><For each={tabKeys()}>{key => {
         const title = () => resolve(tabId(key) ?? '')?.title ?? String((editor.node(key)?.payload.metadata as any)?.name ?? 'Unavailable Document');
         onCleanup(() => tabButtons.delete(key));
         return <div class="flint-document-tab" role="presentation" data-active={activeTab() === key} data-native-context-menu
           onContextMenu={event => openTabMenu(key, event)}
           onKeyDown={event => { if (event.key === 'ContextMenu' || event.key === 'F10' && event.shiftKey) openTabMenu(key, event); }}>
-          <button ref={button => tabButtons.set(key, button)} type="button" role="tab" aria-selected={activeTab()===key} onClick={()=>chooseTab(key)}>{title()}<Show when={detachedTab(key)}><span class="flint-document-tab__detached" aria-label="Detached window" title="Select to activate its standalone window">↗</span></Show><Show when={native?.isDirty(tabId(key) ?? '')}><span class="flint-document-tab__dirty" role="img" aria-label="Unsaved changes" title="Unsaved changes" /></Show></button>
+          <button ref={button => tabButtons.set(key, button)} type="button" role="tab" aria-selected={activeTab()===key} onClick={()=>chooseTab(key)}>{title()}<Show when={tabActivity()?.(tabId(key)??'')}>{status=><span class="document-tab-activity" role="status" aria-label={status()} title={status()}> · {status()}</span>}</Show><Show when={detachedTab(key)}><span class="flint-document-tab__detached" aria-label="Detached window" title="Select to activate its standalone window">↗</span></Show><Show when={native?.isDirty(tabId(key) ?? '')}><span class="flint-document-tab__dirty" role="img" aria-label="Unsaved changes" title="Unsaved changes" /></Show></button>
           <Show when={detachment}><button type="button" aria-label={`Document actions: ${title()}`} onPointerDown={e=>e.preventDefault()} onClick={event=>openTabMenu(key,event)}>⋯</button></Show>
           <button type="button" class="flint-document-tab__close" aria-label={`Close Document: ${title()}`} title={`Close ${title()}`} onClick={event => { event.stopPropagation(); closeTab(key); }}>×</button>
         </div>;
-      }}</For></div><For each={tabKeys()}>{key=>{
+      }}</For>{tabProps.afterTabs}</div><For each={tabKeys()}>{key=>{
         const [visited, setVisited] = createSignal(false);
         createEffect(() => { if (activeTab() === key) setVisited(true); });
         return <Show when={retainedSessions ? visited() : activeTab() === key}>
@@ -444,6 +451,8 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
           const revealed=await revealMatch(editor,{id:'flint-navigation',text:'',context:'',captures:[],ranges:[range],path:editor.blockQueries.ancestorPath(node.key).map(n=>n.key),breadcrumb:'',capabilities:{highlight:false,reveal:true,annotate:false,replace:false}},stillCurrent);
           await verify?.();
           if(!revealed||!stillCurrent())throw new Error('Passage is stale or cannot currently be revealed');
+          const windowId=editor.windowManager?.ownerForNode(node.key);
+          if(windowId)editor.windowManager!.lifecycle.reveal(windowId);
           editor.focus.request(node.key,{reason:'flint-navigation'});
           const mount=editor.mounts.get(node.key);
           if(range.coordinate==='cell'&&mount?.restoreInlineSelection){mount.restoreInlineSelection({anchor:range.start,head:range.end});editor.selections.setPrimary(node.key,node.contentKey,node.viewId,range.start,range.end);}
@@ -458,7 +467,48 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
       },accepts:key=>{const node=editor.node(key);return !!node&&[...liveViews.values()].some(view=>view.viewId===node.viewId);}}));
       createEffect(() => { const vault=selectedVault(); untrack(() => facts?.use(vault)); });
       const knowledge = native ? new VaultKnowledge(editor, native, knowledgeHost, undefined, facts) : undefined;
-      if(knowledge)onCleanup(registerCompletionDocuments(editor,{knowledge,accepts:key=>{const active=knowledgeHost.active();return !!active?.projection.node(key);}}));
+      onCleanup(registerCompletionDocuments(editor,{
+        knowledge,key:props.nodeKey,type:definition.type,vault:()=>selectedVault()?.root,
+        openVault:root=>vault?(root?vault.open(root):vault.retry!()):Promise.reject(Error('Native Document persistence is unavailable')),
+        accepts:key=>{const active=knowledgeHost.active();return !!active?.projection.node(key);},
+        documents:()=>{
+          guard();const v=selectedVault(),choices=new Map<string,FlintDocumentChoice>();
+          for(const doc of documents()){
+            const location=native?.location(doc.id);
+            if(location&&v&&!vaultContains(v.root,vaultPath(location)))continue;
+            choices.set(doc.id,{documentId:doc.id,title:doc.title,location,vault:v?.root,disabled:!doc.placement});
+          }
+          for(const doc of v?.listing().documents??[]){
+            const prior=choices.get(doc.resourceId);
+            const ambiguous=doc.state==='ambiguous'||!!prior?.location&&vaultPath(prior.location)!==vaultPath(doc.location);
+            choices.set(doc.resourceId,{documentId:doc.resourceId,title:prior?.title??doc.title??doc.location.filename,location:doc.location,vault:v!.root,disabled:ambiguous||prior?.disabled||['unavailable','pending'].includes(doc.state)});
+          }
+          return [...choices.values()];
+        },
+        async prepareDocument(choice,current){
+          const v=selectedVault();
+          const check=()=>{guard();if(!current()||selectedVault()!==v||choice.vault&&v?.root!==choice.vault)throw Error('Flint Document selection is stale');};
+          check();
+          if(!resolve(choice.documentId)?.placement){
+            if(!v||!choice.location)throw Error('The selected Document is no longer available');
+            await v.refresh();check();
+            const row=v.requireSelectedFile(choice.location),byteHash=row.baseline?.nativeHash;
+            if(row.resourceId!==choice.documentId||!byteHash)throw Error('The selected Document identity changed');
+            await native!.openVerified(choice.location,{resourceId:choice.documentId,byteHash},check,undefined,async()=>{
+              await v.refresh();check();
+              if(v.requireSelectedFile(choice.location!).resourceId!==choice.documentId)throw Error('The selected Document identity changed');
+            });
+            check();
+          }
+          if(!resolve(choice.documentId)?.placement)throw Error('The selected Document is unavailable or ambiguous');
+          return ()=>{guard();openDocument(choice.documentId,true);};
+        },
+        reveal:()=>{
+          guard();const windowId=editor.windowManager?.ownerForNode(props.nodeKey);
+          if(windowId)editor.windowManager!.lifecycle.reveal(windowId);
+          editor.focus.request(props.nodeKey,{reason:'flint-command'});
+        },
+      }));
       const entityList = new DocumentEntityList(entityAnnotations);
       const entityOrigin = createMemo(() => {
         viewRevision();
@@ -491,6 +541,10 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
         async save(location?: VaultLocation) {
           guard();await documentSaver!.save(requireId(),location);
         },
+        async saveSubmitted(id:string,defaultFilename:string) {
+          guard();if(!resolve(id))throw Error('Submitted Document is no longer available');
+          return documentSaver!.save(id,undefined,false,{defaultFilename});
+        },
         async recover(location: {folder: string; filename: string}) { guard(); if(native.compatibleSource(activeId()??''))await native.recover(activeId(),location);else if (selectedVault()) await vault!.recoverNative(location); else await native.recover(activeId(), location); },
         compare() { guard(); return native.compare(requireId()); },
         async keepMutable() { guard(); await native.keepMutable(requireId()); },
@@ -509,6 +563,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
         exportPackage() {guard();const id=requireId();void editor.interchange.exportPackage(id,selectedVault()?.root,()=>mounted&&scope.active()&&activeId()===id);},
         inspectPackage() {guard();const id=requireId();void editor.interchange.inspectPackage(id,()=>mounted&&scope.active()&&activeId()===id);},
         downloadViewer() {guard();const a=document.createElement('a');a.href='/ink-viewer.html';a.download='Ink Viewer.html';a.click();},
+        ...(editor.features.teiImport ? { openTeiXml() {guard();editor.interchange.pickTei({current:()=>mounted&&scope.active(),open:openDocument});} } : {}),
         importFiles() {guard();editor.interchange.pickNew({current:()=>mounted&&scope.active(),open:openDocument});},
         exportDocument(format:'html'|'markdown'|'text') {guard();const id=requireId();void editor.interchange.exportDocument(id,format,()=>mounted&&scope.active()&&activeId()===id);},
         suggestedFilename() {const id=activeId(),doc=id&&resolve(id);return doc ? (editor.repository.readState().contents[doc.contentKey].payload.metadata as any)?.interchange?.suggestedFilename : undefined;},
@@ -528,6 +583,25 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
         },
       } : undefined;
       const application: import('../feature-api/document-application').DocumentApplicationInstance = {
+          id: applicationId, activeDocumentId: activeId,
+          createDocument(title = 'Untitled document') {
+            guard();
+            const { document } = createFormattedDocument('page');
+            document.metadata = { ...document.metadata as object, title: title.trim() || 'Untitled document' };
+            const state = editor.repository.readState(), root = state.rootPlacementKey;
+            if (state.contents[state.placements[root].contentKey].viewType !== 'workspace-block') throw Error('Create Documents in a workspace.');
+            const banks = state.contents[state.placements[root].contentKey].children.filter(k => state.contents[state.placements[k].contentKey].viewType === 'workspace-object-bank-block');
+            if (banks.length > 1) throw Error('Ambiguous workspace object bank.');
+            editor.commands.structuralTransaction('Create Document', () => {
+              const bank = banks[0] ?? editor.commands.insert({type:'workspace-object-bank-block',children:[]}, {kind:'at',parentKey:root,index:editor.commands.childrenOf(root).length});
+              editor.commands.insert(document, {kind:'at',parentKey:bank,index:editor.commands.childrenOf(bank).length});
+            });
+            native?.trackCandidate(String(document.id));
+            // Refresh only on explicit resource creation; typing never calls catalog().
+            setRevision(n => n + 1);
+            openDocument(String(document.id), true);
+            return String(document.id);
+          },
           documents: () => documents().map(({ id, title }) => ({ id, title })), tabs, files, vault, properties, knowledge, interchange, entityBacklinks: EntityBacklinks,
           recentDocuments: recents ? {
             items: () => recents.items(recentVaultId()).map(d => ({ ...d, title: resolve(d.id)?.title ?? d.title, location: native?.location(d.id) ?? d.location })),
@@ -567,37 +641,44 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
           closeActiveTab() { const key = activeTab(); if (key) closeTab(key); },
         };
       const presentationPort = {
-          key:props.nodeKey,applicationId:definition.applicationId??definition.type,application,windowId:()=>editor.windowManager?.ownerForNode(props.nodeKey),
+          key:props.nodeKey,applicationId:appId,application,windowId:()=>editor.windowManager?.ownerForNode(props.nodeKey),
           desktop:()=> <Dynamic component={definition.view} initialView={initialView} application={application}/>,
           tabs:()=>tabKeys().map(key=>({key,documentId:tabId(key),title:resolve(tabId(key)??'')?.title??'Unavailable Document',dirty:!!native?.isDirty(tabId(key)??'')})),
+          documentTabs,closeTab,
+          setTabActivity:(value:(id:string)=>string)=>{setTabActivity(()=>value);return ()=>setTabActivity(undefined);},
+          setCloseGuard:(value:(ids:readonly string[],signal?:AbortSignal,keys?:readonly string[])=>boolean|Promise<boolean>)=>{conversationCloseGuard=value;return ()=>{if(conversationCloseGuard===value)conversationCloseGuard=undefined;};},
           activeTab,selectTab:chooseTab,presented:setExternalPresentation,
           session:()=>{retainedSessions?.transfers.observe();return retainedSessions?.sessions().find(s=>s.host.ownerKey===props.nodeKey&&s.host.slotKey===activeTab());},
           prompt:()=>documentSaver?.prompt(),
           saveAs:documentSaver?()=>documentSaver.save(requireId(),undefined,true):undefined,
       };
-      if(presentationKey || (editor.features.textualWorkspace && retainedSessions))onMount(()=>onCleanup(documentApplicationPorts(editor).register(presentationPort)));
+      onMount(()=>{const id=presentationPort.windowId();if(id&&editor.windowManager)onCleanup(editor.windowManager.lifecycle.guard(id,signal=>conversationCloseGuard?.(documentTabs().map(t=>t.documentId??''),signal,documentTabs().map(t=>t.key))??true));});
+      onMount(()=>onCleanup(documentApplicationPorts(editor).register(presentationPort)));
       return <>{documentSaver && <documentSaver.Dialogs/>}<Show when={publication()}>{p=><PublicationDialog editor={editor} initial={p().initial} close={()=>setPublication(undefined)}/>}</Show><Show when={collectionMode()}>{mode=><CollectionDialog editor={editor} vault={selectedVault()?.root??'.'} current={()=>mounted&&scope.active()} mode={mode()} close={()=>setCollectionMode(undefined)}/>}</Show><Show when={choosingVault()}><DocumentBrowser mode="directory" initialLocation={{folder:selectedVault()?.root??'.',filename:''}} busy={chooserBusy()} error={chooserError()} onClose={()=>setChoosingVault(false)} onChoose={async location=>{setChooserBusy(true);setChooserError('');try{await vault!.open(location.folder);if(mounted)setChoosingVault(false);return true;}catch(e){if(mounted)setChooserError(String(e));return false;}finally{if(mounted)setChooserBusy(false);}}}/></Show><div ref={root} tabIndex={-1} data-block-type={definition.type} data-runtime-key={props.nodeKey}>
         <Show when={presentationKey} fallback={<Dynamic component={definition.view} initialView={initialView} application={application} />}>{key=><RegisteredApplicationView editor={editor} application={key()} instance={presentationPort} workspace="desktop" host={originPresentationHost}/>}</Show>
       </div></>;
     };
     scope.own(editor.registry.register({ type: definition.type, capabilities: ["container"], view: props => <Show when={scope.active()}><Instance nodeKey={props.nodeKey} /></Show> }, scope.owner));
-    scope.own(editor.commandRegistry.register({ id: "flint.open", label: "Open Flint", canExecute: () => editor.repository.state.contents[editor.repository.state.placements[editor.repository.state.rootPlacementKey].contentKey].viewType === "workspace-block", execute({ args }) {
+    if (definition.launch !== false) scope.own(editor.commandRegistry.register({ id: `${appId}.open`, label: `Open ${label}`, canExecute: () => editor.repository.state.contents[editor.repository.state.placements[editor.repository.state.rootPlacementKey].contentKey].viewType === "workspace-block", execute({ args }) {
       requireActive();
+      definition.beforeOpen?.();
       const root = editor.repository.state.rootPlacementKey;
       const existing = catalog();
-      const examples: ExistingBlockDto[] = existing.length ? [] : ["Notes", "Ideas"].map(title => { const id = crypto.randomUUID(); return { id, type: "document-block", metadata: { documentId: id, title, folder: ".", filename: `${id}.json` }, children: [{ id: crypto.randomUUID(), type: "standoff-editor-block", text: `${title} — write here.` }, { id: crypto.randomUUID(), type: "standoff-editor-block", text: "An ordinary Codex Document, shared across its views." }] }; });
+      const examples: ExistingBlockDto[] = existing.length ? [] : definition.seedDocuments ? definition.seedDocuments() : ["Notes", "Ideas"].map(title => { const id = crypto.randomUUID(); return { id, type: "document-block", metadata: { documentId: id, title, folder: ".", filename: `${id}.json` }, children: [{ id: crypto.randomUUID(), type: "standoff-editor-block", text: `${title} — write here.` }, { id: crypto.randomUUID(), type: "standoff-editor-block", text: "An ordinary Codex Document, shared across its views." }] }; });
       const initialTabs = existing.length ? existing.map(d => ({ id: d.id, title: d.title })) : examples.map(d => ({ id: (d.metadata as any).documentId as string, title: (d.metadata as any).title as string }));
       const state = editor.repository.readState(), rootContent = state.contents[state.placements[root].contentKey];
       const banks = rootContent.children.filter(key => state.contents[state.placements[key].contentKey].viewType === "workspace-object-bank-block");
       if (banks.length > 1) throw new Error("Ambiguous workspace object bank.");
       const desktopParent = rootContent.children.find(key => ["image-background-block", "video-background-block", "youtube-video-background-block", "canvas-background-block"].includes(state.contents[state.placements[key].contentKey].viewType)) ?? root;
       const zIndex = editor.windowManager?.launchMetadata().zIndex ?? Math.max(0, ...Object.values(state.contents).filter(c => ["window-block", "document-window-block"].includes(c.viewType)).map(c => Number((c.payload.metadata as any)?.zIndex) || 0)) + 1;
-      const application = definition.create(initialTabs.slice(0, 2));
+      const requestedId = (args as { documentId?: string } | undefined)?.documentId;
+      if (requestedId && existing.filter(d => d.id === requestedId && d.placement).length !== 1) throw Error('Requested Document is missing or ambiguous.');
+      const application = definition.create(requestedId ? initialTabs.filter(d => d.id === requestedId) : initialTabs.slice(0, 2));
       if ((args as { view?: string } | undefined)?.view === 'graph' && editor.features.flintSpatialGraph) launchViews.set(String(application.id), 'graph');
-      try { editor.commands.transaction("Open Flint", () => {
+      try { editor.commands.structuralTransaction(`Open ${label}`, () => {
         const bank = banks[0] ?? editor.commands.insert({ id: crypto.randomUUID(), type: "workspace-object-bank-block", children: [] }, { kind: "at", parentKey: root, index: editor.commands.childrenOf(root).length });
         for (const document of examples) editor.commands.insert(document, { kind: "at", parentKey: bank, index: editor.commands.childrenOf(bank).length });
-        const placement = editor.commands.insert({ id: crypto.randomUUID(), type: "window-block", metadata: { title: "Flint", position: { x: 35 + (zIndex - 1) * 24, y: 35 + (zIndex - 1) * 24 }, size: { w: Math.min(1380, Math.max(840, window.innerWidth - 90)), h: Math.min(900, Math.max(620, window.innerHeight - 120)) }, zIndex }, children: [application] }, { kind: "at", parentKey: desktopParent, index: 0 });
+        const placement = editor.commands.insert({ id: crypto.randomUUID(), type: "window-block", metadata: { title: label, desktopApplication: appId, position: { x: 35 + (zIndex - 1) * 24, y: 35 + (zIndex - 1) * 24 }, size: { w: Math.min(1380, Math.max(840, window.innerWidth - 90)), h: Math.min(900, Math.max(620, window.innerHeight - 120)) }, zIndex }, children: [application] }, { kind: "at", parentKey: desktopParent, index: 0 });
         editor.windowManager?.activatePlacement(placement);
       }); } finally { launchViews.delete(String(application.id)); }
     } }, scope.owner));

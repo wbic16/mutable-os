@@ -115,6 +115,20 @@ export function createDocumentVaults(native: NativeDocumentSession, indexLifecyc
       const rows=this.snapshot().documents.filter(d=>vaultPath(d.location)===vaultPath(loc));
       if(rows.length!==1||rows[0].state==='ambiguous')throw new Error('Document missing or ambiguous; refresh the vault');return rows[0];
     }
+    /** Exact saved-result activation, followed by native byte/identity verification.
+     * An unrelated unreadable file is not authority to reject this inspected file.
+     * Cached listings and failed scans still cannot authorise admission. */
+    requireSelectedFile(loc:VaultLocation) {
+      if(!this.verified)throw new Error('Refresh discovery before opening a selected Document');
+      this.requireDirectory(loc.folder);vaultLeaf(loc.filename);
+      const scan=this.snapshot(),rows=scan.documents.filter(d=>vaultPath(d.location)===vaultPath(loc));
+      if(rows.length!==1||!['paired','unenrolled'].includes(rows[0].state)||
+        scan.documents.filter(d=>d.resourceId===rows[0].resourceId).length!==1||
+        scan.operations.some(o=>o.phase==='pending')||
+        scan.documentSaves?.some(s=>s.resourceId===rows[0].resourceId||s.path===vaultPath(loc)))
+        throw new Error('Selected Document missing, pending or ambiguous; refresh the vault');
+      return rows[0];
+    }
     async mutate<T>(action:()=>Promise<T>, refreshTree=true) {
       if(!this.alive)throw new Error('Vault closed');
       if(this.busy())throw new Error('A vault operation is already active');

@@ -6,7 +6,7 @@ import {encodeFacts} from '../knowledge/transport';
 import type {Facts} from '../knowledge/facts';
 const unpack=(s:string)=>decodeAuthoredValue(JSON.parse(s)) as any;
 const rawKey=(v:unknown)=>JSON.stringify(encodeAuthoredValue(v));
-const PROFILE='mutable-saved-sql-v3:';
+const PROFILE='mutable-saved-sql-v4:';
 export interface SqlFactsRequest {resourceId:string;path:string;byteHash:string;policy:ExtractionPolicy}
 /** Copy only one consistent bounded SQL snapshot; async semantic work starts after the read transaction. */
 function snapshot(db:any,request:SqlFactsRequest,check:()=>void){

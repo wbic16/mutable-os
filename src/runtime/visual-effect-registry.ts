@@ -62,7 +62,12 @@ export type VisualRenderer = {
       create(context: { owner: VisualEffectOwner; params: EffectParams; document: Document; host: HTMLElement }): ViewportPresentationEffect });
 export interface RendererBinding { readonly id:string; readonly name:string; readonly params?:EffectParams }
 export type CaretTransition = 'caret-enter'|'caret-leave';
+export interface SemanticAuthoringDescriptor {
+  readonly purpose:string; readonly attributes:readonly string[];
+  readonly ai:'authorable'|'inert'; readonly rendering:string; readonly validation:string;
+}
 export interface PropertyTypeDefinition {
+  readonly semantic?:SemanticAuthoringDescriptor;
   readonly type:string;
   readonly renderers:readonly RendererBinding[];
   readonly stateOrder?:readonly string[];
@@ -118,6 +123,7 @@ export class VisualEffectRegistry {
   }
   validateType(definition:PropertyTypeDefinition) {
     json(definition);if(!definition.type||!Array.isArray(definition.renderers))throw Error('Invalid property type');
+    if(definition.semantic){const s=definition.semantic;if(!s.purpose||!s.rendering||!s.validation||!['authorable','inert'].includes(s.ai)||!Array.isArray(s.attributes)||s.attributes.some(a=>typeof a!=='string'||!a))throw Error('Invalid semantic authoring descriptor');}
     const ids=new Set<string>();
     for(const binding of definition.renderers){
       if(!binding.id||ids.has(binding.id))throw Error('Renderer binding IDs must be unique');ids.add(binding.id);
@@ -138,6 +144,7 @@ export class VisualEffectRegistry {
     this.assertLive();if(!name||this.handlers.has(name))throw Error(`Handler ${name} already registered`);
     this.handlers.set(name,handler);this.touch();return ()=>{if(this.handlers.get(name)===handler){this.handlers.delete(name);this.touch();}};
   }
+  definitions(){this.changed[0]();return this.alive()?[...this.types.values()]:[];}
   type(name?:string){this.changed[0]();return this.alive()&&name?this.types.get(name):undefined;}
   renderer(name:string){this.changed[0]();return this.alive()?this.renderers.get(name):undefined;}
   handler(name:string){this.changed[0]();return this.alive()?this.handlers.get(name):undefined;}

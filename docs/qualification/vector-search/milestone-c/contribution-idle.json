@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "earlySynopsis": true,
+  "lastValidSynopsis": true,
+  "cancelledSynopsis": true,
+  "events": [
+    {
+      "kind": "submit",
+      "at": 3891.8000000715256
+    },
+    {
+      "kind": "provider-first-text",
+      "at": 4082.100000023842
+    },
+    {
+      "kind": "fragment-0",
+      "at": 4083.4000000953674
+    },
+    {
+      "kind": "first-native-display",
+      "at": 4128.600000023842
+    },
+    {
+      "kind": "fragment-1",
+      "at": 4288
+    },
+    {
+      "kind": "fragment-2",
+      "at": 4326.100000023842
+    },
+    {
+      "kind": "provider-complete",
+      "at": 4359.100000023842
+    },
+    {
+      "kind": "validation-complete",
+      "at": 4359.400000095367
+    },
+    {
+      "kind": "final-native-display",
+      "at": 4409
+    }
+  ],
+  "firstNativeBlockId": "2a3513a0-1791-48d1-bcf6-525156387b3e",
+  "sameNativeMountThroughCompletion": true,
+  "lateNativeEntityAndGloss": true,
+  "oneUndoAndRedo": true,
+  "interleavedTyping": true,
+  "cancellationRetainsNativeBlock": true,
+  "cancellationOneUndo": true,
+  "persistence": true,
+  "streamingWork": {
+    "snapshots": 0,
+    "fullMapScans": 0
+  },
+  "clipboard": [
+    {
+      "across": false,
+      "copied": "Comprehensibility",
+      "unchanged": true
+    },
+    {
+      "across": true,
+      "copied": "Comprehensibility makes a machine open to investigation. Capability alone does not establish understanding.\nA better",
+      "unchanged": true
+    }
+  ]
+}

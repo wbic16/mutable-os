@@ -1,0 +1,15 @@
+
+ RUN  v2.1.9 /Users/iianneill/Documents/GitHub/speedy-ts-reactive
+
+ ✓ src/rendering/range-rendering.test.tsx (16 tests) 2126ms
+   ✓ releases renderer components on feature removal and terminal editor disposal, even with a pending frame 408ms
+ ✓ src/features/quill/input.test.tsx (10 tests) 3037ms
+   ✓ M1 checkpoint 1: mounted native SVG input > inserts, navigates, selects, replaces and deletes through the input gateway with native undo/redo 396ms
+   ✓ mounted SVG input/undo with 500 unrelated Blocks reads no unrelated payloads or snapshots 2182ms
+ ✓ src/features/quill/layout.test.ts (8 tests) 8ms
+
+ Test Files  3 passed (3)
+      Tests  34 passed (34)
+   Start at  15:21:51
+   Duration  15.05s (transform 10.16s, setup 0ms, collect 15.67s, tests 5.17s, environment 1.78s, prepare 173ms)
+

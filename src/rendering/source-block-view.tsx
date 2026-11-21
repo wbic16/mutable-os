@@ -48,7 +48,7 @@ export function SourceBlockView(props:BlockViewProps) {
    // A linked occurrence may change during an IME run. Never overwrite that edit.
    if(compositionSource!==undefined&&compositionSource!==current){textarea.value=textareaText(current);compositionSource=undefined;before=undefined;return current;}
    const next=editSource(current,value,before);before=undefined;compositionSource=undefined;return next;
-  },contextActions:()=>[{label:'Convert whole source Block to Mutable Ink',run:()=>{void editor.interchange.convertSourceBlock(props.nodeKey);}}]});
+  },contextActions:()=>[{label:'Convert whole source Block to Mutable Ink',disabled:!editor.canEditText(props.nodeKey),run:()=>{if(editor.canEditText(props.nodeKey))void editor.interchange.convertSourceBlock(props.nodeKey);}}]});
  });
  createEffect(()=>{const value=textareaText(text());if(!textarea||composition||textarea.value===value)return;const s=selection();textarea.value=value;restore(s);});
  onCleanup(()=>{alive=false;controller?.abort();unmount?.();});
@@ -58,14 +58,14 @@ export function SourceBlockView(props:BlockViewProps) {
    <button aria-pressed={mode()==='source'} onClick={source}>Source</button>
    <button aria-pressed={mode()==='preview'} disabled={pending()||!format()} onClick={()=>void renderPreview()}>Preview</button>
    <Show when={mode()==='preview'}><button disabled={pending()} onClick={()=>void renderPreview()}>Refresh preview</button></Show>
-   <button disabled={!format()} onClick={()=>void editor.interchange.convertSourceBlock(props.nodeKey)}>Convert to Mutable Ink…</button>
-   <Show when={(node()?.payload.metadata as any)?.sourceLink}><button onClick={()=>editor.interchange.refreshSource(props.nodeKey)}>Reconnect / refresh source…</button></Show>
+   <button disabled={!format()||!editor.canEditText(props.nodeKey)} onClick={()=>{if(editor.canEditText(props.nodeKey))void editor.interchange.convertSourceBlock(props.nodeKey);}}>Convert to Mutable Ink…</button>
+   <Show when={(node()?.payload.metadata as any)?.sourceLink}><button disabled={!editor.canEditText(props.nodeKey)} onClick={()=>{if(editor.canEditText(props.nodeKey))editor.interchange.refreshSource(props.nodeKey);}}>Reconnect / refresh source…</button></Show>
    <Show when={pending()}><span role="status">Preparing preview…</span></Show>
    <Show when={preview()&&renderedSource()!==text()}><span role="status">Preview is out of date.</span></Show>
   </div>
   <Show when={!format()}><p>Unsupported source schema. Authored data is retained without interpretation.</p></Show>
   <Show when={error()}><p role="status">{error()}</p></Show>
-  <textarea ref={textarea} hidden={mode()!=='source'} aria-label="Authoritative source" spellcheck={false} readOnly={!format()}
+  <textarea ref={textarea} hidden={mode()!=='source'} aria-label="Authoritative source" spellcheck={false} readOnly={!format()||!editor.canEditText(props.nodeKey)}
    onBeforeInput={capture}
    onCompositionStart={()=>{before=selection();compositionSource=text();composition=true;}}
    onCompositionEnd={()=>{composition=false;}}

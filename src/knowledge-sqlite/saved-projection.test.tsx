@@ -30,6 +30,14 @@ function database(){const db=new Database(':memory:');migrate(db,'mutable',{fres
 const evidence=(p:any)=>({path:'doc.mutable.json',contentHash:p.contentHash});
 const semantic=(v:any)=>({...v,resource:{...v.resource,indexedUtc:null}});
 
+it('keeps mode in existing saved SQL attributes and Cell coordinates without a mode table', async () => {
+  const h = host([doc('doc', [{ id: 'moded', type: 'standoff-editor-block', mode: 'verse-line', text: 'A😀BCD' }])]);
+  const projection = await projectSaved(nativeBytes(h.capture()), vault);
+  const p = projection.blocks.find(b => b.block.guid === 'moded')!.block;
+  expect(p.typename).toBe('standoff-editor-block'); expect(p.coordinate).toBe('cell'); expect(p.cellCount).toBe(5);
+  expect(decodeAuthoredValue(JSON.parse(p.attributes)).payload.mode).toBe('verse-line');
+});
+
 it.each(['legacy', 'native'])('indexes full entity mentions from ranges despite truncated %s excerpt caches', async format => {
   const dto = doc('doc', [
     { id: 'dino-block', type: 'standoff-editor-block', text: '-dino\r', standoffProperties: [

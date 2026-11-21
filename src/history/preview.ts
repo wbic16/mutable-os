@@ -13,7 +13,7 @@ export function compactPreview(result: DeepReadonly<SubtreeResult>): DeepReadonl
     const content = fragment!.contents[key], metadata = content.payload.metadata as { name?: string; title?: string } | undefined;
     return { id: String(content.payload.id ?? ""), type: content.viewType, caption: metadata?.name ?? metadata?.title ?? content.viewType.replace(/-block$/, "").replaceAll("-", " "),
       runs: ["standoff-editor-block", "plain-text-block", "code-mirror-block", ...sourceTextTypes].includes(content.viewType) ? textRuns(content, fragment!) : [],
-      empty: !content.inlineContent.length && !content.payload.text, stop: !!(tree?.cycle || tree?.excludedReference),
+      empty: !content.compactInline?.spans.length && !content.inlineContent.length && !content.payload.text, stop: !!(tree?.cycle || tree?.excludedReference),
       children: tree?.cycle || tree?.excludedReference ? [] : (tree?.children ?? []).filter(c => c.slot?.kind !== "inline-content").map(c => c.excludedReference ? "external" : visit(c.contentKey, c)) };
   };
   return freeze({ blockId: result.blockId, revisionId: result.revisionId, status: result.status, ...(result.message ? { message: result.message } : {}),

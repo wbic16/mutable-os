@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="Quill">
+ <defs><linearGradient id="quill-gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0be"/><stop offset=".45" stop-color="#deb45e"/><stop offset="1" stop-color="#a9742f"/></linearGradient></defs>
+ <rect x="2" y="2" width="68" height="68" rx="15" fill="#211d28"/>
+ <g fill="none" stroke="#d3ac68" stroke-width=".5" opacity=".32"><circle cx="33" cy="31" r="18"/><path d="M33 8V53M10 31H56"/></g>
+ <path fill="url(#quill-gold)" fill-rule="evenodd" d="M34 9C19 9 10 21 10 35C10 50 19 59 33 58C48 58 57 45 57 30C57 17 47 9 34 9ZM35 12C46 12 50 21 49 34C48 47 42 55 32 55C22 55 18 47 19 34C20 21 25 12 35 12Z"/>
+ <path fill="url(#quill-gold)" d="M23 43C34 31 49 38 54 50C58 59 63 61 67 59C59 67 52 58 47 57C38 57 38 52 33 52L38 51C31 49 31 45 26 45L31 43Z"/>
+ <path d="M24 43C39 39 49 49 57 59" fill="none" stroke="#fff0be" stroke-width="1.1" stroke-linecap="round"/>
+ <path d="M33 24L34 29L39 31L34 32L33 37L32 32L27 31L32 30Z" fill="#e6c37c"/>
+</svg>

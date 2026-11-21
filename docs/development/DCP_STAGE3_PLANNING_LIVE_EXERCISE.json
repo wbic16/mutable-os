@@ -1,0 +1,132 @@
+{
+  "date": "2026-11-09T09:42:12.898Z",
+  "purpose": "One synthetic Stage 2 live exercise before Stage 3 planning",
+  "model": "gpt-5.4-mini",
+  "userDocumentsTouched": false,
+  "continuity": false,
+  "ready": true,
+  "providerNotice": "Session provider ready.",
+  "notice": "",
+  "committed": 3,
+  "attempts": [
+    {
+      "receipt": {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_04fcb639ed90f22e016af195766ba087d0ad022a66ce8b33ef",
+        "startedUtc": "2026-11-09T09:42:13.180Z",
+        "completedUtc": "2026-11-09T09:42:15.902Z",
+        "usage": {
+          "input_tokens": 15291,
+          "output_tokens": 82,
+          "total_tokens": 15373
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      },
+      "tools": [
+        "list_text_blocks"
+      ]
+    },
+    {
+      "receipt": {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_04fcb639ed90f22e016af19578486887d0b9d103f3b40444c6",
+        "startedUtc": "2026-11-09T09:42:15.914Z",
+        "completedUtc": "2026-11-09T09:42:17.162Z",
+        "usage": {
+          "input_tokens": 15982,
+          "output_tokens": 48,
+          "total_tokens": 16030
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      },
+      "tools": [
+        "read_source"
+      ]
+    },
+    {
+      "receipt": {
+        "provider": "openai",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "responseId": "resp_04fcb639ed90f22e016af1957a139487d0ade944eadf38d1a5",
+        "startedUtc": "2026-11-09T09:42:17.171Z",
+        "completedUtc": "2026-11-09T09:42:24.368Z",
+        "usage": {
+          "input_tokens": 16715,
+          "output_tokens": 1004,
+          "total_tokens": 17719
+        },
+        "stop": "completed",
+        "cost": {
+          "status": "unknown"
+        }
+      },
+      "tools": []
+    }
+  ],
+  "nativeTypes": [
+    "standoff-editor-block",
+    "indented-list-block",
+    "tab-row-block",
+    "timer-block"
+  ],
+  "sourceAnnotations": [
+    {
+      "type": "dialectic/range-anchor",
+      "start": 31,
+      "end": 42
+    }
+  ],
+  "checks": {
+    "ordinaryParagraph": true,
+    "structuredList": true,
+    "tabs": true,
+    "widget": true,
+    "sourceAnchor": true,
+    "highlight": false,
+    "committed": true
+  },
+  "passed": false,
+  "diagnostics": {
+    "records": 28,
+    "events": {
+      "broker.request": 9,
+      "broker.response": 6,
+      "provider.request": 3,
+      "provider.response": 3,
+      "provider.response-body": 3,
+      "provider.turn": 3,
+      "exchange.closed": 1
+    }
+  },
+  "assessment": {
+    "status": "partial",
+    "sourceText": "Object note: Copper acquires a green patina over time.",
+    "requestedSourceEffect": "Exact native anchor plus highlight on green patina",
+    "observedSourceEffect": "Range anchor at inclusive offsets 31\u201342; no style/highlight on this source",
+    "repairTriggered": false,
+    "scope": "Native output types and source annotations observed after real broker/controller admission; not a benchmark or a full visual-quality review",
+    "rootCause": "Not established from the retained summary; investigate the source annotation omission before treating this exercise as fully qualified"
+  },
+  "settings": {
+    "provider": "openai",
+    "model": "gpt-5.4-mini",
+    "maxOutputTokens": 8192,
+    "repair": true,
+    "cadence": "conversational"
+  },
+  "requestedExercise": [
+    "ordinary explanatory paragraph",
+    "bullet list with two useful points",
+    "horizontal tabs with two labelled substantive panels",
+    "native timer for 30 seconds",
+    "discover/read earlier Object note, anchor green patina exactly and highlight that source range"
+  ]
+}

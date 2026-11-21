@@ -1,0 +1,866 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mutable:dcp:1.0:response-proposal",
+  "title": "DCP v1 model response \u2014 design proposal",
+  "description": "Revision 2 incorporates the separate Symposium argument model. Logical protocol schema. Runtime profile 4b-1 admits native composition, scoped Entities/relationships, arguments/relationships, explicit Glosses and anchored classifications; assets, continuation suggestions and promotion remain unnegotiated. See DIALECTIC_STAGE_4B_QUALIFICATION.md for implementation boundaries. Provider adapters select the contribution branch for structured final output and tool argument branches for client tools. Host validation additionally enforces negotiated capabilities, ownership, source fences, reference kinds, unique IDs, exact text and canonical admission. Request/tool-result contracts are illustrated in the companion examples. Proposed hard ceilings: 256 nodes, depth 12, 256 KiB response; individual exchanges may lower them.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Contribution"
+    },
+    {
+      "$ref": "#/$defs/ContextRequest"
+    }
+  ],
+  "$defs": {
+    "Attribute": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "value": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "Span": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "from": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Attribute"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "from",
+        "to",
+        "ref",
+        "attributes"
+      ],
+      "additionalProperties": false,
+      "description": "Boundary IDs address decoded Cell boundaries. Types and attributes require capability validation; not numeric model offsets."
+    },
+    "Paragraph": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "const": "paragraph"
+        },
+        "markup": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 32768
+        },
+        "ranges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Span"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "markup",
+        "ranges"
+      ],
+      "additionalProperties": false
+    },
+    "Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "const": "group"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Node"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "List": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "const": "list"
+        },
+        "style": {
+          "enum": [
+            "bullet",
+            "ordered"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Node"
+            },
+            "minItems": 1,
+            "maxItems": 32
+          },
+          "minItems": 1,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "style",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "Table": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "const": "table"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Node"
+              },
+              "minItems": 1,
+              "maxItems": 32
+            },
+            "minItems": 1,
+            "maxItems": 16
+          },
+          "minItems": 1,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "rows"
+      ],
+      "additionalProperties": false,
+      "description": "Rows contain cells; each cell contains a composition. Equal column counts and aggregate size require host validation."
+    },
+    "Asset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "const": "asset"
+        },
+        "asset": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "asset",
+        "caption"
+      ],
+      "additionalProperties": false,
+      "description": "Reserved negotiated multimodal capability: asset must be a host-issued handle to verified managed bytes. Never a URL or local path. Not admitted in initial text-only profiles."
+    },
+    "Node": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Paragraph"
+        },
+        {
+          "$ref": "#/$defs/Group"
+        },
+        {
+          "$ref": "#/$defs/List"
+        },
+        {
+          "$ref": "#/$defs/Table"
+        },
+        {
+          "$ref": "#/$defs/Asset"
+        }
+      ]
+    },
+    "Anchor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "selector": {
+          "type": "object",
+          "properties": {
+            "exact": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            "prefix": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 2048
+            },
+            "suffix": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 2048
+            }
+          },
+          "required": [
+            "exact",
+            "prefix",
+            "suffix"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "revision",
+        "selector"
+      ],
+      "additionalProperties": false
+    },
+    "LocalEntity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "typename": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "description": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 8192
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "minItems": 0,
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "typename",
+        "description",
+        "aliases"
+      ],
+      "additionalProperties": false,
+      "description": "Creates a Document-owned Entity only; no global create/update/merge/promotion operation."
+    },
+    "Interpretation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Attribute"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "id",
+        "target",
+        "type",
+        "ref",
+        "attributes"
+      ],
+      "additionalProperties": false,
+      "description": "Applies an attributed semantic interpretation to a host passage or newly proposed anchor. Does not rewrite source text."
+    },
+    "Argument": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "anchor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "An issued passage-anchor handle, a new anchors declaration, or an explicit inline-ID passage-anchor alias. Never a Gloss, Entity, classification type or argument handle."
+        }
+      },
+      "required": [
+        "id",
+        "anchor"
+      ],
+      "additionalProperties": false,
+      "description": "Explicit Symposium-owned dialectic/argument definition with its own canonical identity and a link to an existing durable passage anchor. No duplicated text or inherent classification; no Gloss or SQL Claim is created. Owner and provenance are host-stamped at atomic commit."
+    },
+    "Gloss": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        }
+      },
+      "required": [
+        "id",
+        "target",
+        "type",
+        "text"
+      ],
+      "additionalProperties": false,
+      "description": "Independent general-purpose Mutable Gloss clarifying meaning or authorial intention. Its target may overlap an argument passage; it never provides argument identity or an argument-relationship endpoint."
+    },
+    "Relation": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ArgumentRelation"
+        },
+        {
+          "$ref": "#/$defs/EntityRelation"
+        }
+      ]
+    },
+    "Suggestion": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "minItems": 0,
+          "maxItems": 12
+        }
+      },
+      "required": [
+        "label",
+        "prompt",
+        "context"
+      ],
+      "additionalProperties": false,
+      "description": "A user-selectable continuation, not an instruction to automatically create another contribution."
+    },
+    "Search": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "tool": {
+          "const": "search_symposium"
+        },
+        "arguments": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "query",
+            "limit"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "tool",
+        "arguments"
+      ],
+      "additionalProperties": false
+    },
+    "Read": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "tool": {
+          "const": "read_source"
+        },
+        "arguments": {
+          "type": "object",
+          "properties": {
+            "handle": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "required": [
+            "handle"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "tool",
+        "arguments"
+      ],
+      "additionalProperties": false
+    },
+    "Contribution": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "dcp/1.0"
+        },
+        "kind": {
+          "const": "contribution"
+        },
+        "exchange": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "intent": {
+          "enum": [
+            "reply",
+            "acknowledge",
+            "share",
+            "create",
+            "propose",
+            "challenge",
+            "qualify",
+            "clarify",
+            "compare",
+            "elaborate",
+            "synthesise",
+            "ask",
+            "answer",
+            "other"
+          ]
+        },
+        "replyTargets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "minItems": 0,
+          "maxItems": 12,
+          "description": "Additional addressed passages/discursive references. Materialise as contribution.discursiveReferences; never replace the host-selected primary structural reply, which is retained separately in contribution.replies."
+        },
+        "composition": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Node"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "anchors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Anchor"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LocalEntity"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        },
+        "interpretations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Interpretation"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Argument"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        },
+        "glosses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Gloss"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Relation"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        },
+        "suggestions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Suggestion"
+          },
+          "minItems": 0,
+          "maxItems": 4
+        },
+        "promotionRecommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              }
+            },
+            "required": [
+              "entity",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 4
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "exchange",
+        "intent",
+        "replyTargets",
+        "composition",
+        "anchors",
+        "entities",
+        "interpretations",
+        "arguments",
+        "glosses",
+        "relations",
+        "suggestions",
+        "promotionRecommendations"
+      ],
+      "additionalProperties": false,
+      "description": "All fields present, with empty arrays when unused. Ordinary conversation requires no semantic annotation, argument, Entity or Gloss. Default intent is reply. Provider identity/provenance is host-stamped, never trusted from model output. Runtime provider schemas are compiled separately for the bounded text-only profile."
+    },
+    "ContextRequest": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "dcp/1.0"
+        },
+        "kind": {
+          "const": "context-request"
+        },
+        "exchange": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "calls": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Search"
+              },
+              {
+                "$ref": "#/$defs/Read"
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 4
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "exchange",
+        "calls"
+      ],
+      "additionalProperties": false
+    },
+    "ArgumentRelation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "enum": [
+            "supports",
+            "challenges",
+            "qualifies",
+            "contradicts",
+            "elaborates",
+            "answers",
+            "depends-on",
+            "provides-evidence-for"
+          ]
+        },
+        "from": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "An issued or newly declared Symposium argument handle owned by this Symposium; no implicit conversion from an anchor, annotation, Gloss, Entity or SQL Claim."
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "An issued or newly declared Symposium argument handle owned by this Symposium; no implicit conversion from an anchor, annotation, Gloss, Entity or SQL Claim."
+        },
+        "kind": {
+          "const": "argument"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "type",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "description": "A Symposium-owned dialectic/argument-relation record with its own identity, typed argument endpoints and host provenance. Reuses native definition/canonical-operation infrastructure, not Gloss relationships or SQL Claim storage. Vocabulary is a proposed Dialectic capability set."
+    },
+    "EntityRelation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "from": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "const": "entity"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "type",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "description": "Uses the proposed shared Document-owned Entity-relationship adapter with scoped Entity endpoints. Independent of Symposium argument relations and Gloss links; never mutates global records."
+    }
+  }
+}

@@ -7,6 +7,8 @@ import { identityCoordinates, type LocalCoordinates } from "../runtime/local-coo
 import type { WindowGeometryHost } from "../rendering/window-geometry";
 
 interface ReactiveViewContextValue {
+  passive?: boolean;
+  openSource?: () => void;
   retainedBlocks?: RetainedBlockOutlets;
   editor: ReactiveEditor;
   projection: BlockTreeProjection;
@@ -20,7 +22,7 @@ const ReactiveViewContext = createContext<ReactiveViewContextValue>();
 export const ReactiveViewProvider: ParentComponent<ReactiveViewContextValue> = (props) => {
   const retainedBlocks = props.editor.features.reversibleBlocks ? new RetainedBlockOutlets() : undefined;
   onCleanup(() => retainedBlocks?.dispose());
-  return <ReactiveViewContext.Provider value={{ retainedBlocks, editor: props.editor, projection: props.projection, coordinates: props.coordinates ?? identityCoordinates, windowGeometry: props.windowGeometry, activity: props.activity }}>
+  return <ReactiveViewContext.Provider value={{ passive: props.passive, openSource: props.openSource, retainedBlocks, editor: props.editor, projection: props.projection, coordinates: props.coordinates ?? identityCoordinates, windowGeometry: props.windowGeometry, activity: props.activity }}>
     {props.children}
   </ReactiveViewContext.Provider>;
 };

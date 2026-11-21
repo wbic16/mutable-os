@@ -6,6 +6,8 @@ import {unwrap} from 'solid-js/store';
 import {clone} from './clone';
 import type {BlockNode, ExistingBlockDto, RepositoryOperation} from './types';
 import {structuralChangeFor} from './structural-plan';
+import {composePreparedLeaves} from './prepared-leaves';
+import {managedImageBlock} from '../interchange/resource-url';
 const editors: ReactiveEditor[] = [];
 afterEach(()=>{editors.splice(0).forEach(e=>e.dispose());vi.restoreAllMocks();});
 const p=(id:string):ExistingBlockDto=>({id,type:'standoff-editor-block',text:'α😀 annotated text',standoffProperties:[{id:'ann-'+id,type:'codex/entity-reference',value:'entity',start:4,end:10}],metadata:{unknown:{preserve:true}}});
@@ -14,6 +16,15 @@ function setup(extra=0){
  const view=editor.createView('test'),block=(id:string)=>Object.values(view.state.nodes).find(n=>n.payload.id===id)!;
  return {editor,view,block};
 }
+it.each([0,300])('admits mixed prepared image leaves with bounded canonical work beside %i unrelated paragraphs',extra=>{
+ const f=setup(extra),r=f.editor.repository,c=f.editor.commands;
+ const native=managedImageBlock({cavernId:'fixture',assetId:'sha256:'+'a'.repeat(64),mediaType:'image/png',byteLength:100},'Image').native;
+ const fragment=composePreparedLeaves({id:'mixed',type:'container-block',children:[{id:'slot',type:'image-block'},{id:'commentary',type:'standoff-editor-block',text:'Commentary '.repeat(50)}]},new Map([['slot',native]]),3);
+ const untouched=r.readState().contents[f.block('c').contentKey],payload=vi.spyOn(untouched,'payload','get'),snapshot=vi.spyOn(r,'snapshot'),rebuild=vi.spyOn(r as any,'rebuildReferences'),build=vi.spyOn(f.view as any,'build');
+ c.boundedStructuralTransaction('Admit prepared composition',()=>c.insertFragment(fragment,{kind:'before',anchorKey:f.block('a').key}));
+ r.undo();r.redo();expect(snapshot).not.toHaveBeenCalled();expect(rebuild).not.toHaveBeenCalled();expect(build).not.toHaveBeenCalled();expect(payload).not.toHaveBeenCalled();
+ payload.mockRestore();validateRepository(r.readState());checkProjection(f);
+});
 function checkProjection(f:ReturnType<typeof setup>){
  const oracle=f.editor.createView('oracle');
  const shape=(node:BlockNode,view:typeof oracle):unknown=>({placement:node.placementKey,content:node.contentKey,type:node.viewType,payload:clone(unwrap(node.payload)),children:node.children.map(k=>shape(view.node(k)!,view)),inline:node.inlineContent.map(k=>shape(view.node(k)!,view)),relations:Object.fromEntries(Object.entries(node.ownedRelations).map(([name,k])=>[name,shape(view.node(k)!,view)]))});

@@ -1,5 +1,7 @@
 import { For, Show, createContext, createSignal, onCleanup, onMount, useContext, untrack, type JSX } from 'solid-js';
 import './cavern-startup.css';
+import { browserSaveDiagnostics, diagnosticError, downloadSaveDiagnostics } from '../persistence/browser-save-diagnostics';
+import { featureFlags } from '../configuration';
 import { currentSettingsCapture } from './settings-snapshot';
 
 export type CurrentCavern = { path: string; name: string; cavernGuid: string; session: string; mode?: 'phext' | 'native' };
@@ -48,7 +50,7 @@ async function request(action: string, body?: unknown) {
       headers: { 'Content-Type': 'application/json', ...(ssoIdentity?.csrf ? { 'x-csrf-token': ssoIdentity.csrf } : {}) },
       body: JSON.stringify(body),
     });
-  } catch { throw new Error(unavailable); }
+  } catch (cause) { throw new Error(unavailable, { cause }); }
   // The SSO gate's 401: the Mutable session is gone (expired
   // mid-flight). Restart sign-in at the current page (§3.1); the
   // error below still surfaces if the navigation is somehow held.
@@ -67,6 +69,10 @@ async function request(action: string, body?: unknown) {
 /** The workspace is mounted only after an explicitly selected folder is established. */
 export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.Element }) {
   const [current, setCurrent] = createSignal<CurrentCavern>();
+  // A server lease can change without replacing the live editing workspace.
+  // Only an explicit, guarded Cavern switch may dispose that workspace.
+  const [workspace, setWorkspace] = createSignal<CurrentCavern>();
+  const [disconnected, setDisconnected] = createSignal('');
   const [recent, setRecent] = createSignal<Array<Omit<CurrentCavern, 'session'>>>([]);
   const [recovery, setRecovery] = createSignal<Recovery>();
   const [choosing, setChoosing] = createSignal(false), [mode, setMode] = createSignal<'open' | 'create'>('open');
@@ -83,13 +89,14 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
   // call answers with a real payload — and forever when the
   // server's gate is unconfigured, which is the point.
   const [identity, setIdentity] = createSignal<SsoIdentity>();
-  let alive = true, polling = false, generation: string | undefined;
+  let alive = true, polling = false, generation: string | undefined, connectionFailure: string | undefined;
   // Every managed request is bound to the active server context, fencing stale tabs.
   const originalFetch = window.fetch;
   const boundFetch: typeof window.fetch = (input, init) => {
     const address = new URL(input instanceof Request ? input.url : String(input), window.location.href);
     const gated = address.origin === window.location.origin && (address.pathname.startsWith('/api/') || address.pathname === '/upload');
     if (!gated) return originalFetch.call(window, input, init);
+    if (((address.pathname.startsWith('/api/') && !address.pathname.startsWith('/api/cavern/')) || address.pathname === '/upload') && untrack(disconnected)) return Promise.reject(new Error('Cavern connection interrupted. Retry connection before saving. Your workspace is still open.'));
     const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
     const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
     // The Cavern fence, unchanged: the session header rides on the
@@ -149,12 +156,29 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     if (!alive) return;
     if (value.recentCaverns) setRecent(value.recentCaverns);
     setRecovery(value.recovery); setIndex(value.index);
-    generation = value.current?.session; setCurrent(value.current);
+    generation = value.current?.session; setCurrent(value.current); setWorkspace(value.current); setDisconnected('');
+  };
+  const reconnect = async () => {
+    const selected = current();
+    if (!selected || busy()) return;
+    setBusy(true);
+    try {
+      const value = await request('startup', {});
+      if (!alive || current() !== selected) return;
+      const next = value.current as CurrentCavern | undefined;
+      if (!next || next.path !== selected.path || next.cavernGuid !== selected.cavernGuid || !next.session) {
+        throw new Error('The server is not using this Cavern. Reopen the original Cavern before retrying. Your workspace has been retained.');
+      }
+      generation = next.session; setCurrent(next); setDisconnected('');
+      browserSaveDiagnostics.record('cavern.reconnected', { cavernId: next.cavernGuid });
+      setIndex(value.index); if (value.recentCaverns) setRecent(value.recentCaverns);
+    } catch (e) { if (alive && current() === selected) { setDisconnected(String(e)); browserSaveDiagnostics.record('cavern.reconnect-failed', { cavernId: selected.cavernGuid, error: diagnosticError(e) }); } }
+    finally { if (alive) setBusy(false); }
   };
   const startup = async () => {
     setBusy(true); setError('');
-    try { apply(await request('startup', {})); }
-    catch (e) { if (alive) setError(String(e)); }
+    try { apply(await request('startup', {})); if (alive) browserSaveDiagnostics.record('cavern.started', { cavernId: current()?.cavernGuid }); }
+    catch (e) { if (alive) { setError(String(e)); browserSaveDiagnostics.record('cavern.startup-failed', { error: diagnosticError(e) }); } }
     finally { if (alive) setBusy(false); }
   };
   const choose = (next: 'open' | 'create' = 'open') => {
@@ -196,7 +220,7 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     return !event.defaultPrevented || window.confirm('There is unsaved or pending work. Switch Caverns and close this workspace? Cancel to save or recover it first.');
   };
   const establish = async (resolved: Target, intent: 'open' | 'create', confirmed = false, modeChoice?: 'phext' | 'native') => {
-    if (current()?.path === resolved.path) { setChoosing(false); setTarget(undefined); setError(''); return; }
+    if (current()?.path === resolved.path) { if (disconnected()) await reconnect(); setChoosing(false); setTarget(undefined); setError(''); return; }
     if (!safeToSwitch()) return;
     // Freeze the workspace during establishment; failed opens retain its live work.
     // A successful context replacement disposes the old workspace through keyed Show.
@@ -272,20 +296,22 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     },
   };
   onMount(() => {
+    browserSaveDiagnostics.record('app.started');
     // Order is load-bearing, not incidental: loadIdentity() starts
-    // the shared identity promise and startup()'s first request()
+    // the shared identity promise and startup()’s first request()
     // awaits it, so the startup POST always carries the CSRF
     // token when a session exists.
     void loadIdentity();
     void startup();
     const timer = setInterval(() => {
-      const selected = untrack(current); if (!selected || polling || untrack(busy)) return;
+      const selected = untrack(current); if (!selected || polling || untrack(busy) || untrack(disconnected)) return;
       polling = true;
       void request('status').then(value => {
-        if (!alive || current()?.session !== selected.session) return;
-        if (value.current?.session !== selected.session) { generation = undefined; setCurrent(undefined); setRecovery({ path: selected.path, error: 'The current Cavern changed in another Mutable window. Reopen it to continue.' }); }
+        if (!alive || current() !== selected) return;
+        if (connectionFailure) { browserSaveDiagnostics.record('cavern.status-restored', { cavernId: selected.cavernGuid }); connectionFailure = undefined; }
+        if (value.current?.session !== selected.session) { generation = undefined; setDisconnected('The local server restarted or changed Caverns. Your workspace and unsaved edits are still open. Retry connection, then retry your save.'); browserSaveDiagnostics.record('cavern.session-lost', { cavernId: selected.cavernGuid, phase: value.current ? 'session-changed' : 'server-context-missing' }); }
         else { setIndex(value.index); if (value.recentCaverns) setRecent(value.recentCaverns); }
-      }).catch(e => { if (alive) setIndex({ coverage: { state: 'unknown', diagnostics: [String(e)] } }); }).finally(() => { polling = false; });
+      }).catch(e => { if (alive && current() === selected) { const failure = diagnosticError(e); if (failure !== connectionFailure) browserSaveDiagnostics.record('cavern.status-failed', { cavernId: selected.cavernGuid, error: failure }); connectionFailure = failure; setIndex({ coverage: { state: 'unknown', diagnostics: [String(e)] } }); } }).finally(() => { polling = false; });
     }, 3000);
     onCleanup(() => clearInterval(timer));
   });
@@ -334,11 +360,13 @@ export function CavernStartup(props: { children: (cavern: CurrentCavern) => JSX.
     </Show>
     <Show when={busy()}><p role="status">Opening Cavern…</p></Show>
     <Show when={error()}><p class="cavern-error" role="alert">{error()}</p><Show when={!current() && !choosing()}><button disabled={busy()} onClick={() => void startup()}>Retry startup</button></Show></Show>
+    <Show when={featureFlags.browserSaveDiagnostics}><button onClick={() => void downloadSaveDiagnostics()}>Download save diagnostics</button></Show>
   </section>;
   return <Context.Provider value={context}>
     {identityBar()}
-    <Show when={current()} keyed fallback={<main class="cavern-startup">{chooser()}</main>}>{selected => <>
+    <Show when={workspace()} keyed fallback={<main class="cavern-startup">{chooser()}</main>}>{selected => <>
       <div inert={choosing()}>{props.children(selected)}</div>
+      <Show when={disconnected()}><aside class="cavern-connection" role="alert"><p>{disconnected()}</p><button disabled={busy()} onClick={() => void reconnect()}>{busy() ? 'Reconnecting…' : 'Retry connection'}</button><Show when={featureFlags.browserSaveDiagnostics}><button onClick={() => void downloadSaveDiagnostics()}>Download save diagnostics</button></Show></aside></Show>
       <Show when={choosing()}><div class="cavern-overlay" ref={el => queueMicrotask(() => el.querySelector<HTMLInputElement>('input')?.focus())} onKeyDown={e => {
         if (e.key === 'Escape' && !busy()) { setChoosing(false); setTarget(undefined); setError(''); }
         if (e.key === 'Tab') {
@@ -415,6 +443,7 @@ export function CavernControl() {
       <span class="cavern-mode-line">{cavern!.current()!.mode === 'phext' ? 'Phext mode — everything in one cavern.phext file' : 'Native mode — ordinary files in the folder'}</span>
       <button onClick={() => act(() => cavern!.choose('open'))}>Open Another Cavern…</button><button onClick={() => act(() => cavern!.choose('create'))}>Create New Cavern…</button>
       <button onClick={() => act(() => cavern!.reveal())}>Reveal Cavern in {navigator.platform.includes('Mac') ? 'Finder' : 'File Manager'}</button>
+      <Show when={featureFlags.browserSaveDiagnostics}><button onClick={() => act(() => { void downloadSaveDiagnostics(); })}>Download save diagnostics</button></Show>
       <button disabled={cavern!.current()!.mode !== 'phext'} title={cavern!.current()!.mode !== 'phext' ? nativeGateTitle : undefined} onClick={() => void download('phext')}>Download Cavern (.phext)</button><button disabled={cavern!.current()!.mode !== 'phext'} title={cavern!.current()!.mode !== 'phext' ? nativeGateTitle : undefined} onClick={() => void download('xz')}>Download Sealed Cavern (.phext.xz)</button>
       <button disabled={cavern!.current()!.mode !== 'phext'} title={cavern!.current()!.mode !== 'phext' ? nativeGateTitle : undefined} onClick={() => void updateShippedSettings()}>Update Shipped Settings</button>
       <Show when={cavern!.current()!.mode === 'native'}><p>Downloads and shipped settings are Phext-mode features.</p>

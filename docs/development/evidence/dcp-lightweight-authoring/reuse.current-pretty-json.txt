@@ -1,0 +1,179 @@
+{
+  "protocol": "dcp/1.0",
+  "kind": "contribution",
+  "exchange": "5e9da7c1-84bd-418d-8164-5686bca52fd9",
+  "intent": "answer",
+  "replyTargets": [
+    "new:r1"
+  ],
+  "composition": [
+    {
+      "id": "new:b1",
+      "kind": "paragraph",
+      "markup": "<annotation id=\"new:s1\" type=\"dialectic/qualification\">Yes—if vulnerability means difficulty recovering from political upheaval. <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e3\">Leonardo</e> could carry expertise and reputation elsewhere and seek another patron; <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e8\">Ludovico</e> could not carry <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e7\">Milan</e>’s territory, institutions and revenues away with <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e8\">him</e>. But portability did not guarantee employment, payment or safety. <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e3\">Leonardo</e> still depended on access to powerful sponsors, whereas <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e8\">Ludovico</e>, while ruling, commanded resources <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e3\">Leonardo</e> lacked. The distinction is therefore <b>greater adaptability, not freedom from dependence</b>: <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e3\">Leonardo</e>’s livelihood was potentially more recoverable, while <e ref=\"src:QJ2jkgJnbMXeH431dUMOiQ:e8\">Ludovico</e>’s power was more tightly bound to a particular political order.</annotation>",
+      "ranges": [],
+      "textStyle": null,
+      "margins": null
+    }
+  ],
+  "anchors": [
+    {
+      "id": "new:r1",
+      "source": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+      "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+      "selector": {
+        "exact": "Does that make Leonardo less vulnerable than Ludovico?",
+        "prefix": "",
+        "suffix": ""
+      }
+    }
+  ],
+  "entities": [],
+  "interpretations": [
+    {
+      "id": "new:m1",
+      "target": "new:r1",
+      "type": "dialectic/question",
+      "ref": null,
+      "attributes": []
+    },
+    {
+      "id": "new:m2",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Leonardo depended on Ludovico, but Leonardo's skills were portable.",
+        "prefix": "",
+        "suffix": ""
+      },
+      "type": "dialectic/claim",
+      "ref": null,
+      "attributes": []
+    },
+    {
+      "id": "new:m3",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Leonardo",
+        "prefix": "Returning to ",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+      "attributes": []
+    },
+    {
+      "id": "new:m4",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Ludovico",
+        "prefix": "Returning to Leonardo and ",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+      "attributes": []
+    },
+    {
+      "id": "new:m5",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Leonardo",
+        "prefix": "Ludovico: ",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+      "attributes": []
+    },
+    {
+      "id": "new:m6",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Ludovico",
+        "prefix": "depended on ",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+      "attributes": []
+    },
+    {
+      "id": "new:m7",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Leonardo",
+        "prefix": "but ",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+      "attributes": []
+    },
+    {
+      "id": "new:m8",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Ludovico",
+        "prefix": "",
+        "suffix": " lost Milan."
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+      "attributes": []
+    },
+    {
+      "id": "new:m9",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Milan",
+        "prefix": "",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e7",
+      "attributes": []
+    },
+    {
+      "id": "new:m10",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Leonardo",
+        "prefix": "Does that make ",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e3",
+      "attributes": []
+    },
+    {
+      "id": "new:m11",
+      "target": {
+        "block": "src:QJ2jkgJnbMXeH431dUMOiQ:b2",
+        "revision": "b6934a95-8316-497e-ad14-99205a96df79",
+        "quote": "Ludovico",
+        "prefix": "less vulnerable than ",
+        "suffix": ""
+      },
+      "type": "mutable/entity-reference",
+      "ref": "src:QJ2jkgJnbMXeH431dUMOiQ:e8",
+      "attributes": []
+    }
+  ],
+  "arguments": [
+    {
+      "id": "new:arg1",
+      "anchor": "new:s1"
+    }
+  ],
+  "glosses": [],
+  "relations": []
+}
