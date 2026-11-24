@@ -92,7 +92,9 @@ export class FocusService {
     if (pending.request.valid?.() === false || this.permit?.(pending.nodeKey) === false) { this.pending = undefined; return; }
     handle.focus();
     const caret = pending.request.caret;
-    if (handle.restoreSelection && caret) {
+    if (handle.focusAtBoundary && (caret === "start" || caret === "end")) {
+      handle.focusAtBoundary(caret);
+    } else if (handle.restoreSelection && caret) {
       const length =
         handle.focusElement instanceof HTMLTextAreaElement
           ? handle.focusElement.value.length

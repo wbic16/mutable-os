@@ -1,0 +1,85 @@
+{
+  "virtualTextFlows": false,
+  "virtualItemKeysDuringTyping": 0,
+  "blockHeight": 30.296875,
+  "blockStep": 42.296875,
+  "mountMs": 2375.7000000029802,
+  "mountedElements": 29275,
+  "characterSpans": 25000,
+  "dialecticRanges": false,
+  "codeMode": "",
+  "structuredMode": "",
+  "structuredWorkersDuringTyping": 0,
+  "pdfMode": "",
+  "pdfCallsDuringTyping": 0,
+  "iiifMode": "",
+  "iiifCallsDuringTyping": 0,
+  "academicMode": "",
+  "academicRequests": 0,
+  "backlinks": false,
+  "markdownExperiment": false,
+  "presentation": "flint",
+  "sceneFramesDuringTyping": 0,
+  "characters": 25000,
+  "paragraphCharacters": 100,
+  "paragraphs": 250,
+  "edits": 40,
+  "meanMs": 1.8950000002980232,
+  "medianMs": 1.6000000014901161,
+  "p95Ms": 5.5999999940395355,
+  "maxMs": 6.200000002980232,
+  "snapshots": 0,
+  "restored": true,
+  "unrelatedCellStable": true
+}
+Real Chrome insertText, Backspace, undo and redo: passed
+{
+  "split": {
+    "splitMs": 7.799999997019768,
+    "frameMs": 69.39999999850988,
+    "undoMs": 25.5,
+    "splitSnapshots": 0,
+    "added": true,
+    "focusedRight": true,
+    "restored": true,
+    "unrelatedCellStable": true
+  }
+}
+Real Chrome Enter and split undo: passed
+{
+  "boundaries": [
+    {
+      "position": "start",
+      "handlerMs": 4.100000001490116,
+      "frameMs": 45.79999999701977,
+      "undoMs": 3.100000001490116,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    {
+      "position": "end",
+      "handlerMs": 3.8000000044703484,
+      "frameMs": 48.80000000447035,
+      "undoMs": 18.799999997019768,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    },
+    {
+      "position": "empty",
+      "handlerMs": 3.5999999940395355,
+      "frameMs": 43.69999999552965,
+      "undoMs": 3.600000001490116,
+      "snapshots": 0,
+      "added": true,
+      "focusCorrect": true,
+      "restored": true,
+      "unrelatedCellStable": true
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "url": "http://localhost:3000/standoff-code-mirror",
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/157.0.8103.80",
+    "revision": "@5cb0fce6746acfc926045c45b23d811d479c49b9",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+    "jsVersion": "15.7.112.43"
+  },
+  "checks": [
+    "JavaScript and JSON parsers actually load",
+    "language loading shows no handled import failures",
+    "javascript parses source on the live route",
+    "typescript parses source on the live route",
+    "json parses source on the live route",
+    "markdown parses source on the live route",
+    "xml parses source on the live route",
+    "sql parses source on the live route",
+    "plain text removes the parser",
+    "no handled dynamic import failure on live route",
+    "no uncaught browser exceptions"
+  ],
+  "errors": []
+}

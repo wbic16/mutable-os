@@ -75,3 +75,7 @@ describe("document entity inventory", () => {
     expect(new Set(result.rows[0].ranges.map(range => range.nodeKey)).size).toBe(2);
   });
 });
+it('includes native source mentions with explicit UTF16 navigation ranges and no fake Cells',()=>{
+ const editor=new ReactiveEditor({id:'doc',type:'document-block',children:[{id:'code',type:'standoff-code-mirror-block',text:'A😀bc',standoffProperties:[{id:'entity',type:'codex/entity-reference',start:1,end:2,value:'ada'}]}]});cleanup.push(()=>editor.dispose());const view=editor.createView('native-inventory'),key=view.state.nodes[view.state.rootKey].children[0],api=entityTestApi(editor);
+ expect(api.text(key)).toBeUndefined();expect(collectDocumentEntities(api,key).rows).toMatchObject([{id:'ada',documentMentions:1,ranges:[{coordinate:'utf16',start:1,end:4}]}]);expect(editor.node(key)!.inlineContent).toEqual([]);
+});

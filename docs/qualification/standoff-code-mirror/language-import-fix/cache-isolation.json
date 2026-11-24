@@ -1,0 +1,7 @@
+{
+  "liveServer": "http://localhost:3000",
+  "before": "12c088155876d09f31d1d40ece7719df6c9e07dae7eef6000da08d6e8b86a223",
+  "after": "12c088155876d09f31d1d40ece7719df6c9e07dae7eef6000da08d6e8b86a223",
+  "unchanged": true,
+  "check": "Live optimizer metadata unchanged across the input-ownership qualification run; all language parsers verified again afterward."
+}

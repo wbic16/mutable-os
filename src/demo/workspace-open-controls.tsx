@@ -1,3 +1,5 @@
+import { dispatchEditorGlobals } from '../input/editor-global-input';
+import { editorInputBoundary } from '../runtime/editor-input';
 import { documentFormats, type DocumentFormat } from "../features/document-formats/model";
 import { SystemSubmenu } from "./codex-system-bar";
 import { For, Show, createSignal, onCleanup, onMount } from "solid-js";
@@ -71,6 +73,16 @@ export function createWorkspaceOpenControls(session: WorkspaceSession, available
   onCleanup(session.editor.commandRegistry.register({ id: 'document.save', label: 'Save Document', canExecute: context => !busy() && actions.canSaveDocument(context.targetKey), execute: context => save(context.targetKey) }, 'workspace-open'));
   onMount(() => {
     const keydown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+      const boundary = editorInputBoundary(event);
+      if (boundary) {
+        dispatchEditorGlobals(event, session.editor.bindings, id => {
+          if (id === 'document.save') { void save(boundary.nodeKey); return true; }
+          if (id === 'document.open') { open('document'); return true; }
+          return false;
+        }, action => action.id === 'document.save' ? !busy() && actions.canSaveDocument(boundary.nodeKey) : action.id === 'document.open' && enabled());
+        return;
+      }
       const focused = session.editor.focus.state.focusedKey;
       if (!event.isComposing && !event.altKey && !event.shiftKey && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's' && focused && actions.canSaveDocument(focused)) {
         event.preventDefault(); event.stopImmediatePropagation(); void save(focused); return;

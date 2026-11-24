@@ -1,3 +1,5 @@
+import { codeSurface } from '../features/standoff-code-mirror/mounts';
+import { EditorView } from '@codemirror/view';
 import {revealInlineReading} from './inline-alternatives';
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import type { SearchMatch } from "./text-search";
@@ -18,6 +20,7 @@ export async function revealMatch(editor: ReactiveEditor, match: SearchMatch, cu
   if (!current()) return false;
   const range = match.ranges[0], mount = editor.mounts.get(range.nodeKey);
   if (!mount) return false;
+  const native=codeSurface(editor,range.nodeKey)?.code;if(native&&range.coordinate==='utf16')native.view.dispatch({effects:EditorView.scrollIntoView(range.start,{y:'center'})});
   const point = range.coordinate === "cell" ? mount.inlineBoundary?.(range.start) : undefined;
   (point?.node.parentElement ?? mount.root).scrollIntoView?.({ block: "center", inline: "nearest" });
   return true;
@@ -38,6 +41,7 @@ export async function revealPositionMarker(editor: ReactiveEditor, marker: Docum
   if (!current()) return false;
   const mount = editor.mounts.get(markerNodeKey(marker));
   if (!mount) return false;
+  if(marker.anchor.kind==='text-range'){const range=marker.anchor.range,native=codeSurface(editor,range.nodeKey)?.code;if(native&&range.coordinate==='utf16')native.view.dispatch({effects:EditorView.scrollIntoView(range.start,{y:'center'})});}
   const point = marker.anchor.kind === "text-range" && marker.anchor.range.coordinate === "cell" ? mount.inlineBoundary?.(marker.anchor.range.start) : undefined;
   (point?.node.parentElement ?? mount.root).scrollIntoView?.({ block: "center", inline: "nearest" });
   editor.concertina.setActiveMarker(marker.id);

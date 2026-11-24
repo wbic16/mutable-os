@@ -22,8 +22,8 @@ export function createEntityReferencesFeature(capabilities: (scope: FeatureScope
       api.register.panel({ type: "entity-search", view: props => <EntitySearch api={api} panel={props.panel} /> });
       api.register.panel({ type: "entity-list", view: props => <EntityListWindow list={list!} panel={props.panel} /> });
       api.register.annotation({ id: "entity", type: "codex/entity-reference", label: "Entity reference", title: "Link selected text to an entity", apply: (ranges, key) => { openEntitySearch(api, ranges, key); }, details: EntityPropertyDetails });
-      for (const id of ["entity.open", "cross.entity"]) api.register.command({ id, label: "Entity reference", canExecute: ({ targetKey }) => !!api.text(targetKey), execute: ({ targetKey }) => { openEntitySearch(api, api.selection(targetKey), targetKey); } });
-      for (const id of ["entity.list.open", "cross.entityList"]) api.register.command({ id, label: "Entities in Document", canExecute: ({ targetKey }) => !!api.text(targetKey), execute: ({ targetKey }) => { list!.open(targetKey); if (!list!.state.open) throw new Error(list!.state.error); } });
+      for (const id of ["entity.open", "cross.entity"]) api.register.command({ id, label: "Entity reference", canExecute: ({ targetKey }) => !!api.codeAnnotations?.supports(targetKey)||!!api.text(targetKey), execute: ({ targetKey }) => { if(api.codeAnnotations?.supports(targetKey))api.codeAnnotations.open(targetKey,'codex/entity-reference');else openEntitySearch(api, api.selection(targetKey), targetKey); } });
+      for (const id of ["entity.list.open", "cross.entityList"]) api.register.command({ id, label: "Entities in Document", canExecute: ({ targetKey }) => !!api.codeAnnotations?.supports(targetKey)||!!api.text(targetKey), execute: ({ targetKey }) => { list!.open(targetKey); if (!list!.state.open) throw new Error(list!.state.error); } });
       api.register.action({ id: "entity.list", slot: "document-actions", command: "entity.list.open", label: "Entities", title: "Entities in Document", binding: "entity.list.open" });
       registerEntityBindings(api);
     },

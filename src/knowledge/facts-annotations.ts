@@ -5,7 +5,7 @@ export function annotationCollector(facts:Facts,signal?:AbortSignal,policy?:Obse
  const resourceId=facts.id,groups=new Map<string,Mention>(),bad=new Set<string>(),localIds=new Set<string>();let properties=0;
  const warn=(message:string,reference=true)=>{facts.diagnostics.push(message);if(reference)facts.referenceDiagnostics!.push(message);};
  return {
- async add({raw,blockId,standoff,length,resolve,snippet}:{raw:any;blockId:string;standoff:boolean;length:number;resolve:(raw:any)=>{property:any;owner?:{root:boolean;blockId:string}};snippet:(start:number,end:number,context:boolean)=>string|Promise<string>}){
+ async add({raw,blockId,standoff,length,resolve,snippet,pointEndSame=false}:{raw:any;blockId:string;standoff:boolean;pointEndSame?:boolean;length:number;resolve:(raw:any)=>{property:any;owner?:{root:boolean;blockId:string}};snippet:(start:number,end:number,context:boolean)=>string|Promise<string>}){
    await policy?.step?.();
    if(++properties>10000)throw Error('Annotation budget exceeded');
    if(policy&&!policy.step&&properties%128===0){await new Promise(r=>setTimeout(r,0));signal?.throwIfAborted();policy.check?.();}
@@ -15,12 +15,13 @@ export function annotationCollector(facts:Facts,signal?:AbortSignal,policy?:Obse
    const documentIssue=!a.type||a.type==='codex/block-reference';
    if(raw.annotationId&&(!owner||!owner.root)){warn('Foreign/unresolved linked definition',documentIssue);return;}
    const zeroWidth=raw.isZeroWidth===true;
-   if(!standoff||typeof raw.id!=='string'||!raw.id||typeof a.type!=='string'||!a.type||typeof a.start!=='number'||typeof a.end!=='number'||!Number.isInteger(a.start)||!Number.isInteger(a.end)||a.start<0||(zeroWidth?a.end!==a.start-1||a.start>length:a.end<a.start||a.end>=length)){warn('Unsupported annotation identity/range',documentIssue);return;}
+   if(pointEndSame&&zeroWidth){warn('Point annotation retained but omitted from range-only Facts',documentIssue);return;}
+   if(!standoff||typeof raw.id!=='string'||!raw.id||typeof a.type!=='string'||!a.type||typeof a.start!=='number'||typeof a.end!=='number'||!Number.isInteger(a.start)||!Number.isInteger(a.end)||a.start<0||(zeroWidth?(a.end!==a.start-1&&(!pointEndSame||a.end!==a.start))||a.start>length:a.end<a.start||a.end>=length)){warn('Unsupported annotation identity/range',documentIssue);return;}
    const segmentId=JSON.stringify([resourceId,blockId,raw.id]);
    const logicalId=JSON.stringify([resourceId,raw.annotationId?'linked':blockId,raw.annotationId??raw.id]);
    if(localIds.has(segmentId)){bad.add(logicalId);groups.delete(logicalId);warn('Duplicate segment identity',documentIssue);return;}localIds.add(segmentId);
    const definition=raw.annotationId?{resourceId:resourceId,blockId:owner!.blockId,annotationId:String(raw.annotationId)}:undefined;
-   const annotation:AnnotationFact={id:segmentId,logicalId,blockId,type:a.type,start:a.start,end:a.end+1,value:policy?.cloneValue?await policy.cloneValue(a.value):structuredClone(a.value),definition};
+   const annotation:AnnotationFact={id:segmentId,logicalId,blockId,type:a.type,start:a.start,end:zeroWidth&&pointEndSame?a.start:a.end+1,value:policy?.cloneValue?await policy.cloneValue(a.value):structuredClone(a.value),definition};
    facts.annotations.push(annotation);
    if(!['codex/block-reference','codex/entity-reference'].includes(a.type))return;
    if(typeof a.value!=='string'||!a.value){warn('Unsupported reference value',documentIssue);return;}

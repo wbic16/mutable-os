@@ -1,3 +1,4 @@
+import { registerEditorInput, type EditorInputCapability } from './editor-input';
 import type { NodeKey } from "../block-tree/types";
 
 export interface NativeTextSelection {
@@ -13,6 +14,8 @@ export interface MountHandle {
   focusElement: HTMLElement;
   inputPolicy: "native-text" | "standoff" | "control" | "container" | "opaque-widget";
   generation: number;
+  editorInput?: EditorInputCapability;
+  focusAtBoundary?(edge: "start" | "end"): void;
   /** Alternate native text presentation may consume input before DOM editing. */
   interceptInlineInput?(event: Event): boolean;
   /** Preserve a single owned text source when accepting native rich paragraphs. */
@@ -44,6 +47,7 @@ export interface MountHandle {
 type MountSubscriber = (nodeKey: NodeKey, handle: MountHandle) => void;
 
 export class MountRegistry {
+  private inputDisposers = new Map<MountHandle, () => void>();
   private byNode = new Map<NodeKey, MountHandle>();
   private byElement = new WeakMap<Element, NodeKey>();
   private generations = new Map<NodeKey, number>();
@@ -55,24 +59,36 @@ export class MountRegistry {
     nodeKey: NodeKey,
     handle: Omit<MountHandle, "generation">,
   ): () => void {
+    const previous = this.byNode.get(nodeKey);
+    if (previous) this.detach(previous);
     const generation = (this.generations.get(nodeKey) ?? 0) + 1;
     this.generations.set(nodeKey, generation);
     const mounted: MountHandle = { ...handle, generation };
     this.byNode.set(nodeKey, mounted);
     this.byElement.set(mounted.root, nodeKey);
     this.byElement.set(mounted.focusElement, nodeKey);
+    if (mounted.editorInput) this.inputDisposers.set(mounted, registerEditorInput(nodeKey, mounted, () => this.byNode.get(nodeKey) === mounted));
     for (const subscriber of this.subscribers) subscriber(nodeKey, mounted);
 
     return () => {
-      if (this.byNode.get(nodeKey)?.generation !== generation) return;
+      if (this.byNode.get(nodeKey) !== mounted) return;
       const selection = mounted.captureSelection?.();
       if (selection) this.selections.set(nodeKey, selection);
       const inline = mounted.captureInlineSelection?.();
       if (inline) this.inlineSelections.set(nodeKey, inline);
       this.byNode.delete(nodeKey);
-      this.byElement.delete(mounted.root);
-      this.byElement.delete(mounted.focusElement);
+      this.detach(mounted);
     };
+  }
+
+  private detach(handle: MountHandle) {
+    this.inputDisposers.get(handle)?.(); this.inputDisposers.delete(handle);
+    this.byElement.delete(handle.root); this.byElement.delete(handle.focusElement);
+  }
+
+  dispose() {
+    for (const handle of this.byNode.values()) this.detach(handle);
+    this.byNode.clear(); this.generations.clear(); this.selections.clear(); this.inlineSelections.clear();
   }
 
   subscribe(subscriber: MountSubscriber): () => void {
@@ -98,8 +114,7 @@ export class MountRegistry {
   releaseOccurrence(nodeKey: NodeKey): void {
     const handle = this.byNode.get(nodeKey);
     if (handle) {
-      this.byElement.delete(handle.root);
-      this.byElement.delete(handle.focusElement);
+      this.detach(handle);
     }
     this.byNode.delete(nodeKey);
     this.generations.delete(nodeKey);

@@ -1,3 +1,5 @@
+import { codeSurface } from '../standoff-code-mirror/mounts';
+import { scryCommands } from './commands';
 import {retrievalRequest} from '../../application/retrieval-client';
 import {nativeDocumentSession} from '../../persistence/native-session';
 import { isTabCommandQuery, parseTabCommand, tabCommandCandidates, tabCommands } from '../../runtime/tab-commands';
@@ -108,25 +110,7 @@ export function createAutocompleteFeature(editor: ReactiveEditor): CodexFeature 
      const parsed=flintCommand(query);if(parsed?.kind!=='document')return;
      return {key:'flint.documents',query:parsed.query,load:async signal=>(await flintDocumentChoices(editor,source.nodeKey,signal)).map(doc=>({id:`flint.document:${doc.documentId}`,name:doc.title,reason:doc.disabled?'Document unavailable or ambiguous':`Open in Flint · ${doc.location?`${doc.location.folder==='.'?'':doc.location.folder+'/'}${doc.location.filename}`:'Unsaved Document · '+doc.documentId}`,disabled:doc.disabled,data:doc}))};
     },
-    commands:(query='')=>{
-     const flint=editor.features.flintSlashCommands&&editor.features.flint?flintCommand(query):undefined;
-     if(flint)return [{id:'flint.open',name:'flint open',reason:flint.kind==='open'?'Open or activate Flint · add --doc to choose a Document':'Use /flint open or /flint open --doc <Document name>',disabled:flint.kind!=='open'}];
-     const tables=tableCommandCandidates(editor,source.nodeKey,query);
-     const tabs=tabCommandCandidates(editor,source.nodeKey,query);
-     if(editor.features.verticalTabs&&isTabCommandQuery(query))return tabs;
-     // An unavailable exact /c stays literal; do not fall through to /col or container.
-     if(editor.features.tableLayouts&&parseTableCommand(query))return tables;
-     return [...tables, ...tabs, ...[
-     ...(editor.features.reversibleBlocks?surfaceCommands:[]),
-     ...(editor.features.glossMode?[{id:'gloss.create',name:'gloss',reason:'Write a Document-local Gloss'}]:[]),
-     {id:'entity',name:'entity',reason:'Resolve an Entity or create explicitly'},
-     {id:'link',name:'link',reason:'Reference an available native Document'},
-     ...(editor.features.flintSlashCommands&&editor.features.flint?[{id:'flint.open',name:'flint open',reason:'Open or activate Flint · add --doc to choose a Document'}]:[]),
-     ...(editor.features.semanticRetrieval?[{id:'search',name:'search',reason:'Scry: search saved passages, lexical first then semantic'}]:[]),
-     {id:'entity.list.open',name:'backlinks',reason:'Open the current Document Entity references'},
-     {id:'thesis.createProposition',name:'proposition',reason:'Open a Thesis draft'},
-     {id:'date',name:'date',reason:'Insert today’s local ISO date'},
-    ].filter(r=>['entity','link','date','search'].includes(r.id)||editor.commandRegistry.canExecute(r.id,{targetKey:source.nodeKey,args:undefined})).filter(r=>!query||r.name.toLowerCase().includes(query.toLowerCase()))];},
+    commands:(query='')=>scryCommands(editor,source.nodeKey,query),
     valid,
     commit:(s,e,label)=>{
      if(!valid(s))throw Error('Stale source');
@@ -381,7 +365,7 @@ export function createAutocompleteFeature(editor: ReactiveEditor): CodexFeature 
   }};
   const explicit=(key:string)=>{const h=editor.mounts.get(key),r=h?.captureInlineSelection?.();if(!r||r.anchor===r.head)throw Error('Select a phrase, or type @ to open Autocomplete');const s=snapshot(key,Math.min(r.anchor,r.head),Math.max(r.anchor,r.head),false);open(s,'entity',s.literal);};
   if(editor.features.semanticRetrieval)api.register.command({id:'autocomplete.search',label:'Scry: search passages',canExecute:({targetKey})=>editor.node(targetKey)?.viewType==='standoff-editor-block',execute:({targetKey})=>{const r=editor.mounts.get(targetKey)?.captureInlineSelection?.()??{anchor:0,head:0};const source=snapshot(targetKey,Math.min(r.anchor,r.head),Math.max(r.anchor,r.head),false);open(source,'block',source.literal);}});
-  api.register.command({id:'autocomplete.open',label:'Autocomplete selected text',canExecute:({targetKey})=>editor.node(targetKey)?.viewType==='standoff-editor-block',execute:({targetKey})=>explicit(targetKey)});
+  api.register.command({id:'autocomplete.open',label:'Autocomplete selected text',canExecute:({targetKey})=>!!codeSurface(editor,targetKey)||editor.node(targetKey)?.viewType==='standoff-editor-block',execute:({targetKey})=>{const native=codeSurface(editor,targetKey);if(native)native.run('autocomplete.open');else explicit(targetKey);}});
   api.register.binding({id:'autocomplete.open',name:'Autocomplete selected text',description:'Keep the selected phrase and edit an independent query',category:'Autocomplete',tags:[],scope:'editor/standoff',defaults:[chord(keyboard(';','Ctrl'),keyboard('a'))],handler:ctx=>ctx.run('autocomplete.open')});
   api.register.action({id:'autocomplete.open',slot:'document-actions',command:'autocomplete.open',label:'Autocomplete',title:'Autocomplete selected text',binding:'autocomplete.open'});
   const release=editor.repository.subscribeChanges(()=>{if(finishing)return;const s=current,source=s?.source;if(s)queueMicrotask(()=>{if(current===s&&s.source===source&&!valid(source!)){if(draft)s.fail('The source changed in another view. Copy the draft phrase if needed, then cancel; newer canonical text will not be overwritten.');else cancel();}});});

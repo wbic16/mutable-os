@@ -1,0 +1,15 @@
+.standoff-code-mirror-tools { align-items: center; font: 12px/1.5 system-ui, sans-serif; }
+.standoff-code-mirror-tools button, .cm-mutable-panel button {
+  border: 1px solid #aab5c2; border-radius: 3px; padding: 2px 7px;
+  background: var(--editor-background, #fafafa); color: inherit; cursor: pointer;
+}
+.standoff-code-mirror-tools button:hover, .cm-mutable-panel button:hover { background: #e9eff5; }
+.cm-mutable-panel { font: 13px/1.5 system-ui, sans-serif; }
+.cm-mutable-panel button { margin: 2px; }
+.cm-mutable-panel label { display: grid; grid-template-columns: 150px minmax(160px, 1fr); margin: 6px 0; align-items: start; }
+.cm-mutable-panel input, .cm-mutable-panel textarea {
+  border: 1px solid #9ba8b6; background: #fff; color: #222; padding: 3px 6px;
+  min-width: 0; font: 13px/1.5 ui-monospace, monospace;
+}
+.cm-mutable-panel textarea { min-height: 50px; resize: vertical; }
+.cm-mutable-panel [role=status]:not(:empty) { padding: 5px; color: #803b17; }

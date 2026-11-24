@@ -10,10 +10,10 @@ interface Link {
   surface: string; cells: readonly string[]; signature: string; definitionOwner?: string;
 }
 const properties = (content: ContentRecord) => {
-  const value = content.payload[content.viewType === 'standoff-editor-block' ? 'standoffProperties' : 'blockProperties'];
+  const value = content.payload[['standoff-editor-block','standoff-code-mirror-block'].includes(content.viewType) ? 'standoffProperties' : 'blockProperties'];
   return Array.isArray(value) ? value.filter((p): p is JsonObject => !!p && typeof p === 'object' && !Array.isArray(p)) : [];
 };
-const supported = (c: ContentRecord) => ['standoff-editor-block','mutable/citation-block','mutable/web-article-block'].includes(c.viewType);
+const supported = (c: ContentRecord) => ['standoff-editor-block','standoff-code-mirror-block','mutable/citation-block','mutable/web-article-block'].includes(c.viewType);
 const pools = new WeakMap<ReactiveEditor, Map<string, Inventory>>();
 
 /** Owned placement membership and per-content link deltas. Never observes a rendered tree. */
@@ -71,6 +71,13 @@ class Inventory {
     if (change.taskStateOwner) return;
     const state = this.editor.repository.readState(), affectedOwners=new Set<string>();
     for (const [key,before] of change.previousContents) {
+      const after=state.contents[key];
+      // Source-local evidence only. Rebased offsets with the same mention text
+      // do not rebuild the inventory or notify consumers.
+      if(before?.viewType==='standoff-code-mirror-block'&&after?.viewType===before.viewType&&JSON.stringify(before.children)===JSON.stringify(after.children)&&JSON.stringify(before.ownedRelations)===JSON.stringify(after.ownedRelations)){
+        const signature=(c:ContentRecord)=>{const chars=[...String(c.payload.text??'')];return JSON.stringify(properties(c).filter(p=>p.type==='codex/entity-reference'||p.annotationId).map(({start,end,...p})=>[p,chars.slice(Number(start),p.isZeroWidth?Number(start):Number(end)+1).join('')]));};
+        if(signature(before)===signature(after))continue;
+      }
       if (this.members.has(key) || this.definitionUsed(key)) {
         if (!this.pending.has(key)) this.pending.set(key,before);
       }
@@ -120,6 +127,7 @@ class Inventory {
     if (!content || !supported(content)) {this.clearLinks(key,affected);return;}
     const old = this.links.get(key) ?? new Map<string,Link>(), next = new Map<string,Link>();
     this.clearCells(key);const linkedCells=new Set<string>();
+    const codePoints=content.viewType==='standoff-code-mirror-block'?[...String(content.payload.text??'')]:undefined;
     let invalid = 0;
     for (const [index,p] of properties(content).entries()) {
       if(p.type==='dialectic/range-anchor')continue; // passive reply identity, never an Entity mention
@@ -138,13 +146,15 @@ class Inventory {
       }
       if (resolved.isDeleted || p.isDeleted || resolved.type !== 'codex/entity-reference') continue;
       if (typeof resolved.value !== 'string' || !resolved.value.trim() || p.annotationId && !definitionOwner) { invalid++; continue; }
-      const block = content.viewType !== 'standoff-editor-block';
-      const from = Number(start), to = Number(end)+1;
-      if (!block && (!Number.isInteger(from)||!Number.isInteger(to)||from<0||to<=from||to>contentLength(content))) { invalid++; continue; }
-      const cells = block ? [] : content.inlineContent.slice(from,to);
+      const native=content.viewType==='standoff-code-mirror-block';
+      const block = content.viewType !== 'standoff-editor-block'&&!native;
+      const from = Number(start), to = native&&p.isZeroWidth?from:Number(end)+1;
+      if (!block && (!Number.isInteger(from)||!Number.isInteger(to)||from<0||to<from||to===from&&!(native&&p.isZeroWidth)||to>(native?codePoints!.length:contentLength(content)))) { invalid++; continue; }
+      const cells = block || native ? [] : content.inlineContent.slice(from,to);
       const sameCells = !content.compactInline && prior && cells.length === prior.cells.length && cells.every((id,i) => id === prior.cells[i] && !this.changedCells.has(state.placements[id]?.contentKey));
       let surface = prior && sameCells ? prior.surface : '';
-      if (!block && content.compactInline) {const atoms=inlineSlice(content.compactInline.spans,from,to);if(atoms.some(a=>a.kind==='image')){invalid++;continue;}surface=inlineText(atoms);}
+      if(native)surface=codePoints!.slice(from,to).join('');
+      else if (!block && content.compactInline) {const atoms=inlineSlice(content.compactInline.spans,from,to);if(atoms.some(a=>a.kind==='image')){invalid++;continue;}surface=inlineText(atoms);}
       else if (!block && !sameCells) {
         let plain = true;
         for (const id of cells) { const c=state.contents[state.placements[id]?.contentKey]; if(c?.viewType!=='text-cell'){plain=false;break;} surface+=String(c.payload.text??''); }

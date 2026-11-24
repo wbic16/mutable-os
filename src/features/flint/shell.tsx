@@ -1,3 +1,4 @@
+import { editorInputBoundary } from '../../runtime/editor-input';
 import { For, Show, createSignal, createMemo, createUniqueId, onMount, onCleanup, lazy } from 'solid-js';
 import type { DocumentApplicationInstance } from '../../feature-api/document-application';
 import { Dynamic } from "solid-js/web";
@@ -43,6 +44,14 @@ export function FlintView(props:{application:DocumentApplicationInstance; initia
     if (typeof ResizeObserver !== 'undefined') { const observer = new ResizeObserver(measure); observer.observe(shell); onCleanup(() => observer.disconnect()); }
     // Handle the active Flint tab before the workspace's document shortcut.
     const saveShortcut = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+      const boundary = editorInputBoundary(event);
+      if (boundary) {
+        if (shell.contains(boundary.handle.root)) app.handleSaveShortcut?.(event, () => {
+          if (!storage() && app.properties() && !vault()?.readOnly && !vault()?.busy) void save();
+        });
+        return;
+      }
       if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey || event.key.toLowerCase() !== 's'
         || event.isComposing || !(event.target instanceof Node) || !shell.contains(event.target)) return;
       event.preventDefault(); event.stopPropagation();

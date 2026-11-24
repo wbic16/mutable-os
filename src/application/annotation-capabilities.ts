@@ -1,3 +1,5 @@
+import { codeSurface } from '../features/standoff-code-mirror/mounts';
+import { Coordinates } from '../features/standoff-code-mirror/model';
 import { immutable } from "../runtime/effect-contributions";
 import type { AnnotationCapabilities, AnnotationText } from "../feature-api/annotations";
 import type { FeatureScope } from "../runtime/features";
@@ -31,7 +33,7 @@ export function annotationCapabilities(editor: ReactiveEditor, scope: FeatureSco
     const revision = editor.repository.state.revision;
     if (textRevision !== revision) { texts.clear(); textRevision = revision; }
     const cached = texts.get(key); if (cached) return cached;
-    const node = editor.node(key); if (!node) return;
+    const node = editor.node(key); if (!node||node.viewType==='standoff-code-mirror-block') return;
     const snapshot = immutable({ key, contentKey: node.contentKey, placementKey: node.placementKey,
       version: editor.repository.state.contents[node.contentKey]?.inlineRevision ?? 0,
       cells: node.inlineContent.map(key => { const cell = editor.node(key); return { plain: cell?.viewType === "text-cell", text: String(cell?.payload.text ?? " ") }; }),
@@ -40,6 +42,7 @@ export function annotationCapabilities(editor: ReactiveEditor, scope: FeatureSco
     texts.set(key, snapshot); return snapshot;
   };
   return {
+    codeAnnotations:{supports:key=>!!codeSurface(editor,key),open:(key,type)=>{const source=codeSurface(editor,key);if(!source)throw Error('Code editor is not mounted.');source.open(type);}},
     liveDocumentEntities(owner) {
       check();const root=locate(editor,owner,'document').rootKey;
       const inventory=liveDocumentEntities(editor,editor.node(root)!.contentKey);
@@ -85,7 +88,7 @@ export function annotationCapabilities(editor: ReactiveEditor, scope: FeatureSco
       const node = editor.node(key);
       const origin = node?.viewType === "document-window-block" ? node.children.find(child => editor.node(child)?.viewType === "document-block") ?? key : key;
       const scope = locate(editor, origin, "document");
-      const found=scopeNodes(editor,scope,['mutable/citation-block','mutable/web-article-block']).found;
+      const found=scopeNodes(editor,scope,['mutable/citation-block','mutable/web-article-block','standoff-code-mirror-block']).found;
       const blockReferences=found.filter(({node})=>['mutable/citation-block','mutable/web-article-block'].includes(node.viewType)).map(({node})=>({
         contentKey:node.contentKey,
         // Detach only this Block's annotation metadata before freezing. Freezing
@@ -93,14 +96,21 @@ export function annotationCapabilities(editor: ReactiveEditor, scope: FeatureSco
         // crashes consumers (including Scry's Entity inventory).
         properties:immutable(JSON.parse(JSON.stringify(Array.isArray(node.payload.blockProperties)?node.payload.blockProperties:[])) as Record<string,unknown>[]),
       }));
-      return { scope, blockReferences, texts: found.filter(({ node }) => node.viewType === "standoff-editor-block").map(({ node }) => immutable({
-        key: node.key, contentKey: node.contentKey, placementKey: node.placementKey,
-        version: editor.repository.state.contents[node.contentKey]?.inlineRevision ?? 0,
-        cellCount: node.inlineContent.length,
-        properties: ((Array.isArray(node.payload.standoffProperties) ? node.payload.standoffProperties : []) as Record<string, unknown>[])
-          .filter(p => p && typeof p === 'object' && !Array.isArray(p))
-          .map(p => JSON.parse(JSON.stringify(editor.linkedAnnotations.resolve(p, node.contentKey)))),
-      })) };
+      return { scope, blockReferences, texts: found.filter(({node})=>['standoff-editor-block','standoff-code-mirror-block'].includes(node.viewType)).map(({node})=>{
+        const native=node.viewType==='standoff-code-mirror-block',coordinates=native?new Coordinates(String(node.payload.text??'')):undefined;
+        return immutable({key:node.key,contentKey:node.contentKey,placementKey:node.placementKey,
+          version:native?editor.repository.state.contents[node.contentKey].revision:editor.repository.state.contents[node.contentKey]?.inlineRevision??0,
+          coordinate:native?'utf16' as const:'cell' as const,
+          cellCount:coordinates?.text.length??node.inlineContent.length,
+          properties:((Array.isArray(node.payload.standoffProperties)?node.payload.standoffProperties:[]) as Record<string,unknown>[])
+            .filter(p=>p&&typeof p==='object'&&!Array.isArray(p)).flatMap(p=>{
+              const resolved=JSON.parse(JSON.stringify(editor.linkedAnnotations.resolve(p,node.contentKey)));
+              if(!coordinates)return [resolved];
+              try{const {from,to}=coordinates.range(p);return [{...resolved,start:from,end:to-1}];}catch{return [];}
+            }),
+        });
+      }) };
+
     },
     watchDocumentEntities(key, listener) {
       check();

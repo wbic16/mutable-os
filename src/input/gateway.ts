@@ -1,3 +1,4 @@
+import { editorInputBoundary } from '../runtime/editor-input';
 import { passiveElement } from '../runtime/passive-presentation';
 import { openBlockContextMenu } from "../runtime/open-block-context-menu";
 import { modeContinuationError, modeJoinError } from '../block-tree/mode-editing';
@@ -46,7 +47,7 @@ export interface CompletionInput {
 export function installInlinePresentationInput(document:Document,mounts:MountRegistry){
   const events=['keydown','beforeinput','input','compositionstart','compositionupdate','compositionend','copy','cut','paste'];
   const intercept=(event:Event)=>{
-    if(event.defaultPrevented)return;
+    if(event.defaultPrevented || editorInputBoundary(event))return;
     if(mounts.resolveEvent(event)?.handle.interceptInlineInput?.(event)){
       if(event.cancelable)event.preventDefault();event.stopImmediatePropagation();
     }
@@ -112,6 +113,7 @@ export class InputGateway {
   }
 
   private onInput = (event: Event) => {
+    if (editorInputBoundary(event)) return;
     const resolved = this.mounts.resolveEvent(event);
     if (!resolved) return;
     if (resolved.handle.composing) return;
@@ -146,6 +148,7 @@ export class InputGateway {
     return resolved.handle.inputPolicy === "standoff" ? ["editor/standoff", "editor"] : ["editor"];
   }
   private onKeyDown = (event: KeyboardEvent) => {
+    if (editorInputBoundary(event)) return;
     if(this.inlineNavigation?.(event))return;
     if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1 && event.key !== "Shift") this.markdown?.cancel();
     if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1 && event.key !== "Shift") this.listInput.cancelTask?.();
@@ -166,8 +169,9 @@ export class InputGateway {
     this.bindings.dispatch(event, this.scopes(event), id => this.runBinding(id, event));
   };
   private onContextMenu = (event: MouseEvent) => this.onControlClick(event);
-  private onControlClick = (event: MouseEvent) => { this.bindings.dispatch(event, this.scopes(event), id => this.runBinding(id, event)); };
+  private onControlClick = (event: MouseEvent) => { if (editorInputBoundary(event)) return; this.bindings.dispatch(event, this.scopes(event), id => this.runBinding(id, event)); };
   private onCustomInput = (event: Event) => {
+    if (editorInputBoundary(event)) return;
     if (!(event instanceof CustomEvent) || event.defaultPrevented) return;
     const { name, payload } = event.detail ?? {};
     // Dispatch on the target Block, preserving occurrence-local context.
@@ -175,6 +179,7 @@ export class InputGateway {
   };
 
   private onBeforeInput = (event: InputEvent) => {
+    if (editorInputBoundary(event)) return;
     const resolved = this.mounts.resolveEvent(event);
     if (!resolved || resolved.handle.inputPolicy !== "standoff" || resolved.handle.composing) return;
     const selection = resolved.handle.captureInlineSelection?.();
@@ -317,6 +322,7 @@ export class InputGateway {
   };
 
   private onFocusIn = (event: FocusEvent) => {
+    if (editorInputBoundary(event)) return;
     if(passiveElement(event.target))return;
     if (this.bindings.pendingHint()) this.bindings.cancelChord();
     if (event.target instanceof Element && event.target.closest('[data-block-selection-handle], [data-block-selection-inspector], [data-table-controls]')) return;
@@ -336,6 +342,7 @@ export class InputGateway {
   private onFocusOut = () => { this.markdown?.cancel(); this.listInput.cancelTask?.(); this.clipboard?.clearIntent(); this.caretEvents?.setComposing?.(false); this.caretEvents?.setCaret(); };
 
   private onCompositionStart = (event: CompositionEvent) => {
+    if (editorInputBoundary(event)) return;
     this.markdown?.cancel();
     this.listInput.cancelTask?.();
     this.bindings.cancelChord();
@@ -349,6 +356,7 @@ export class InputGateway {
   };
 
   private onCompositionEnd = (event: CompositionEvent) => {
+    if (editorInputBoundary(event)) return;
     const resolved = this.mounts.resolveEvent(event);
     this.caretEvents?.setComposing?.(false);
     if (!resolved) return;
@@ -362,7 +370,8 @@ export class InputGateway {
     }
   };
 
-  private onSelectionChange = () => {
+  private onSelectionChange = (event: Event) => {
+    if (editorInputBoundary(event)) return;
     const selection = this.document.getSelection();
     const anchorElement =
       selection?.anchorNode instanceof Element
@@ -391,6 +400,7 @@ export class InputGateway {
   };
 
   private onPointerDown = (event: PointerEvent) => {
+    if (editorInputBoundary(event)) return;
     if(passiveElement(event.target))return;
     this.markdown?.cancel();
     this.listInput.cancelTask?.();
@@ -483,6 +493,7 @@ export class InputGateway {
   }
 
   private onCopy = (event: ClipboardEvent) => {
+    if (editorInputBoundary(event)) return;
     if(this.completion?.()?.clipboard?.(event))return;
     if(this.clipboard?.copyProjectionEvent(event))return;
     if (this.clipboard?.enabled()) { this.clipboard.handleText(event); return; }
@@ -490,6 +501,7 @@ export class InputGateway {
   };
 
   private onCut = (event: ClipboardEvent) => {
+    if (editorInputBoundary(event)) return;
     if(this.completion?.()?.clipboard?.(event))return;
     if (this.clipboard?.enabled()) { this.clipboard.handleText(event); return; }
     if (!this.writeStandoffClipboard(event)) return;
@@ -505,6 +517,7 @@ export class InputGateway {
   };
 
   private onPaste = (event: ClipboardEvent) => {
+    if (editorInputBoundary(event)) return;
     this.markdown?.cancel();
     this.listInput.cancelTask?.();
     if(this.completion?.()?.clipboard?.(event))return;

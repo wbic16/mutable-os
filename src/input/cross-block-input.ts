@@ -1,3 +1,4 @@
+import { editorInputBoundary } from '../runtime/editor-input';
 import { passiveElement } from '../runtime/passive-presentation';
 import { normalizeInlineSelection } from '../runtime/inline-alternatives';
 import type { ReactiveEditor } from "../reactive-editor/editor";
@@ -25,7 +26,10 @@ export class CrossBlockInput {
   private emptySelectAll?: string;
   private disposeEffect: () => void;
   constructor(private editor: ReactiveEditor, private document: Document) {
-    const listen = (name: string, fn: (event: any) => void) => { document.addEventListener(name, fn, true); this.listeners.push([name, fn]); };
+    const listen = (name: string, fn: (event: any) => void) => {
+      const guarded = (event: Event) => { if (!editorInputBoundary(event)) fn(event); };
+      document.addEventListener(name, guarded, true); this.listeners.push([name, guarded]);
+    };
     listen("pointerdown", this.down); listen("pointermove", this.move); listen("pointerup", this.up); listen("pointercancel", this.cancel);
     // MouseEvent.detail contains the browser's click count. PointerEvent.detail
     // is zero in Chromium; guessing a double-click timeout would ignore OS settings.

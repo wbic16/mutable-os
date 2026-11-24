@@ -1,3 +1,4 @@
+import { editorInputBoundary } from '../runtime/editor-input';
 import type { TextSelectionSnapshot } from "../runtime/selection-snapshot";
 import type { NodeKey } from "../block-tree/types";
 import type { CurrentTextOperations } from "../runtime/current-text-operation";
@@ -52,7 +53,7 @@ export class SelectionGestures {
     if (this.mouse) this.ports.releasePointer();
     this.mouse = undefined; this.pendingMouse = undefined; this.keyboard = undefined;
   }
-  private reset = () => { this.cancelGesture(); this.heldDelete = undefined; this.composing = false; this.suppressClick = false; };
+  reset = () => { this.cancelGesture(); this.heldDelete = undefined; this.composing = false; this.suppressClick = false; };
   private consume(event: Event): void { if (event.cancelable) event.preventDefault(); event.stopImmediatePropagation(); }
   private complete(policy: SelectionGesturePolicy): "pass" | "handled" | "failed" {
     if (this.policy !== policy) return "pass";
@@ -179,14 +180,15 @@ export class SelectionGestures {
       ["click", menu as EventListener], ["contextmenu", menu as EventListener], ["keyup", keyup as EventListener], ["keydown", keydown as EventListener],
       ["focusin", focus], ["compositionstart", composition], ["compositionend", compositionEnd],
     ];
-    for (const [name, listener] of listeners) document.addEventListener(name, listener, true);
+    const guarded = listeners.map(([name, listener]): [string, EventListener] => [name, event => { if (!editorInputBoundary(event)) listener(event); }]);
+    for (const [name, listener] of guarded) document.addEventListener(name, listener, true);
     document.defaultView?.addEventListener("blur", this.reset);
     let installed = true;
     const dispose = () => {
       if (!installed) return;
       installed = false;
       this.reset();
-      for (const [name, listener] of listeners) document.removeEventListener(name, listener, true);
+      for (const [name, listener] of guarded) document.removeEventListener(name, listener, true);
       document.defaultView?.removeEventListener("blur", this.reset);
       if (this.stopInput === dispose) this.stopInput = undefined;
     };

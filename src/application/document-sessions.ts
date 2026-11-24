@@ -1,3 +1,5 @@
+import { dispatchEditorSave } from '../input/editor-global-input';
+import { editorInputBoundary } from '../runtime/editor-input';
 import { DocumentHostPresentations } from "./document-host-presentations";
 import { createRoot, createSignal, getOwner, type Owner } from "solid-js";
 import type { ReactiveEditor } from "../reactive-editor/editor";
@@ -68,6 +70,16 @@ export class DocumentSessionStore {
   private privateViews = new Map<string, RetainedDocumentSession>();
   readonly saveError = createSignal<string>();
   private saveShortcut = (event: KeyboardEvent) => {
+    if (event.defaultPrevented) return;
+    const boundary = editorInputBoundary(event);
+    if (boundary) {
+      const session = this.forElement(boundary.handle.root);
+      if (!session || this.transfers.atOrigin(session)) return;
+      dispatchEditorSave(event, this.editor.bindings, () => {
+        void (this.saveHandlers.get(session.id)?.() ?? this.save(session)).catch(error => this.saveError[1](String(error)));
+      });
+      return;
+    }
     if (!event.ctrlKey && !event.metaKey || event.altKey || event.shiftKey || event.key.toLowerCase() !== 's' || event.isComposing) return;
     const session = event.target instanceof Element ? this.forElement(event.target) : undefined;
     if (!session || this.transfers.atOrigin(session)) return;

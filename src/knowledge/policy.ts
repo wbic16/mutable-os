@@ -1,6 +1,6 @@
 /** Source Blocks index authoritative UTF-16 text only, never rendered markup or inferred entities. */
 export const sourceTextTypes = ['mutable/markdown-source-block', 'mutable/html-source-block'];
-export const nativeTextTypes = ['plain-text-block', 'text-block', ...sourceTextTypes];
+export const nativeTextTypes = ['plain-text-block', 'text-block', 'standoff-code-mirror-block', ...sourceTextTypes];
 /** Serializable extraction capabilities; the host supplies opaque types, never a registry. */
 export interface ExtractionPolicy { version:1; opaqueTypes:readonly string[] }
 export const DEFAULT_POLICY:ExtractionPolicy = Object.freeze({version:1,opaqueTypes:Object.freeze([])});

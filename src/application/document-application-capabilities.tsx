@@ -1,3 +1,4 @@
+import { dispatchEditorSave } from '../input/editor-global-input';
 import {registerDocumentPresentations} from './document-presentation-registration';
 import {RegisteredApplicationView,originPresentationHost} from './application-presentations';
 import { documentApplicationPorts } from './document-application-ports';
@@ -340,6 +341,12 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
       const [choosingVault,setChoosingVault]=createSignal(false),[chooserBusy,setChooserBusy]=createSignal(false),[chooserError,setChooserError]=createSignal('');
       const [vaultLoading,setVaultLoading]=createSignal(false),[vaultError,setVaultError]=createSignal('');
       let requestedVault: string | undefined;
+      const openCandidate = async (location: VaultLocation, expectedResourceId?: string) => {
+        const v=lease();v.requireDirectory(location.folder);vaultLeaf(location.filename);
+        if(![...(v.listing().other??[]),...v.listing().markdown].includes(vaultPath(location)))throw Error('File is no longer in this vault; Refresh first');
+        const id=await native!.openCompatible(location,v.root,undefined,expectedResourceId);
+        if(mounted&&selectedVault()===v)openDocument(id);
+      };
       const vault: ApplicationVault | undefined = native && vaults ? {
         documentFormats: editor.features.documentFormats ? documentFormats : undefined,
         state: vaultState,
@@ -373,11 +380,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
         async refresh() { await lease().refreshListing(true); },
         verify: editor.features.vaultDiscoveryCache ? async () => { await lease().refreshListing(true,true); } : undefined,
         async openFile(location) { const v = lease(); v.requireListedFile(location); const id = await native.open(location); if (mounted && selectedVault() === v) openDocument(id); },
-        async openCandidate(location) {
-          const v=lease();v.requireDirectory(location.folder);vaultLeaf(location.filename);
-          if(![...(v.listing().other??[]),...v.listing().markdown].includes(vaultPath(location)))throw Error('File is no longer in this vault; Refresh first');
-          const id=await native.openCompatible(location,v.root);if(mounted&&selectedVault()===v)openDocument(id);
-        },
+        openCandidate: location => openCandidate(location),
         async createDocument(folder, filename, title, format = 'page') {
           if (!editor.features.documentFormats && format !== 'page') throw new Error('Document formats are disabled.');
           const v = lease(), destination = {folder, filename}; destinationIn(v, destination);
@@ -584,6 +587,7 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
       } : undefined;
       const application: import('../feature-api/document-application').DocumentApplicationInstance = {
           id: applicationId, activeDocumentId: activeId,
+          handleSaveShortcut: (event, save) => dispatchEditorSave(event, editor.bindings, save),
           createDocument(title = 'Untitled document') {
             guard();
             const { document } = createFormattedDocument('page');
@@ -608,9 +612,13 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
             remove(id) { guard(); recents.remove(id, recentVaultId()); },
             async open(id) {
               guard();
-              if (!recents.items(recentVaultId()).some(d => d.id === id)) throw Error('This Document is no longer in the recent list.');
+              const recent = recents.items(recentVaultId()).find(d => d.id === id);
+              if (!recent) throw Error('This Document is no longer in the recent list.');
               if (resolve(id)?.placement) { openDocument(id); return; }
               const v = lease(), matches = v.listing().documents.filter(d => d.resourceId === id);
+              // Recognized files are not native-index entries. Recheck the stored
+              // location against this Vault's listing and its identity before admission.
+              if (!matches.length && recent.location) { await openCandidate(recent.location, id); return; }
               if (matches.length !== 1) throw Error('Document missing or ambiguous in this Vault. Refresh the Library to locate it.');
               // Stored paths are display hints, never filesystem authority. Resolve current identity through the existing Vault opener.
               await vault!.openFile(matches[0].location);

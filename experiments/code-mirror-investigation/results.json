@@ -1,0 +1,535 @@
+{
+  "versions": {
+    "codemirror": "6.0.2",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.13",
+    "@codemirror/language": "6.12.4",
+    "@codemirror/commands": "6.11.1"
+  },
+  "cases": 1764,
+  "customRangeMismatches": 182,
+  "customRangeExamples": [
+    {
+      "from": 0,
+      "to": 1,
+      "a": 0,
+      "b": 1,
+      "count": 1,
+      "expected": [],
+      "actual": [
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 1,
+      "a": 0,
+      "b": 1,
+      "count": 2,
+      "expected": [],
+      "actual": [
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "a": 0,
+      "b": 1,
+      "count": 1,
+      "expected": [
+        [
+          1,
+          2
+        ]
+      ],
+      "actual": [
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "a": 0,
+      "b": 1,
+      "count": 2,
+      "expected": [
+        [
+          2,
+          3
+        ]
+      ],
+      "actual": [
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "a": 0,
+      "b": 2,
+      "count": 1,
+      "expected": [],
+      "actual": [
+        [
+          0,
+          1
+        ]
+      ]
+    }
+  ],
+  "markMismatches": 182,
+  "markExamples": [
+    {
+      "from": 0,
+      "to": 1,
+      "a": 0,
+      "b": 1,
+      "count": 1,
+      "expected": [],
+      "actual": [
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 1,
+      "a": 0,
+      "b": 1,
+      "count": 2,
+      "expected": [],
+      "actual": [
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "a": 0,
+      "b": 1,
+      "count": 1,
+      "expected": [
+        [
+          1,
+          2
+        ]
+      ],
+      "actual": [
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "a": 0,
+      "b": 1,
+      "count": 2,
+      "expected": [
+        [
+          2,
+          3
+        ]
+      ],
+      "actual": [
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "a": 0,
+      "b": 2,
+      "count": 1,
+      "expected": [],
+      "actual": [
+        [
+          0,
+          1
+        ]
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "name": "before",
+      "mapped": [
+        [
+          2,
+          5
+        ]
+      ]
+    },
+    {
+      "name": "at start",
+      "mapped": [
+        [
+          2,
+          5
+        ]
+      ]
+    },
+    {
+      "name": "inside",
+      "mapped": [
+        [
+          1,
+          5
+        ]
+      ]
+    },
+    {
+      "name": "at end",
+      "mapped": [
+        [
+          1,
+          4
+        ]
+      ]
+    },
+    {
+      "name": "delete before",
+      "mapped": [
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    {
+      "name": "delete inside",
+      "mapped": [
+        [
+          1,
+          3
+        ]
+      ]
+    },
+    {
+      "name": "delete whole",
+      "mapped": []
+    },
+    {
+      "name": "replace whole",
+      "mapped": []
+    },
+    {
+      "name": "replace left",
+      "mapped": [
+        [
+          2,
+          4
+        ]
+      ]
+    },
+    {
+      "name": "replace right",
+      "mapped": [
+        [
+          1,
+          3
+        ]
+      ]
+    }
+  ],
+  "unicode": [
+    {
+      "text": "abc",
+      "cells": 3,
+      "utf16": 3,
+      "boundaries": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "cmLength": 3,
+      "cmText": "abc"
+    },
+    {
+      "text": "漢é",
+      "cells": 2,
+      "utf16": 2,
+      "boundaries": [
+        0,
+        1,
+        2
+      ],
+      "cmLength": 2,
+      "cmText": "漢é"
+    },
+    {
+      "text": "a😀b",
+      "cells": 3,
+      "utf16": 4,
+      "boundaries": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "cmLength": 4,
+      "cmText": "a😀b"
+    },
+    {
+      "text": "é",
+      "cells": 2,
+      "utf16": 2,
+      "boundaries": [
+        0,
+        1,
+        2
+      ],
+      "cmLength": 2,
+      "cmText": "é"
+    },
+    {
+      "text": "a\nb",
+      "cells": 3,
+      "utf16": 3,
+      "boundaries": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "cmLength": 3,
+      "cmText": "a\nb"
+    },
+    {
+      "text": "a\r\nb",
+      "cells": 4,
+      "utf16": 4,
+      "boundaries": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "cmLength": 3,
+      "cmText": "a\nb"
+    },
+    {
+      "text": "a\rb",
+      "cells": 3,
+      "utf16": 3,
+      "boundaries": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "cmLength": 3,
+      "cmText": "a\nb"
+    },
+    {
+      "text": "a\r\nb\nc",
+      "cells": 6,
+      "utf16": 6,
+      "boundaries": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "cmLength": 5,
+      "cmText": "a\nb\nc"
+    },
+    {
+      "text": "é",
+      "cells": 1,
+      "utf16": 1,
+      "boundaries": [
+        0,
+        1
+      ],
+      "cmLength": 1,
+      "cmText": "é"
+    },
+    {
+      "text": "👨‍👩‍👧‍👦",
+      "cells": 7,
+      "utf16": 11,
+      "boundaries": [
+        0,
+        2,
+        3,
+        5,
+        6,
+        8,
+        9,
+        11
+      ],
+      "cmLength": 11,
+      "cmText": "👨‍👩‍👧‍👦"
+    }
+  ],
+  "crlf": {
+    "internalLength": 3,
+    "serialized": "a\r\nb"
+  },
+  "pointCases": [
+    {
+      "end": 2,
+      "affinity": "before",
+      "name": "insert",
+      "mapped": [
+        {
+          "id": "point",
+          "isZeroWidth": true,
+          "start": 2,
+          "end": 2,
+          "affinity": "before"
+        }
+      ]
+    },
+    {
+      "end": 2,
+      "affinity": "before",
+      "name": "consume",
+      "mapped": []
+    },
+    {
+      "end": 2,
+      "affinity": "after",
+      "name": "insert",
+      "mapped": [
+        {
+          "id": "point",
+          "isZeroWidth": true,
+          "start": 3,
+          "end": 3,
+          "affinity": "after"
+        }
+      ]
+    },
+    {
+      "end": 2,
+      "affinity": "after",
+      "name": "consume",
+      "mapped": []
+    },
+    {
+      "end": 1,
+      "affinity": "before",
+      "name": "insert",
+      "mapped": [
+        {
+          "id": "point",
+          "isZeroWidth": true,
+          "start": 2,
+          "end": 1,
+          "affinity": "before"
+        }
+      ]
+    },
+    {
+      "end": 1,
+      "affinity": "before",
+      "name": "consume",
+      "mapped": [
+        {
+          "id": "point",
+          "isZeroWidth": true,
+          "start": 2,
+          "end": 1,
+          "affinity": "before"
+        }
+      ]
+    },
+    {
+      "end": 1,
+      "affinity": "after",
+      "name": "insert",
+      "mapped": [
+        {
+          "id": "point",
+          "isZeroWidth": true,
+          "start": 2,
+          "end": 1,
+          "affinity": "after"
+        }
+      ]
+    },
+    {
+      "end": 1,
+      "affinity": "after",
+      "name": "consume",
+      "mapped": [
+        {
+          "id": "point",
+          "isZeroWidth": true,
+          "start": 2,
+          "end": 1,
+          "affinity": "after"
+        }
+      ]
+    }
+  ],
+  "overlapSize": 4,
+  "compoundParts": [
+    {
+      "a": 1,
+      "b": 2,
+      "c": 1,
+      "d": 3,
+      "text": "XY"
+    },
+    {
+      "a": 4,
+      "b": 5,
+      "c": 5,
+      "d": 6,
+      "text": "Z"
+    }
+  ],
+  "deletionModes": {
+    "Simple": [
+      1,
+      1,
+      1
+    ],
+    "TrackDel": [
+      1,
+      null,
+      1
+    ],
+    "TrackBefore": [
+      1,
+      null,
+      null
+    ],
+    "TrackAfter": [
+      null,
+      null,
+      1
+    ]
+  }
+}

@@ -134,18 +134,19 @@ export async function projectSaved(bytes:Uint8Array,vaultGuid:string,policy?:Ext
       const definition=owner?.payload.linkedAnnotations?.[raw.annotationId];
       const resolved=!!definition&&!external;
       const zeroWidth=raw.isZeroWidth===true;
-      const length=coordinate==='cell'?units.length:text?.length??0;
+      const nativeCode=c.viewType==='standoff-code-mirror-block',codePoints=nativeCode?[...text!]:[];
+      const length=nativeCode?codePoints.length:coordinate==='cell'?units.length:text?.length??0;
       requireValue(coordinate&&Number.isSafeInteger(raw.start)&&Number.isSafeInteger(raw.end)&&raw.start>=0&&
         (zeroWidth ? raw.start<=length&&(raw.end===raw.start||raw.end===raw.start-1) : raw.end+1>=raw.start&&raw.end+1<=length),'invalid or unrepresentable standoff range');
       const segmentCoordinate=zeroWidth?'utf16':coordinate;
-      const startIndex=zeroWidth&&coordinate==='cell'?units.slice(0,raw.start).map(c=>c.viewType==='text-cell'?String(c.payload.text):'\ufffc').join('').length:raw.start;
-      const endIndex=zeroWidth?startIndex:raw.end+1;
+      const startIndex=nativeCode?codePoints.slice(0,raw.start).join('').length:zeroWidth&&coordinate==='cell'?units.slice(0,raw.start).map(c=>c.viewType==='text-cell'?String(c.payload.text):'\ufffc').join('').length:raw.start;
+      const endIndex=zeroWidth?startIndex:nativeCode?codePoints.slice(0,raw.end+1).join('').length:raw.end+1;
       if(raw.annotationId&&!resolved)warn('Unresolved external or missing annotation definition');
       const definitionResourceGuid=external&&'resourceId'in external.source?external.source.resourceId:owner?resourceId:null;
       out.segments.push({guid:propertyKey('segment',raw,ordinal),resourceGuid:resourceId,sourceBlockGuid:blockId,authoredId:id(raw.id)?raw.id:null,identityKind:id(raw.id)?'authored':'derived',
         logicalGuid:raw.annotationId?key('logical',definitionResourceGuid,owner?.payload.id??null,external??null,raw.annotationId):propertyKey('logical',raw,ordinal),
         typename:typeof a.type==='string'?a.type:null,startIndex,endIndex,coordinate:segmentCoordinate,
-        text:zeroWidth?'':coordinate==='cell'?units.slice(raw.start,raw.end+1).map(c=>c.viewType==='text-cell'?c.payload.text:'\ufffc').join(''):text!.slice(raw.start,raw.end+1),
+        text:zeroWidth?'':nativeCode?codePoints.slice(raw.start,raw.end+1).join(''):coordinate==='cell'?units.slice(raw.start,raw.end+1).map(c=>c.viewType==='text-cell'?c.payload.text:'\ufffc').join(''):text!.slice(raw.start,raw.end+1),
         value:scalar(a.value),valueJson:json(a.value),targetEntityGuid:a.type==='codex/entity-reference'&&id(a.value)?a.value:null,
         targetBlockGuid:a.type==='codex/block-reference'&&id(a.value)?a.value:null,targetResourceGuid:a.type==='codex/block-reference'&&id(bag(a.metadata).documentId)?bag(a.metadata).documentId:null,
         definitionResourceGuid:raw.annotationId?definitionResourceGuid:null,definitionBlockGuid:raw.annotationId?owner?.payload.id??null:null,definitionAnnotationId:raw.annotationId??null,

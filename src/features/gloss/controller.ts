@@ -1,3 +1,4 @@
+import { codeSurface } from '../standoff-code-mirror/mounts';
 import {glossPresentationControls} from './presentation-context';
 import {applicationPresentationSurface} from '../../rendering/application-presentation-surface';
 import {createSignal} from 'solid-js';
@@ -15,8 +16,23 @@ export class GlossController {
  private clickEpoch=0;private draft?:Draft;private draftInput?:HTMLTextAreaElement;private closeUI?:()=>void;private releases:(()=>void)[]=[];
  private evidence={locationOf:(key:string)=>this.editor.repository.locationOf(key),ownedKeys:(key:string)=>this.editor.repository.ownedPlacementKeys(key)};
  constructor(private editor:ReactiveEditor){
-  this.releases.push(editor.commandRegistry.register<{selection?:{anchor:number;head:number}}>({id:'gloss.create',label:'Create Gloss',canExecute:({targetKey})=>editor.features.glossMode&&editor.node(targetKey)?.viewType==='standoff-editor-block',execute:({targetKey,args})=>{this.open(targetKey,args?.selection);}},'gloss'));
+  this.releases.push(editor.commandRegistry.register<{selection?:{anchor:number;head:number}}>({id:'gloss.create',label:'Create Gloss',canExecute:({targetKey})=>editor.features.glossMode&&(editor.node(targetKey)?.viewType==='standoff-editor-block'||!!codeSurface(editor,targetKey)),execute:({targetKey,args})=>{const native=codeSurface(editor,targetKey);if(native)native.open(GLOSS);else this.open(targetKey,args?.selection);}},'gloss'));
   if(editor.features.glossMode)this.releases.push(editor.visualEffects.registerType({type:GLOSS,renderers:[{id:'gloss-marker',name:'css-class',params:{classes:['mutable-gloss-anchor']}}]}));
+ }
+ /** Native source adapter: CP boundaries, exact content revision, shared local definitions.
+  * The caller retains its SDK selection and popup; no Cell presentation is used. */
+ nativeCode(key:string,revision:number,start:number,end:number,raw:string,definitionId?:string) {
+  const e=this.editor,n=e.node(key),state=e.repository.readState(),c=n&&state.contents[n.contentKey];
+  if(!e.features.glossMode||!c||c.viewType!=='standoff-code-mirror-block'||c.revision!==revision||!e.canEditText(key))throw Error('Gloss target changed or is unavailable.');
+  const owner=this.owner(c.key);if(!owner||this.documentFor(key)!==owner)throw Error('Glosses require a source owned by this Document.');
+  const root=state.contents[owner],registry=clone(root.payload.linkedAnnotations as Record<string,any>??{});
+  const id=definitionId??crypto.randomUUID();
+  if(definitionId){if(!glossDefinition(registry[id])||registry[id].isDeleted)throw Error('Gloss definition is unavailable.');registry[id]={...registry[id],value:raw};}
+  else registry[id]={id,type:GLOSS,value:raw,metadata:{gloss:{version:1,localId:crypto.randomUUID(),links:{}}}};
+  const operations:RepositoryOperation[]=[{kind:'put-content',record:{...root,revision:root.revision+1,payload:{...root.payload,linkedAnnotations:registry}}}];
+  if(!definitionId){const props=clone(c.payload.standoffProperties as any[]??[]);operations.push({kind:'put-content',annotationOrigins:[...props.map((_,i)=>i),null],record:{...c,revision:c.revision+1,payload:{...c.payload,standoffProperties:[...props,{id:crypto.randomUUID(),type:GLOSS,annotationId:id,start,end:end-1}]}}});}
+  if(!glossChangeFor(state,operations,this.evidence))throw Error('Gloss range must be nonempty and valid.');
+  e.repository.commit(definitionId?'Edit Gloss':'Create Gloss',operations,true,{requireBounded:true});return id;
  }
  private owner(key:string){return glossOwner(this.editor.repository.readState(),key,this.evidence);}
  private documentFor(key:string){const seen=new Set<string>();let n=this.editor.node(key);while(n&&!seen.has(n.key)){seen.add(n.key);if(n.viewType==='document-block')return n.contentKey;n=this.editor.projections.get(n.viewId)?.parentOf(n.key);}return;}

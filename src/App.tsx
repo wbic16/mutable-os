@@ -144,6 +144,15 @@ export function PilotApp() {
 export default function App(props: { configuration?: ReactiveEditorConfiguration } = {}) {
   const route = window.location.pathname.replace(/\/+$/, "");
   const features = resolveFeatureFlags(props.configuration);
+  if (import.meta.env.DEV && route === `${import.meta.env.BASE_URL}standoff-code-mirror`) {
+    if(!features.standoffCodeMirror||!features.editorInputOwnership)return <main>Annotated CodeMirror is disabled.</main>;
+    const Demo=lazy(()=>import('./demo/standoff-code-mirror'));return <Demo configuration={props.configuration}/>;
+  }
+  if (import.meta.env.DEV && route === `${import.meta.env.BASE_URL}input-ownership`) {
+    if (!features.editorInputOwnership) return <main>Editor input ownership is disabled.</main>;
+    const Prototype = lazy(() => import('./demo/editor-input-ownership'));
+    return <Prototype configuration={props.configuration} />;
+  }
   if (route === `${import.meta.env.BASE_URL}phosphor`) {
     if (!features.phosphor) return <main>Phosphor is disabled.</main>;
     const Phosphor = lazy(() => import("./features/phosphor/demo"));

@@ -40,7 +40,7 @@ export function scopeNodes(editor: ReactiveEditor, scope: SearchScope, extraType
     if (key !== scope.rootKey && node.viewType === "document-block") return;
     if (scope.region === "main" && key !== scope.rootKey && side.test(node.viewType)) return;
     const route = [...path, key], names = [...labels, nodeLabel(node)], next = new Set(seen).add(node.contentKey);
-    if (["standoff-editor-block", "text-block", "plain-text-block", ...sourceTextTypes,...extraTypes].includes(node.viewType)) found.push({ node, path: route, breadcrumb: names.join(" / ") });
+    if (["standoff-editor-block", "standoff-code-mirror-block", "text-block", "plain-text-block", ...sourceTextTypes,...extraTypes].includes(node.viewType)) found.push({ node, path: route, breadcrumb: names.join(" / ") });
     else if (typeof node.payload.text === "string" && node.payload.text) unsupported.add(node.viewType);
     for (const child of node.children) visit(child, route, names, next);
     for (const [, child] of Object.entries(node.ownedRelations).sort(([a], [b]) => a.localeCompare(b))) visit(child, route, names, next);
@@ -76,6 +76,7 @@ export class TextSearch {
     const version = this.epochs.get(content.key) ?? 0;
     const cached = this.sources.get(content.key); if (cached?.version === version) return cached;
     const result = await canonicalSearchSource(state, content.key, version, signal);
+    if(content.viewType==='standoff-code-mirror-block')result.runs=result.runs.map(run=>({...run,text:run.text.replace(/\r\n?/g,'\n')}));
     if ((this.epochs.get(content.key) ?? 0) !== version) throw new DOMException("Document changed; search again.", "AbortError");
     this.sources.set(content.key, result); return result;
   }
@@ -114,7 +115,7 @@ export class TextSearch {
           if (set.matches.length >= 5000) { set.status = "partial"; set.exact = false; break outer; }
           const id = `${set.sessionId}:${set.matches.length}`;
           const range: SearchRange = { nodeKey: node.key, contentKey: node.contentKey, placementKey: node.placementKey, version: rangeVersion, start: raw.start, end: raw.end, coordinate: source.coordinate };
-          set.matches.push({ id, text: raw.text, context: raw.context, captures: raw.captures, groups: raw.groups, ranges: [range], path, breadcrumb, capabilities: { highlight: source.coordinate === "cell", reveal: true, annotate: source.coordinate === "cell" && raw.actionable, replace: raw.actionable, reason: !raw.actionable ? "Range splits a grapheme cluster." : source.coordinate === "utf16" ? "Plain-text results support reveal, not standoff highlights or annotations." : undefined } });
+          set.matches.push({ id, text: raw.text, context: raw.context, captures: raw.captures, groups: raw.groups, ranges: [range], path, breadcrumb, capabilities: { highlight: source.coordinate === "cell" || node.viewType==='standoff-code-mirror-block', reveal: true, annotate: source.coordinate === "cell" && raw.actionable, replace: raw.actionable && node.viewType!=='standoff-code-mirror-block', reason: node.viewType==='standoff-code-mirror-block'?"Use the native CodeMirror search panel for source replacement.": !raw.actionable ? "Range splits a grapheme cluster." : source.coordinate === "utf16" ? "Plain-text results support reveal, not standoff highlights or annotations." : undefined } });
           (set.deduplication[`${node.contentKey}:${raw.start}:${raw.end}`] ??= []).push(id);
         }
       }

@@ -56,9 +56,10 @@ export async function sqlSavedFacts(db:any,input:SqlFactsRequest,check:()=>void=
   if(v.runs){if(v.runs.reduce((n:number,r:any)=>n+r.text.length,0)>2000000)throw Error('Native text exceeds the bounded search budget');block.text={coordinate:b.coordinate,runs:v.runs};}
   // Native Cell boundaries are retained in runs; image gaps get the existing readable placeholder.
   const cells=new Map<number,string>();if(b.coordinate==='cell')for(const run of v.runs){for(let i=0;i<run.text.length;){check();const start=run.boundaries[i];let j=i+1;while(j<run.boundaries.length&&run.boundaries[j]===-1)j++;if(start<0||j>=run.boundaries.length)throw Error('Saved SQL Cell boundaries unavailable');cells.set(start,run.text.slice(i,j));i=j;}}
-  const snippet=(from:number,to:number)=>{let text='';for(let i=from;i<to;i++)text+=cells.get(i)??'[inline object]';return text;};
+  const nativeCode=b.typename==='standoff-code-mirror-block',codePoints=nativeCode?[...String(payload.text??'')]:[];
+  const snippet=(from:number,to:number)=>{if(nativeCode)return codePoints.slice(from,to).join('');let text='';for(let i=from;i<to;i++)text+=cells.get(i)??'[inline object]';return text;};
   for(const raw of !sourceTextTypes.includes(b.typename)&&Array.isArray(payload.standoffProperties)?payload.standoffProperties:[]){
-   await annotations.add({raw,blockId:b.guid,standoff:b.coordinate==='cell',length:b.cellCount??0,snippet,resolve:raw=>{const r=v.links.get(rawKey(raw));if(!r)throw Error('Saved annotation evidence unavailable');return r;}});
+   await annotations.add({raw,blockId:b.guid,standoff:b.coordinate==='cell'||nativeCode,pointEndSame:nativeCode,length:nativeCode?codePoints.length:b.cellCount??0,snippet,resolve:raw=>{const r=v.links.get(rawKey(raw));if(!r)throw Error('Saved annotation evidence unavailable');return r;}});
   }
  }
  annotations.finish();facts.diagnostics=[...new Set(facts.diagnostics)];facts.referenceDiagnostics=[...new Set(facts.referenceDiagnostics)];check();

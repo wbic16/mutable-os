@@ -57,7 +57,7 @@ export function collectDocumentEntities(editor: AnnotationCapabilities, originKe
         version: node.version,
         start,
         end: end + 1,
-        coordinate: "cell",
+        coordinate: node.coordinate ?? "cell",
       });
     });
   }

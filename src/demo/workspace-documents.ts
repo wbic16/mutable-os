@@ -1,3 +1,5 @@
+import { dispatchEditorGlobals } from '../input/editor-global-input';
+import { editorInputBoundary } from '../runtime/editor-input';
 import { createSignal, onCleanup, onMount } from "solid-js";
 import type { ExistingBlockDto } from "../block-tree/types";
 import type { ReactiveEditor } from "../reactive-editor/editor";
@@ -154,11 +156,17 @@ export function createWorkspaceDocuments(editor: ReactiveEditor, options: {
   };
   const runRegistered = (id: string) => {
     const projection = editor.projections.values().next().value;
-    if (!projection) return;
+    if (!projection) return false;
     const context = { targetKey: projection.state.rootKey, args: undefined };
-    if (editor.commandRegistry.canExecute(id, context)) void editor.commandRegistry.execute(id, context);
+    if (!editor.commandRegistry.canExecute(id, context)) return false;
+    void editor.commandRegistry.execute(id, context); return true;
   };
   const keyDown = (event: KeyboardEvent) => {
+    if (event.defaultPrevented) return;
+    if (editorInputBoundary(event)) {
+      dispatchEditorGlobals(event, editor.bindings, runRegistered, action => ['document.open', 'document.save', 'document.saveAs'].includes(action.id) && !busy() && !browser() && !pending());
+      return;
+    }
     if (event.isComposing || event.altKey || !(event.ctrlKey || event.metaKey)) return;
     const key = event.key.toLowerCase();
     if (key !== "s" && !(key === "o" && !event.shiftKey)) return;

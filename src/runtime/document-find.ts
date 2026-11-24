@@ -1,3 +1,4 @@
+import { editorInputBoundary } from './editor-input';
 import { createStore } from "solid-js/store";
 import type { ReactiveEditor } from "../reactive-editor/editor";
 import { resolveSearchScope, TextSearch, type ScopeKind, type SearchMatchSet, type SearchScope, type SearchMatch } from "./text-search";
@@ -143,6 +144,7 @@ export class DocumentFind {
   }
   install(document: Document) {
     const keydown = (event: KeyboardEvent) => {
+      if (editorInputBoundary(event)) return;
       const target = event.target as Element;
       if (target?.closest?.('[data-document-find]')) return;
       const cross = this.editor.crossText.range();

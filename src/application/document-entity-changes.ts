@@ -15,7 +15,7 @@ function snapshot(editor: ReactiveEditor, root: string) {
     const content = state.contents[key];
     if (!content || dependencies.has(key) || (key !== root && content.viewType === 'document-block')) return;
     dependencies.add(key);
-    if (content.viewType === 'standoff-editor-block' || ['mutable/citation-block','mutable/web-article-block'].includes(content.viewType)) {
+    if (['standoff-editor-block','standoff-code-mirror-block'].includes(content.viewType) || ['mutable/citation-block','mutable/web-article-block'].includes(content.viewType)) {
       const properties = ['mutable/citation-block','mutable/web-article-block'].includes(content.viewType)?content.payload.blockProperties:content.payload.standoffProperties;
       if (Array.isArray(properties)) properties.forEach((property, index) => {
         if (!property || typeof property !== 'object' || Array.isArray(property) || property.type === 'mutable/gloss' || property.type === 'dialectic/range-anchor') return;

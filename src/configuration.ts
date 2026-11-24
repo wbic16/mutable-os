@@ -37,6 +37,9 @@ export type FeatureFlags = Readonly<{
   blockModes: boolean;
   /** Lezer-derived, session-only syntax on standoff CodeBlocks. */
   standoffCodeHighlighting: boolean;
+  /** Mounted SDK editor input ownership; prototype route is separate. */
+  editorInputOwnership: boolean;
+  standoffCodeMirror: boolean;
   markdownInputTransformation: boolean;
   /** Presentation orientation on existing TabRows. */
   verticalTabs: boolean;
@@ -268,6 +271,8 @@ export const featureFlags: FeatureFlags = Object.freeze({
   virtualTextFlows: true,
   blockModes: true,
   standoffCodeHighlighting: true,
+  editorInputOwnership: true,
+  standoffCodeMirror: true,
   markdownInputTransformation: true,
   verticalTabs: true,
   desktopApplicationIcons: true,

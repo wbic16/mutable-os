@@ -590,7 +590,7 @@ export class CanonicalRepository {
     const gloss = !bulk && glossChangeFor(this.readState(), operations, {locationOf:key=>this.locationOf(key),ownedKeys:key=>this.ownedPlacementKeys(key)});
     if(gloss) {
       this.commitInline(label,operations,undefined,recordHistory,metadata,undefined,undefined,placementDelta,undefined,undefined,undefined,
-        {gloss,contents:[gloss.owner,...gloss.texts],childrenOwners:[],inlineOwners:gloss.texts});return;
+        {gloss,contents:[gloss.owner,...gloss.texts],childrenOwners:[],inlineOwners:gloss.texts},timings);return;
     }
     const taskStateOwner = !bulk && taskStateChangeFor(this.readState(), operations);
     if (taskStateOwner) {
@@ -622,7 +622,8 @@ export class CanonicalRepository {
       locationOf: key => this.locationOf(key), referenceCount: key => this.contentReferenceCount(key), ownedKeys: key => this.ownedPlacementKeys(key),
     });
     if (structural) {
-      this.commitInline(label, operations, undefined, recordHistory, metadata, undefined, undefined, placementDelta, undefined, undefined, undefined, structural);
+      stage("classification");
+      this.commitInline(label, operations, undefined, recordHistory, metadata, undefined, undefined, placementDelta, undefined, undefined, undefined, structural, timings);
       return;
     }
     if(metadata.requireBounded)throw Error('Operation cannot satisfy bounded canonical admission');
@@ -728,7 +729,9 @@ export class CanonicalRepository {
     stage("reactiveFlush");
   }
 
-  private commitInline(label: string, operations: RepositoryOperation[], inlineOwner: ContentKey | undefined, recordHistory: boolean, metadata: CommitMetadata, split?: SplitChange, childrenOwner?: ContentKey, placementDelta?: PlacementIdentityDelta, emptyParagraph?: EmptyParagraphChange, listWrap?: ListWrapChange, taskStateOwner?: ContentKey, structural?: StructuralChange): void {
+  private commitInline(label: string, operations: RepositoryOperation[], inlineOwner: ContentKey | undefined, recordHistory: boolean, metadata: CommitMetadata, split?: SplitChange, childrenOwner?: ContentKey, placementDelta?: PlacementIdentityDelta, emptyParagraph?: EmptyParagraphChange, listWrap?: ListWrapChange, taskStateOwner?: ContentKey, structural?: StructuralChange, timings?: Record<string,number>): void {
+    let mark=timings?performance.now():0;
+    const stage=timings?(name:string)=>{const now=performance.now();timings[`bounded.${name}`]=now-mark;mark=now;}:undefined;
     const current = this.readState();
     // Capture inverse data before changing any reactive records.
     const inverse = operations.map((operation) => inverseFor(current, operation)).reverse();
@@ -753,12 +756,14 @@ export class CanonicalRepository {
         operation.record.revision = previous.revision + 1;
       }
     }
+    stage?.("inverseAndPreparation");
     for (const subscriber of this.beforeChangeSubscribers) subscriber(label, metadata.cause);
     for (const subscriber of this.beforeSubscribers) subscriber(this.snapshot(), label);
     const identityDelta = this.identity?.validateCommit(prepared);
     const capture = this.prepareCapture(current, prepared, metadata);
     const resources = this.changedResources(prepared), provenance = this.changesResourceProvenance(prepared);
     const commitId = createCommitId();
+    stage?.("captureAndObservers");
     batch(() => {
       // Remove old locations before installing new ones: a split transfers Cells
       // between two owners, and operation ordering must not erase their new home.
@@ -797,16 +802,19 @@ export class CanonicalRepository {
       if (identityDelta) this.identity!.acceptCommit(identityDelta);
       if (placementDelta) this.placementIdentity.acceptCommit(placementDelta);
       this.advanceResourceGenerations(prepared, resources, provenance);
+      stage?.("apply");
       if (recordHistory) {
         if(this.activeUndoGroup)this.activeUndoGroup.record(operations,inverse);
         else this.undoStack.push(this.historyStorage.store(commitId, label, operations, inverse));
         this.redoStack = [];
       }
+      stage?.("historyStorage");
       this.deliverCapture(capture, commitId, label, recordHistory);
       for (const subscriber of this.subscribers) subscriber(this.snapshot(), label);
       const origins = annotationOrigins(operations);
       for (const subscriber of this.changeSubscribers) subscriber({ resourceIds: this.references.enriched ? [...resources] : undefined, resourceProvenanceChanged: provenance, compactEdits:compactEdits(operations), commit: { id: commitId, cause: metadata.cause }, label, previousContents, inlineOwner, split, childrenOwner, emptyParagraph, listWrap, taskStateOwner, structural, annotationOrigins: origins });
     });
+    stage?.("publishAndRender");
   }
 
   canUndo(): boolean {

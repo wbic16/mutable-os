@@ -38,6 +38,22 @@ it('does not show or persist the list when its feature flag is disabled', () => 
   const f=setup(false);f.tabs()[1].click();expect(f.host.querySelector('.flint-recent-documents')).toBeNull();
   expect([...reads.mock.calls,...writes.mock.calls].some(([key])=>String(key).includes('recent-documents'))).toBe(false);
 });
+it('preserves a recent button through a catalog refresh between mouse press and release', async () => {
+  const f = setup();
+  f.host.querySelector<HTMLButtonElement>('[aria-label="Close Document: Letter 0"]')!.click();
+  const button = f.host.querySelector<HTMLButtonElement>('[aria-label="Reopen Letter 0"]')!;
+  button.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0 }));
+  button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));
+  button.focus();
+  const other = Object.values(f.projection.state.nodes).find(n => n.payload.id === 'doc-1')!;
+  f.editor.commands.setPayloadField(other.key, 'metadata', { ...(other.payload.metadata as Record<string, unknown>), title: 'Renamed letter' });
+  // A browser cannot deliver the click to a button removed during the gesture.
+  expect(f.host.querySelector('[aria-label="Reopen Letter 0"]') === button).toBe(true);
+  expect(f.host.querySelector('[aria-label="Reopen Renamed letter"]')).not.toBeNull();
+  button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0 }));
+  button.click();
+  await vi.waitFor(() => expect(f.host.querySelector('[role=tab][aria-selected=true]')?.textContent).toBe('Letter 0'));
+});
 it('promotes a successful reopen even when that document is already active in another Flint window', () => {
   const f=setup();
   f.editor.commandRegistry.execute('flint.open',{targetKey:f.projection.state.rootKey,args:undefined});

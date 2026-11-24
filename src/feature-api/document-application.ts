@@ -9,6 +9,8 @@ export interface RecentApplicationDocument extends ApplicationDocument { locatio
 export interface DocumentApplicationInstance {
   /** Stable application Block identity; contextual state stays outside its payload. */
   id?: string;
+  /** Native editor hosts reserve only complete configured Save shortcuts. */
+  handleSaveShortcut?(event: KeyboardEvent, save: () => void): boolean;
   createDocument?(title?: string): string;
   /** Identity-only observation: library rows must not depend on dirty/save status. */
   activeDocumentId?(): string | undefined;

@@ -299,7 +299,7 @@ export class NativeDocumentSession {
     if(this.editor.features.semanticRetrieval)retrievalForeground();
     this.opening++;this.notifyKnowledge();try{return await this.openResource(location,importText,undefined,signal);}finally{this.opening--;this.notifyKnowledge();}
   }
-  async openCompatible(location:DocumentLocation,vault:string,signal?:AbortSignal) {
+  async openCompatible(location:DocumentLocation,vault:string,signal?:AbortSignal,expectedResourceId?:string) {
     signal?.throwIfAborted();
     if(this.editor.features.semanticRetrieval)retrievalForeground();
     this.opening++;this.notifyKnowledge();
@@ -307,6 +307,7 @@ export class NativeDocumentSession {
       const data=await request('recognize',{location},signal);signal?.throwIfAborted();if(this.disposed)throw Error('Document session closed');
       const bytes=new TextEncoder().encode(data.text),recognized=recognizeCompatibleDocument(bytes),id=recognized.resource.resourceId;
       if(id!==data.resourceId)throw Error('Recognition identity changed');
+      if(expectedResourceId!==undefined&&id!==expectedResourceId)throw Error('The recent Document has been replaced by a different Document at this path. Open it from the Library to review it.');
       const digest=await crypto.subtle.digest('SHA-256',bytes);
       if([...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('')!==data.byteHash)throw Error('Recognition bytes changed');
       signal?.throwIfAborted();if(this.disposed)throw Error('Document session closed');

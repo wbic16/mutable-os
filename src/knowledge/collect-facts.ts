@@ -50,10 +50,11 @@ export async function collectFacts(state:RepositoryState,resourceId:string,signa
    const {contentKey:_,version:__,...text}=await canonicalSearchSource(state,c.key,0,signal,2000000);block.text=text;
   }
   policy?.check?.();if(policy?.timings)policy.timings.textMs+=performance.now()-textStart;const annotationStart=performance.now();
+  const nativeCode=c.viewType==='standoff-code-mirror-block',codePoints=nativeCode?[...String(c.payload.text??'')]:[];
   for(const raw of !sourceTextTypes.includes(c.viewType)&&Array.isArray(c.payload.standoffProperties)?c.payload.standoffProperties:[]) {
-   await annotations.add({raw,blockId,standoff:c.inlineKind==='standoff',length:inline?.length??contentLength(c),
+   await annotations.add({raw,blockId,standoff:c.inlineKind==='standoff'||nativeCode,pointEndSame:nativeCode,length:nativeCode?codePoints.length:inline?.length??contentLength(c),
     resolve:raw=>{const owner=linkedDefinitionOwner(state,raw,c.key);return {property:resolveLinkedProperty(state,raw,c.key),owner:owner?{root:owner.key===root.key,blockId:String(owner.payload.id)}:undefined};},
-    snippet:(from,to,context)=>inline?inline.snippet(from,to):contentSlice(state,c,from,to).map(a=>a.kind==='text'?a.text:'[inline object]').join('')});
+    snippet:(from,to,context)=>nativeCode?codePoints.slice(from,to).join(''):inline?inline.snippet(from,to):contentSlice(state,c,from,to).map(a=>a.kind==='text'?a.text:'[inline object]').join('')});
   }
   if(policy?.timings)policy.timings.annotationsMs+=performance.now()-annotationStart;
   const relations=Object.keys(c.ownedRelations).sort((a,b)=>a.localeCompare(b));

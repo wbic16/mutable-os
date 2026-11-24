@@ -1,3 +1,4 @@
+import { editorInputBoundary } from '../runtime/editor-input';
 import { presentationEligible } from '../runtime/presentation-eligibility';
 import { passiveFocus } from '../runtime/passive-presentation';
 import {NativeTextProtection} from '../block-tree/text-protection';
@@ -209,6 +210,8 @@ export class ReactiveEditor {
     this.repository = new CanonicalRepository(this.features.reversibleBlocks ? upgradeLegacySurfaces(decoded.state) : decoded.state, {compactCanonicalText:this.features.compactCanonicalText});
     this.textProtection = new NativeTextProtection(this.repository);
     const protectedInput=(event:Event)=>{
+      // SDK read-only is synchronised by its adapter; canonical admission remains authoritative.
+      if(editorInputBoundary(event))return;
       if(this.textProtection.isTransientInput(event.target))return;
       const resolved=this.mounts.resolveEvent(event);if(!resolved||this.canEditText(resolved.nodeKey))return;
       if(event instanceof KeyboardEvent){
@@ -248,11 +251,11 @@ export class ReactiveEditor {
     this.commandRegistry.authoringAllowed = (key,id) => ['workspace.presentation.desktop','workspace.presentation.textual'].includes(id) || !this.isPassiveOccurrence(key) && !passiveFocus();
     this.textRanges = new TextRanges(key => {
       const node = this.node(key), content = node && this.repository.readState().contents[node.contentKey];
-      if (!node || !content || !["standoff-editor-block", "plain-text-block", ...sourceTextTypes].includes(node.viewType)) return;
+      if (!node || !content || !["standoff-editor-block", "standoff-code-mirror-block", "plain-text-block", ...sourceTextTypes].includes(node.viewType)) return;
       const cell = node.viewType === "standoff-editor-block";
       return { nodeKey: node.key, contentKey: node.contentKey, placementKey: node.placementKey,
         version: cell ? content.inlineRevision : content.revision,
-        length: cell ? node.inlineContent.length : String(node.payload.text ?? "").length, coordinate: cell ? "cell" : "utf16" };
+        length: cell ? node.inlineContent.length : node.viewType==="standoff-code-mirror-block" ? String(node.payload.text ?? "").replace(/\r\n?/g, "\n").length : String(node.payload.text ?? "").length, coordinate: cell ? "cell" : "utf16" };
     });
     this.decorations.configureValidation(ranges => this.textRanges.validate(ranges), range => this.visualEffects.validateType({
       type:range.type??'editor/temporary-range',renderers:range.renderers??this.visualEffects.type(range.type)?.renderers??[],
@@ -497,7 +500,7 @@ export class ReactiveEditor {
       const node = projection.state.nodes[key];
       if (!node || !presentationEligible(this, key)) return;
       const capabilities = this.registry.resolve(node.viewType)?.capabilities;
-      const editable = capabilities?.includes('inline-editor') || capabilities?.includes('native-text');
+      const editable = capabilities?.includes('inline-editor') || capabilities?.includes('native-text') || this.features.editorInputOwnership && capabilities?.includes('self-managed-editor');
       if (direction === 1 && editable) return node;
       const children = direction === 1 ? node.children : [...node.children].reverse();
       for (const child of children) { const found = edge(child); if (found) return found; }
@@ -514,7 +517,7 @@ export class ReactiveEditor {
       }
       if (direction === -1 && parent.key !== scope.key) {
         const caps = this.registry.resolve(parent.viewType)?.capabilities;
-        if (presentationEligible(this, parent.key) && (caps?.includes('inline-editor') || caps?.includes('native-text'))) return parent;
+        if (presentationEligible(this, parent.key) && (caps?.includes('inline-editor') || caps?.includes('native-text') || this.features.editorInputOwnership && caps?.includes('self-managed-editor'))) return parent;
       }
       current = parent;
     }
@@ -582,6 +585,7 @@ export class ReactiveEditor {
   }
 
   dispose(): void {
+    this.mounts.dispose();
     this.disposeTextProtectionInput?.();this.textProtection.dispose();
     this.tables.dispose();
     this.tabs.dispose();

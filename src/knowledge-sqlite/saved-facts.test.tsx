@@ -107,3 +107,12 @@ it('source Blocks have literal UTF16 text and no annotation assertions in full, 
  const h=host([doc('doc',['markdown','html'].map((format:any)=>({id:format,type:sourceType(format),...sourcePayload(format,'<b>Rome</b>\r\n**literal**\n😀'),standoffProperties:[{id:'inactive-'+format,type:'codex/entity-reference',value:'never-infer',start:999,end:1000}]})))]);
  const r=await parity(h.capture());expect(r.facts.mentions).toEqual([]);expect(r.facts.blocks.find(b=>b.id==='html')?.text).toEqual({coordinate:'utf16',runs:[{text:'<b>Rome</b>\r\n**literal**\n😀'}]});
 });
+it('native CodeMirror CP annotations preserve SQL UTF16 slices and semantic Facts parity',async()=>{
+ const h=host([doc('doc',[{id:'native-code',type:'standoff-code-mirror-block',text:'A😀b\r\n漢',metadata:{language:'plain'},standoffProperties:[
+  {id:'native-entity',type:'codex/entity-reference',start:1,end:2,value:'entity-ada',metadata:{entityName:'Ada'},future:{keep:true}},
+  {id:'native-point',type:'note',start:3,end:3,isZeroWidth:true,affinity:'before'},
+  {id:'native-deleted',type:'codex/entity-reference',start:0,end:0,value:'gone',isDeleted:true},
+ ]}])]);
+ const result=await parity(h.capture());expect(result.facts.mentions.find(m=>m.targetId==='entity-ada')).toMatchObject({text:'😀b',ranges:[{blockId:'native-code',start:1,end:3}]});expect(result.facts.mentions.some(m=>m.targetId==='gone')).toBe(false);
+ const row=result.db.prepare("SELECT coordinate,startIndex,endIndex,text FROM StandoffProperty WHERE authoredId='native-entity'").get();expect(row).toEqual({coordinate:'utf16',startIndex:1,endIndex:4,text:'😀b'});
+});

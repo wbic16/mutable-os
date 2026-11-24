@@ -40,10 +40,10 @@ export function glossChangeFor(state:RepositoryState,ops:RepositoryOperation[],e
  }
  const texts:string[]=[];
  for(const r of records)if(r!==root) {
-  const prior=state.contents[r.key];if(!prior||r.inlineKind!=='standoff'||glossOwner(state,r.key,e)!==root.key||!same(strip(prior,'standoffProperties'),strip(r,'standoffProperties')))return;
+  const prior=state.contents[r.key];if(!prior||(r.inlineKind!=='standoff'&&r.viewType!=='standoff-code-mirror-block')||glossOwner(state,r.key,e)!==root.key||!same(strip(prior,'standoffProperties'),strip(r,'standoffProperties')))return;
   const p=prior.payload.standoffProperties??[],q=r.payload.standoffProperties??[];if(!Array.isArray(p)||!Array.isArray(q))return;
   if(!same(p.filter(x=>x.type!==GLOSS),q.filter(x=>x.type!==GLOSS)))return;
-  for(const x of q.filter(x=>x.type===GLOSS))if(!glossDefinition(next[x.annotationId])||!Number.isInteger(x.start)||!Number.isInteger(x.end)||x.start<0||x.end<x.start||x.end>=contentLength(r))return;
+  for(const x of q.filter(x=>x.type===GLOSS))if(!glossDefinition(next[x.annotationId])||!Number.isInteger(x.start)||!Number.isInteger(x.end)||x.start<0||x.end<x.start||x.end>=(r.viewType==='standoff-code-mirror-block'?[...String(r.payload.text??'')].length:contentLength(r)))return;
   if(!same(p,q))texts.push(r.key);
  }
  if(!definitions.length&&!texts.length)return;

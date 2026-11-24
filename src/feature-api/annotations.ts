@@ -14,10 +14,12 @@ import type { DocumentPositionMarker } from "../runtime/document-position-marker
 
 export interface AnnotationText {
   readonly key: string; readonly contentKey: string; readonly placementKey: string; readonly version: number;
+  readonly coordinate?: "cell" | "utf16";
   readonly cells: readonly { readonly text: string; readonly plain: boolean }[];
   readonly properties: readonly JsonObject[];
 }
 export interface AnnotationCapabilities {
+  codeAnnotations?: { supports(key:string):boolean; open(key:string,type:string):void };
   liveDocumentEntities?(owner: string): import('./live-entities').LiveDocumentEntities;
   /** Validate snapshots without copying paragraph text. Used only before mutation. */
   validateRanges?(ranges: readonly SearchRange[]): void;

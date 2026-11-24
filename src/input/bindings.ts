@@ -105,14 +105,24 @@ export class BindingRegistry {
   modified(id: string) { this.revision[0](); return Object.hasOwn(this.overrides, id); }
   suspend() { this.cancelChord(); this.paused++; return () => { this.paused = Math.max(0, this.paused - 1); }; }
   matches(id: string, event: KeyboardEvent | MouseEvent) { return !this.paused && this.effective(id).some(t => t.kind !== "chord" && triggerKey(t) === triggerKey(captureTrigger(event))); }
-  dispatch(event: KeyboardEvent | MouseEvent, scopes: string[], run: BindingContext["run"]): boolean {
+  /** Complete host reservations only. Prefixes/continuations remain with one native dispatch. */
+  dispatchReserved(event: KeyboardEvent, scopes: string[], run: BindingContext["run"], eligible: (action: BindingAction) => boolean): boolean {
+    if (this.paused || event.defaultPrevented || event.isComposing || this.pending) return false;
+    const trigger = captureTrigger(event);
+    if (this.chordStarts.has(triggerKey(trigger))) return false;
+    return this.invoke(trigger, scopes, {event, run}, eligible);
+  }
+  hasPendingChord(): boolean { return !!this.pending; }
+  dispatch(event: KeyboardEvent | MouseEvent, scopes: string[], run: BindingContext["run"], eligible?: (action: BindingAction) => boolean): boolean {
     if (this.paused || event.defaultPrevented) return false;
     if (event instanceof KeyboardEvent && event.isComposing) { this.cancelChord(); return false; }
     if (event instanceof KeyboardEvent) {
+      if (eligible && this.pending && !this.pending.candidates.some(c => scopes.includes(c.action.scope) && eligible(c.action))) this.cancelChord();
       if (this.pending && event.key === "Escape") { event.preventDefault(); event.stopPropagation(); this.cancelChord(); return true; }
       const stroke = captureTrigger(event);
       if (stroke.kind === "keyboard" && this.pending) {
-        const relevant = this.pending.candidates.filter(candidate => scopes.includes(candidate.action.scope));
+        const relevant = this.pending.candidates.filter(candidate => scopes.includes(candidate.action.scope) && (!eligible || eligible(candidate.action)));
+        if (!relevant.length && eligible) this.cancelChord();
         if (relevant.length) {
           if (event.repeat) { event.preventDefault(); event.stopPropagation(); return true; }
           const candidates = relevant.filter(candidate => triggerKey(candidate.trigger.steps[this.pending!.step]) === triggerKey(stroke));
@@ -126,24 +136,24 @@ export class BindingRegistry {
         }
       }
       if (stroke.kind === "keyboard") {
-        const starts = (this.chordStarts.get(triggerKey(stroke)) ?? []).filter(candidate => scopes.includes(candidate.action.scope));
+        const starts = (this.chordStarts.get(triggerKey(stroke)) ?? []).filter(candidate => scopes.includes(candidate.action.scope) && (!eligible || eligible(candidate.action)));
         if (starts.length) {
           if (event.repeat) { event.preventDefault(); event.stopPropagation(); return true; }
           this.pending = { candidates: starts, step: 1 }; this.armChord(); this.updateChordHint(); event.preventDefault(); event.stopPropagation(); return true;
         }
       }
     } else if (this.pending) this.cancelChord();
-    return this.invoke(captureTrigger(event), scopes, { event, run });
+    return this.invoke(captureTrigger(event), scopes, { event, run }, eligible);
   }
   dispatchCustom(name: string, scopes: string[], run: BindingContext["run"], payload?: unknown) {
     this.cancelChord();
     return this.invoke({ kind: "custom", name }, scopes, { payload, run });
   }
-  private invoke(trigger: Trigger, scopes: string[], context: BindingContext) {
+  private invoke(trigger: Trigger, scopes: string[], context: BindingContext, eligible: (action: BindingAction) => boolean = () => true) {
     if (this.paused) return false;
     const candidates = this.index.get(triggerKey(trigger)) ?? [];
     for (const scope of scopes) for (const action of candidates) {
-      if (action.scope !== scope) continue;
+      if (action.scope !== scope || !eligible(action)) continue;
       if (this.invokeAction(action, context)) return true;
     }
     return false;
