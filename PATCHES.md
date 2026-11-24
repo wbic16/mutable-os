@@ -2006,3 +2006,13 @@ lease (`writerLock(home, 'retrieval.lock')`).
   vite 4's chunk rendering exceeds the default ~2 GB heap
   where vite 8's did not; an environment sizing fact, not a
   pin deviation.
+
+**Addendum 5 (2026-11-24, re-anchor onto upstream
+0a4128a61bdd171c6c16c27d7eef3a03e8250882).** Between the
+1417dde1 verification and promotion, upstream advanced two
+commits ("First draft", "Completed") adding a new top-level
+`animated-explainers/` directory and nothing else. Zero file
+overlap with either band; the stack replayed onto 0a4128a
+with no conflicts and no content change beyond this record.
+The Addendum 4 battery was re-run in full on the new tip
+before promotion.
