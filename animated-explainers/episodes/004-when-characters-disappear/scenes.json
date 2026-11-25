@@ -1,0 +1,119 @@
+[
+  {
+    "id": "boundaries",
+    "start": 0,
+    "duration": 6,
+    "heading": "Boundary Cells",
+    "caption": "Annotations reference boundary Cells.",
+    "narration": [
+      {
+        "at": 0.65,
+        "text": "An annotation can reference the character Cells that define its boundaries."
+      }
+    ]
+  },
+  {
+    "id": "outside",
+    "start": 6,
+    "duration": 7,
+    "heading": "Outside the range",
+    "caption": "Same Cells. New positions.",
+    "narration": [
+      {
+        "at": 0.42,
+        "text": "When characters outside an annotation disappear, its boundary references remain intact."
+      }
+    ]
+  },
+  {
+    "id": "inside",
+    "start": 13,
+    "duration": 7,
+    "heading": "Inside the range",
+    "caption": "Same boundaries. Smaller range.",
+    "narration": [
+      {
+        "at": 0.72,
+        "text": "When characters inside the range disappear, the annotation contracts naturally."
+      }
+    ]
+  },
+  {
+    "id": "question",
+    "start": 20,
+    "duration": 4,
+    "heading": "A boundary at risk",
+    "caption": "What if the boundary disappears?",
+    "narration": [
+      {
+        "at": 0.45,
+        "text": "But what happens when a boundary Cell itself disappears?"
+      }
+    ]
+  },
+  {
+    "id": "start",
+    "start": 24,
+    "duration": 9,
+    "heading": "Reassigning the start",
+    "caption": "New boundary. Same annotation.",
+    "narration": [
+      {
+        "at": 0.73,
+        "text": "The start boundary can transfer to the first surviving Cell within the annotated range."
+      }
+    ]
+  },
+  {
+    "id": "end",
+    "start": 33,
+    "duration": 7,
+    "heading": "Reassigning the end",
+    "caption": "The annotation survives.",
+    "narration": [
+      {
+        "at": 0.65,
+        "text": "The end boundary can likewise transfer to the last surviving Cell."
+      }
+    ]
+  },
+  {
+    "id": "one",
+    "start": 40,
+    "duration": 6,
+    "heading": "One surviving Cell",
+    "caption": "Two boundaries. One Cell.",
+    "narration": [
+      {
+        "at": 0.4,
+        "text": "Even a single surviving character can sustain a range annotation."
+      }
+    ]
+  },
+  {
+    "id": "none",
+    "start": 46,
+    "duration": 5,
+    "heading": "The final deletion",
+    "caption": "No surviving target.",
+    "narration": [
+      {
+        "at": 0.15,
+        "text": "When no annotated characters remain, the ordinary range annotation disappears."
+      }
+    ]
+  },
+  {
+    "id": "closing",
+    "start": 51,
+    "duration": 5,
+    "heading": "Even boundaries can change.",
+    "caption": "Annotations can endure.",
+    "narration": [
+      {
+        "at": 0.5,
+        "text": "Even boundaries can change. Annotations can endure."
+      }
+    ]
+  }
+]

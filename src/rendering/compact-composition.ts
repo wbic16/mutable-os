@@ -1,3 +1,4 @@
+import { addressesFor } from './character-address';
 import type {ReactiveEditor} from '../reactive-editor/editor';
 /** Browser provisional text belongs to the mounted occurrence. Commit exactly
  * one typed replacement through the existing command and history boundary. */
@@ -14,10 +15,11 @@ export function compactComposition(editor:ReactiveEditor,key:string,flow:HTMLEle
   }
   const a=active;if(!a)return;collect(a.observer.takeRecords());dispose();
   for(const n of a.loose)if(n.parentNode===flow)flow.removeChild(n);
-  const changed=[...a.dirty].map(e=>({e,index:node.inlineContent.indexOf(e.dataset.inlineKey!)})).filter(x=>x.index>=0).sort((a,b)=>b.index-a.index);
+  const addresses=addressesFor(flow);
+  const changed=[...a.dirty].map(e=>({e,index:addresses ? addresses.indexOf(e) ?? -1 : node.inlineContent.indexOf(e.dataset.inlineKey!)})).filter(x=>x.index>=0).sort((a,b)=>b.index-a.index);
   for(const {e,index} of changed){
    const cell=editor.node(e.dataset.inlineKey!);
-   if(e.parentNode!==flow){const nextKey=node.inlineContent[index+1],next=nextKey?flow.querySelector(`[data-inline-key="${nextKey}"]`):null;flow.insertBefore(e,next);}
+   if(e.parentNode!==flow){const nextKey=node.inlineContent[index+1],next=addresses ? addresses.elementAt(index+1) ?? null : nextKey?flow.querySelector(`[data-inline-key="${nextKey}"]`):null;flow.insertBefore(e,next);}
    if(cell?.viewType==='text-cell'){const value=String(cell.payload.text??'');if(e.childNodes.length===1&&e.firstChild?.nodeType===Node.TEXT_NODE)e.firstChild.nodeValue=value;else e.textContent=value;}
   }
   if(a.blocked||c.inlineRevision!==a.revision){editor.crossText.notice('Composition was not applied because its range contains an image or its source changed. Composed text: '+text);restore({anchor:a.start,head:a.end});return;}

@@ -90,7 +90,7 @@ export async function qualifyWindowManager() {
     check(tabs().length === 2 && store.size === 1, "production Flint lazily mounts only the initially selected Document");
     const a = store.sessions()[0], node = text(a.projection, "A-text-0"), mount = editor.mounts.get(node.key)!;
     const owner = owners.get(node.key)!; owner.setLocal("owner-local-A");
-    const cells = [...mount.root.querySelectorAll("[data-inline-index]")], initialText = mount.captureText!();
+    const cells = [...mount.root.querySelectorAll("[data-inline-key]")], initialText = mount.captureText!();
     check(cells.length > 0, "identity instrumentation observes actual editing cells");
     focus(node.key, 2);
     await trusted({ type: "text", text: "X" }); await settle();
@@ -109,10 +109,10 @@ export async function qualifyWindowManager() {
     check(JSON.stringify(mount.captureInlineSelection!()) === JSON.stringify(beforeSelection), "backward native standoff selection survives trusted tab clicks");
     check(owner.local() === "owner-local-A" && editor.mounts.get(node.key) === mount, "owner-local state and mount identity survive returning to the tab");
     check(panel.scrollTop === scroll && scroll > 0, "Document scroll position survives hidden and visible transitions");
-    const stableCells = [...mount.root.querySelectorAll("[data-inline-index]")];
+    const stableCells = [...mount.root.querySelectorAll("[data-inline-key]")];
     const subscriptionsBefore = activeSubscriptions, callsBefore = subscriptionCalls;
     await click(tabs()[1]); await click(tabs()[0]);
-    check(stableCells.every((cell, i) => mount.root.querySelectorAll("[data-inline-index]")[i] === cell), "unchanged editing cell DOM survives repeated tab switching");
+    check(stableCells.every((cell, i) => mount.root.querySelectorAll("[data-inline-key]")[i] === cell), "unchanged editing cell DOM survives repeated tab switching");
     observations.visitedTabSubscriptions = { before: subscriptionsBefore, after: activeSubscriptions, newCalls: subscriptionCalls - callsBefore };
     check(activeSubscriptions === subscriptionsBefore, "switching visited tabs does not accumulate repository subscriptions");
     editor.crossText.enable(true);

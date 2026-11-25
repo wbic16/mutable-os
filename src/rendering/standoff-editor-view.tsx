@@ -1,3 +1,8 @@
+import { unwrap } from 'solid-js/store';
+import { cellWork } from '../block-tree/cell-diagnostics';
+import { addressesFor, characterIndex, characterSelector, bindCharacterIndex } from './character-address';
+import { updateSurvivingStyles, type CharacterStyles } from './character-style-changes';
+import { isReadingRelation } from "../block-tree/inline-alternative";
 import { QuillSurface } from '../features/quill/surface';
 import { QUILL_TYPE, validQuill, sourceRole } from '../features/quill/model';
 import {Dynamic,render} from 'solid-js/web';
@@ -39,26 +44,25 @@ function pointBoundary(root: HTMLElement, node: Node | null, offset: number): nu
   if (!node) return 0;
   if (node === root) {
     const childOffset = Math.max(0, Math.min(offset, root.childNodes.length));
-    const previous = root.childNodes[childOffset - 1];
-    if (previous instanceof HTMLElement) {
-      const projectedEnd = Number(previous.dataset.superpositionEnd);
-      if (Number.isInteger(projectedEnd)) return projectedEnd + 1;
-      const inlineIndex = Number(previous.dataset.inlineIndex);
-      if (Number.isInteger(inlineIndex)) return inlineIndex + 1;
+    if (!childOffset) return 0;
+    let preceding = 0;
+    // During native composition there may be a few unowned children. Walk
+    // only those neighbours, stopping at the nearest known character.
+    for (let child: ChildNode | null = root.childNodes[childOffset-1]; child; child = child.previousSibling) {
+      if (!(child instanceof HTMLElement)) continue;
+      const projectedEnd = Number(child.dataset.superpositionEnd);
+      if (Number.isInteger(projectedEnd)) return projectedEnd + 1 + preceding;
+      const index = characterIndex(child);
+      if (index !== undefined) return index + 1 + preceding;
+      preceding += child.classList.contains("reactive-inline-image") ? 1 : [...(child.textContent ?? "")].length;
     }
-    return [...root.childNodes]
-      .slice(0, childOffset)
-      .reduce((boundary, child) => {
-        if (!(child instanceof HTMLElement)) return boundary;
-        if (child.classList.contains("reactive-inline-image")) return boundary + 1;
-        return boundary + [...(child.textContent ?? "")].length;
-      }, 0);
+    return preceding;
   }
   const element = node instanceof Element ? node : node.parentElement;
-  let cell = element?.closest<HTMLElement>("[data-inline-index]");
-  while(cell&&cell.parentElement!==root)cell=cell.parentElement?.closest<HTMLElement>("[data-inline-index]")??undefined;
+  let cell = element?.closest<HTMLElement>(characterSelector);
+  while(cell&&cell.parentElement!==root)cell=cell.parentElement?.closest<HTMLElement>(characterSelector)??undefined;
   if (cell && root.contains(cell)) {
-    const index = Number(cell.dataset.inlineIndex ?? 0);
+    const index = characterIndex(cell) ?? 0;
     const projectedEnd = Number(cell.dataset.superpositionEnd);
     if (Number.isInteger(projectedEnd)) return offset > 0 ? projectedEnd + 1 : index;
     if (cell.classList.contains("reactive-inline-alternative-cell")) return index+(offset>0?1:0);
@@ -79,24 +83,34 @@ function pointBoundary(root: HTMLElement, node: Node | null, offset: number): nu
 }
 
 function restoreBoundary(root: HTMLElement, index: number): { node: Node; offset: number } {
+  const addresses = addressesFor(root);
+  if (addresses?.length) {
+    const at = Math.max(0, Math.min(index,addresses.length));
+    const cell = addresses.elementAt(Math.min(at, addresses.length-1))!;
+    const text = cell.firstChild;
+    if (text?.nodeType === Node.TEXT_NODE && !cell.hasAttribute('aria-hidden') && !cell.hasAttribute('contenteditable'))
+      return {node:text, offset:at === addresses.length ? text.nodeValue!.length : 0};
+  }
   const bounded = Math.max(0, Math.min(index, root.childNodes.length));
   return { node: root, offset: bounded };
 }
 
 function rangeFragments(
   flow: HTMLElement,
-  surface: HTMLElement,
+  origin: DOMRect,
+  scroll: {scrollLeft:number; scrollTop:number},
   start: number,
   endInclusive: number,
   scale = 1,
 ): VisualFragment[] {
-  const cells = flow.children;
-  if (!cells.length) return [];
-  const startCell = cells[Math.max(0, Math.min(start, cells.length - 1))];
-  const endCell = cells[Math.max(0, Math.min(endInclusive, cells.length - 1))];
+  const addresses = addressesFor(flow), length = addresses?.length ?? flow.children.length;
+  if (!length) return [];
+  const at = (index:number) => addresses?.elementAt(index) ?? flow.children[index];
+  const startCell = at(Math.max(0, Math.min(start,length-1)));
+  const endCell = at(Math.max(0, Math.min(endInclusive,length-1)));
   // Exact single-Cell decorations use the same visual box as the surface.
   // Mixed text/surface ranges retain the established policy for this increment.
-  if(startCell===endCell&&startCell.hasAttribute('data-character-surface'))return [localFragment(startCell.getBoundingClientRect(),surface.getBoundingClientRect(),surface,scale)];
+  if(startCell===endCell&&startCell.hasAttribute('data-character-surface'))return [localFragment(startCell.getBoundingClientRect(),origin,scroll,scale)];
   const startNode = startCell.firstChild ?? startCell;
   const endNode = endCell.firstChild ?? endCell;
   const range = document.createRange();
@@ -105,11 +119,10 @@ function rangeFragments(
     endNode,
     endNode.nodeType === Node.TEXT_NODE ? endNode.textContent?.length ?? 0 : endNode.childNodes.length,
   );
-  const surfaceRect = surface.getBoundingClientRect();
   const rects = typeof range.getClientRects === "function" ? [...range.getClientRects()] : [];
   const fragments = rects
     .filter((rect) => rect.width > 0 || rect.height > 0)
-    .map((rect) => localFragment(rect, surfaceRect, surface, scale));
+    .map((rect) => localFragment(rect, origin, scroll, scale));
   return fragments.reduce<VisualFragment[]>((merged, fragment) => {
     const previous = merged.at(-1);
     const sameLine = previous && Math.abs(previous.y - fragment.y) < 2 && Math.abs(previous.height - fragment.height) < 2;
@@ -123,9 +136,20 @@ function rangeFragments(
 }
 
 function DecorationLayer(props: { class: string; shapes: DecorationShape[]; blendMode?: "color-dodge"; active?: (key: string) => boolean }) {
+  // A new measurement may leave most SVG paths identical. Preserve their
+  // objects so Solid keeps their DOM nodes, paint state and attributes.
+  const paths = createMemo<DecorationShape[]>(previous => {
+    const prior = new Map(previous.map(shape => [shape.key, shape]));
+    return props.shapes.map(shape => {
+      const old = prior.get(shape.key);
+      if (!old) return shape;
+      const keys = Object.keys(shape) as (keyof DecorationShape)[];
+      return keys.length === Object.keys(old).length && keys.every(key => shape[key] === old[key]) ? old : shape;
+    });
+  }, []);
   return (
     <svg class={props.class} aria-hidden="true" style={{ "mix-blend-mode": props.blendMode }}>
-      <For each={props.shapes}>
+      <For each={paths()}>
         {(shape) => (
           <path
             data-property-type={shape.propertyType}
@@ -315,7 +339,7 @@ function noiseAppearance(annotation: StandoffAnnotation): Pick<NoiseRegion, "fre
   }
 }
 
-function ProjectedAlternative(props: { nodeKey: NodeKey; sourceIndex: number; sourceEnd: number; propertyId: string; classes?:string }) {
+function ProjectedAlternative(props: { nodeKey: NodeKey; cellKey: string; sourceIndex: number; sourceEnd: number; propertyId: string; classes?:string }) {
   const { editor, projection } = useReactiveView();
   const node = () => projection.state.nodes[props.nodeKey];
   const runs = createMemo(() => compileCellStyleRuns(
@@ -324,7 +348,9 @@ function ProjectedAlternative(props: { nodeKey: NodeKey; sourceIndex: number; so
   ));
   return <span
     class={["reactive-superposition-projection",props.classes].filter(Boolean).join(" ")}
-    data-inline-index={props.sourceIndex}
+    data-inline-key={props.cellKey}
+    ref={el => { if (editor.features.identityDomCharacterAddressing) bindCharacterIndex(el, () => props.sourceIndex); }}
+    data-inline-index={editor.features.identityDomCharacterAddressing ? undefined : props.sourceIndex}
     data-superposition-end={props.sourceEnd}
     data-superposition-id={props.propertyId}
     contentEditable={false}
@@ -354,9 +380,17 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
   const [draft,setDraft]=createSignal<ProvisionalCells>();
   const logical=(at:number)=>draft()?.fromPresentation(at)??at;
   const presented=(at:number)=>draft()?.toPresentation(at)??at;
+  const annotationSource = createMemo(() => {
+    const owner = node();
+    return (owner && (editor.repository.residentAnnotations(owner.contentKey) ?? owner.payload.standoffProperties) || []) as StandoffAnnotation[];
+  });
   const annotations = createMemo(
-    () => ((node()?.payload.standoffProperties as StandoffAnnotation[] | undefined) ?? []).map(property => editor.linkedAnnotations.resolve(property, node()?.contentKey) as StandoffAnnotation),
+    () => annotationSource().map(property => editor.linkedAnnotations.resolve(property, node()?.contentKey) as StandoffAnnotation),
   );
+  const linkedLayoutInputs = createMemo(() => {
+    const linked = annotations().filter(p => p.annotationId || p.type === "mutable/gloss" || p.type === "dialectic/range-anchor");
+    return JSON.stringify(linked);
+  });
   const identities = editor.features.standoffPropertyRendering ? editor.annotationIdentities.acquire(node()!.contentKey) : undefined;
   onCleanup(() => identities?.dispose());
   const annotationKey = (annotation: StandoffAnnotation, index: number) => identities?.keys()[index]
@@ -384,18 +418,18 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
       }
       return result;
     }});
-  const legacyAnnotations=createMemo(()=>annotations().map(annotation=>editor.features.standoffPropertyRendering&&editor.visualEffects.type(annotation.type)?{...annotation,isDeleted:true}:annotation));
+  const legacyAnnotations=createMemo(()=>annotations().map(annotation=>editor.features.standoffPropertyRendering&&editor.visualEffects.type(annotation.type)?{type:annotation.type,isDeleted:true}:annotation));
   // Removal is logical and synchronous; old measured legacy shapes must not
   // remain visible until the next animation frame.
-  const activeVisualKeys=createMemo(()=>new Set(legacyAnnotations().flatMap((annotation,index)=>hasActiveRange(annotation)?[annotationKey(annotation,index)]:[])));
-  const legacySvgKeys=createMemo(()=>new Set(legacyAnnotations().flatMap((annotation,index)=>hasActiveRange(annotation)&&(editor.effects.get(annotation.type)||standoffStyleSchema(annotation.type)?.svg)?[annotationKey(annotation,index)]:[])));
+  const activeVisualKeys=createMemo(()=>new Set(legacyAnnotations().flatMap((annotation,index)=>(standoffStyleSchema(annotation.type)?.regionEffect || standoffStyleSchema(annotation.type)?.noiseEffect) && hasActiveRange(annotation)?[annotationKey(annotation,index)]:[])));
+  const legacySvgKeys=createMemo(()=>new Set(legacyAnnotations().flatMap((annotation,index)=>(editor.effects.get(annotation.type)||standoffStyleSchema(annotation.type)?.svg)&&hasActiveRange(annotation)?[annotationKey(annotation,index)]:[])));
   const temporaryLayout=createMemo(()=>JSON.stringify((editor.decorations.nodes[props.nodeKey]??[]).filter(d=>!editor.features.standoffPropertyRendering||d.excludable).map(d=>editor.features.standoffPropertyRendering
     ? [d.runtimeKey,d.range.start,d.range.end,d.excludable,d.excludeLabel,d.excludeTitle,d.active]
     : d)));
   const logicalRanges=createMemo(()=>{
     const ranges:AnnotationRange[]=[...rendering.eventRanges()];
     if(editor.features.annotationRangeEvents)legacyAnnotations().forEach((annotation,index)=>{
-      if(!hasActiveRange(annotation)||annotation.start>=(node()?.inlineContent.length??0)||!editor.effects.get(annotation.type)?.caretOpacity)return;
+      if(!editor.effects.get(annotation.type)?.caretOpacity||!hasActiveRange(annotation)||annotation.start>=(node()?.inlineContent.length??0))return;
       ranges.push({key:annotationKey(annotation,index),index,id:annotation.id,type:annotation.type!,start:annotation.start,end:Math.min(annotation.end,(node()?.inlineContent.length??0)-1)});
     });
     return ranges;
@@ -409,7 +443,7 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
     return JSON.stringify(set?.items.filter(item => item.anchor.boundary.index !== item.head.boundary.index)
       .map(item => [item.id,item.anchor.boundary.index,item.head.boundary.index,item.id === set.primaryId]) ?? []);
   });
-  const superpositions = createMemo(() => editor.features.textSuperposition ? textSuperpositions(node()) : []);
+  const superpositions = createMemo(() => editor.features.textSuperposition && !projection.isCompact(props.nodeKey) ? textSuperpositions(node()) : []);
   const showHideRanges = createMemo(() => annotations().map((annotation, index) => ({ annotation, id: annotation.id ?? index }))
     .filter(({ annotation }) => annotation.type === "style/show-hide" && hasActiveRange(annotation)));
   const concealedRanges = createMemo(() => showHideRanges().filter(({ id }) => !editor.showHide.shows(props.nodeKey, id)));
@@ -459,14 +493,31 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
     const nativeSelection = document.getSelection();
     if (!nativeSelection) return;
     const anchor = restoreBoundary(flow, presented(selection.anchor));
-    const head = restoreBoundary(flow, presented(selection.head));
-    nativeSelection.removeAllRanges();
-    const range = document.createRange();
-    range.setStart(anchor.node, anchor.offset);
-    range.collapse(true);
-    nativeSelection.addRange(range);
-    if (selection.anchor !== selection.head && typeof nativeSelection.extend === "function") {
-      nativeSelection.extend(head.node, head.offset);
+    const head = selection.anchor === selection.head ? anchor : restoreBoundary(flow, presented(selection.head));
+    const samePoint = (current:Node|null, offset:number, target:typeof anchor, at:number) => {
+      if (current === target.node && offset === target.offset) return true;
+      // A native text end and its adjacent text start can denote the same
+      // logical boundary with different visual affinity (especially in bidi).
+      if (!addressesFor(flow) || !current) return false;
+      if (current === flow) return pointBoundary(flow,current,offset) === at;
+      const cell = current.parentElement;
+      return current.nodeType === Node.TEXT_NODE && cell?.parentElement === flow
+        && !cell.hasAttribute('contenteditable') && !cell.hasAttribute('aria-hidden')
+        && pointBoundary(flow,current,offset) === at;
+    };
+    if (nativeSelection.rangeCount !== 1 ||
+        !samePoint(nativeSelection.anchorNode,nativeSelection.anchorOffset,anchor,presented(selection.anchor)) ||
+        !samePoint(nativeSelection.focusNode,nativeSelection.focusOffset,head,presented(selection.head))) {
+      if (typeof nativeSelection.setBaseAndExtent === "function") {
+        nativeSelection.setBaseAndExtent(anchor.node, anchor.offset, head.node, head.offset);
+      } else {
+        nativeSelection.removeAllRanges();
+        const range = document.createRange();
+        range.setStart(anchor.node, anchor.offset);
+        range.collapse(true);
+        nativeSelection.addRange(range);
+        if (selection.anchor !== selection.head) nativeSelection.extend?.(head.node, head.offset);
+      }
     }
     if (document.activeElement === flow) {
       if (selection.anchor === selection.head) editor.setCaret(props.nodeKey,selection.head);
@@ -483,13 +534,15 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
     const foreground: DecorationShape[] = [];
     const occupied: UnderlineLane[] = [];
     const highlighters: DecorationShape[] = [];
+    const surfaceRect = surface.getBoundingClientRect();
+    const scroll = {scrollLeft:surface.scrollLeft, scrollTop:surface.scrollTop};
     const fragmentCache = new Map<string, VisualFragment[]>();
     const fragmentsFor = (start: number, end: number) => {
       const key = `${start}:${end}`;
       let fragments = fragmentCache.get(key);
       if (!fragments) {
         const d=draft();
-        fragmentCache.set(key, fragments = rangeFragments(flow, surface,
+        fragmentCache.set(key, fragments = rangeFragments(flow, surfaceRect, scroll,
           d?d.toPresentation(d.canonicalToDraft(start)):start,
           d?d.toPresentation(d.canonicalToDraft(end+1,true))-1:end, scale));
       }
@@ -515,9 +568,8 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
     const regions: RegionEffect[] = [];
     const noises: NoiseRegion[] = [];
     annotations().forEach((annotation, annotationIndex) => {
-      if (!hasActiveRange(annotation) || annotation.start >= (node()?.inlineContent.length ?? 0)) return;
       const schema = standoffStyleSchema(annotation.type);
-      if (!schema?.regionEffect && !schema?.noiseEffect) return;
+      if ((!schema?.regionEffect && !schema?.noiseEffect) || !hasActiveRange(annotation) || annotation.start >= (node()?.inlineContent.length ?? 0)) return;
       const key = annotationKey(annotation,annotationIndex);
       fragmentsFor(annotation.start, annotation.end).forEach((fragment, fragmentIndex) => {
         const region = schema.regionEffect ? regionAppearance(annotation) : undefined;
@@ -527,7 +579,6 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
       });
     });
     const superpositionRegions: SuperpositionAnchor[] = [];
-    const surfaceRect = surface.getBoundingClientRect();
     const inlineOrigin = props.inline ? surface.getClientRects()[0] : undefined;
     for (const property of superpositions()) {
       if (property.visible === false) continue;
@@ -564,14 +615,14 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
       selected.push(
         ...highlightShapes(
           `${props.nodeKey}:${item.id}`,
-          rangeFragments(flow, surface, presented(start), Math.max(presented(start), presented(end) - 1), scale),
+          rangeFragments(flow, surfaceRect, scroll, presented(start), Math.max(presented(start), presented(end) - 1), scale),
           item.id === selectionSet.primaryId ? "#75a99a" : "#b692d1",
         ),
       );
     });
     const search: DecorationShape[] = [];
     const controls: ReturnType<typeof exclusions> = [];
-    const origin = searchVisible && (editor.decorations.nodes[props.nodeKey] ?? []).some(d => d.excludable) ? surface.getBoundingClientRect() : undefined;
+    const origin = searchVisible && (editor.decorations.nodes[props.nodeKey] ?? []).some(d => d.excludable) ? surfaceRect : undefined;
     if (origin) measuredOrigin = { x: origin.left,y: origin.top };
     for (const decoration of searchVisible ? editor.decorations.nodes[props.nodeKey] ?? [] : []) {
       // Shared range renderers measure their own overlays. Cell colours require no rectangles.
@@ -601,11 +652,13 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
     setExclusions(controls);
     // Reading text can reflow later inline readings even when their canonical
     // content is unchanged. Reuse their existing layout owners and caches.
+    if (!Object.keys(node()?.ownedRelations ?? {}).some(isReadingRelation)) return;
     for(const cellKey of node()?.inlineContent??[]){const cell=projection.node(cellKey);if(cell?.viewType!=='inline-alternative-cell')continue;
       for(const name of cell.payload.readings as string[])editor.mounts.get(node()!.ownedRelations[name])?.invalidateInlineLayout?.();
     }
   };
 
+  let segmenter: Intl.Segmenter | undefined;
   let caretSurface: ReturnType<typeof editor.caretModes.mount> | undefined;
   const scheduleMeasure = (bubble=true) => {
     if(bubble)inlineParentLayout?.();
@@ -641,7 +694,7 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
         // A combining continuation is not a single-Cell grapheme.
         if(cell?.viewType!=='text-cell'||! /^[A-Z]$/.test(text)||/^[\p{Mark}\u200c\u200d\u202a-\u202e\u2066-\u2069]/u.test(next))continue;
         if(concealedRanges().some(r=>hasActiveRange(r.annotation)&&r.annotation.start<=start&&r.annotation.end>=start)||superpositions().some(r=>r.active!=='source'&&r.start<=start&&r.end>=start))continue;
-        const element=flow.children[start] as HTMLElement|undefined;
+        const element=(addressesFor(flow)?.elementAt(start) ?? flow.children[start]) as HTMLElement|undefined;
         if(!element||element.dataset.inlineKey!==cellKey)continue;
         requests.push({identity:key,cell:element,text,renderer,params:binding.params()});
       }
@@ -683,6 +736,17 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
       inlinePointAt: (x, y) => {
         // Browser caret hit tests can remain pinned to the active editing host
         // while dragging. Resolve against the actual paragraph under the pointer.
+        const addresses = addressesFor(flow);
+        if (addresses) {
+          const target = flow.ownerDocument.elementFromPoint?.(x,y)?.closest(characterSelector);
+          const index = target && addresses.indexOf(target);
+          if (target && typeof index === 'number') {
+            for (const rect of target.getClientRects()) {
+              if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)
+                return logical(index + Number(x >= (rect.left+rect.right)/2));
+            }
+          }
+        }
         let closest = 0, distance = Infinity;
         Array.from(flow.children).forEach((cell, index) => {
           for (const rect of Array.from(cell.getClientRects())) {
@@ -694,8 +758,21 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
         });
         return logical(closest);
       },
+      adjacentGrapheme: (index,direction) => {
+        const addresses = addressesFor(flow), owner = node();
+        if (!addresses || !owner || draft()) return;
+        const spans = editor.repository.readState().contents[owner.contentKey]?.compactInline?.spans;
+        if (spans?.length !== 1 || spans[0].kind !== 'text') return;
+        const text = spans[0].text, cell = addresses.elementAt(index);
+        const offset = cell ? addresses.utf16Offset(cell)! : text.length;
+        if (typeof Intl.Segmenter !== 'function') return Math.max(0,Math.min(index+direction,addresses.length));
+        segmenter ??= new Intl.Segmenter(undefined,{granularity:'grapheme'});
+        const part = segmenter.segment(text).containing(direction < 0 ? offset-1 : offset);
+        if (part) return addresses.logicalOffset(part.index + (direction > 0 ? part.segment.length : 0));
+      },
       inlineBoundary: index => {
         index=presented(index);
+        if (addressesFor(flow)) return restoreBoundary(flow,index);
         const cell = flow.children[Math.min(index, flow.children.length - 1)];
         if (cell?.firstChild?.nodeType === Node.TEXT_NODE) return { node: cell.firstChild, offset: index < flow.children.length ? 0 : cell.firstChild.textContent!.length };
         return restoreBoundary(flow, index);
@@ -739,7 +816,13 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
     node()?.inlineContent.length;
     concealedRanges();
     selectedShowHideRanges();
-    JSON.stringify(annotations());
+    const owner = node();
+    if (owner && editor.repository.residentAnnotations(owner.contentKey)) {
+      editor.repository.state.contents[owner.contentKey]?.inlineRevision;
+      // Local definitions are immutable for the lifetime of this resident
+      // binding. External definitions can change between text edits.
+      linkedLayoutInputs();
+    } else JSON.stringify(annotations());
     for (const property of superpositions()) {
       const alternative = projection.state.nodes[node()?.ownedRelations[property.alternatives[0]] ?? ""];
       alternative?.inlineContent.length;
@@ -799,7 +882,8 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
                 <Show when={!projected() || sourceIndex() === projected()!.start} fallback={<span
                   class={["reactive-superposition-source-cell",classesAt(rendering.classes(),sourceIndex())].filter(Boolean).join(" ")}
                   data-inline-key={cellKey}
-                  data-inline-index={index()}
+                  ref={el => { if (editor.features.identityDomCharacterAddressing) bindCharacterIndex(el, index); }}
+                      data-inline-index={editor.features.identityDomCharacterAddressing ? undefined : index()}
                   aria-hidden="true"
                 >{String(cell()?.payload.text ?? "")}</span>}>
                   <Show when={projected()} fallback={<Show when={cell()?.viewType==='inline-alternative-cell'} fallback={<Show
@@ -807,7 +891,8 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
                     fallback={<span
                       data-inline-key={provisional()?undefined:cellKey}
                       data-provisional-cell={provisional()?cellKey:undefined}
-                      data-inline-index={index()}
+                      ref={el => { if (editor.features.identityDomCharacterAddressing) bindCharacterIndex(el, index); }}
+                      data-inline-index={editor.features.identityDomCharacterAddressing ? undefined : index()}
                       class={provisional()&&provisional()!=='draft-text'?'scry-bracket-cell':classesAt(rendering.classes(),sourceIndex())}
                       style={cellStyleAt(cellStyles(), sourceIndex())}
                       classList={{ "reactive-standoff-cell--concealed": concealedRanges().some(({ annotation }) => hasActiveRange(annotation) && annotation.start <= sourceIndex() && annotation.end >= sourceIndex()) }}
@@ -816,7 +901,8 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
                     <span
                       class={["reactive-inline-image",classesAt(rendering.classes(),sourceIndex())].filter(Boolean).join(" ")}
                       data-inline-key={cellKey}
-                      data-inline-index={index()}
+                      ref={el => { if (editor.features.identityDomCharacterAddressing) bindCharacterIndex(el, index); }}
+                      data-inline-index={editor.features.identityDomCharacterAddressing ? undefined : index()}
                       contentEditable={false}
                       role="img"
                       data-image-placeholder={!managedAsset(cell()?.payload.asset) && !cell()?.payload.src ? "Image not loaded" : undefined}
@@ -842,8 +928,9 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
                         }}
                       />
                     </span>
-                  </Show>}><span class="reactive-inline-alternative-cell" data-inline-key={cellKey} data-inline-index={index()} contentEditable={false} style={cellStyleAt(cellStyles(),sourceIndex())}><InlineAlternativeView hostKey={props.nodeKey} cellKey={cellKey} invalidate={scheduleMeasure}/></span></Show>}>{property => <ProjectedAlternative
-                    nodeKey={node()!.ownedRelations[property().active]}
+                  </Show>}><span class="reactive-inline-alternative-cell" data-inline-key={cellKey} ref={el => { if (editor.features.identityDomCharacterAddressing) bindCharacterIndex(el, index); }}
+                      data-inline-index={editor.features.identityDomCharacterAddressing ? undefined : index()} contentEditable={false} style={cellStyleAt(cellStyles(),sourceIndex())}><InlineAlternativeView hostKey={props.nodeKey} cellKey={cellKey} invalidate={scheduleMeasure}/></span></Show>}>{property => <ProjectedAlternative
+                    cellKey={cellKey} nodeKey={node()!.ownedRelations[property().active]}
                     sourceIndex={index()}
                     sourceEnd={property().end}
                     propertyId={property().id}
@@ -862,7 +949,13 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
         if(!passive)editor.commands.updateInlineImage(key, { status });
         if (status === "ready") scheduleMeasure();
       }, (image, asset) => editor.clipboard.assets.bind(image, asset),
-        (element,key)=>render(()=>runWithOwner(viewOwner,()=> <InlineAlternativeView hostKey={props.nodeKey} cellKey={key} invalidate={scheduleMeasure}/>),element));
+        (element,key)=>render(()=>runWithOwner(viewOwner,()=> <InlineAlternativeView hostKey={props.nodeKey} cellKey={key} invalidate={scheduleMeasure}/>),element), editor.features.identityDomCharacterAddressing);
+      if (cells.addresses) cells.addresses.lookupResident = (element,index) => {
+        const owner = node();
+        if (!draft() && owner && owner.inlineContent[index] === element.getAttribute('data-inline-key'))
+          return editor.repository.residentCharacterAt(owner.contentKey,index);
+      };
+      let last: {keys: readonly string[]; paint:CharacterStyles} | undefined;
       createRenderEffect(() => {
         const owner = node();
         const styles = cellStyles();
@@ -880,22 +973,47 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
             })),
           }];
         }));
-        const presentation=(owner?.inlineContent ?? []).map((key, index): CharacterCellPresentation => {
-          const cell = projection.state.nodes[key];
-          const classes=classesAt(classRuns,index);
-          const property = projected.find(property => index >= property.start && index <= property.end);
-          if (property) return { key, index, classes, text: String(cell?.payload.text ?? ""),
-            hiddenSource: index !== property.start,
-            alternative: index === property.start ? alternatives.get(property.id) : undefined };
-          if(cell?.viewType==='inline-alternative-cell')return {key,index,text:'',slot:true,classes,style:cellStyleAt(styles,index)};
-          if (cell?.viewType === "image-cell") return { key, index, classes, text: "", image: {
-            asset: managedAsset(cell.payload.asset), src: String(cell.payload.src ?? ""), alt: String(cell.payload.alt ?? ""), label: String(cell.payload.alt ?? "Inline image"),
-            width: cell.payload.width as number | undefined, height: cell.payload.height as number | undefined,
-          } };
-          return { key, index, text: String(cell?.payload.text ?? ""), classes, style: cellStyleAt(styles, index),
-            concealed: concealed.some(({ annotation }) => hasActiveRange(annotation) && annotation.start <= index && annotation.end >= index) };
-        });
-        cells.update(draft()?.present(presentation)??presentation);
+        const sequence = owner?.inlineContent ?? [];
+        const keys = unwrap(sequence);
+        const provisional = draft();
+        const compact = cells.addresses && owner && editor.repository.state.contents[owner.contentKey]?.compactInline;
+        const plain = !!compact && compact.spans.length <= 1 && (!compact.spans.length || compact.spans[0].kind === 'text')
+          && !provisional && !concealed.length && !projected.length;
+        const paint = {styles,classes:classRuns};
+        const rawNodes = unwrap(projection.state.nodes);
+        const plainCell = (index:number):CharacterCellPresentation => {
+          if (cellWork) cellWork.characterDescriptors++;
+          const key = keys[index];
+          return {key,index,text:String(rawNodes[key].payload.text),classes:classesAt(classRuns,index),style:cellStyleAt(styles,index)};
+        };
+        const edit = projection.characterEdits.get(keys);
+        if (plain && last && edit?.previous.deref() === last.keys && cells.addresses!.length === keys.length-edit.added+edit.end-edit.start) {
+          cells.spliceText(edit.start, edit.end, Array.from({length:edit.added}, (_,i) => plainCell(edit.start+i)));
+          updateSurvivingStyles(last.paint,paint,keys.length,edit.start,edit.end,edit.added,i=>cells.styleText(plainCell(i)));
+        } else if (plain && last?.keys === keys && edit && keys.length === cells.addresses!.length) {
+          updateSurvivingStyles(last.paint,paint,keys.length,keys.length,keys.length,0,i=>cells.styleText(plainCell(i)));
+        } else if (plain) {
+          cells.update(keys.map((_,i) => plainCell(i)));
+        } else {
+          const presentation=sequence.map((key, index): CharacterCellPresentation => {
+            if (cellWork) cellWork.characterDescriptors++;
+            const cell = projection.state.nodes[key];
+            const classes=classesAt(classRuns,index);
+            const property = projected.find(property => index >= property.start && index <= property.end);
+            if (property) return { key, index, classes, text: String(cell?.payload.text ?? ""),
+              hiddenSource: index !== property.start,
+              alternative: index === property.start ? alternatives.get(property.id) : undefined };
+            if(cell?.viewType==='inline-alternative-cell')return {key,index,text:'',slot:true,classes,style:cellStyleAt(styles,index)};
+            if (cell?.viewType === "image-cell") return { key, index, classes, text: "", image: {
+              asset: managedAsset(cell.payload.asset), src: String(cell.payload.src ?? ""), alt: String(cell.payload.alt ?? ""), label: String(cell.payload.alt ?? "Inline image"),
+              width: cell.payload.width as number | undefined, height: cell.payload.height as number | undefined,
+            } };
+            return { key, index, text: String(cell?.payload.text ?? ""), classes, style: cellStyleAt(styles, index),
+              concealed: concealed.some(({ annotation }) => hasActiveRange(annotation) && annotation.start <= index && annotation.end >= index) };
+          });
+          cells.update(provisional?.present(presentation)??presentation);
+        }
+        last = plain ? {keys,paint} : undefined;
       });
       onCleanup(() => cells.dispose());
     }
@@ -918,7 +1036,8 @@ function NativeStandoffEditorView(props: BlockViewProps & {inline?:boolean}) {
       <Dynamic component={props.inline?'span':'div'} ref={surface} class="reactive-standoff-surface" onClick={(event:MouseEvent) => {
         if(editor.mounts.resolveEvent(event)?.nodeKey!==props.nodeKey)return;
         if(!passive){editor.gloss.click(props.nodeKey,event);return;}
-        const index=Number((event.target as Element).closest<HTMLElement>('[data-inline-index]')?.dataset.inlineIndex);
+        const index=characterIndex((event.target as Element).closest(characterSelector));
+        if (index === undefined) return;
         const link=annotations().find(p=>p.type==='reference/url'&&!p.isDeleted&&p.start!==undefined&&p.end!==undefined&&p.start<=index&&p.end>=index);
         if(link){try{const url=new URL(String(link.value));if(['http:','https:','mailto:'].includes(url.protocol)){event.preventDefault();window.open(url.href,'_blank','noopener,noreferrer');}}catch{/* Invalid links remain inert. */}}
       }} onPointerMove={hoverCandidate} onPointerLeave={() => setHovered(undefined)}>

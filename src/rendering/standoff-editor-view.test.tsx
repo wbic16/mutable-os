@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { characterIndex } from './character-address';
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render } from "solid-js/web";
 import { ReactiveEditor } from "../reactive-editor/editor";
@@ -46,7 +47,7 @@ function renderBlocks(children: Array<Record<string, unknown>>) {
 }
 
 function setCaret(flow: HTMLElement, cellIndex: number, offset: number) {
-  const cell = flow.querySelectorAll<HTMLElement>("[data-inline-index]")[cellIndex];
+  const cell = flow.querySelectorAll<HTMLElement>("[data-inline-key]")[cellIndex];
   const range = document.createRange();
   range.setStart(cell.firstChild!, offset);
   range.collapse(true);
@@ -62,7 +63,7 @@ function setRange(
   endCellIndex: number,
   endOffset: number,
 ) {
-  const cells = flow.querySelectorAll<HTMLElement>("[data-inline-index]");
+  const cells = flow.querySelectorAll<HTMLElement>("[data-inline-key]");
   const range = document.createRange();
   range.setStart(cells[startCellIndex].firstChild!, startOffset);
   range.setEnd(cells[endCellIndex].firstChild!, endOffset);
@@ -176,18 +177,18 @@ describe("StandoffEditorView", () => {
     ];
     const { editor, projection, host } = renderEditor("abc", initial);
     const key = projection.state.nodes[projection.state.rootKey].children[0];
-    const cell = host.querySelectorAll<HTMLElement>("[data-inline-index]")[1];
+    const cell = host.querySelectorAll<HTMLElement>("[data-inline-key]")[1];
     expect(cell.style.color).toBe("red"); expect(cell.style.textTransform).toBe("uppercase");
     expect(cell.style.textDecorationLine).toBe("line-through"); expect(cell.style.fontWeight).toBe("");
     editor.commands.setPayloadField(key, "standoffProperties", [{ ...initial[0], value: "blue", start: 1, end: 1 }]);
-    expect(host.querySelectorAll("[data-inline-index]")[1]).toBe(cell);
+    expect(host.querySelectorAll("[data-inline-key]")[1]).toBe(cell);
     expect(cell.style.color).toBe("blue"); expect(cell.style.textTransform).toBe(""); expect(cell.style.textDecorationLine).toBe("");
-    expect(host.querySelector<HTMLElement>('[data-inline-index="0"]')?.style.color).toBe("");
+    expect(host.querySelector<HTMLElement>('[data-inline-key]:nth-child(1)')?.style.color).toBe("");
     editor.commands.setPayloadField(key, "standoffProperties", []);
     expect(cell.style.color).toBe("");
     editor.repository.undo(); expect(cell.style.color).toBe("blue");
     editor.repository.undo(); expect(cell.style.color).toBe("red");
-    expect(host.querySelectorAll("[data-inline-index]")[1]).toBe(cell);
+    expect(host.querySelectorAll("[data-inline-key]")[1]).toBe(cell);
     const saved = editor.encodeDocument().children![0];
     expect(saved.text).toBe("abc"); expect(saved.standoffProperties).toEqual(initial);
   });
@@ -237,7 +238,7 @@ describe("StandoffEditorView", () => {
     Object.defineProperty(Range.prototype, "getClientRects", {
       configurable: true,
       value: function (this: Range) {
-        const index = (node: Node) => Number((node.parentElement as HTMLElement | null)?.dataset.inlineIndex ?? -1);
+        const index = (node: Node) => characterIndex(node.parentElement) ?? -1;
         const start = index(this.startContainer), end = index(this.endContainer);
         const rect = (left: number, top: number, width: number, height = 16) => ({ left, top, width, height });
         if (start === 2 && end === 5) return [rect(10, 20, 40), rect(5, 42, 55)];
@@ -282,16 +283,16 @@ describe("StandoffEditorView", () => {
   it("moves colour styling with mapped annotation ranges during typing and undo", async () => {
     const { editor, host } = renderEditor("ABCD", [{ id: "colour", type: "text/colour", start: 1, end: 2, value: "purple" }]);
     const flow = host.querySelector<HTMLElement>(".reactive-standoff-flow")!;
-    const originalB = flow.querySelectorAll<HTMLElement>("[data-inline-index]")[1];
+    const originalB = flow.querySelectorAll<HTMLElement>("[data-inline-key]")[1];
     setCaret(flow, 0, 0);
     flow.dispatchEvent(new InputEvent("beforeinput", { bubbles: true, cancelable: true, inputType: "insertText", data: "X" }));
     await Promise.resolve();
     expect(editor.encodeDocument().children![0].text).toBe("XABCD");
-    expect(flow.querySelectorAll("[data-inline-index]")[2]).toBe(originalB);
+    expect(flow.querySelectorAll("[data-inline-key]")[2]).toBe(originalB);
     expect(originalB.style.color).toBe("purple");
-    expect(flow.querySelector<HTMLElement>('[data-inline-index="1"]')?.style.color).toBe("");
+    expect(flow.querySelector<HTMLElement>('[data-inline-key]:nth-child(2)')?.style.color).toBe("");
     editor.repository.undo();
-    expect(flow.querySelectorAll("[data-inline-index]")[1]).toBe(originalB);
+    expect(flow.querySelectorAll("[data-inline-key]")[1]).toBe(originalB);
     expect(originalB.style.color).toBe("purple");
   });
 
@@ -512,7 +513,7 @@ describe("StandoffEditorView", () => {
       { id: "highlight", type: "style/highlighter", start: 1, end: 4 },
     ]);
     const flow = host.querySelector<HTMLElement>(".reactive-standoff-flow")!;
-    const cell = flow.querySelectorAll<HTMLElement>("[data-inline-index]")[2];
+    const cell = flow.querySelectorAll<HTMLElement>("[data-inline-key]")[2];
     cell.firstChild!.textContent = "cX";
     setCaret(flow, 2, 2);
     flow.dispatchEvent(

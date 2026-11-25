@@ -1,3 +1,4 @@
+import { characterSelector } from '../rendering/character-address';
 import { editorInputBoundary } from '../runtime/editor-input';
 import { passiveElement } from '../runtime/passive-presentation';
 import { normalizeInlineSelection } from '../runtime/inline-alternatives';
@@ -202,7 +203,7 @@ export class CrossBlockInput {
     capturePointer();
   };
   private wordPoint(x: number, y: number) {
-    const element = this.document.elementFromPoint?.(x, y), cell = element?.closest('[data-inline-index]');
+    const element = this.document.elementFromPoint?.(x, y), cell = element?.closest(characterSelector);
     const hit = cell && this.editor.mounts.resolveElement(cell);
     // Choose the character under the pointer, not the nearest caret boundary
     // (the right half of a final character otherwise selects the following word).
@@ -286,8 +287,16 @@ export class CrossBlockInput {
     let next: ViewPosition | undefined;
     if (direction === "Left" || direction === "Right") {
       this.preferredX = undefined;
-      const text = node.inlineContent.map(key => String(this.editor.node(key)?.payload.text ?? "\uFFFC")).join("");
-      const boundaries = graphemeBoundaries(text), index = backwards ? boundaries.filter(i => i < head.boundary.index).at(-1) : boundaries.find(i => i > head.boundary.index);
+      const at = head.boundary.index;
+      let index: number | undefined;
+      if (backwards ? at > 0 : at < node.inlineContent.length) {
+        index = this.editor.mounts.get(node.key)?.adjacentGrapheme?.(at, backwards ? -1 : 1);
+        if (index === undefined) {
+          const text = node.inlineContent.map(key => String(this.editor.node(key)?.payload.text ?? "\uFFFC")).join("");
+          const boundaries = graphemeBoundaries(text);
+          index = backwards ? boundaries.filter(i => i < at).at(-1) : boundaries.find(i => i > at);
+        }
+      }
       if (index !== undefined) next = this.editor.crossText.position(node.key, index);
     } else {
       const rect = this.rect(head);

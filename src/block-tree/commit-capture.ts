@@ -56,6 +56,7 @@ export interface RepositoryCommitResult {
 export interface RepositoryOptions {
   /** Admission policy only; existing content never changes representation. */
   compactCanonicalText?: boolean;
+  residentCellBoundaries?: boolean;
   enforceBlockIdentity?: boolean;
   /** Repository-semantic evidence, enabled by default. False retains count-only
    * bookkeeping for compatibility/rollback; cannot be changed after construction. */

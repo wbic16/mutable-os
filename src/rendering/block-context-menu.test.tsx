@@ -71,7 +71,7 @@ describe("Block context menu", () => {
   });
   it.each(["click", "early native menu", "secondary native menu"])("opens with Grouping enabled for %s and exposes inline StickyNote insertion", async sequence => {
     const { element, editor, key } = mount(undefined, true);
-    const target = element("second").querySelector("[data-inline-index]")!;
+    const target = element("second").querySelector("[data-inline-key]")!;
     const send = (type: string, button = 0) => target.dispatchEvent(new MouseEvent(type, { ctrlKey: true, button, bubbles: true, cancelable: true }));
     send("pointerdown", sequence === "secondary native menu" ? 2 : 0);
     if (sequence === "early native menu") send("contextmenu", 2);

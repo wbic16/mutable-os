@@ -24,8 +24,12 @@ function FontGate({children}: {children: ReactNode}) {
   return loaded ? children : null;
 }
 
-export function SeriesPlate({number, children}: {number: string; children: ReactNode}) {
-  return <FontGate>
+const ProductBranding = React.createContext(true);
+
+export function SeriesPlate({number, productBranding = true, seriesAttribution = false, children}: {
+  number: string; productBranding?: boolean; seriesAttribution?: boolean; children: ReactNode;
+}) {
+  return <FontGate><ProductBranding.Provider value={productBranding}>
     <svg viewBox="0 0 1080 1080" width="100%" height="100%" style={{background: ink.paper}}>
       <defs>
         <radialGradient id="field" cx="47%" cy="44%" r="78%">
@@ -42,12 +46,15 @@ export function SeriesPlate({number, children}: {number: string; children: React
       <rect width="1080" height="1080" fill="url(#field)" />
       <g fontFamily={type.mono} fontSize={26} fill={ink.cream} letterSpacing={2}>
         <image href={mark} x={76} y={60} width={50} height={50} />
-        <text x={150} y={94}>MUTABLE <tspan fill={ink.entity}>/ CONCEPTS /</tspan> {number}</text>
+        <text x={150} y={94}>
+          {seriesAttribution ? 'Mutable OS ' : productBranding && 'MUTABLE '}
+          <tspan fill={ink.entity}>{seriesAttribution ? '/ Concepts /' : productBranding ? '/ CONCEPTS /' : 'CONCEPTS /'}</tspan> {number}
+        </text>
       </g>
       <path d="M76 140H1004" stroke={ink.rule} strokeWidth={1.5} />
       {children}
     </svg>
-  </FontGate>;
+  </ProductBranding.Provider></FontGate>;
 }
 
 // Oblique leaves introduce the same range marks and endpoint guides that appear
@@ -75,26 +82,34 @@ function Folios({spread}: {spread: number}) {
   </g>;
 }
 
-export function Bookend({lead, emphasis, emphasisSize = 89, spread, opacity}: {
-  lead: string; emphasis: string; emphasisSize?: number; spread: number; opacity: number;
+export function Bookend({lead, emphasis, leadSize = 92, emphasisSize = 89, spread, opacity, imprintOpacity = 1, volumeLabel}: {
+  lead: string; emphasis: string; leadSize?: number; emphasisSize?: number; spread: number; opacity: number; imprintOpacity?: number; volumeLabel?: string;
 }) {
+  const productBranding = React.useContext(ProductBranding);
   return <g opacity={opacity}>
-    <Folios spread={spread} />
+    <g opacity={imprintOpacity}><Folios spread={spread} /></g>
     <g textAnchor="middle" fontFamily={type.serif} fill={ink.cream}>
-      <text x="540" y="679" fontSize={92}>
+      <text x="540" y="679" fontSize={leadSize}>
         {lead}
       </text>
       <text x="540" y="782" fontSize={emphasisSize} fontStyle="italic" fill={ink.entity}>
         {emphasis}
       </text>
     </g>
-    <path d="M76 919H1004" stroke={ink.rule} strokeWidth="1.5" />
-    <text x="76" y="981" fontFamily={type.serif} fontSize="36" fill={ink.cream}>Mutable OS</text>
-    <text x="1004" y="980" textAnchor="end" fontFamily={type.mono} fontSize="28" fill={ink.grey}>mutable.ink</text>
+    <g opacity={imprintOpacity}>
+      <path d="M76 919H1004" stroke={ink.rule} strokeWidth="1.5" />
+      <text x="76" y="981" fontFamily={type.serif} fontSize="36" fill={ink.cream}>{volumeLabel ?? (productBranding ? 'Mutable OS' : 'Volume I')}</text>
+      <text x="1004" y="980" textAnchor="end" fontFamily={type.mono} fontSize="28" fill={ink.grey}>mutable.ink</text>
+    </g>
   </g>;
 }
 
-export function Caption({text, opacity}: {text: string; opacity: number}) {
+export function Caption({text, opacity}: {text: string | readonly string[]; opacity: number}) {
+  if (typeof text !== 'string') {
+    return <g textAnchor="middle" fontFamily={type.sans} fontSize="42" fill={ink.cream} opacity={opacity}>
+      {text.map((line, index) => <text key={line} x="540" y={949 + index * 50}>{line}</text>)}
+    </g>;
+  }
   return <text x="540" y="967" textAnchor="middle" fontFamily={type.sans} fontSize="42"
     fill={ink.cream} opacity={opacity}>{text}</text>;
 }

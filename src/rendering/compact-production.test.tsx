@@ -7,16 +7,24 @@ import {ReactiveTreeView} from './reactive-tree-view';
 import {decodeBlockTree} from '../block-tree/codecs';
 import {admitNative,captureNative,nativeText,decodeNative} from '../persistence/native-resource';
 const clean:(()=>void)[]=[];afterEach(()=>{while(clean.length)clean.pop()!();document.body.replaceChildren();vi.restoreAllMocks();});
-function fixture(features = {}){
+function fixture(features = {}, extraParagraphs = 0, firstText = 'A😀éBCD'){
  const editor=new ReactiveEditor({type:'workspace-block',children:[{id:'bank',type:'workspace-object-bank-block'}]},{features:{autocompleteWorkstation:false,...features}});registerCoreViews(editor);
- const source=decodeBlockTree({id:'doc',type:'document-block',children:[{id:'a',type:'standoff-editor-block',text:'A😀éBCD',standoffProperties:[{type:'style/bold',start:1,end:4}]},{id:'b',type:'standoff-editor-block',text:'Other'}]}).state;
- const bank=Object.values(editor.repository.readState().contents).find(c=>c.payload.id==='bank')!;admitNative(editor.repository,new TextEncoder().encode(nativeText(captureNative(source,'doc'))),bank.key);
+ const source=decodeBlockTree({id:'doc',type:'document-block',children:[{id:'a',type:'standoff-editor-block',text:'A😀éBCD',standoffProperties:[{type:'style/bold',start:1,end:4}]},{id:'b',type:'standoff-editor-block',text:'Other'},...Array.from({length:extraParagraphs},(_,i)=>({id:'other-'+i,type:'standoff-editor-block',text:'Plain'}))]}).state;
+ const bank=Object.values(editor.repository.readState().contents).find(c=>c.payload.id==='bank')!;const file=JSON.parse(nativeText(captureNative(source,'doc')));
+ file.document.blocks.find((b:{id:string})=>b.id==='a').inline=[{kind:'text',text:firstText}];
+ admitNative(editor.repository,new TextEncoder().encode(JSON.stringify(file)),bank.key);
  const doc=Object.values(editor.repository.readState().contents).find(c=>c.payload.id==='doc')!,pk=Object.values(editor.repository.readState().placements).find(p=>p.contentKey===doc.key)!.key;
  const projection=editor.createView('first',pk);expect(Object.values(projection.state.nodes).some(n=>n.viewType==='text-cell')).toBe(false);
- const mount=(p=projection)=>{const host=document.body.appendChild(document.createElement('div'));clean.push(render(()=><ReactiveTreeView editor={editor} projection={p}/>,host));return host;};
+ const unmounts=new WeakMap<HTMLElement,()=>void>();
+ const mount=(p=projection)=>{
+   const host=document.body.appendChild(document.createElement('div'));
+   const dispose=render(()=><ReactiveTreeView editor={editor} projection={p}/>,host);
+   unmounts.set(host,dispose); clean.push(()=>unmounts.get(host)?.()); return host;
+ };
+ const unmount=(host:HTMLElement)=>{unmounts.get(host)?.();unmounts.delete(host);host.remove();};
  clean.push(()=>editor.dispose());const host=mount();clean.push(editor.installGateway(document));
  const node=()=>Object.values(projection.state.nodes).find(n=>n.payload.id==='a')!;
- return {editor,projection,host,node,mount,pk,flow:()=>host.querySelector<HTMLElement>('.reactive-standoff-flow')!};
+ return {editor,projection,host,node,mount,unmount,pk,flow:()=>host.querySelector<HTMLElement>('.reactive-standoff-flow')!};
 }
 it('real renderer uses occurrence-local Cells, broadcasts edits, preserves unaffected identity and native reopen',()=>{
  const f=fixture(),{editor,projection}=f;const second=editor.createView('second',f.pk),other=f.mount(second);const before=f.flow().firstChild,otherBefore=other.querySelector('.reactive-standoff-flow')!.firstChild;
@@ -109,4 +117,353 @@ it('limits slot paste/history to affected occurrences and updates native dirty m
  e.repository.undo();expect(nativeText(captureNative(e.repository.readState(),'doc'))).toBe(before);e.repository.redo();builds.forEach(spy=>expect(spy).not.toHaveBeenCalled());expect(snapshot).not.toHaveBeenCalled();expect(observer.takeRecords()).toHaveLength(0);observer.disconnect();snapshot.mockRestore();
  await native.save('doc');expect(native.isDirty('doc')).toBe(false);
  const host=e.repository.readState().contents[f.node().contentKey],slot=host.compactInline!.spans.find(a=>a.kind==='alternative')!;if(slot.kind!=='alternative')throw Error('slot');e.commands.replaceInlineRange(host.ownedRelations[slot.properties.readings[0]],0,0,'new');expect(native.isDirty('doc')).toBe(true);
+});
+
+it('keeps both rendered occurrences styled through resident splices, annotation authoring and Undo', () => {
+  const f = fixture(), {editor} = f;
+  const other = f.mount(editor.createView('shared', f.pk));
+  const owner = f.node();
+  const expectBold = (expected: string) => {
+    for (const host of [f.host, other]) {
+      const flow = host.querySelector<HTMLElement>('.reactive-standoff-flow')!;
+      const styled = [...flow.children].filter(el => (el as HTMLElement).style.fontWeight === "600");
+      expect(styled.map(el => el.textContent).join("")).toBe(expected);
+    }
+  };
+  expectBold("😀éB");
+  editor.commands.replaceInlineRange(owner.key, 0, 0, "ab");
+  expectBold("😀éB");
+  editor.commands.replaceInlineRange(owner.key, 4, 5, "🍎🍎");
+  expectBold("😀🍎🍎́B");
+  editor.commands.setPayloadField(owner.key, "standoffProperties", [{type: "style/bold", start: 0, end: 1}]);
+  expectBold("ab");
+  editor.commands.replaceInlineRange(owner.key, 0, 1, "X");
+  expectBold("b");
+  editor.repository.undo();
+  expectBold("ab");
+  editor.repository.undo();
+  expectBold("😀🍎🍎́B");
+});
+
+it("crosses a graph edit and resident typing in both history directions, saves resident bounds, and reopens cold",async()=>{
+  const {editor,projection,node,host}=fixture();
+  const repo=editor.repository,a=node(),b=Object.values(projection.state.nodes).find(n=>n.payload.id==="b")!;
+  const save=()=>nativeText(captureNative(repo.readState(),"doc"));
+  const paths:boolean[]=[];
+  repo.subscribeChanges(c=>paths.push(!!c.residentPayload));
+  editor.commands.setPayloadField(a.key,"standoffProperties",[
+    {id:"repeat",start:0,end:2,type:"style/bold",extension:{future:["🌿",17]}},
+    {id:"repeat",start:1,end:2,type:"style/italics"},{isZeroWidth:true,start:1,end:0,affinity:"before"},
+    {id:"mention",type:"codex/entity-reference",value:"Rabbit",start:1,end:2}]);
+  const {watchDocumentEntities}=await import("../application/document-entity-changes");
+  const refresh=vi.fn(), watch=watchDocumentEntities(editor,a.key,refresh);
+  clean.push(watch.dispose);
+  const states=[save()];
+  editor.commands.replaceInlineRange(a.key,0,0,"x");states.push(save());
+  await Promise.resolve();expect(refresh).not.toHaveBeenCalled();
+  editor.commands.replaceAcrossBlocks([{placementKey:a.key,start:6,end:8},{placementKey:b.key,start:0,end:1}],"Q");
+  await Promise.resolve();refresh.mockClear(); // Cross-block removal changes document membership.
+  states.push(save());editor.commands.replaceInlineRange(a.key,2,2,"🌿");states.push(save());
+  await Promise.resolve();expect(refresh).not.toHaveBeenCalled();
+  expect(paths.slice(-3)).toEqual([true,false,true]);
+  const {canonicalSearchSource}=await import("../runtime/canonical-search-source");
+  const record=repo.readState().contents[a.contentKey];
+  const search=await canonicalSearchSource(repo.readState(),a.contentKey,record.inlineRevision);
+  expect(search.runs[0].text).toBe(host.querySelector(".reactive-standoff-flow")!.textContent);
+  const {clipCompactProperties,contentLength}=await import("../block-tree/inline-sequence");
+  const clipped=clipCompactProperties(record.payload.standoffProperties,0,4,contentLength(record));
+  expect(clipped[0]).toMatchObject({id:"repeat",extension:{future:["🌿",17]}});
+  expect(repo.residentAnnotations(a.contentKey)).toBeDefined();
+  const {observeLive}=await import("../knowledge/live-observer");
+  const {DEFAULT_POLICY}=await import("../knowledge/policy");
+  const {facts}=await observeLive(repo,"doc",DEFAULT_POLICY);
+  expect(facts.annotations.find(p=>p.type==="codex/entity-reference")).toMatchObject({start:3,end:5,value:"Rabbit"});
+  const {annotationCapabilities}=await import("../application/annotation-capabilities");
+  const navigation=annotationCapabilities(editor,{owner:"qualification",active:()=>true,
+    own(dispose){clean.push(dispose);return dispose;},defer(fn){queueMicrotask(fn);}});
+  const occurrence=navigation.documentAnnotations(a.key).texts.find(t=>t.key===a.key)!;
+  const mention=occurrence.properties.find(p=>p.id==="mention")!;
+  const range=editor.textRanges.snapshot(a.key,Number(mention.start),Number(mention.end)+1);
+  navigation.focusRange!(range,repo.state.revision);
+  expect(editor.mounts.get(a.key)!.captureInlineSelection!()).toEqual({anchor:3,head:5});
+  const {packageFragment}=await import("../interchange/package/native");
+  const exportBlocks=(e:ReactiveEditor)=>packageFragment(captureNative(e.repository.readState(),"doc")).blocks
+    .filter(b=>b.inline).map(b=>({atoms:b.inline!.atoms,properties:b.inline!.properties.map(({localId,...p})=>p)}));
+  const exported=exportBlocks(editor);
+  expect(JSON.stringify(exported)).toContain("Rabbit");
+  for(let i=2;i>=0;i--){repo.undo();expect(save()).toBe(states[i]);}
+  for(let i=1;i<=3;i++){repo.redo();expect(save()).toBe(states[i]);}
+  const fresh=new ReactiveEditor({type:"workspace-block",children:[{id:"bank",type:"workspace-object-bank-block"}]});
+  try {
+    const bank=Object.values(fresh.repository.readState().contents).find(c=>c.payload.id==="bank")!;
+    admitNative(fresh.repository,new TextEncoder().encode(states[3]),bank.key);
+    const reopened=Object.values(fresh.repository.readState().contents).find(c=>c.payload.id==="a")!;
+    expect((await observeLive(fresh.repository,"doc",DEFAULT_POLICY)).facts).toEqual(facts);
+    expect(exportBlocks(fresh)).toEqual(exported);
+    expect(fresh.repository.residentAnnotations(reopened.key)).toBeUndefined();
+    expect(nativeText(captureNative(fresh.repository.readState(),"doc"))).toBe(states[3]);
+  }finally{fresh.dispose();}
+});
+
+it("cancels stale IME and pending clipboard input after another occurrence commits",async()=>{
+  const f=fixture(),{editor}=f, key=f.node().key;
+  const m=editor.mounts.get(key)!;
+  editor.commands.replaceInlineRange(key,0,0,"X");
+  const other=editor.createView("concurrent",f.pk);f.mount(other);
+  const twin=Object.values(other.state.nodes).find(n=>n.contentKey===f.node().contentKey)!;
+  m.focus();m.restoreInlineSelection!({anchor:1,head:2});
+  f.flow().dispatchEvent(new CompositionEvent("compositionstart",{bubbles:true}));
+  editor.commands.replaceInlineRange(twin.key,0,0,"Y");
+  const original=nativeText(captureNative(editor.repository.readState(),"doc"));
+  let revision=editor.repository.state.revision;
+  f.flow().dispatchEvent(new CompositionEvent("compositionend",{bubbles:true,data:"discard"}));
+  expect(editor.repository.state.revision).toBe(revision);
+  expect(nativeText(captureNative(editor.repository.readState(),"doc"))).toBe(original);
+  let finish!:(items:unknown[])=>void;
+  const old=Object.getOwnPropertyDescriptor(navigator,"clipboard");
+  Object.defineProperty(navigator,"clipboard",{configurable:true,value:{read:()=>new Promise(r=>{finish=r;})}});
+  try{
+    m.focus();editor.selections.setPrimary(key,f.node().contentKey,f.node().viewId,0,1);
+    m.restoreInlineSelection!({anchor:0,head:1});
+    editor.clipboard.pasteMarkdown(key);
+    await vi.waitFor(()=>expect(finish).toBeTypeOf("function"));
+    editor.commands.replaceInlineRange(twin.key,0,0,"Z");
+    revision=editor.repository.state.revision;
+    finish([{types:["text/plain"],getType:async()=>({size:9,text:async()=>"**stale**"})}]);
+    await new Promise(r=>setTimeout(r,30));
+    expect(editor.repository.state.revision).toBe(revision);
+    editor.repository.undo();
+    expect(nativeText(captureNative(editor.repository.readState(),"doc"))).toBe(original);
+  }finally{if(old)Object.defineProperty(navigator,"clipboard",old);else Reflect.deleteProperty(navigator,"clipboard");}
+});
+
+it("shares the annotation-surface origin per layout pass and preserves unchanged SVG paths",async()=>{
+  const f=fixture({standoffPropertyRendering:false}), {editor}=f, key=f.node().key;
+  const surface=f.flow().closest<HTMLElement>(".reactive-standoff-surface")!;
+  const box=vi.spyOn(surface,"getBoundingClientRect");
+  const original=Object.getOwnPropertyDescriptor(Range.prototype,"getClientRects");
+  const rects=vi.fn(function(this:Range){return [{left:0,top:0,width:this.toString().length*10,height:12}];});
+  Object.defineProperty(Range.prototype,"getClientRects",{configurable:true,value:rects});
+  try{
+    const frame=()=>new Promise(r=>setTimeout(r,50));
+    editor.commands.setPayloadField(key,"standoffProperties",[
+      {id:"before",type:"style/rectangle",start:0,end:0},
+      {id:"containing",type:"style/rectangle",start:1,end:5},
+      {id:"coincident",type:"style/rectangle",start:1,end:5}]);
+    await frame();
+    const query=()=>[...surface.querySelectorAll('path[data-property-type="style/rectangle"]')];
+    const initial=query();expect(initial.length).toBe(3);
+    const path=initial[1].getAttribute("d");
+    box.mockClear();rects.mockClear();
+    editor.commands.replaceInlineRange(key,3,3,"abc");await frame();
+    const next=query();
+    expect(next[0]).toBe(initial[0]);
+    expect(next[1].getAttribute("d")).not.toBe(path);
+    expect(rects.mock.calls.length).toBeGreaterThan(0);
+    // Three annotations require two distinct ranges and one common origin per frame.
+    expect(rects.mock.calls.length).toBe(2*box.mock.calls.length);
+  }finally{if(original)Object.defineProperty(Range.prototype,"getClientRects",original);else Reflect.deleteProperty(Range.prototype,"getClientRects");}
+});
+
+it("resolves a Gloss selection after resident range movement and native capture",()=>{
+  const f=fixture(), {editor}=f, key=f.node().key;
+  editor.commands.replaceInlineRange(key,0,0,"X");
+  editor.gloss.open(key,{anchor:1,head:3});
+  editor.gloss.commit("note: character boundaries");
+  editor.commands.replaceInlineRange(key,0,0,"Z");
+  const current=editor.repository.readState().contents[f.node().contentKey];
+  const gloss=(current.payload.standoffProperties as any[]).find(p=>p.type==="mutable/gloss");
+  expect(gloss).toMatchObject({start:2,end:3});
+  expect(editor.repository.residentAnnotations(current.key)).toBeDefined();
+  const bytes=nativeText(captureNative(editor.repository.readState(),"doc"));
+  expect(bytes).toContain("note: character boundaries");
+  expect(bytes).toContain(gloss.annotationId);
+});
+
+it("updates only tracked mention wording while the live entity inventory is open",async()=>{
+  const f=fixture(), {editor}=f, a=f.node();
+  const {liveDocumentEntities}=await import("../application/live-document-entities");
+  const {observeCellWork}=await import("../block-tree/cell-diagnostics");
+  const props=Array.from({length:400},(_,i)=>({type:"unknown",id:String(i),start:0,end:3}));
+  editor.commands.setPayloadField(a.key,"standoffProperties",[
+    ...props,{id:"m",type:"codex/entity-reference",value:"e",start:1,end:3}]);
+  const inv=liveDocumentEntities(editor,editor.node(f.projection.state.rootKey)!.contentKey);
+  clean.push(inv.dispose);
+  const notify=vi.fn();inv.subscribe(notify);
+  const old=inv.read();
+  const d=observeCellWork(), lookup=vi.spyOn(editor.repository,"residentRangeTextNearSplice");
+  try{
+    editor.commands.replaceInlineRange(a.key,6,6,"xyz");await Promise.resolve();
+    expect(inv.read()).toBe(old);
+    expect(notify).not.toHaveBeenCalled();
+    editor.commands.replaceInlineRange(a.key,2,2,"🍏");await Promise.resolve();
+    expect(inv.read().rows[0].forms).toEqual(["😀🍏é"]);
+    expect(notify).toHaveBeenCalledTimes(1);
+    expect(lookup).toHaveBeenCalledTimes(2);
+    expect(d.counts.entityInventoryReads).toBe(0);expect(d.counts.mentionSurfaceChecks).toBe(2);
+    expect(d.counts.numericExports).toBe(0);
+    editor.commands.replaceInlineRange(a.key,1,2,"");await Promise.resolve();
+    expect(inv.read().rows[0].forms).toEqual(["🍏é"]);
+    editor.repository.undo();await Promise.resolve();
+    expect(inv.read().rows[0].forms).toEqual(["😀🍏é"]);
+  }finally{d.stop();}
+});
+
+it("qualifies virtual text rows without enumerating numeric ranges or reevaluating sibling payloads on typing",async()=>{
+  const f=fixture({},70), {editor}=f;
+  const {unwrap}=await import("solid-js/store");
+  const {observeCellWork}=await import("../block-tree/cell-diagnostics");
+  const a=f.node(), siblings=Object.values(f.projection.state.nodes).filter(n=>String(n.payload.id).startsWith("other-"));
+  expect(siblings.length).toBe(70);
+  let reads=0;
+  for(const sibling of siblings)Object.defineProperty(unwrap(sibling.payload),"checked",{
+    configurable:true,get(){reads++;return undefined;}});
+  const lease=editor.repository.acquireResidentCells(a.contentKey), d=observeCellWork();
+  try{
+    editor.commands.replaceInlineRange(a.key,2,2,"X");
+    editor.commands.replaceInlineRange(a.key,2,2,"Y");
+    expect(d.counts.splices).toBe(2);
+    expect(d.counts.numericExports).toBe(0);
+    expect(reads).toBe(0);
+  }finally{d.stop();lease();}
+});
+
+it('inserts into 25,000 mounted characters with bounded DOM and presentation work',async()=>{
+  const {observeCellWork}=await import('../block-tree/cell-diagnostics');
+  const {addressesFor,characterIndex}=await import('./character-address');
+  const f=fixture({},0,'x'.repeat(24999)+'א'), e=f.editor, key=f.node().key, flow=f.flow();
+  const addresses=addressesFor(flow)!;
+  const tail=addresses.elementAt(24999)!;
+  expect(e.repository.residentAnnotations(f.node().contentKey)).toBeUndefined();
+  e.commands.replaceInlineRange(key,1,1,'😀');
+  expect(addresses.elementAt(25000)).toBe(tail);
+  expect(addresses.utf16Offset(tail)).toBe(25001);
+  const originals=Array.from(flow.querySelectorAll(':scope > [data-inline-key]'));
+  const observer=new MutationObserver(()=>{});
+  observer.observe(flow,{subtree:true,attributes:true,childList:true});
+  const work=observeCellWork();
+  try {
+    e.commands.replaceInlineRange(key,3,3,'漢');
+    expect(work.counts).toMatchObject({allocations:1,retargets:0,numericExports:0,characterDescriptors:1,characterUpdates:1,characterPasses:1});
+    expect(work.counts.addressMembers).toBeLessThan(260);
+  } finally {work.stop();}
+  const records=observer.takeRecords();observer.disconnect();
+  expect(records.filter(r=>r.attributeName==='data-inline-index')).toHaveLength(0);
+  expect(records.flatMap(r=>Array.from(r.removedNodes))).toHaveLength(0);
+  expect(records.flatMap(r=>Array.from(r.addedNodes))).toHaveLength(1);
+  expect(originals.every((el,i)=>addresses.elementAt(i+(i>=3?1:0))===el)).toBe(true);
+  expect(characterIndex(tail)).toBe(25001);
+  e.commands.replaceInlineRange(key,2,198,'ב');
+  expect(characterIndex(originals[100])).toBeUndefined();
+  expect(addresses.elementAt(addresses.length-1)).toBe(tail);
+  expect(addresses.utf16Offset(tail)).toBe(addresses.length);
+},60000);
+
+it.each([true,false])('addresses backward selections and astral, combining and RTL text with direct rendering %s', async directDomCharacterCells=>{
+  const {characterIndex}=await import('./character-address');
+  const f=fixture({directDomCharacterCells},0,'א😀éب'), e=f.editor, key=f.node().key;
+  const handle=e.mounts.get(key)!, flow=f.flow();
+  const emoji=flow.children[1], combining=flow.children[3];
+  handle.focus();
+  handle.restoreInlineSelection!({anchor:4,head:1});
+  expect(handle.captureInlineSelection!()).toEqual({anchor:4,head:1});
+  expect(handle.inlinePoint!(emoji.firstChild!,2)).toBe(2);
+  e.commands.replaceInlineRange(key,0,0,'語');
+  expect(characterIndex(emoji)).toBe(2);
+  expect(characterIndex(combining)).toBe(4);
+  expect(flow.querySelector('[data-inline-index]')).toBeNull();
+  e.commands.insertInlineImage(key,2,{assetId:'image',alt:'image',src:'',status:'failed'});
+  expect(characterIndex(emoji)).toBe(3);
+  expect(handle.inlinePoint!(flow.children[2],1)).toBe(3);
+  e.repository.undo();
+  expect(characterIndex(emoji)).toBe(2);
+  e.repository.redo();
+  expect(characterIndex(emoji)).toBe(3);
+});
+
+it('looks up a shared resident identity across occurrences and releases the old address on unmount',async()=>{
+  const {addressesFor}=await import('./character-address');
+  const f=fixture(),e=f.editor,second=e.createView('address-peer',f.pk);
+  const peerHost=f.mount(second);
+  const peer=peerHost.querySelector<HTMLElement>('.reactive-standoff-flow')!;
+  const a=addressesFor(f.flow())!, b=addressesFor(peer)!;
+  const left=a.elementAt(1)!, right=b.elementAt(1)!;
+  expect(a.residentCharacter(left)).toBeUndefined();
+  expect(left).not.toBe(right);
+  e.commands.replaceInlineRange(f.node().key,0,0,'!');
+  const cell=a.residentCharacter(left);
+  expect(cell).toMatchObject({index:2,value:'😀',utf16:2});
+  expect(b.residentCharacter(right)).toBe(cell);
+  e.repository.undo();
+  expect(a.residentCharacter(left)).toBeUndefined();
+  e.commands.replaceInlineRange(f.node().key,0,0,'字');
+  expect(a.residentCharacter(left)).not.toBe(cell);
+  f.unmount(peerHost);
+  expect(addressesFor(peer)).toBeUndefined();
+  expect(b.residentCharacter(right)).toBeUndefined();
+  const rehydrated=a.residentCharacter(left);
+  expect(rehydrated).toMatchObject({index:2});
+  const contentKey=f.node().contentKey;
+  f.unmount(f.host);
+  expect(e.repository.residentCharacterAt(contentKey,2)).toBeUndefined();
+  const reopened=f.mount().querySelector<HTMLElement>('.reactive-standoff-flow')!;
+  const current=addressesFor(reopened)!, survivor=current.elementAt(2)!;
+  expect(current.residentCharacter(survivor)).toBeUndefined();
+  e.commands.replaceInlineRange(f.node().key,0,0,'x');
+  expect(current.residentCharacter(survivor)).toMatchObject({value:'😀',index:3});
+  expect(current.residentCharacter(survivor)).not.toBe(rehydrated);
+});
+
+it('deletes full graphemes using bounded character address lookups',async()=>{
+  const {observeCellWork}=await import('../block-tree/cell-diagnostics');
+  const f=fixture({},0,'A🇦🇺é👨‍👩‍👧‍👦ב'), e=f.editor, key=f.node().key, flow=f.flow();
+  const mount=e.mounts.get(key)!;
+  mount.focus();
+  const command=(at:number,type:string)=>{
+    mount.restoreInlineSelection!({anchor:at,head:at});
+    flow.dispatchEvent(new InputEvent('beforeinput',{bubbles:true,cancelable:true,inputType:type}));
+  };
+  command(3,'deleteContentBackward');
+  expect(flow.textContent).toBe('Aé👨‍👩‍👧‍👦ב');
+  const reads=vi.spyOn(e,'node'),work=observeCellWork();
+  try {
+    command(3,'deleteContentForward');
+    expect(flow.textContent).toBe('Aéב');
+    expect(reads.mock.calls.filter(([k])=>f.node().inlineContent.includes(k))).toHaveLength(0);
+    expect(work.counts.characterDescriptors).toBeLessThan(5);
+  } finally {work.stop();}
+  command(3,'deleteContentBackward');
+  expect(flow.textContent).toBe('Aב');
+});
+
+it('preserves native affinity at an equivalent bidi boundary',()=>{
+  const f=fixture({},0,'Aא😀B'), native=document.getSelection()!, mount=f.editor.mounts.get(f.node().key)!;
+  mount.focus();
+  const prior=f.flow().children[0].firstChild!;
+  native.setBaseAndExtent(prior,1,prior,1);
+  const writes=vi.spyOn(native,'setBaseAndExtent');
+  mount.restoreInlineSelection!({anchor:1,head:1});
+  expect(writes).not.toHaveBeenCalled();
+  expect(native.anchorNode).toBe(prior);
+  expect(native.anchorOffset).toBe(1);
+});
+
+it('resolves a pointer over a shifted span with one geometry read',()=>{
+  const f=fixture(),flow=f.flow(),handle=f.editor.mounts.get(f.node().key)!;
+  const target=flow.children[3];
+  f.editor.commands.replaceInlineRange(f.node().key,0,0,'xy');
+  const previous=Object.getOwnPropertyDescriptor(document,'elementFromPoint');
+  Object.defineProperty(document,'elementFromPoint',{configurable:true,value:()=>target});
+  const reads=vi.spyOn(Element.prototype,'getClientRects').mockImplementation(function(this:Element) {
+    expect(this).toBe(target);
+    return [{left:100,right:110,top:10,bottom:20}] as unknown as DOMRectList;
+  });
+  try {
+    expect(handle.inlinePointAt!(107,15)).toBe(6);
+    expect(reads).toHaveBeenCalledTimes(1);
+  } finally {
+    if(previous)Object.defineProperty(document,'elementFromPoint',previous);
+    else Reflect.deleteProperty(document,'elementFromPoint');
+    reads.mockRestore();
+  }
 });

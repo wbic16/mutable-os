@@ -7,18 +7,30 @@ import { presentationEligible } from '../runtime/presentation-eligibility';
 /** Non-reactive qualification counters, scoped to the lifetime of a mounted flow. */
 export const virtualTextFlowDiagnostics = new WeakMap<HTMLElement, { itemKeys: number; measurements: number }>();
 
+const residentEligibility = new WeakMap<object, boolean>();
+function allowsVirtualFlow(properties: readonly {type?:unknown; isDeleted?:unknown}[]) {
+  return !properties.some(p => !p.isDeleted && /superposition|show-hide|animation|video|iframe|shader/.test(String(p.type)));
+}
+
 /** Evaluated in an occurrence-local memo: typing must not rescan other paragraphs. */
 export function plainTextItem(key: string, context: ReturnType<typeof useReactiveView>) {
   const node = context.projection.state.nodes[key];
   if (node?.viewType !== 'standoff-editor-block') return false;
   const compact=context.editor.repository.state.contents[node.contentKey]?.compactInline;
-  if (compact?.spans.some(atom=>atom.kind!=='text')) return false;
-  if (node.inlineContent.some(cell => context.projection.state.nodes[cell]?.viewType !== 'text-cell')) return false;
-  return !((node.payload.standoffProperties ?? []) as Array<{ type: string; isDeleted?: boolean }>).some(p => !p.isDeleted && /superposition|show-hide|animation|video|iframe|shader/.test(p.type));
+  if (compact ? compact.spans.some(atom=>atom.kind!=='text') :
+    node.inlineContent.some(cell => context.projection.state.nodes[cell]?.viewType !== 'text-cell')) return false;
+  const properties = context.editor.repository.residentAnnotations(node.contentKey);
+  if (!properties) return allowsVirtualFlow((node.payload.standoffProperties ?? []) as {type?:unknown; isDeleted?:unknown}[]);
+  // Typing can move endpoints without changing annotation type or visibility.
+  const cached = residentEligibility.get(properties);
+  if (cached !== undefined) return cached;
+  const allowed = allowsVirtualFlow(properties);
+  residentEligibility.set(properties, allowed);
+  return allowed;
 }
 
 /** Deliberately narrow first route: native text/heading siblings, retained parent. */
-export function eligibleTextFlow(parent: string, keys: readonly string[], context: ReturnType<typeof useReactiveView>) {
+export function eligibleTextFlowParent(parent: string, keys: readonly string[], context: ReturnType<typeof useReactiveView>) {
   const { editor, projection, passive, coordinates } = context;
   if (!editor.features.virtualTextFlows || passive || (coordinates?.scale() ?? 1) !== 1 || keys.length < 64) return false;
   const owner = projection.state.nodes[parent];
@@ -30,13 +42,18 @@ export function eligibleTextFlow(parent: string, keys: readonly string[], contex
   for (let ancestor = projection.parentOf(parent); ancestor; ancestor = projection.parentOf(ancestor.key)) {
     if (['table-block', 'grid-block', 'surface-block', 'indented-list-block', 'tab-row-block', 'sticky-tab-row-block'].includes(ancestor.viewType)) return false;
   }
-  return keys.every(key => {
-    const node = projection.state.nodes[key];
-    if (node?.viewType !== 'standoff-editor-block' || node.children.length || Object.keys(node.ownedRelations).length || typeof node.payload.checked === 'boolean') return false;
-    const properties = (node.payload.blockProperties ?? []) as Array<{ type: string; isDeleted?: boolean }>;
-    // Layout transforms/background media are outside this vertical text route.
-    return properties.every(p => p.isDeleted || /^block\/(alignment|font|indent|margin)(\/|$)/.test(p.type));
-  });
+  return true;
+}
+
+export function eligibleTextFlowItem(key: string, context: ReturnType<typeof useReactiveView>) {
+  const node = context.projection.state.nodes[key];
+  if (node?.viewType !== 'standoff-editor-block' || node.children.length || Object.keys(node.ownedRelations).length || typeof node.payload.checked === 'boolean') return false;
+  const properties = (node.payload.blockProperties ?? []) as Array<{ type: string; isDeleted?: boolean }>;
+  return properties.every(p => p.isDeleted || /^block\/(alignment|font|indent|margin)(\/|$)/.test(p.type));
+}
+
+export function eligibleTextFlow(parent: string, keys: readonly string[], context: ReturnType<typeof useReactiveView>) {
+  return eligibleTextFlowParent(parent, keys, context) && keys.every(key=>eligibleTextFlowItem(key, context));
 }
 
 export function VirtualTextFlow(props: { parentKey: string; keys: readonly string[] }) {

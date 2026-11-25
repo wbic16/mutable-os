@@ -177,7 +177,7 @@ describe.each([true, false])("DocumentWindow annotation toolbar (compact=%s)", c
   it("Control-click removes only its range, while dragging from a highlight adds a range", async () => {
     const { groupSelection, host, node, editor, group, pointer, select, click } = setup();
     await group(0, 2); await group(0, 3, "q");
-    const cell = host.querySelector<HTMLElement>('[data-block-id="p"] [data-inline-index="1"]')!;
+    const cell = host.querySelector<HTMLElement>('[data-block-id="p"] [data-inline-key]:nth-child(2)')!;
     pointer(cell, "pointerdown", true);
     expect(groupSelection.ranges()).toHaveLength(2);
     pointer(cell, "pointerup", true); await Promise.resolve();

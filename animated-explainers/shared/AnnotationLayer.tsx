@@ -4,7 +4,7 @@ import type {Span, StandoffRange} from './TextRun';
 
 export type RangeMark = {range: StandoffRange; span: Span; draw: number};
 
-function RangeUnderline({span, y, draw, color}: {
+export function RangeUnderline({span, y, draw, color}: {
   span: Span; y: number; draw: number; color: string;
 }) {
   if (draw === 0) return null;

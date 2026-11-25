@@ -1,0 +1,10 @@
+[
+  {"id":"opening","start":0,"duration":8,"caption":"Beyond the document.","narration":[{"at":0.45,"text":"A standoff annotation can describe a range of text. But it can also connect that text to something beyond the document."}]},
+  {"id":"occurrence","start":8,"duration":8,"caption":"A textual occurrence is not an entity.","narration":[{"at":0.3,"text":"The word Napoleon is a textual occurrence. The person it refers to is an independently identifiable entity."}]},
+  {"id":"mention","start":16,"duration":8,"caption":"Textual occurrence · Mention · Entity","narration":[{"at":0.3,"text":"A mention annotation records the association between a particular range of text and the entity to which it refers."}]},
+  {"id":"graph","start":24,"duration":10,"caption":"A bridge between text and knowledge.","narration":[{"at":0.3,"text":"When that association is represented in a database, the annotation becomes a bridge between the textual world and the world of structured knowledge."}]},
+  {"id":"confluence","start":34,"duration":12,"caption":"Many mentions. One entity.","narration":[{"at":0.3,"text":"Across many documents, different words and expressions can refer to the same entity."},{"at":6.2,"text":"Each occurrence has its own context, and each mention has its own identity."}]},
+  {"id":"context","start":46,"duration":10,"caption":"Same expression. Different entities.","narration":[{"at":0.3,"text":"Conversely, the same expression can refer to different entities."},{"at":4.5,"text":"It is the recorded association, not the wording alone, that identifies the referent."}]},
+  {"id":"traversal","start":56,"duration":12,"caption":"From text to knowledge. From knowledge to text.","narration":[{"at":0.25,"text":"These connections can be followed in either direction: from a textual occurrence to its entity, or from an entity to the passages in which it is mentioned."}]},
+  {"id":"close","start":68,"duration":7,"caption":"Text need not become a graph. It can be connected to one.","narration":[{"at":0.65,"text":"Text need not become a graph."},{"at":3.05,"text":"It can be connected to one."}]}
+]

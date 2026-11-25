@@ -1,0 +1,10 @@
+[
+  {"id":"ordinary","start":0,"duration":6,"caption":"One annotation. One segment.","narration":[{"at":1.55,"text":"An annotation can describe a continuous range of text."}]},
+  {"id":"gap","start":6,"duration":8,"caption":"Meaning can be discontinuous.","narration":[{"at":0.25,"text":"But a meaningful unit need not occupy a continuous range."},{"at":4.55,"text":"Consider the phrasal verb ‘pick up’."}]},
+  {"id":"branch","start":14,"duration":8,"caption":"Separate ranges. One annotation.","narration":[{"at":0.3,"text":"A single annotation can describe both parts, using a separate segment for each range."}]},
+  {"id":"container","start":22,"duration":7,"caption":"A block contains a sequence of text.","narration":[{"at":0.4,"text":"Text can also be organised into independent structural containers, called blocks."}]},
+  {"id":"split","start":29,"duration":11,"caption":"One segment becomes two.","narration":[{"at":0.35,"text":"What happens if a block is divided inside an annotated range?"},{"at":4.95,"text":"The range can become two segments, each belonging to its own block."}]},
+  {"id":"passage","start":40,"duration":8,"caption":"Two blocks. Two segments. One annotation.","narration":[{"at":0.15,"text":"The annotation remains a single object. Its segments have local boundaries, but together they describe one continuous passage."}]},
+  {"id":"merge","start":48,"duration":9,"caption":"Different segmentation. Same annotation.","narration":[{"at":0.35,"text":"Merge the blocks again, and adjacent segments can become one."},{"at":5.0,"text":"The annotation survives the structural transformation."}]},
+  {"id":"close","start":57,"duration":7,"caption":"Text has structure. Meaning need not obey it.","narration":[{"at":0.95,"text":"Text has structure."},{"at":2.95,"text":"Meaning need not obey it."}]}
+]

@@ -116,14 +116,14 @@ export async function qualifyWindowManager() {
     check(!!draft,'native Thesis draft is ready');
     check(thesis.contains(document.activeElement),'new Thesis owns native focus');
     const firstOwner=thesis.closest<HTMLElement>('[data-mwm-window]')!.dataset.mwmWindow!;
-    const cells=draft.querySelectorAll('[data-inline-index]'),range=document.createRange();
+    const cells=draft.querySelectorAll('[data-inline-key]'),range=document.createRange();
     range.setStart(cells[1].firstChild!,0);range.setEnd(cells[3].firstChild!,0);document.getSelection()!.removeAllRanges();document.getSelection()!.addRange(range);draft.focus();
     manager.lifecycle.activate(win.key);manager.lifecycle.activate(firstOwner);await settle();
     check(document.activeElement===draft && document.getSelection()!.toString().length===2,'activation restores Thesis inline selection');
     let trustedEdit=false;window.addEventListener('beforeinput',event=>trustedEdit=event.isTrusted&&event.target===draft,{once:true,capture:true});
     await trusted({type:'text',text:'Z'});await settle();
     check(trustedEdit,'Chrome native input delivered a trusted beforeinput event');
-    const clickCell=draft.querySelectorAll<HTMLElement>('[data-inline-index]')[2],clickBox=clickCell.getBoundingClientRect();
+    const clickCell=draft.querySelectorAll<HTMLElement>('[data-inline-key]')[2],clickBox=clickCell.getBoundingClientRect();
     await trusted({type:'click',x:clickBox.left+clickBox.width*.25,y:clickBox.top+clickBox.height*.5});await settle();
     check(document.activeElement===draft && document.getSelection()!.isCollapsed,'trusted pointer click places a caret without restoring the old selection');
     check(draft.textContent===sourceBefore.slice(0,1)+'Z'+sourceBefore.slice(3,5) && editor.node(text.key)!.inlineContent.map(k=>editor.node(k)!.payload.text).join('')===sourceBefore,'active draft input edits Thesis once and leaves source unchanged');

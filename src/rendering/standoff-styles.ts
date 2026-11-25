@@ -162,6 +162,10 @@ function cellEffectStyle(annotation: StandoffAnnotation): JSX.CSSProperties | un
 
 export function standoffCellStyles(index: number, annotations: readonly StandoffAnnotation[]): JSX.CSSProperties {
   const active = annotations.filter((annotation) => hasActiveRange(annotation) && annotation.start <= index && annotation.end >= index);
+  return composeCellStyles(active);
+}
+
+function composeCellStyles(active: readonly StandoffAnnotation[]): JSX.CSSProperties {
   const styles: JSX.CSSProperties = {};
   const lines = new Set<string>();
   const shadows: string[] = [];
@@ -190,16 +194,32 @@ const emptyCellStyle: JSX.CSSProperties = {};
  * in the per-character reactive dependency graph. Preserve source-order cascade.
  */
 export function compileCellStyleRuns(annotations: readonly StandoffAnnotation[]): CellStyleRun[] {
-  const css = annotations.filter(annotation => {
+  // Read each pair of live offsets once. Source order controls precedence even
+  // when two ranges begin in the reverse order or use the same object twice.
+  const events = new Map<number, {ordinal: number; enter: boolean}[]>([[0, []]]);
+  function event(position: number, ordinal: number, enter: boolean) {
+    const list = events.get(position);
+    if (list) list.push({ordinal, enter});
+    else events.set(position, [{ordinal, enter}]);
+  }
+  annotations.forEach((annotation, ordinal) => {
     const schema = standoffStyleSchema(annotation.type);
-    return (schema?.cell || schema?.cellEffect || schema?.valueStyle) && hasActiveRange(annotation);
+    if (annotation.isDeleted || !(schema?.cell || schema?.cellEffect || schema?.valueStyle)) return;
+    const {start, end} = annotation;
+    if (typeof start !== "number" || typeof end !== "number" || !Number.isInteger(start)
+      || !Number.isInteger(end) || start < 0 || end < start) return;
+    event(start, ordinal, true);
+    event(end + 1, ordinal, false);
   });
-  const boundaries = new Set<number>([0]);
-  for (const annotation of css) { boundaries.add(annotation.start!); boundaries.add(annotation.end! + 1); }
+  const active = new Set<number>();
   const runs: CellStyleRun[] = [];
   let previous = "";
-  for (const start of [...boundaries].sort((a, b) => a - b)) {
-    const style = standoffCellStyles(start, css);
+  for (const [start, changes] of [...events].sort(([a], [b]) => a - b)) {
+    for (const {ordinal, enter} of changes) {
+      if (enter) active.add(ordinal);
+      else active.delete(ordinal);
+    }
+    const style = composeCellStyles([...active].sort((a, b) => a - b).map(i => annotations[i]));
     const signature = JSON.stringify(style);
     if (signature !== previous) runs.push({ start, style });
     previous = signature;
@@ -228,10 +248,9 @@ export function allocateUnderlineLane(occupied:UnderlineLane[],start:number,end:
 }
 export function standoffSvgStyles(annotations: readonly StandoffAnnotation[], cellCount: number, effect: (type?: string) => EffectDefinition | undefined = () => undefined, occupied:UnderlineLane[] = []) {
   return annotations.flatMap((annotation, index) => {
-    if (!hasActiveRange(annotation) || annotation.start >= cellCount) return [];
     const definition = effect(annotation.type);
     const svg: SvgStyle | undefined = definition ? { kind: "contribution", definition } : standoffStyleSchema(annotation.type)?.svg;
-    if (!svg) return [];
+    if (!svg || !hasActiveRange(annotation) || annotation.start >= cellCount) return [];
     const height = svg.kind === "contribution" ? svg.definition.laneHeight : svg.kind === "rainbow" ? 14 : svg.kind === "underline" ? 2 : 0;
     const offset = allocateUnderlineLane(occupied,annotation.start,annotation.end,height);
     return [{ annotation, svg, offset, index }];

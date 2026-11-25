@@ -4,6 +4,10 @@ import {ink, type} from '../theme';
 export type StandoffRange = Readonly<{id: string; start: number; end: number}>;
 export type Span = Readonly<{left: number; right: number}>;
 
+export function measureSpan(run: SVGTextElement, start: number, end: number): Span {
+  return {left: run.getStartPositionOfChar(start).x, right: run.getEndPositionOfChar(end - 1).x};
+}
+
 export function namedRange(id: string, text: string, target: string): StandoffRange {
   const start = text.indexOf(target);
   if (!target || start < 0 || text.indexOf(target, start + 1) >= 0) {
@@ -24,10 +28,7 @@ export function TextRun({text, ranges, size, children}: {
     const run = node.current!;
     const positions: Record<string, Span> = {};
     for (const range of ranges) {
-      positions[range.id] = {
-        left: run.getStartPositionOfChar(range.start).x,
-        right: run.getEndPositionOfChar(range.end - 1).x,
-      };
+      positions[range.id] = measureSpan(run, range.start, range.end);
     }
     setBounds(positions);
   }, [text, ranges, size]);

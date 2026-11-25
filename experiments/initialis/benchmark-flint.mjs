@@ -263,7 +263,7 @@ try{
  interaction.metrics=Object.fromEntries(metricsAfter.metrics.filter(m=>['LayoutCount','RecalcStyleCount','LayoutDuration','RecalcStyleDuration','TaskDuration'].includes(m.name)).map(m=>[m.name,m.value-(metricsBefore.metrics.find(b=>b.name===m.name)?.value??0)]));
  await evaluate('proof.inputObserver.disconnect()');
  // Trusted native keyboard and composition at the decorated cell, separate from timing.
- const position=await evaluate(`(()=>{const c=[...proof.flow.querySelectorAll('[data-inline-key]')].find(c=>/^[A-Z]$/.test(c.textContent));proof.testPosition=Number(c.dataset.inlineIndex);proof.mount.restoreInlineSelection({anchor:proof.testPosition,head:proof.testPosition});return proof.testPosition;})()`);
+ const position=await evaluate(`(()=>{const c=[...proof.flow.querySelectorAll('[data-inline-key]')].find(c=>/^[A-Z]$/.test(c.textContent));proof.testPosition=proof.mount.inlinePoint(c.firstChild,0);proof.mount.restoreInlineSelection({anchor:proof.testPosition,head:proof.testPosition});return proof.testPosition;})()`);
  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39},sessionId);
  await send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39},sessionId);
  interaction.arrow=await evaluate('proof.mount.captureInlineSelection()');interaction.arrowExpected=position+1;

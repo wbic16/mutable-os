@@ -129,6 +129,9 @@ export type FeatureFlags = Readonly<{
   flintSpatialGraph: boolean;
   /** Selected at native admission; false retains legacy loading. Never converts a live Document. */
   compactCanonicalText: boolean;
+  /** Share resident character anchors between mounted occurrences during compact text editing. */
+  residentCellBoundaries: boolean;
+  identityDomCharacterAddressing: boolean;
   /** Creation/import of native one-position owned inline alternatives. */
   inlineAlternatives: boolean;
   /** Native clipboard and qualified structural operations for compact alternatives. */
@@ -322,6 +325,8 @@ export const featureFlags: FeatureFlags = Object.freeze({
   presentationProbe: false,
   flintSpatialGraph: true,
   compactCanonicalText: true,
+  residentCellBoundaries: true,
+  identityDomCharacterAddressing: true,
   inlineAlternatives: true,
   inlineAlternativeInteroperability: true,
   nativeDocumentPersistence: true,

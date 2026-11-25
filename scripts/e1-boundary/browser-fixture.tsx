@@ -209,8 +209,8 @@ export async function qualifyWindowManager() {
     // Capture after the hidden edit/undo: editing can legitimately replace cell
     // occurrences and advance revisions. Isolate adoption from those changes.
     const nodeKeys = [...retained.occurrenceKeys()].sort().join("|");
-    const inlineCell = retainedMount.root.querySelector("[data-inline-index]");
-    const cells = [...island.querySelectorAll("[data-inline-index]")];
+    const inlineCell = retainedMount.root.querySelector("[data-inline-key]");
+    const cells = [...island.querySelectorAll("[data-inline-key]")];
     const retainedOwners = [...retained.occurrenceKeys()].flatMap((key: string) =>
       (owners.get(key) ?? []).map(record => ({ key, record, count: owners.get(key)!.length })));
     const snapshot = JSON.stringify(editor.repository.snapshot());
@@ -222,10 +222,10 @@ export async function qualifyWindowManager() {
     await settle();
     check(editor.projections.size === projectionCount && editor.projections.get(retained.viewId) === retained, "connected-host adoption retains exact projection object and ViewId");
     check([...retained.occurrenceKeys()].sort().join("|") === nodeKeys && editor.mounts.get(retainedKey.key) === retainedMount, "connected-host adoption retains every occurrence NodeKey and mount record");
-    check(island.querySelector("[data-document-view]") === documentRoot && retainedMount.root.querySelector("[data-inline-index]") === inlineCell, "connected-host adoption retains Document and editing-cell DOM identity");
+    check(island.querySelector("[data-document-view]") === documentRoot && retainedMount.root.querySelector("[data-inline-key]") === inlineCell, "connected-host adoption retains Document and editing-cell DOM identity");
     check(owners.get(retainedKey.key)!.length === 1 && retainedOwner.owner && retainedOwner.disposed === 0 && rootCleanup === 0, "connected-host adoption neither recreates nor disposes the Solid owner");
     check(retainedOwners.every(({ key, record, count }) => record.disposed === 0 && owners.get(key)!.length === count)
-      && cells.every((cell, index) => island.querySelectorAll("[data-inline-index]")[index] === cell),
+      && cells.every((cell, index) => island.querySelectorAll("[data-inline-key]")[index] === cell),
       "all instrumented Document/paragraph owners and every editing cell survive adoption");
     check(retainedLifetime.subscriptions === 1 && retainedLifetime.unsubscriptions === 0 && retainedLifetime.disposeCalls === 0, "connected-host adoption preserves the original projection subscription");
     check(JSON.stringify(editor.repository.snapshot()) === snapshot, "host adoption alone leaves the complete canonical state unchanged");

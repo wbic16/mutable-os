@@ -51,7 +51,7 @@ it('keeps typing and provisional input local and retains existing Mode continuat
  f.input(p.key,1,'insertText','x');expect(f.value(p.key)).toBe('Ax😀BC');f.e.repository.undo();f.e.repository.redo();f.e.repository.undo();
  const flow=f.select(p.key,0),mount=f.e.mounts.get(p.key)!;
  flow.dispatchEvent(new CompositionEvent('compositionstart',{bubbles:true}));expect(mount.composing).toBe(true);
- flow.querySelector('[data-inline-index="0"]')!.firstChild!.textContent='漢';flow.dispatchEvent(new InputEvent('input',{bubbles:true,isComposing:true,inputType:'insertCompositionText',data:'漢'}));
+ flow.querySelector('[data-inline-key]:nth-child(1)')!.firstChild!.textContent='漢';flow.dispatchEvent(new InputEvent('input',{bubbles:true,isComposing:true,inputType:'insertCompositionText',data:'漢'}));
  expect(f.value(p.key)).toBe('A😀BC');flow.dispatchEvent(new CompositionEvent('compositionend',{bubbles:true,data:'漢'}));expect(f.value(p.key)).toBe('漢😀BC');f.e.repository.undo();
  spies.forEach(s=>expect(s).not.toHaveBeenCalled());expect(f.e.repository.state.contents[q.contentKey]).toBe(unaffected);spies.forEach(s=>s.mockRestore());expect(save()).toBe(before);
  expect(f.input(p.key,2,'insertParagraph').defaultPrevented).toBe(true);await Promise.resolve();expect(f.v.state.nodes[p.key].payload.mode).toBe('tei/verse-line');f.e.repository.undo();

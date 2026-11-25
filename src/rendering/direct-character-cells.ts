@@ -1,3 +1,5 @@
+import { CharacterAddresses } from './character-address';
+import { cellWork } from '../block-tree/cell-diagnostics';
 import { managedAsset, assetKey, type ManagedAssetReference } from '../interchange/managed-asset';
 import type { JSX } from "solid-js";
 
@@ -19,6 +21,7 @@ export interface CharacterCellPresentation {
 type Entry = {
   element: HTMLSpanElement;
   kind: "text" | "image" | "alternative" | "slot";
+  width?: number;
   releaseSlot?:()=>void;
   text?: string;
   style?: JSX.CSSProperties;
@@ -34,6 +37,7 @@ type Entry = {
  */
 export class DirectCharacterCells {
   private entries = new Map<string, Entry>();
+  readonly addresses?: CharacterAddresses;
   private disposed = false;
   private keys?: readonly string[];
 
@@ -42,10 +46,13 @@ export class DirectCharacterCells {
     private readonly imageStatus?: (key: string, status: "ready" | "failed") => void,
     private readonly bindAsset?: (image: HTMLImageElement, asset: ManagedAssetReference) => () => void,
     private readonly mountSlot?: (element:HTMLElement,key:string)=>()=>void,
-  ) {}
+    identityAddressing = false,
+  ) { if (identityAddressing) this.addresses = new CharacterAddresses(flow); }
 
   update(cells: readonly CharacterCellPresentation[]): void {
     if (this.disposed) return;
+    if (cellWork) { cellWork.characterPasses++; cellWork.characterUpdates += cells.length; }
+    let widthChanged = false;
     const document = this.flow.ownerDocument;
     const keys = cells.map(cell => cell.key);
     const sequenceChanged = !this.keys || keys.length !== this.keys.length || keys.some((key, index) => key !== this.keys![index]);
@@ -106,7 +113,11 @@ export class DirectCharacterCells {
         }
       }
       const element = entry.element;
-      if (cell.index !== undefined) setAttribute(element, "data-inline-index", String(cell.index));
+      if (this.addresses) {
+        const width = cell.slot || cell.image ? 1 : cell.text.length;
+        if (width !== entry.width) { entry.width = width; widthChanged = true; }
+      }
+      if (!this.addresses && cell.index !== undefined) setAttribute(element, "data-inline-index", String(cell.index));
       if (cell.slot) {
         if(entry.style!==cell.style){
           for(const name of Object.keys(entry.style??{}))if(!(name in (cell.style??{})))element.style.removeProperty(name);
@@ -160,11 +171,55 @@ export class DirectCharacterCells {
       }
     }
     flush();
+    if (this.addresses && (structureChanged || widthChanged)) {
+      this.addresses.splice(0, this.addresses.length, cells.map(c => this.entries.get(c.key)!.element), cells.map(c => c.slot || c.image ? 1 : c.text.length));
+    }
     // Drop any browser-inserted trailing nodes after canonical text is committed.
     if (structureChanged) while (cursor) { const next = cursor.nextSibling; cursor.remove(); cursor = next; }
   }
 
+  /** Compact plain text has immutable keyed text nodes. Only inserted text and
+   * surviving runs with a changed visual signature need a presentation write. */
+  spliceText(start: number, end: number, inserted: readonly CharacterCellPresentation[]) {
+    const addresses = this.addresses!;
+    const next = addresses.elementAt(end) ?? null;
+    for (let i = start; i < end; i++) {
+      const el = addresses.elementAt(i)!;
+      this.entries.delete(el.dataset.inlineKey!);
+      el.remove();
+    }
+    const fragment = this.flow.ownerDocument.createDocumentFragment();
+    const elements = inserted.map(cell => {
+      const el = this.flow.ownerDocument.createElement('span');
+      el.dataset.inlineKey = cell.key;
+      el.textContent = cell.text;
+      this.entries.set(cell.key, {element:el, kind:'text', text:cell.text,width:cell.text.length});
+      this.styleText(cell);
+      fragment.append(el);
+      return el;
+    });
+    if (elements.length) this.flow.insertBefore(fragment, next);
+    addresses.splice(start, end, elements, inserted.map(c => c.text.length));
+    this.keys = undefined;
+    if (cellWork) cellWork.characterPasses++;
+  }
+
+  styleText(cell: CharacterCellPresentation) {
+    if (cellWork) cellWork.characterUpdates++;
+    const entry = this.entries.get(cell.key)!;
+    const style = cell.style;
+    if (entry.style !== style) {
+      for (const name of Object.keys(entry.style ?? {}))
+        if (!(name in (style ?? {}))) entry.element.style.removeProperty(name);
+      for (const [name, value] of Object.entries(style ?? {}))
+        if (value !== entry.style?.[name as keyof JSX.CSSProperties]) entry.element.style.setProperty(name, String(value ?? ''));
+      entry.style = style;
+    }
+    setAttribute(entry.element, 'class', cell.classes || undefined);
+  }
+
   dispose(): void {
+    this.addresses?.dispose();
     this.disposed = true;
     for (const entry of this.entries.values()) {
       entry.releaseSlot?.(); entry.alternative?.dispose(); entry.releaseAsset?.();

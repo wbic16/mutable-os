@@ -48,14 +48,14 @@ describe("E1.1 retained Document session lifetime", () => {
     const f = await setup(), store = f.session.documentSessions!;
     expect(store.size).toBe(1);
     const a = f.view("a"), key = f.text("a").key, mount = f.editor.mounts.get(key)!;
-    const cells = [...mount.root.querySelectorAll("[data-inline-index]")];
+    const cells = [...mount.root.querySelectorAll("[data-inline-key]")];
     f.tabs()[1].click(); await tick();
     expect(store.size).toBe(2); expect(f.view("a")).toBe(a); expect(f.editor.mounts.get(key)).toBe(mount);
     expect(mount.root.closest<HTMLElement>('[role="tabpanel"]')!.hidden).toBe(true);
     expect(store.sessions().find(s => s.projection === a)!.host.activity()).toMatchObject({ mounted: true, visible: false, active: false });
     f.tabs()[0].click(); await tick();
     expect(f.view("a")).toBe(a); expect(f.text("a").key).toBe(key); expect(f.editor.mounts.get(key)).toBe(mount);
-    expect([...mount.root.querySelectorAll("[data-inline-index]")]).toEqual(cells);
+    expect([...mount.root.querySelectorAll("[data-inline-key]")]).toEqual(cells);
     expect(f.records.filter(r => r.key === key)).toHaveLength(1);
     expect(f.records.every(r => r.disposed === 0)).toBe(true);
   });

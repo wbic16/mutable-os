@@ -98,3 +98,23 @@ Portal views, such as Timer Blocks and global overlays, remain canonically locat
 - A renderer must tolerate being disposed/recreated and the same content appearing in another occurrence.
 
 See [SVG and overlays](SVG_AND_OVERLAYS.md) for geometry-derived rendering.
+
+## Accepted Flint character architecture
+
+The resident Cell boundary and identity-based DOM addressing programme was accepted and closed on 25 November 2026.
+
+**Identity is stable; position is derived. Logical granularity need not dictate physical presentation granularity.**
+
+- Eligible compact text stays cold through open, mount and scroll. On editing, each Unicode code point has one lightweight, content-owned resident Cell. Annotations derive their start and end indexes from their boundary Cells. A text splice reindexes the affected suffix once.
+- Each mounted occurrence owns its DOM, caret, selection and geometry. It resolves a surviving character span to its current position on demand. Several occurrences can share a canonical Cell while retaining independent presentation.
+- Both production flags are enabled by default. The independent switches preserve the numeric boundary planner, the previous DOM addressing path and diagnostic comparisons. [Feature defaults](../../src/configuration.ts)
+
+The qualification reports retain the measurements, benchmark commands, raw archives and regression evidence. [Resident Cell boundaries](../../RESIDENT_CELL_BOUNDARY_QUALIFICATION_REPORT.md) · [Identity-based DOM addressing](../../IDENTITY_BASED_DOM_ADDRESSING_IMPLEMENTATION_REPORT.md)
+
+## Architectural backlog
+
+### Decoupling Logical and Physical Character Granularity
+
+Deferred investigative opportunity. A future renderer could preserve one logical Cell per character while coalescing contiguous characters with compatible effective presentation into bounded DOM text runs. Possible strategies include fixed-size runs, effective-style runs and bounded effective-style runs. The existing addressing abstraction could map each character to a native Text node and UTF-16 offset for selection and Browser Range construction.
+
+Intra-paragraph virtualisation is also deferred until a concrete product requirement justifies it.

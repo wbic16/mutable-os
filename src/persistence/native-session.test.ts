@@ -276,3 +276,28 @@ it('full Flint defaults to compact native open, typing, undo/redo, manual save, 
  const b=await open();expect(b.mount.captureText!()).toBe('Saved compact '+before);expect(b.editor.repository.readState().contents[b.text.contentKey].compactInline).toBeDefined();expect(b.service.isDirty(b.id)).toBe(false);
  expect((await fs.readdir(f.root)).filter(n=>n.endsWith('.md'))).toEqual(['import.md']);
 },20000);
+
+it('saves hot range offsets to the opened file and keeps clean lease transitions out of history',async()=>{
+ const f=await host(), file=path.join(f.root,'resident.ink');
+ await fs.copyFile('vaults/imported/documents/michelangelo-letters/1507-02-13-[a7a41cd3].ink',file);
+ const {editor,service}=f.make(true), location={folder:'.',filename:'resident.ink'};
+ const id=await service.open(location),repo=editor.repository;
+ const c=Object.values(repo.readState().contents).find(c=>c.compactInline&&Array.isArray(c.payload.standoffProperties)&&c.payload.standoffProperties.length>0)!;
+ const [pk]=repo.ownedPlacementKeys(c.key),before=nativeText(captureNative(repo.readState(),id));
+ const changes=vi.fn(),stop=repo.subscribeChanges(changes);
+ const a=repo.acquireResidentCells(c.key),b=repo.acquireResidentCells(c.key);
+ expect(changes).not.toHaveBeenCalled();expect(service.isDirty(id)).toBe(false);
+ editor.commands.replaceInlineRange(pk,0,0,'🍏');
+ const ranges=repo.residentAnnotations(c.key);expect(ranges).toBeDefined();
+ expect(service.isDirty(id)).toBe(true);
+ expect(await service.save(id)).toMatchObject({phase:'saved',dirty:false});
+ expect(repo.residentAnnotations(c.key)).toBe(ranges);
+ const revision=repo.state.revision;changes.mockClear();
+ a();b();expect(repo.residentAnnotations(c.key)).toBeUndefined();
+ expect(changes).not.toHaveBeenCalled();expect(repo.state.revision).toBe(revision);
+ expect(service.isDirty(id)).toBe(false);
+ const fresh=f.make(true);await fresh.service.open(location);
+ expect(nativeText(captureNative(fresh.editor.repository.readState(),id))).toBe(nativeText(captureNative(repo.readState(),id)));
+ repo.undo();expect(nativeText(captureNative(repo.readState(),id))).toBe(before);
+ stop();
+});

@@ -229,6 +229,13 @@ export class InputGateway {
       return;
     }
 
+    const adjacent = (index:number,direction:-1|1) => {
+      const mounted = resolved.handle.adjacentGrapheme?.(index,direction);
+      if (mounted !== undefined) return mounted;
+      const textValue = node.inlineContent.map(k => this.node(k)?.payload.text ?? (this.node(k)?.editingInlineOwner ? "\uFFFC" : "")).join("");
+      const boundaries = graphemeBoundaries(textValue);
+      return direction < 0 ? boundaries.filter(b => b < index).at(-1) ?? 0 : boundaries.find(b => b > index) ?? node.inlineContent.length;
+    };
     if (event.inputType === "insertText" || event.inputType === "insertCompositionText") {
       text = event.data ?? "";
     } else if (event.inputType === "insertParagraph" || event.inputType === "insertLineBreak") {
@@ -238,10 +245,7 @@ export class InputGateway {
       return;
     } else if (event.inputType === "deleteContentBackward") {
       if (start === end && start > 0) {
-        const textValue = node.inlineContent
-          .map((cellKey) => this.node(cellKey)?.payload.text ?? (this.node(cellKey)?.editingInlineOwner ? "\uFFFC" : ""))
-          .join("");
-        start = graphemeBoundaries(textValue).filter((boundary) => boundary < start).at(-1) ?? 0;
+        start = adjacent(start,-1);
       } else if (start === end && start === 0) {
         const previous = this.adjacentSibling(resolved.nodeKey, -1);
         if (previous) {
@@ -279,10 +283,7 @@ export class InputGateway {
       text = "";
     } else if (event.inputType === "deleteContentForward") {
       if (start === end && end < node.inlineContent.length) {
-        const textValue = node.inlineContent
-          .map((cellKey) => this.node(cellKey)?.payload.text ?? (this.node(cellKey)?.editingInlineOwner ? "\uFFFC" : ""))
-          .join("");
-        end = graphemeBoundaries(textValue).find((boundary) => boundary > end) ?? node.inlineContent.length;
+        end = adjacent(end,1);
       } else if (start === end && end === node.inlineContent.length) {
         const next = this.adjacentSibling(resolved.nodeKey, 1);
         if (next) {

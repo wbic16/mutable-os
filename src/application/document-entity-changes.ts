@@ -61,6 +61,7 @@ function source(editor: ReactiveEditor, key: string, release: () => void) {
   const stop = editor.repository.subscribeChanges(change => {
     // Gloss admission proves that entity annotations and ownership are unchanged.
     if (change.taskStateOwner || change.structural?.gloss) return;
+    if (change.residentPayload && !change.annotationOrigins?.size) return;
     let relevant = false;
     const state = editor.repository.readState();
     if (change.emptyParagraph && current.dependencies.has(change.emptyParagraph.parent)) {

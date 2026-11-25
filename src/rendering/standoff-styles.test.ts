@@ -92,3 +92,15 @@ describe("Standoff property appearance", () => {
     expect(rectangle).toMatchObject({ strokeWidth: 3, dashArray: "10 10", animated: true });
   });
 });
+
+it("reads each CSS boundary once across disjoint ranges and skips SVG offsets", () => {
+  let reads = 0;
+  const css = Array.from({length: 500}, (_, i) => ({
+    type: "style/bold", get start() { reads++; return 2*i; }, get end() { reads++; return 2*i; },
+  }));
+  const runs = compileCellStyleRuns([...css, {type: "style/rectangle", get start(): number { throw Error("unrelated offset"); }}]);
+  expect(reads).toBe(1000);
+  expect(runs).toHaveLength(1000);
+  expect(cellStyleAt(runs, 998)).toEqual({"font-weight":"600"});
+  expect(cellStyleAt(runs, 999)).toEqual({});
+});

@@ -73,7 +73,7 @@ const send = (method, params = {}, sessionId) => new Promise((resolve, reject) =
  } else {
  // Exercise the actual entry path with Grouping enabled, not just saved fixtures.
  await evaluate('makeAnchorFixture(1)');await frame();
- const menuPoint=await evaluate(`(()=>{const r=anchorCheck.root('a').querySelector('[data-inline-index="1"]').getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}})()`);
+ const menuPoint=await evaluate(`(()=>{const r=anchorCheck.root('a').querySelector('[data-inline-key]:nth-child(2)').getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}})()`);
  await send('Input.dispatchMouseEvent',{type:'mousePressed',...menuPoint,button:'left',buttons:1,clickCount:1,modifiers:2},sessionId);
  await send('Input.dispatchMouseEvent',{type:'mouseReleased',...menuPoint,button:'left',buttons:0,clickCount:1,modifiers:2},sessionId);await frame();
  check('Control-click opens Block menu with Grouping enabled',await evaluate(`document.querySelectorAll('.reactive-block-menu').length`),1);

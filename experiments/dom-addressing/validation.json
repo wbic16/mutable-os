@@ -1,0 +1,108 @@
+{
+  "typecheck": "passed",
+  "differential": {
+    "seed": "5a11ce",
+    "commands": 10000,
+    "retainedHistoricalRecordsChecked": 205
+  },
+  "broad": {
+    "passed": 1319,
+    "failed": 14,
+    "newFailures": [],
+    "failures": [
+      "src/application/flint-backlinks.test.tsx > discards a delayed result when its tab is closed and keeps local mentions if name lookup fails",
+      "src/application/flint-backlinks.test.tsx > does not rebuild inventory, query summaries or mutate Backlinks while typing before, within and after a reference",
+      "src/application/flint-backlinks.test.tsx > lists live entity references without a Vault scan; Refresh reloads names and DB counts",
+      "src/application/flint-backlinks.test.tsx > reuses cached Backlinks across typing, context lenses and tab switches",
+      "src/application/flint-backlinks.test.tsx > updates counts on Undo, excludes block references and isolates previews and rows to the active tab",
+      "src/block-tree/portable-spike/codec.test.ts > isolated portable authored Document spike > copies allocate fresh Block/placement IDs while preserving sharing inside the copied graph",
+      "src/block-tree/portable-spike/codec.test.ts > isolated portable authored Document spike > preserves Unicode, inline images, authored annotation units and rich canonical copies",
+      "src/persistence/tab-orientation.test.ts > marks only the owning native Document dirty without snapshots or unrelated status updates, and saves/reloads undo states",
+      "src/rendering/block-selection.test.tsx > Block selection and reordering > handles drag/drop events and rejects cross-parent list moves",
+      "src/rendering/minimal-type-extensibility.test.tsx > test-only minimal native type extension > leaves normal application assembly empty and historical types working without definitions",
+      "src/rendering/page-creation.test.tsx > page creation convention > offers document-wide Page conversion on the document itself",
+      "src/rendering/page-creation.test.tsx > page creation convention > wraps every document child when invoked inside a nested block, preserving order, annotations and margins",
+      "src/rendering/unknown-feature.test.tsx > documents without optional feature implementations > preserves unknown authored data, renders fallback children, and edits ordinary text",
+      "src/rendering/window-icon.test.tsx > Window icon minimization > restores a standoff Cell selection after its child view remounts"
+    ],
+    "unhandled": "Existing drag/drop exception in block-selection.test.tsx"
+  },
+  "additional": {
+    "passed": 232,
+    "failed": 7,
+    "reproducedWithIdentityAddressingDisabled": [
+      "src/features/dialectic/dialectic.test.tsx > fences Stage 3C changed sources and late sessions, and rolls annotations and fragments back atomically",
+      "src/features/dialectic/dialectic.test.tsx > protects submitted base text canonically while retaining annotations, drafts and history",
+      "src/features/dialectic/dialectic.test.tsx > qualifies Stage 3B human Add Image equivalence and mixed managed/external fragment admission",
+      "src/features/dialectic/dialectic.test.tsx > qualifies Stage 3C retained PDF native equivalence, mixed admission, identity, history, persistence and bounded work",
+      "src/features/dialectic/dialectic.test.tsx > rejects Stage 3A nonmanaged and foreign originals, changed sources and late session changes",
+      "src/features/grouping/document-style-bar.test.tsx > DocumentWindow annotation toolbar (compact=false) > collects only Control-held gestures, excludes early release, and keeps static highlights",
+      "src/features/grouping/document-style-bar.test.tsx > DocumentWindow annotation toolbar (compact=true) > collects only Control-held gestures, excludes early release, and keeps static highlights"
+    ],
+    "precedingCommitCheck": {
+      "precedingCommit": "0a4128a61bdd171c6c16c27d7eef3a03e8250882",
+      "acceptedCommit": "7adc6b648913075f28daa8dd3915e5f51e117b0d",
+      "method": "Ran the seven named tests with default feature settings on the detached parent checkout and the accepted source, using the same installed dependencies.",
+      "node": "22.12.0",
+      "vitest": "2.1.9",
+      "command": "node_modules/.bin/vitest run --maxWorkers=1 --minWorkers=1 src/features/dialectic/dialectic.test.tsx src/features/grouping/document-style-bar.test.tsx -t 'fences Stage 3C changed sources|protects submitted base text canonically|qualifies Stage 3B human Add Image|qualifies Stage 3C retained PDF|rejects Stage 3A nonmanaged|collects only Control-held gestures'",
+      "matchingFailures": {
+        "src/features/dialectic/dialectic.test.tsx > fences Stage 3C changed sources and late sessions, and rolls annotations and fragments back atomically": {
+          "line": 1428,
+          "column": 372,
+          "assertion": "AssertionError: expected '' to match /changed/"
+        },
+        "src/features/dialectic/dialectic.test.tsx > protects submitted base text canonically while retaining annotations, drafts and history": {
+          "line": 494,
+          "column": 129,
+          "assertion": "AssertionError: expected true to be false // Object.is equality"
+        },
+        "src/features/dialectic/dialectic.test.tsx > qualifies Stage 3B human Add Image equivalence and mixed managed/external fragment admission": {
+          "line": 1382,
+          "column": 322,
+          "assertion": "AssertionError: expected \"spy\" to be called 1 times, but got 2 times"
+        },
+        "src/features/dialectic/dialectic.test.tsx > qualifies Stage 3C retained PDF native equivalence, mixed admission, identity, history, persistence and bounded work": {
+          "line": 1405,
+          "column": 88,
+          "assertion": "AssertionError: expected \"spy\" to be called 1 times, but got 2 times"
+        },
+        "src/features/dialectic/dialectic.test.tsx > rejects Stage 3A nonmanaged and foreign originals, changed sources and late session changes": {
+          "line": 1373,
+          "column": 156,
+          "assertion": "AssertionError: expected '' to match /changed/"
+        },
+        "src/features/grouping/document-style-bar.test.tsx > DocumentWindow annotation toolbar (compact=false) > collects only Control-held gestures, excludes early release, and keeps static highlights": {
+          "line": 124,
+          "column": 84,
+          "assertion": "AssertionError: expected <g …(2)><path …(7)></path></g>\n…(3) to have a length of 2 but got 4"
+        },
+        "src/features/grouping/document-style-bar.test.tsx > DocumentWindow annotation toolbar (compact=true) > collects only Control-held gestures, excludes early release, and keeps static highlights": {
+          "line": 124,
+          "column": 84,
+          "assertion": "AssertionError: expected <g …(2)><path …(7)></path></g>\n…(3) to have a length of 2 but got 4"
+        }
+      },
+      "introducedRegressions": []
+    }
+  },
+  "chromeSelection": {
+    "browser": "Chrome/158.0.8127.37",
+    "checks": [
+      "first Command-A selects only the active TextBlock",
+      "second Command-A selects every visible TextBlock, including nested containers",
+      "experimental pointer-selection preference remains disabled",
+      "browser input owns precisely the selected Document text",
+      "further Command-A does not rescan the Document",
+      "selection creates no snapshots, commits, revisions or editor remounts",
+      "Escape returns to the source Document editor",
+      "Control-A provides the same two-stage selection",
+      "clicking selected text restores ordinary caret input",
+      "native input retains browser Select All",
+      "Scry retains its phrase selection and suspended history",
+      "no browser exceptions"
+    ],
+    "selectedBlocks": 8,
+    "errors": []
+  }
+}

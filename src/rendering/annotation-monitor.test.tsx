@@ -145,14 +145,14 @@ describe("annotation monitor", () => {
   });
 
   it("lists inclusive left-Cell overlaps, ignores deleted annotations, previews and restores the caret", async () => {
-    const { editor, flow, open, panel } = setup();
+    const { editor, key, flow, open, panel } = setup();
     expect((await open()).defaultPrevented).toBe(true);
     expect(panel().querySelectorAll(".annotation-select")).toHaveLength(2);
     expect(document.activeElement).toBe(panel());
     expect(editor.overlays.overlays[0].annotationPreview).toEqual({ start: 0, end: 2 });
     panel().dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
     await Promise.resolve(); expect(panel()).toBeNull(); expect(document.activeElement).toBe(flow);
-    expect(document.getSelection()!.anchorOffset).toBe(2);
+    expect(editor.mounts.get(key)!.captureInlineSelection!()).toEqual({anchor:2,head:2});
     await open(0); expect(panel().querySelectorAll(".annotation-select")).toHaveLength(1);
   });
 

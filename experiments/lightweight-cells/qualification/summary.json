@@ -1,0 +1,4687 @@
+{
+  "1000-1000-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 53.2,
+        "p95": 61.5,
+        "max": 63.9
+      },
+      "settled": {
+        "median": 54.4,
+        "p95": 65.7,
+        "max": 65.8
+      },
+      "frames": {
+        "median": 199.5,
+        "p95": 248.4,
+        "max": 403.2
+      }
+    },
+    "mountMs": 258.9,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.075457,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.105891,
+      "ScriptDuration": 3.082697,
+      "TaskDuration": 3.561862
+    },
+    "idle": {
+      "median": 56.6,
+      "p95": 140.7,
+      "max": 140.7
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 52.3,
+        "p95": 62.5,
+        "max": 62.5
+      },
+      "afterUndoPaste": {
+        "median": 61,
+        "p95": 71.6,
+        "max": 71.6
+      },
+      "largePaste": {
+        "median": 70.4,
+        "p95": 70.4,
+        "max": 70.4
+      },
+      "sustained": {
+        "median": 48,
+        "p95": 49.4,
+        "max": 49.6
+      }
+    }
+  },
+  "1000-1000-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 21.2,
+        "p95": 27.6,
+        "max": 32.7
+      },
+      "settled": {
+        "median": 23,
+        "p95": 32,
+        "max": 36.5
+      },
+      "frames": {
+        "median": 191,
+        "p95": 244.8,
+        "max": 377.4
+      }
+    },
+    "mountMs": 157.8,
+    "boundary": {
+      "allocations": 1020,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 36000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 1000,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.076597,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.107412,
+      "ScriptDuration": 2.196958,
+      "TaskDuration": 2.625679
+    },
+    "idle": {
+      "median": 86.8,
+      "p95": 148.4,
+      "max": 148.4
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 24,
+        "p95": 27.4,
+        "max": 27.4
+      },
+      "afterUndoPaste": {
+        "median": 34.6,
+        "p95": 36.8,
+        "max": 36.8
+      },
+      "largePaste": {
+        "median": 62.8,
+        "p95": 62.8,
+        "max": 62.8
+      },
+      "sustained": {
+        "median": 16.7,
+        "p95": 19.9,
+        "max": 26.2
+      }
+    }
+  },
+  "1000-20-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 9.1,
+        "p95": 11.5,
+        "max": 14.6
+      },
+      "settled": {
+        "median": 10.9,
+        "p95": 15,
+        "max": 18.2
+      },
+      "frames": {
+        "median": 30.5,
+        "p95": 233.3,
+        "max": 420.6
+      }
+    },
+    "mountMs": 123.4,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.090696,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.058182,
+      "ScriptDuration": 0.414171,
+      "TaskDuration": 0.768659
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 9,
+        "p95": 9.5,
+        "max": 9.5
+      },
+      "afterUndoPaste": {
+        "median": 9.3,
+        "p95": 9.4,
+        "max": 9.4
+      },
+      "largePaste": {
+        "median": 37.2,
+        "p95": 37.2,
+        "max": 37.2
+      },
+      "sustained": {
+        "median": 5.8,
+        "p95": 9.1,
+        "max": 9.3
+      }
+    }
+  },
+  "1000-20-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 6.6,
+        "p95": 12.3,
+        "max": 13
+      },
+      "settled": {
+        "median": 8.3,
+        "p95": 15.3,
+        "max": 17
+      },
+      "frames": {
+        "median": 32.7,
+        "p95": 194.9,
+        "max": 726.9
+      }
+    },
+    "mountMs": 256.5,
+    "boundary": {
+      "allocations": 1020,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 36000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 20,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.078215,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.051658,
+      "ScriptDuration": 0.341257,
+      "TaskDuration": 0.6508069999999999
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.4,
+      "max": 17.4
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 8.9,
+        "p95": 9,
+        "max": 9
+      },
+      "afterUndoPaste": {
+        "median": 9.7,
+        "p95": 9.8,
+        "max": 9.8
+      },
+      "largePaste": {
+        "median": 37.2,
+        "p95": 37.2,
+        "max": 37.2
+      },
+      "sustained": {
+        "median": 6,
+        "p95": 6.8,
+        "max": 6.9
+      }
+    }
+  },
+  "25000-20-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 127.8,
+        "p95": 144.4,
+        "max": 144.4
+      },
+      "settled": {
+        "median": 141.3,
+        "p95": 162.9,
+        "max": 162.9
+      },
+      "frames": {
+        "median": 235.7,
+        "p95": 314.9,
+        "max": 314.9
+      }
+    },
+    "mountMs": 666.7,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 9,
+      "LayoutDuration": 0.263137,
+      "RecalcStyleCount": 34,
+      "RecalcStyleDuration": 0.039442,
+      "ScriptDuration": 0.993637,
+      "TaskDuration": 1.8253380000000001
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.7,
+      "max": 17.7
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 156.6,
+        "p95": 156.6,
+        "max": 156.6
+      },
+      "afterUndoPaste": {
+        "median": 108.2,
+        "p95": 108.2,
+        "max": 108.2
+      },
+      "largePaste": {
+        "median": 184.3,
+        "p95": 184.3,
+        "max": 184.3
+      },
+      "sustained": {
+        "median": 101.9,
+        "p95": 125.4,
+        "max": 125.4
+      }
+    }
+  },
+  "25000-20-numeric-2": {
+    "typing": {
+      "sync": {
+        "median": 164.6,
+        "p95": 237.2,
+        "max": 237.2
+      },
+      "settled": {
+        "median": 189.9,
+        "p95": 237.2,
+        "max": 237.2
+      },
+      "frames": {
+        "median": 318.1,
+        "p95": 378.5,
+        "max": 378.5
+      }
+    },
+    "mountMs": 500.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 9,
+      "LayoutDuration": 0.3517,
+      "RecalcStyleCount": 31,
+      "RecalcStyleDuration": 0.054207,
+      "ScriptDuration": 1.313292,
+      "TaskDuration": 2.4062370000000004
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.2,
+      "max": 17.2
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 103,
+        "p95": 103,
+        "max": 103
+      },
+      "afterUndoPaste": {
+        "median": 104.1,
+        "p95": 104.1,
+        "max": 104.1
+      },
+      "largePaste": {
+        "median": 168.7,
+        "p95": 168.7,
+        "max": 168.7
+      },
+      "sustained": {
+        "median": 109.7,
+        "p95": 112,
+        "max": 112
+      }
+    }
+  },
+  "25000-20-numeric-unprofiled": {
+    "typing": {
+      "sync": {
+        "median": 153,
+        "p95": 226.4,
+        "max": 226.4
+      },
+      "settled": {
+        "median": 163.1,
+        "p95": 250,
+        "max": 250
+      },
+      "frames": {
+        "median": 387.7,
+        "p95": 679.3,
+        "max": 679.3
+      }
+    },
+    "mountMs": 580.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 9,
+      "LayoutDuration": 0.333215,
+      "RecalcStyleCount": 33,
+      "RecalcStyleDuration": 0.048984,
+      "ScriptDuration": 1.282747,
+      "TaskDuration": 2.346091
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.1,
+      "max": 17.1
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 112.7,
+        "p95": 112.7,
+        "max": 112.7
+      },
+      "afterUndoPaste": {
+        "median": 102,
+        "p95": 102,
+        "max": 102
+      },
+      "largePaste": {
+        "median": 192.2,
+        "p95": 192.2,
+        "max": 192.2
+      },
+      "sustained": {
+        "median": 111,
+        "p95": 119.3,
+        "max": 119.3
+      }
+    }
+  },
+  "25000-20-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 170.4,
+        "p95": 216.4,
+        "max": 216.4
+      },
+      "settled": {
+        "median": 188.8,
+        "p95": 216.5,
+        "max": 216.5
+      },
+      "frames": {
+        "median": 313.7,
+        "p95": 404.6,
+        "max": 404.6
+      }
+    },
+    "mountMs": 503.1,
+    "boundary": {
+      "allocations": 25004,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 8,
+      "suffixWrites": 199200,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 16,
+      "annotationViews": 20,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 9,
+      "LayoutDuration": 0.355818,
+      "RecalcStyleCount": 33,
+      "RecalcStyleDuration": 0.054188,
+      "ScriptDuration": 1.333841,
+      "TaskDuration": 2.462488
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 105.2,
+        "p95": 105.2,
+        "max": 105.2
+      },
+      "afterUndoPaste": {
+        "median": 108,
+        "p95": 108,
+        "max": 108
+      },
+      "largePaste": {
+        "median": 132.8,
+        "p95": 132.8,
+        "max": 132.8
+      },
+      "sustained": {
+        "median": 100.1,
+        "p95": 101.2,
+        "max": 101.2
+      }
+    }
+  },
+  "25000-20-resident-2": {
+    "typing": {
+      "sync": {
+        "median": 193.8,
+        "p95": 228.8,
+        "max": 228.8
+      },
+      "settled": {
+        "median": 212.2,
+        "p95": 289.2,
+        "max": 289.2
+      },
+      "frames": {
+        "median": 392.6,
+        "p95": 865.2,
+        "max": 865.2
+      }
+    },
+    "mountMs": 511.6,
+    "boundary": {
+      "allocations": 25004,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 8,
+      "suffixWrites": 199200,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 16,
+      "annotationViews": 20,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 9,
+      "LayoutDuration": 0.392669,
+      "RecalcStyleCount": 31,
+      "RecalcStyleDuration": 0.059148,
+      "ScriptDuration": 1.493473,
+      "TaskDuration": 2.765998
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.6,
+      "max": 17.6
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 111.1,
+        "p95": 111.1,
+        "max": 111.1
+      },
+      "afterUndoPaste": {
+        "median": 106.2,
+        "p95": 106.2,
+        "max": 106.2
+      },
+      "largePaste": {
+        "median": 150.5,
+        "p95": 150.5,
+        "max": 150.5
+      },
+      "sustained": {
+        "median": 101.8,
+        "p95": 103.4,
+        "max": 103.4
+      }
+    }
+  },
+  "25000-20-resident-unprofiled": {
+    "typing": {
+      "sync": {
+        "median": 146.6,
+        "p95": 186.8,
+        "max": 186.8
+      },
+      "settled": {
+        "median": 170,
+        "p95": 219.8,
+        "max": 219.8
+      },
+      "frames": {
+        "median": 321.5,
+        "p95": 527.6,
+        "max": 527.6
+      }
+    },
+    "mountMs": 608.5,
+    "boundary": {
+      "allocations": 25004,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 8,
+      "suffixWrites": 199200,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 16,
+      "annotationViews": 20,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 9,
+      "LayoutDuration": 0.329636,
+      "RecalcStyleCount": 33,
+      "RecalcStyleDuration": 0.048135,
+      "ScriptDuration": 1.164039,
+      "TaskDuration": 2.237763
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.3,
+      "max": 17.3
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 112.9,
+        "p95": 112.9,
+        "max": 112.9
+      },
+      "afterUndoPaste": {
+        "median": 107.8,
+        "p95": 107.8,
+        "max": 107.8
+      },
+      "largePaste": {
+        "median": 145.3,
+        "p95": 145.3,
+        "max": 145.3
+      },
+      "sustained": {
+        "median": 116.3,
+        "p95": 129.7,
+        "max": 129.7
+      }
+    }
+  },
+  "500-0-200-numeric-viewport": {
+    "typing": {
+      "sync": {
+        "median": 3,
+        "p95": 5.5,
+        "max": 9.1
+      },
+      "settled": {
+        "median": 4.9,
+        "p95": 7.2,
+        "max": 12.3
+      },
+      "frames": {
+        "median": 16.6,
+        "p95": 17.6,
+        "max": 18.6
+      }
+    },
+    "mountMs": 152.7,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 40,
+      "LayoutDuration": 0.030281,
+      "RecalcStyleCount": 100,
+      "RecalcStyleDuration": 0.076488,
+      "ScriptDuration": 0.146322,
+      "TaskDuration": 0.361004
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.4,
+      "max": 17.4
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 6.4,
+        "p95": 8.8,
+        "max": 8.8
+      },
+      "afterUndoPaste": {
+        "median": 7.5,
+        "p95": 10.9,
+        "max": 10.9
+      },
+      "largePaste": {
+        "median": 35.9,
+        "p95": 35.9,
+        "max": 35.9
+      },
+      "sustained": {
+        "median": 2.6,
+        "p95": 5.4,
+        "max": 5.6
+      }
+    }
+  },
+  "500-0-200-resident-retention": {
+    "typing": {
+      "sync": {
+        "median": 3,
+        "p95": 4.9,
+        "max": 8
+      },
+      "settled": {
+        "median": 5,
+        "p95": 7,
+        "max": 10.8
+      },
+      "frames": {
+        "median": 16.6,
+        "p95": 17.6,
+        "max": 18
+      }
+    },
+    "mountMs": 154.9,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 40,
+      "LayoutDuration": 0.033698,
+      "RecalcStyleCount": 100,
+      "RecalcStyleDuration": 0.080534,
+      "ScriptDuration": 0.149563,
+      "TaskDuration": 0.385092
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.3,
+      "max": 17.3
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 4.9,
+        "p95": 4.9,
+        "max": 4.9
+      },
+      "afterUndoPaste": {
+        "median": 5.1,
+        "p95": 5.3,
+        "max": 5.3
+      },
+      "largePaste": {
+        "median": 32,
+        "p95": 32,
+        "max": 32
+      },
+      "sustained": {
+        "median": 2.3,
+        "p95": 2.7,
+        "max": 2.7
+      }
+    }
+  },
+  "500-0-200-resident-viewport": {
+    "typing": {
+      "sync": {
+        "median": 3.8,
+        "p95": 6.9,
+        "max": 9.1
+      },
+      "settled": {
+        "median": 5.8,
+        "p95": 12.3,
+        "max": 12.4
+      },
+      "frames": {
+        "median": 16.8,
+        "p95": 18,
+        "max": 19.1
+      }
+    },
+    "mountMs": 242.5,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 40,
+      "LayoutDuration": 0.040659,
+      "RecalcStyleCount": 100,
+      "RecalcStyleDuration": 0.101329,
+      "ScriptDuration": 0.18909199999999998,
+      "TaskDuration": 0.472522
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 5,
+        "p95": 5.7,
+        "max": 5.7
+      },
+      "afterUndoPaste": {
+        "median": 5.2,
+        "p95": 5.5,
+        "max": 5.5
+      },
+      "largePaste": {
+        "median": 31.4,
+        "p95": 31.4,
+        "max": 31.4
+      },
+      "sustained": {
+        "median": 2.4,
+        "p95": 2.8,
+        "max": 2.9
+      }
+    }
+  },
+  "500-18-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 4.2,
+        "p95": 9.1,
+        "max": 11.3
+      },
+      "settled": {
+        "median": 5.5,
+        "p95": 9.1,
+        "max": 14.3
+      },
+      "frames": {
+        "median": 17.8,
+        "p95": 108.6,
+        "max": 231.8
+      }
+    },
+    "mountMs": 259.4,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.038332,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.042508,
+      "ScriptDuration": 0.220303,
+      "TaskDuration": 0.41709399999999996
+    },
+    "idle": {
+      "median": 16.5,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 8.2,
+        "p95": 14.2,
+        "max": 14.2
+      },
+      "afterUndoPaste": {
+        "median": 9.4,
+        "p95": 14.4,
+        "max": 14.4
+      },
+      "largePaste": {
+        "median": 88.6,
+        "p95": 88.6,
+        "max": 88.6
+      },
+      "sustained": {
+        "median": 4.4,
+        "p95": 5.3,
+        "max": 5.5
+      }
+    }
+  },
+  "500-18-numeric-2": {
+    "typing": {
+      "sync": {
+        "median": 5.6,
+        "p95": 7.9,
+        "max": 9.9
+      },
+      "settled": {
+        "median": 7.6,
+        "p95": 10.2,
+        "max": 12.5
+      },
+      "frames": {
+        "median": 20.3,
+        "p95": 188.9,
+        "max": 453
+      }
+    },
+    "mountMs": 112.8,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.055836,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.060916,
+      "ScriptDuration": 0.293527,
+      "TaskDuration": 0.562362
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.7,
+      "max": 17.7
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 6.6,
+        "p95": 7.3,
+        "max": 7.3
+      },
+      "afterUndoPaste": {
+        "median": 6.9,
+        "p95": 7.1,
+        "max": 7.1
+      },
+      "largePaste": {
+        "median": 36.7,
+        "p95": 36.7,
+        "max": 36.7
+      },
+      "sustained": {
+        "median": 4.1,
+        "p95": 4.5,
+        "max": 4.6
+      }
+    }
+  },
+  "500-18-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 5,
+        "p95": 10.1,
+        "max": 10.5
+      },
+      "settled": {
+        "median": 6.7,
+        "p95": 10.6,
+        "max": 13
+      },
+      "frames": {
+        "median": 16.8,
+        "p95": 185.2,
+        "max": 413.7
+      }
+    },
+    "mountMs": 384.7,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 18
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.054539,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.058799,
+      "ScriptDuration": 0.26882700000000004,
+      "TaskDuration": 0.53353
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 20.2,
+      "max": 20.2
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 7.1,
+        "p95": 8,
+        "max": 8
+      },
+      "afterUndoPaste": {
+        "median": 7.1,
+        "p95": 7.8,
+        "max": 7.8
+      },
+      "largePaste": {
+        "median": 48.7,
+        "p95": 48.7,
+        "max": 48.7
+      },
+      "sustained": {
+        "median": 3.4,
+        "p95": 5.1,
+        "max": 5.9
+      }
+    }
+  },
+  "500-18-resident-2": {
+    "typing": {
+      "sync": {
+        "median": 3.4,
+        "p95": 6.7,
+        "max": 9.9
+      },
+      "settled": {
+        "median": 4.7,
+        "p95": 6.8,
+        "max": 12.5
+      },
+      "frames": {
+        "median": 16.5,
+        "p95": 106.5,
+        "max": 739.1
+      }
+    },
+    "mountMs": 124,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 18,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.036768,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.041241,
+      "ScriptDuration": 0.18676099999999998,
+      "TaskDuration": 0.37030599999999997
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 7.2,
+        "p95": 7.3,
+        "max": 7.3
+      },
+      "afterUndoPaste": {
+        "median": 7.3,
+        "p95": 7.9,
+        "max": 7.9
+      },
+      "largePaste": {
+        "median": 33.3,
+        "p95": 33.3,
+        "max": 33.3
+      },
+      "sustained": {
+        "median": 3.6,
+        "p95": 3.9,
+        "max": 4.2
+      }
+    }
+  },
+  "500-274-200-numeric-viewport": {
+    "typing": {
+      "sync": {
+        "median": 15.4,
+        "p95": 23.6,
+        "max": 23.7
+      },
+      "settled": {
+        "median": 16.8,
+        "p95": 23.8,
+        "max": 27.8
+      },
+      "frames": {
+        "median": 125.4,
+        "p95": 255.2,
+        "max": 490.6
+      }
+    },
+    "mountMs": 151.3,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.041098,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.087346,
+      "ScriptDuration": 0.970106,
+      "TaskDuration": 1.2372029999999998
+    },
+    "idle": {
+      "median": 20.8,
+      "p95": 129.9,
+      "max": 129.9
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 18.7,
+        "p95": 19.1,
+        "max": 19.1
+      },
+      "afterUndoPaste": {
+        "median": 16.6,
+        "p95": 21.1,
+        "max": 21.1
+      },
+      "largePaste": {
+        "median": 50.5,
+        "p95": 50.5,
+        "max": 50.5
+      },
+      "sustained": {
+        "median": 16,
+        "p95": 19.8,
+        "max": 20.7
+      }
+    }
+  },
+  "500-274-200-resident-viewport": {
+    "typing": {
+      "sync": {
+        "median": 7.3,
+        "p95": 11.2,
+        "max": 16.4
+      },
+      "settled": {
+        "median": 8.8,
+        "p95": 11.9,
+        "max": 20
+      },
+      "frames": {
+        "median": 123.6,
+        "p95": 266,
+        "max": 528
+      }
+    },
+    "mountMs": 182.7,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.040379,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.086089,
+      "ScriptDuration": 0.6277600000000001,
+      "TaskDuration": 0.894686
+    },
+    "idle": {
+      "median": 18.1,
+      "p95": 138.3,
+      "max": 138.3
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 9.4,
+        "p95": 10.3,
+        "max": 10.3
+      },
+      "afterUndoPaste": {
+        "median": 11.4,
+        "p95": 12.7,
+        "max": 12.7
+      },
+      "largePaste": {
+        "median": 46.5,
+        "p95": 46.5,
+        "max": 46.5
+      },
+      "sustained": {
+        "median": 5.8,
+        "p95": 7.3,
+        "max": 9.2
+      }
+    }
+  },
+  "500-274-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 19.8,
+        "p95": 35.9,
+        "max": 40.9
+      },
+      "settled": {
+        "median": 21,
+        "p95": 36.1,
+        "max": 47
+      },
+      "frames": {
+        "median": 41.1,
+        "p95": 320.6,
+        "max": 809.8
+      }
+    },
+    "mountMs": 363.8,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.060848,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.083256,
+      "ScriptDuration": 1.228138,
+      "TaskDuration": 1.528595
+    },
+    "idle": {
+      "median": 25.7,
+      "p95": 145.9,
+      "max": 145.9
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 19.1,
+        "p95": 19.8,
+        "max": 19.8
+      },
+      "afterUndoPaste": {
+        "median": 22,
+        "p95": 24.4,
+        "max": 24.4
+      },
+      "largePaste": {
+        "median": 49.9,
+        "p95": 49.9,
+        "max": 49.9
+      },
+      "sustained": {
+        "median": 17.1,
+        "p95": 21.8,
+        "max": 23.4
+      }
+    }
+  },
+  "500-274-numeric-2": {
+    "typing": {
+      "sync": {
+        "median": 19.2,
+        "p95": 23.4,
+        "max": 23.9
+      },
+      "settled": {
+        "median": 20.3,
+        "p95": 26.8,
+        "max": 28.1
+      },
+      "frames": {
+        "median": 39.4,
+        "p95": 194.7,
+        "max": 361.6
+      }
+    },
+    "mountMs": 123.3,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.055419,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.076725,
+      "ScriptDuration": 1.1368710000000002,
+      "TaskDuration": 1.412739
+    },
+    "idle": {
+      "median": 22.2,
+      "p95": 118,
+      "max": 118
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 18.3,
+        "p95": 18.8,
+        "max": 18.8
+      },
+      "afterUndoPaste": {
+        "median": 17.1,
+        "p95": 17.2,
+        "max": 17.2
+      },
+      "largePaste": {
+        "median": 51,
+        "p95": 51,
+        "max": 51
+      },
+      "sustained": {
+        "median": 15.1,
+        "p95": 17.4,
+        "max": 17.5
+      }
+    }
+  },
+  "500-274-numeric-hardware": {
+    "typing": {
+      "sync": {
+        "median": 13.9,
+        "p95": 20.2,
+        "max": 22.8
+      },
+      "settled": {
+        "median": 14.8,
+        "p95": 20.2,
+        "max": 25.5
+      },
+      "frames": {
+        "median": 24.6,
+        "p95": 30.1,
+        "max": 30.9
+      }
+    },
+    "mountMs": 264.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.041163,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.05467,
+      "ScriptDuration": 0.826183,
+      "TaskDuration": 1.021138
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 16.9,
+      "max": 16.9
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 15,
+        "p95": 15.8,
+        "max": 15.8
+      },
+      "afterUndoPaste": {
+        "median": 14.9,
+        "p95": 15.4,
+        "max": 15.4
+      },
+      "largePaste": {
+        "median": 38.9,
+        "p95": 38.9,
+        "max": 38.9
+      },
+      "sustained": {
+        "median": 11.8,
+        "p95": 12.7,
+        "max": 13.3
+      }
+    }
+  },
+  "500-274-numeric-hardware2": {
+    "typing": {
+      "sync": {
+        "median": 13.2,
+        "p95": 19.7,
+        "max": 22.8
+      },
+      "settled": {
+        "median": 14.8,
+        "p95": 19.8,
+        "max": 25.3
+      },
+      "frames": {
+        "median": 24.3,
+        "p95": 29.5,
+        "max": 31
+      }
+    },
+    "mountMs": 296.2,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.038987,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.051515,
+      "ScriptDuration": 0.8048500000000001,
+      "TaskDuration": 0.988712
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.1,
+      "max": 17.1
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 14.5,
+        "p95": 17.3,
+        "max": 17.3
+      },
+      "afterUndoPaste": {
+        "median": 14.3,
+        "p95": 14.8,
+        "max": 14.8
+      },
+      "largePaste": {
+        "median": 40.1,
+        "p95": 40.1,
+        "max": 40.1
+      },
+      "sustained": {
+        "median": 12,
+        "p95": 13.8,
+        "max": 14
+      }
+    }
+  },
+  "500-274-numeric-headed": {
+    "typing": {
+      "sync": {
+        "median": 17.8,
+        "p95": 28.3,
+        "max": 37
+      },
+      "settled": {
+        "median": 19.2,
+        "p95": 30.3,
+        "max": 42
+      },
+      "frames": {
+        "median": 390.4,
+        "p95": 1001.9,
+        "max": 1170
+      }
+    },
+    "mountMs": 245.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.0541,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.075521,
+      "ScriptDuration": 1.079591,
+      "TaskDuration": 1.390337
+    },
+    "idle": {
+      "median": 49.3,
+      "p95": 737.5,
+      "max": 737.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 17.4,
+        "p95": 18.1,
+        "max": 18.1
+      },
+      "afterUndoPaste": {
+        "median": 18.8,
+        "p95": 18.9,
+        "max": 18.9
+      },
+      "largePaste": {
+        "median": 45.8,
+        "p95": 45.8,
+        "max": 45.8
+      },
+      "sustained": {
+        "median": 15.1,
+        "p95": 16.8,
+        "max": 17.5
+      }
+    }
+  },
+  "500-274-numeric-inventory": {
+    "typing": {
+      "sync": {
+        "median": 19.3,
+        "p95": 26.6,
+        "max": 33.7
+      },
+      "settled": {
+        "median": 22,
+        "p95": 31.7,
+        "max": 40.5
+      },
+      "frames": {
+        "median": 37.1,
+        "p95": 275.9,
+        "max": 321.7
+      }
+    },
+    "mountMs": 123.3,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 40,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.0569,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.076273,
+      "ScriptDuration": 1.2166249999999998,
+      "TaskDuration": 1.49771
+    },
+    "idle": {
+      "median": 20.5,
+      "p95": 102.2,
+      "max": 102.2
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 17.1,
+        "p95": 18.4,
+        "max": 18.4
+      },
+      "afterUndoPaste": {
+        "median": 18.7,
+        "p95": 18.9,
+        "max": 18.9
+      },
+      "largePaste": {
+        "median": 44.6,
+        "p95": 44.6,
+        "max": 44.6
+      },
+      "sustained": {
+        "median": 15.5,
+        "p95": 19,
+        "max": 19.1
+      }
+    }
+  },
+  "500-274-numeric-trace": {
+    "typing": {
+      "sync": {
+        "median": 15.5,
+        "p95": 27.6,
+        "max": 33.2
+      },
+      "settled": {
+        "median": 17.3,
+        "p95": 30.9,
+        "max": 37.1
+      },
+      "frames": {
+        "median": 133.2,
+        "p95": 147.9,
+        "max": 154.1
+      }
+    },
+    "mountMs": 125.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.04761,
+      "RecalcStyleCount": 590,
+      "RecalcStyleDuration": 0.239443,
+      "ScriptDuration": 0.958075,
+      "TaskDuration": 1.7204030000000001
+    },
+    "idle": {
+      "median": 21.3,
+      "p95": 133.6,
+      "max": 133.6
+    },
+    "trace": {
+      "Layout": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 23.57,
+        "count": 40,
+        "ms": 71.22,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "UpdateLayoutTree": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 25.27,
+        "count": 80,
+        "ms": 41.84,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "PrePaint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 39,
+        "ms": 16.5,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "Paint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 156,
+        "ms": 47.38,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MinorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 31,
+        "ms": 18.65,
+        "synchronous": 23,
+        "synchronousMs": 14.64
+      },
+      "MajorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 2,
+        "ms": 9.11,
+        "synchronous": 1,
+        "synchronousMs": 6.51
+      },
+      "FireAnimationFrame": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 78,
+        "ms": 987.7,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RunMicrotasks": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RasterTask": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      }
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 18,
+        "p95": 19,
+        "max": 19
+      },
+      "afterUndoPaste": {
+        "median": 15.8,
+        "p95": 16.9,
+        "max": 16.9
+      },
+      "largePaste": {
+        "median": 44.1,
+        "p95": 44.1,
+        "max": 44.1
+      },
+      "sustained": {
+        "median": 14,
+        "p95": 15.8,
+        "max": 16
+      }
+    }
+  },
+  "500-274-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 9.7,
+        "p95": 18.8,
+        "max": 21
+      },
+      "settled": {
+        "median": 11.2,
+        "p95": 22.7,
+        "max": 24
+      },
+      "frames": {
+        "median": 38.9,
+        "p95": 339.5,
+        "max": 343.4
+      }
+    },
+    "mountMs": 413.3,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.064125,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.08556,
+      "ScriptDuration": 0.810414,
+      "TaskDuration": 1.1296519999999999
+    },
+    "idle": {
+      "median": 28.1,
+      "p95": 136.4,
+      "max": 136.4
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 10,
+        "p95": 11.4,
+        "max": 11.4
+      },
+      "afterUndoPaste": {
+        "median": 11.5,
+        "p95": 12,
+        "max": 12
+      },
+      "largePaste": {
+        "median": 53.4,
+        "p95": 53.4,
+        "max": 53.4
+      },
+      "sustained": {
+        "median": 8.1,
+        "p95": 9.8,
+        "max": 11
+      }
+    }
+  },
+  "500-274-resident-2": {
+    "typing": {
+      "sync": {
+        "median": 7.6,
+        "p95": 9.4,
+        "max": 15.2
+      },
+      "settled": {
+        "median": 9.3,
+        "p95": 11.2,
+        "max": 17.5
+      },
+      "frames": {
+        "median": 35.8,
+        "p95": 149.6,
+        "max": 177.9
+      }
+    },
+    "mountMs": 122.1,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.049523,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.068322,
+      "ScriptDuration": 0.631573,
+      "TaskDuration": 0.883892
+    },
+    "idle": {
+      "median": 21.5,
+      "p95": 134.4,
+      "max": 134.4
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 10,
+        "p95": 11.2,
+        "max": 11.2
+      },
+      "afterUndoPaste": {
+        "median": 12.5,
+        "p95": 13.2,
+        "max": 13.2
+      },
+      "largePaste": {
+        "median": 44,
+        "p95": 44,
+        "max": 44
+      },
+      "sustained": {
+        "median": 6.6,
+        "p95": 7.9,
+        "max": 9.6
+      }
+    }
+  },
+  "500-274-resident-baseline": {
+    "typing": {
+      "sync": {
+        "median": 27.3,
+        "p95": 42.7,
+        "max": 45.6
+      },
+      "settled": {
+        "median": 31.2,
+        "p95": 48.1,
+        "max": 50.2
+      },
+      "frames": {
+        "median": 56.5,
+        "p95": 91.5,
+        "max": 119.5
+      }
+    },
+    "browserCosts": {
+      "LayoutCount": 61,
+      "LayoutDuration": 0.050148,
+      "RecalcStyleCount": 160,
+      "RecalcStyleDuration": 0.094924,
+      "ScriptDuration": 2.040271,
+      "TaskDuration": 2.312455
+    },
+    "idle": {
+      "median": 20.4,
+      "p95": 23,
+      "max": 23
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 27.7,
+        "p95": 28.2,
+        "max": 28.2
+      },
+      "afterUndoPaste": {
+        "median": 32.5,
+        "p95": 33.2,
+        "max": 33.2
+      },
+      "largePaste": {
+        "median": 70.5,
+        "p95": 70.5,
+        "max": 70.5
+      },
+      "sustained": {
+        "median": 25.3,
+        "p95": 28.5,
+        "max": 28.8
+      }
+    }
+  },
+  "500-274-resident-hardware": {
+    "typing": {
+      "sync": {
+        "median": 6.1,
+        "p95": 12.3,
+        "max": 17.2
+      },
+      "settled": {
+        "median": 7.5,
+        "p95": 12.5,
+        "max": 19.9
+      },
+      "frames": {
+        "median": 17.4,
+        "p95": 22.5,
+        "max": 25.7
+      }
+    },
+    "mountMs": 237.1,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.039793999999999996,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.052215,
+      "ScriptDuration": 0.520509,
+      "TaskDuration": 0.70417
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 20,
+      "max": 20
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 8.1,
+        "p95": 11.1,
+        "max": 11.1
+      },
+      "afterUndoPaste": {
+        "median": 10.5,
+        "p95": 10.9,
+        "max": 10.9
+      },
+      "largePaste": {
+        "median": 38.2,
+        "p95": 38.2,
+        "max": 38.2
+      },
+      "sustained": {
+        "median": 5.1,
+        "p95": 7.8,
+        "max": 8.2
+      }
+    }
+  },
+  "500-274-resident-hardware2": {
+    "typing": {
+      "sync": {
+        "median": 6.2,
+        "p95": 11.1,
+        "max": 17.1
+      },
+      "settled": {
+        "median": 7.6,
+        "p95": 11.3,
+        "max": 19.6
+      },
+      "frames": {
+        "median": 17.5,
+        "p95": 21.9,
+        "max": 25.2
+      }
+    },
+    "mountMs": 334.8,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.040093000000000004,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.051826,
+      "ScriptDuration": 0.526146,
+      "TaskDuration": 0.711621
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.3,
+      "max": 17.3
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 8.7,
+        "p95": 10.5,
+        "max": 10.5
+      },
+      "afterUndoPaste": {
+        "median": 11.1,
+        "p95": 11.2,
+        "max": 11.2
+      },
+      "largePaste": {
+        "median": 38.2,
+        "p95": 38.2,
+        "max": 38.2
+      },
+      "sustained": {
+        "median": 5.5,
+        "p95": 6.1,
+        "max": 7.7
+      }
+    }
+  },
+  "500-274-resident-headed": {
+    "typing": {
+      "sync": {
+        "median": 8.1,
+        "p95": 19.5,
+        "max": 20
+      },
+      "settled": {
+        "median": 10,
+        "p95": 19.7,
+        "max": 23.4
+      },
+      "frames": {
+        "median": 396.3,
+        "p95": 1050.3,
+        "max": 1064.4
+      }
+    },
+    "mountMs": 379.3,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.054339,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.074427,
+      "ScriptDuration": 0.6826300000000001,
+      "TaskDuration": 0.982803
+    },
+    "idle": {
+      "median": 52.8,
+      "p95": 905.9,
+      "max": 905.9
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 9.4,
+        "p95": 9.5,
+        "max": 9.5
+      },
+      "afterUndoPaste": {
+        "median": 12.4,
+        "p95": 12.5,
+        "max": 12.5
+      },
+      "largePaste": {
+        "median": 45.3,
+        "p95": 45.3,
+        "max": 45.3
+      },
+      "sustained": {
+        "median": 5.9,
+        "p95": 7.4,
+        "max": 8
+      }
+    }
+  },
+  "500-274-resident-inventory": {
+    "typing": {
+      "sync": {
+        "median": 7.6,
+        "p95": 14.3,
+        "max": 26
+      },
+      "settled": {
+        "median": 9.5,
+        "p95": 16,
+        "max": 30.6
+      },
+      "frames": {
+        "median": 35.1,
+        "p95": 197.2,
+        "max": 307
+      }
+    },
+    "mountMs": 163.3,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 2200
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.053415,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.074174,
+      "ScriptDuration": 0.696405,
+      "TaskDuration": 0.96403
+    },
+    "idle": {
+      "median": 22,
+      "p95": 104.7,
+      "max": 104.7
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 10,
+        "p95": 10,
+        "max": 10
+      },
+      "afterUndoPaste": {
+        "median": 12.5,
+        "p95": 14.8,
+        "max": 14.8
+      },
+      "largePaste": {
+        "median": 42.6,
+        "p95": 42.6,
+        "max": 42.6
+      },
+      "sustained": {
+        "median": 6.9,
+        "p95": 7.2,
+        "max": 8.5
+      }
+    }
+  },
+  "500-274-resident-trace": {
+    "typing": {
+      "sync": {
+        "median": 7.1,
+        "p95": 14.6,
+        "max": 17
+      },
+      "settled": {
+        "median": 8.6,
+        "p95": 14.9,
+        "max": 20.6
+      },
+      "frames": {
+        "median": 36,
+        "p95": 123.5,
+        "max": 129.4
+      }
+    },
+    "mountMs": 524.1,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.050542,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.068127,
+      "ScriptDuration": 0.6368769999999999,
+      "TaskDuration": 0.9120010000000001
+    },
+    "idle": {
+      "median": 21.8,
+      "p95": 116.6,
+      "max": 116.6
+    },
+    "trace": {
+      "Layout": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 24.9,
+        "count": 40,
+        "ms": 72.96,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "UpdateLayoutTree": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 25.21,
+        "count": 80,
+        "ms": 42.95,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "PrePaint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 39,
+        "ms": 17.08,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "Paint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 156,
+        "ms": 49.09,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MinorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 10,
+        "ms": 9.24,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MajorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "FireAnimationFrame": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 79,
+        "ms": 686.27,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RunMicrotasks": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RasterTask": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      }
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 8.7,
+        "p95": 10.1,
+        "max": 10.1
+      },
+      "afterUndoPaste": {
+        "median": 11.3,
+        "p95": 13.1,
+        "max": 13.1
+      },
+      "largePaste": {
+        "median": 41,
+        "p95": 41,
+        "max": 41
+      },
+      "sustained": {
+        "median": 7.8,
+        "p95": 9.5,
+        "max": 9.6
+      }
+    }
+  },
+  "5000-500-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 46.2,
+        "p95": 79.4,
+        "max": 86.7
+      },
+      "settled": {
+        "median": 51.1,
+        "p95": 86.9,
+        "max": 98.2
+      },
+      "frames": {
+        "median": 270.9,
+        "p95": 328.8,
+        "max": 476.3
+      }
+    },
+    "mountMs": 232.3,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.325349,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.102137,
+      "ScriptDuration": 2.300447,
+      "TaskDuration": 3.538078
+    },
+    "idle": {
+      "median": 42.9,
+      "p95": 200.2,
+      "max": 200.2
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 41.3,
+        "p95": 42.7,
+        "max": 42.7
+      },
+      "afterUndoPaste": {
+        "median": 44.8,
+        "p95": 48.9,
+        "max": 48.9
+      },
+      "largePaste": {
+        "median": 79.8,
+        "p95": 79.8,
+        "max": 79.8
+      },
+      "sustained": {
+        "median": 38.9,
+        "p95": 44.3,
+        "max": 45.7
+      }
+    }
+  },
+  "5000-500-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 34.8,
+        "p95": 51.1,
+        "max": 63
+      },
+      "settled": {
+        "median": 39.2,
+        "p95": 65.5,
+        "max": 82.1
+      },
+      "frames": {
+        "median": 268.2,
+        "p95": 426,
+        "max": 439.1
+      }
+    },
+    "mountMs": 200.7,
+    "boundary": {
+      "allocations": 5020,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 196000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 500,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.317284,
+      "RecalcStyleCount": 145,
+      "RecalcStyleDuration": 0.101171,
+      "ScriptDuration": 1.809914,
+      "TaskDuration": 3.014526
+    },
+    "idle": {
+      "median": 42.6,
+      "p95": 224.2,
+      "max": 224.2
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 29.6,
+        "p95": 30.5,
+        "max": 30.5
+      },
+      "afterUndoPaste": {
+        "median": 34.4,
+        "p95": 34.6,
+        "max": 34.6
+      },
+      "largePaste": {
+        "median": 70.8,
+        "p95": 70.8,
+        "max": 70.8
+      },
+      "sustained": {
+        "median": 26.9,
+        "p95": 31.4,
+        "max": 35.1
+      }
+    }
+  },
+  "before-style/1000-1000-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 262.8,
+        "p95": 372.7,
+        "max": 380.5
+      },
+      "settled": {
+        "median": 264.4,
+        "p95": 372.8,
+        "max": 380.5
+      },
+      "frames": {
+        "median": 291.9,
+        "p95": 398.1,
+        "max": 413.2
+      }
+    },
+    "mountMs": 499.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.064048,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.090209,
+      "ScriptDuration": 11.763181000000001,
+      "TaskDuration": 12.119014
+    },
+    "idle": {
+      "median": 59.2,
+      "p95": 150.8,
+      "max": 150.8
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 274.5,
+        "p95": 274.9,
+        "max": 274.9
+      },
+      "afterUndoPaste": {
+        "median": 250,
+        "p95": 266.2,
+        "max": 266.2
+      },
+      "largePaste": {
+        "median": 274.4,
+        "p95": 274.4,
+        "max": 274.4
+      },
+      "sustained": {
+        "median": 253.3,
+        "p95": 265.7,
+        "max": 266.6
+      }
+    }
+  },
+  "before-style/1000-1000-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 259.2,
+        "p95": 461.3,
+        "max": 822.7
+      },
+      "settled": {
+        "median": 259.4,
+        "p95": 474,
+        "max": 823.7
+      },
+      "frames": {
+        "median": 298.8,
+        "p95": 1599.6,
+        "max": 1630.6
+      }
+    },
+    "mountMs": 461.4,
+    "boundary": {
+      "allocations": 1020,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 36000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 1000
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.092322,
+      "RecalcStyleCount": 144,
+      "RecalcStyleDuration": 0.129176,
+      "ScriptDuration": 12.793895999999998,
+      "TaskDuration": 13.292673
+    },
+    "idle": {
+      "median": 54.3,
+      "p95": 55.5,
+      "max": 55.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 225.8,
+        "p95": 227.9,
+        "max": 227.9
+      },
+      "afterUndoPaste": {
+        "median": 220.8,
+        "p95": 222.6,
+        "max": 222.6
+      },
+      "largePaste": {
+        "median": 244.5,
+        "p95": 244.5,
+        "max": 244.5
+      },
+      "sustained": {
+        "median": 231.8,
+        "p95": 290.7,
+        "max": 380.6
+      }
+    }
+  },
+  "before-style/500-18-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 5.3,
+        "p95": 9.5,
+        "max": 11
+      },
+      "settled": {
+        "median": 6.7,
+        "p95": 9.6,
+        "max": 13.5
+      },
+      "frames": {
+        "median": 19.6,
+        "p95": 152.1,
+        "max": 203.2
+      }
+    },
+    "mountMs": 208.8,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.047717,
+      "RecalcStyleCount": 142,
+      "RecalcStyleDuration": 0.052563,
+      "ScriptDuration": 0.27314299999999997,
+      "TaskDuration": 0.51273
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 6.8,
+        "p95": 7,
+        "max": 7
+      },
+      "afterUndoPaste": {
+        "median": 6.4,
+        "p95": 6.4,
+        "max": 6.4
+      },
+      "largePaste": {
+        "median": 35.8,
+        "p95": 35.8,
+        "max": 35.8
+      },
+      "sustained": {
+        "median": 5.4,
+        "p95": 6.5,
+        "max": 7.1
+      }
+    }
+  },
+  "before-style/500-18-numeric-2": {
+    "typing": {
+      "sync": {
+        "median": 5.5,
+        "p95": 7.4,
+        "max": 10.2
+      },
+      "settled": {
+        "median": 6.8,
+        "p95": 9.5,
+        "max": 12.5
+      },
+      "frames": {
+        "median": 19.7,
+        "p95": 125.3,
+        "max": 745.3
+      }
+    },
+    "mountMs": 113.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.048613,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.053894,
+      "ScriptDuration": 0.277051,
+      "TaskDuration": 0.5144839999999999
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 224.9,
+      "max": 224.9
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 7.5,
+        "p95": 7.7,
+        "max": 7.7
+      },
+      "afterUndoPaste": {
+        "median": 6.9,
+        "p95": 7.3,
+        "max": 7.3
+      },
+      "largePaste": {
+        "median": 34.1,
+        "p95": 34.1,
+        "max": 34.1
+      },
+      "sustained": {
+        "median": 4.6,
+        "p95": 5.2,
+        "max": 5.2
+      }
+    }
+  },
+  "before-style/500-18-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 3.4,
+        "p95": 8.6,
+        "max": 11.4
+      },
+      "settled": {
+        "median": 4.8,
+        "p95": 8.7,
+        "max": 14
+      },
+      "frames": {
+        "median": 16.8,
+        "p95": 106.2,
+        "max": 166.5
+      }
+    },
+    "mountMs": 236.6,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 18
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.037095,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.041313,
+      "ScriptDuration": 0.185914,
+      "TaskDuration": 0.373048
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.6,
+      "max": 17.6
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 6.4,
+        "p95": 9.8,
+        "max": 9.8
+      },
+      "afterUndoPaste": {
+        "median": 6.6,
+        "p95": 8.8,
+        "max": 8.8
+      },
+      "largePaste": {
+        "median": 33.1,
+        "p95": 33.1,
+        "max": 33.1
+      },
+      "sustained": {
+        "median": 3.9,
+        "p95": 5.2,
+        "max": 5.5
+      }
+    }
+  },
+  "before-style/500-18-resident-2": {
+    "typing": {
+      "sync": {
+        "median": 3.5,
+        "p95": 9.1,
+        "max": 12.3
+      },
+      "settled": {
+        "median": 4.8,
+        "p95": 9.2,
+        "max": 14.7
+      },
+      "frames": {
+        "median": 16.7,
+        "p95": 108,
+        "max": 173.1
+      }
+    },
+    "mountMs": 120,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 18
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.037326,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.041694,
+      "ScriptDuration": 0.19245199999999998,
+      "TaskDuration": 0.381612
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.1,
+      "max": 17.1
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 6.3,
+        "p95": 7.9,
+        "max": 7.9
+      },
+      "afterUndoPaste": {
+        "median": 7.7,
+        "p95": 8.4,
+        "max": 8.4
+      },
+      "largePaste": {
+        "median": 46.9,
+        "p95": 46.9,
+        "max": 46.9
+      },
+      "sustained": {
+        "median": 4.3,
+        "p95": 5.2,
+        "max": 5.4
+      }
+    }
+  },
+  "before-style/500-274-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 54.3,
+        "p95": 77,
+        "max": 80.9
+      },
+      "settled": {
+        "median": 59.4,
+        "p95": 85.7,
+        "max": 87.1
+      },
+      "frames": {
+        "median": 95.4,
+        "p95": 364.7,
+        "max": 369.3
+      }
+    },
+    "mountMs": 288.6,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 61,
+      "LayoutDuration": 0.077099,
+      "RecalcStyleCount": 163,
+      "RecalcStyleDuration": 0.10511699999999999,
+      "ScriptDuration": 2.655847,
+      "TaskDuration": 3.061737
+    },
+    "idle": {
+      "median": 21.3,
+      "p95": 26.7,
+      "max": 26.7
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 33,
+        "p95": 38,
+        "max": 38
+      },
+      "afterUndoPaste": {
+        "median": 36,
+        "p95": 39.3,
+        "max": 39.3
+      },
+      "largePaste": {
+        "median": 85.2,
+        "p95": 85.2,
+        "max": 85.2
+      },
+      "sustained": {
+        "median": 35.2,
+        "p95": 49.5,
+        "max": 50.6
+      }
+    }
+  },
+  "before-style/500-274-numeric-2": {
+    "typing": {
+      "sync": {
+        "median": 36.7,
+        "p95": 55.8,
+        "max": 74.8
+      },
+      "settled": {
+        "median": 38.4,
+        "p95": 56,
+        "max": 79.9
+      },
+      "frames": {
+        "median": 50.4,
+        "p95": 96.7,
+        "max": 269.4
+      }
+    },
+    "mountMs": 148.4,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.05001,
+      "RecalcStyleCount": 141,
+      "RecalcStyleDuration": 0.068075,
+      "ScriptDuration": 1.868739,
+      "TaskDuration": 2.113714
+    },
+    "idle": {
+      "median": 21.7,
+      "p95": 90.3,
+      "max": 90.3
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 38.3,
+        "p95": 39.8,
+        "max": 39.8
+      },
+      "afterUndoPaste": {
+        "median": 35.4,
+        "p95": 38.4,
+        "max": 38.4
+      },
+      "largePaste": {
+        "median": 71.9,
+        "p95": 71.9,
+        "max": 71.9
+      },
+      "sustained": {
+        "median": 34.7,
+        "p95": 40.5,
+        "max": 40.6
+      }
+    }
+  },
+  "before-style/500-274-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 26.6,
+        "p95": 37.3,
+        "max": 37.4
+      },
+      "settled": {
+        "median": 29.8,
+        "p95": 41.4,
+        "max": 41.6
+      },
+      "frames": {
+        "median": 41.9,
+        "p95": 90.1,
+        "max": 122.7
+      }
+    },
+    "mountMs": 228.7,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274
+    },
+    "browserCosts": {
+      "LayoutCount": 61,
+      "LayoutDuration": 0.050553,
+      "RecalcStyleCount": 162,
+      "RecalcStyleDuration": 0.068423,
+      "ScriptDuration": 1.431483,
+      "TaskDuration": 1.673735
+    },
+    "idle": {
+      "median": 20.3,
+      "p95": 102.7,
+      "max": 102.7
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 25.6,
+        "p95": 30.1,
+        "max": 30.1
+      },
+      "afterUndoPaste": {
+        "median": 30.7,
+        "p95": 31,
+        "max": 31
+      },
+      "largePaste": {
+        "median": 58.9,
+        "p95": 58.9,
+        "max": 58.9
+      },
+      "sustained": {
+        "median": 22.8,
+        "p95": 26.4,
+        "max": 28.1
+      }
+    }
+  },
+  "before-style/500-274-resident-2": {
+    "typing": {
+      "sync": {
+        "median": 26.3,
+        "p95": 41.5,
+        "max": 51.6
+      },
+      "settled": {
+        "median": 27.4,
+        "p95": 46.6,
+        "max": 51.8
+      },
+      "frames": {
+        "median": 41.7,
+        "p95": 125.9,
+        "max": 210.3
+      }
+    },
+    "mountMs": 232.4,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.051146,
+      "RecalcStyleCount": 144,
+      "RecalcStyleDuration": 0.070086,
+      "ScriptDuration": 1.436709,
+      "TaskDuration": 1.691972
+    },
+    "idle": {
+      "median": 19.9,
+      "p95": 22.3,
+      "max": 22.3
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 24.9,
+        "p95": 30.1,
+        "max": 30.1
+      },
+      "afterUndoPaste": {
+        "median": 32.2,
+        "p95": 33.1,
+        "max": 33.1
+      },
+      "largePaste": {
+        "median": 58.7,
+        "p95": 58.7,
+        "max": 58.7
+      },
+      "sustained": {
+        "median": 25.5,
+        "p95": 25.9,
+        "max": 26.1
+      }
+    }
+  },
+  "before-style/5000-500-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 93.6,
+        "p95": 137,
+        "max": 149.5
+      },
+      "settled": {
+        "median": 99.9,
+        "p95": 149.7,
+        "max": 154.6
+      },
+      "frames": {
+        "median": 269.8,
+        "p95": 312.5,
+        "max": 479.2
+      }
+    },
+    "mountMs": 357.8,
+    "boundary": {
+      "allocations": 5020,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 196000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 500
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.334844,
+      "RecalcStyleCount": 143,
+      "RecalcStyleDuration": 0.104345,
+      "ScriptDuration": 4.241187,
+      "TaskDuration": 5.4892650000000005
+    },
+    "idle": {
+      "median": 40.3,
+      "p95": 129.9,
+      "max": 129.9
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 91.1,
+        "p95": 136.5,
+        "max": 136.5
+      },
+      "afterUndoPaste": {
+        "median": 120.6,
+        "p95": 126.2,
+        "max": 126.2
+      },
+      "largePaste": {
+        "median": 125.7,
+        "p95": 125.7,
+        "max": 125.7
+      },
+      "sustained": {
+        "median": 111.3,
+        "p95": 140.6,
+        "max": 146.7
+      }
+    }
+  },
+  "combined-probes/1000-1000-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 55.3,
+        "p95": 83,
+        "max": 90.1
+      },
+      "settled": {
+        "median": 58.3,
+        "p95": 83.3,
+        "max": 96
+      },
+      "frames": {
+        "median": 179.7,
+        "p95": 245.5,
+        "max": 448.3
+      }
+    },
+    "mountMs": 277.1,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.087502,
+      "RecalcStyleCount": 220,
+      "RecalcStyleDuration": 0.196305,
+      "ScriptDuration": 3.2172400000000003,
+      "TaskDuration": 4.013015
+    },
+    "idle": {
+      "median": 108.2,
+      "p95": 249.9,
+      "max": 249.9
+    },
+    "trace": {
+      "Layout": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 43.75,
+        "count": 40,
+        "ms": 120.49,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "UpdateLayoutTree": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 37.81,
+        "count": 80,
+        "ms": 81.21,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "PrePaint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 39,
+        "ms": 33.67,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "Paint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 156,
+        "ms": 110.37,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MinorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 50,
+        "ms": 46.41,
+        "synchronous": 27,
+        "synchronousMs": 24.48
+      },
+      "MajorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 6,
+        "ms": 22.03,
+        "synchronous": 1,
+        "synchronousMs": 3.91
+      },
+      "FireAnimationFrame": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 78,
+        "ms": 3218.01,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RunMicrotasks": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RasterTask": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      }
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 46.5,
+        "p95": 48.4,
+        "max": 48.4
+      },
+      "afterUndoPaste": {
+        "median": 57.4,
+        "p95": 70.4,
+        "max": 70.4
+      },
+      "largePaste": {
+        "median": 69.2,
+        "p95": 69.2,
+        "max": 69.2
+      },
+      "sustained": {
+        "median": 47.7,
+        "p95": 49.9,
+        "max": 52.6
+      }
+    }
+  },
+  "combined-probes/500-0-200-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 4.8,
+        "p95": 10,
+        "max": 10.5
+      },
+      "settled": {
+        "median": 6.3,
+        "p95": 12.8,
+        "max": 14.4
+      },
+      "frames": {
+        "median": 16.7,
+        "p95": 96,
+        "max": 165.8
+      }
+    },
+    "mountMs": 265.6,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 40,
+      "LayoutDuration": 0.042911,
+      "RecalcStyleCount": 100,
+      "RecalcStyleDuration": 0.071091,
+      "ScriptDuration": 0.234198,
+      "TaskDuration": 0.504876
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "trace": {
+      "Layout": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 20.93,
+        "count": 40,
+        "ms": 72.03,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "UpdateLayoutTree": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 32.77,
+        "count": 40,
+        "ms": 42,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "PrePaint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 39,
+        "ms": 17.74,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "Paint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 78,
+        "ms": 45.94,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MinorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 13,
+        "ms": 6.45,
+        "synchronous": 9,
+        "synchronousMs": 4.97
+      },
+      "MajorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 1,
+        "ms": 10.26,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "FireAnimationFrame": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 79,
+        "ms": 281.93,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RunMicrotasks": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RasterTask": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      }
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 7.1,
+        "p95": 7.1,
+        "max": 7.1
+      },
+      "afterUndoPaste": {
+        "median": 7.2,
+        "p95": 8.4,
+        "max": 8.4
+      },
+      "largePaste": {
+        "median": 37.4,
+        "p95": 37.4,
+        "max": 37.4
+      },
+      "sustained": {
+        "median": 4.5,
+        "p95": 5.4,
+        "max": 5.4
+      }
+    }
+  },
+  "combined-probes/500-0-200-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 4.1,
+        "p95": 8.3,
+        "max": 11.2
+      },
+      "settled": {
+        "median": 5.8,
+        "p95": 8.4,
+        "max": 14.1
+      },
+      "frames": {
+        "median": 16.7,
+        "p95": 77.5,
+        "max": 93.5
+      }
+    },
+    "mountMs": 1023.9,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 40,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 40,
+      "LayoutDuration": 0.03075,
+      "RecalcStyleCount": 100,
+      "RecalcStyleDuration": 0.050347,
+      "ScriptDuration": 0.193991,
+      "TaskDuration": 0.386957
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 16.9,
+      "max": 16.9
+    },
+    "trace": {
+      "Layout": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 15.53,
+        "count": 40,
+        "ms": 50.9,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "UpdateLayoutTree": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 23.28,
+        "count": 40,
+        "ms": 29.89,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "PrePaint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 39,
+        "ms": 11.88,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "Paint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 78,
+        "ms": 33.54,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MinorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 15,
+        "ms": 6.21,
+        "synchronous": 10,
+        "synchronousMs": 4.47
+      },
+      "MajorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 1,
+        "ms": 2.23,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "FireAnimationFrame": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 79,
+        "ms": 225.06,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RunMicrotasks": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RasterTask": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      }
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 7.3,
+        "p95": 10.3,
+        "max": 10.3
+      },
+      "afterUndoPaste": {
+        "median": 9.7,
+        "p95": 9.7,
+        "max": 9.7
+      },
+      "largePaste": {
+        "median": 40.4,
+        "p95": 40.4,
+        "max": 40.4
+      },
+      "sustained": {
+        "median": 5.6,
+        "p95": 7.1,
+        "max": 7.2
+      }
+    }
+  },
+  "combined-probes/500-274-numeric-headed": {
+    "typing": {
+      "sync": {
+        "median": 17.9,
+        "p95": 28.1,
+        "max": 36.6
+      },
+      "settled": {
+        "median": 19.4,
+        "p95": 28.4,
+        "max": 40.7
+      },
+      "frames": {
+        "median": 401.4,
+        "p95": 529,
+        "max": 1003.8
+      }
+    },
+    "mountMs": 239.6,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.053184,
+      "RecalcStyleCount": 174,
+      "RecalcStyleDuration": 0.08268,
+      "ScriptDuration": 1.034055,
+      "TaskDuration": 1.425128
+    },
+    "idle": {
+      "median": 59.1,
+      "p95": 809.1,
+      "max": 809.1
+    },
+    "trace": {
+      "Layout": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 26.48,
+        "count": 40,
+        "ms": 76.53,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "UpdateLayoutTree": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 27.23,
+        "count": 81,
+        "ms": 45.9,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "PrePaint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 39,
+        "ms": 18.2,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "Paint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 156,
+        "ms": 54.37,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MinorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 39,
+        "ms": 27.78,
+        "synchronous": 37,
+        "synchronousMs": 27.02
+      },
+      "MajorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 5,
+        "ms": 14.72,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "FireAnimationFrame": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 79,
+        "ms": 1068.04,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RunMicrotasks": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RasterTask": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      }
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 17.4,
+        "p95": 19.9,
+        "max": 19.9
+      },
+      "afterUndoPaste": {
+        "median": 17.4,
+        "p95": 18.1,
+        "max": 18.1
+      },
+      "largePaste": {
+        "median": 45.8,
+        "p95": 45.8,
+        "max": 45.8
+      },
+      "sustained": {
+        "median": 14.9,
+        "p95": 17.2,
+        "max": 17.6
+      }
+    }
+  },
+  "combined-probes/500-274-resident-headed": {
+    "typing": {
+      "sync": {
+        "median": 8.8,
+        "p95": 16.7,
+        "max": 36.7
+      },
+      "settled": {
+        "median": 10.5,
+        "p95": 17.4,
+        "max": 48.1
+      },
+      "frames": {
+        "median": 81.8,
+        "p95": 243.6,
+        "max": 248.3
+      }
+    },
+    "mountMs": 372.9,
+    "boundary": {
+      "allocations": 520,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 16000,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.062964,
+      "RecalcStyleCount": 148,
+      "RecalcStyleDuration": 0.086552,
+      "ScriptDuration": 0.747514,
+      "TaskDuration": 1.126765
+    },
+    "idle": {
+      "median": 57.1,
+      "p95": 427.8,
+      "max": 427.8
+    },
+    "trace": {
+      "Layout": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 32.31,
+        "count": 40,
+        "ms": 89.75,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "UpdateLayoutTree": {
+        "queuedBeforeSettled": 20,
+        "queuedMs": 32.41,
+        "count": 80,
+        "ms": 54.63,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "PrePaint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 79,
+        "ms": 22.4,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "Paint": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 156,
+        "ms": 58.31,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "MinorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 30,
+        "ms": 24.16,
+        "synchronous": 12,
+        "synchronousMs": 9.48
+      },
+      "MajorGC": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 1,
+        "ms": 3.3,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "FireAnimationFrame": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 78,
+        "ms": 777.72,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RunMicrotasks": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      },
+      "RasterTask": {
+        "queuedBeforeSettled": 0,
+        "queuedMs": 0,
+        "count": 0,
+        "ms": 0,
+        "synchronous": 0,
+        "synchronousMs": 0
+      }
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 10.4,
+        "p95": 11.3,
+        "max": 11.3
+      },
+      "afterUndoPaste": {
+        "median": 13,
+        "p95": 14.8,
+        "max": 14.8
+      },
+      "largePaste": {
+        "median": 48,
+        "p95": 48,
+        "max": 48
+      },
+      "sustained": {
+        "median": 6.5,
+        "p95": 7.2,
+        "max": 9.3
+      }
+    }
+  },
+  "letter-dense-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 12.8,
+        "p95": 18.1,
+        "max": 20.9
+      },
+      "settled": {
+        "median": 14.3,
+        "p95": 21,
+        "max": 21.1
+      },
+      "frames": {
+        "median": 21.2,
+        "p95": 103,
+        "max": 109.6
+      }
+    },
+    "mountMs": 149.4,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.052967,
+      "RecalcStyleCount": 101,
+      "RecalcStyleDuration": 0.047259,
+      "ScriptDuration": 0.613838,
+      "TaskDuration": 0.8314320000000001
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.2,
+      "max": 17.2
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 13.1,
+        "p95": 15.9,
+        "max": 15.9
+      },
+      "afterUndoPaste": {
+        "median": 13.5,
+        "p95": 13.9,
+        "max": 13.9
+      },
+      "largePaste": {
+        "median": 41.3,
+        "p95": 41.3,
+        "max": 41.3
+      },
+      "sustained": {
+        "median": 16.9,
+        "p95": 20.8,
+        "max": 20.9
+      }
+    }
+  },
+  "letter-dense-numeric-2": {
+    "typing": {
+      "sync": {
+        "median": 9.9,
+        "p95": 14.5,
+        "max": 17.5
+      },
+      "settled": {
+        "median": 11.2,
+        "p95": 15.3,
+        "max": 20.5
+      },
+      "frames": {
+        "median": 16.6,
+        "p95": 100.5,
+        "max": 182.7
+      }
+    },
+    "mountMs": 117.7,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.040524,
+      "RecalcStyleCount": 101,
+      "RecalcStyleDuration": 0.035753,
+      "ScriptDuration": 0.467235,
+      "TaskDuration": 0.630679
+    },
+    "idle": {
+      "median": 16.6,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 14.5,
+        "p95": 14.7,
+        "max": 14.7
+      },
+      "afterUndoPaste": {
+        "median": 13.1,
+        "p95": 14.4,
+        "max": 14.4
+      },
+      "largePaste": {
+        "median": 35.6,
+        "p95": 35.6,
+        "max": 35.6
+      },
+      "sustained": {
+        "median": 17.1,
+        "p95": 21.3,
+        "max": 21.5
+      }
+    }
+  },
+  "letter-dense-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 5.2,
+        "p95": 8.9,
+        "max": 17
+      },
+      "settled": {
+        "median": 6.7,
+        "p95": 9.2,
+        "max": 20.6
+      },
+      "frames": {
+        "median": 16.5,
+        "p95": 131.5,
+        "max": 144.2
+      }
+    },
+    "mountMs": 239.2,
+    "boundary": {
+      "allocations": 519,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 15960,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.053229,
+      "RecalcStyleCount": 101,
+      "RecalcStyleDuration": 0.048147,
+      "ScriptDuration": 0.296468,
+      "TaskDuration": 0.514525
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.5,
+      "max": 17.5
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 7.1,
+        "p95": 7.4,
+        "max": 7.4
+      },
+      "afterUndoPaste": {
+        "median": 9.5,
+        "p95": 9.6,
+        "max": 9.6
+      },
+      "largePaste": {
+        "median": 36.6,
+        "p95": 36.6,
+        "max": 36.6
+      },
+      "sustained": {
+        "median": 4.1,
+        "p95": 4.7,
+        "max": 6.2
+      }
+    }
+  },
+  "letter-dense-resident-2": {
+    "typing": {
+      "sync": {
+        "median": 3.9,
+        "p95": 6.1,
+        "max": 12.4
+      },
+      "settled": {
+        "median": 5.3,
+        "p95": 6.7,
+        "max": 15.6
+      },
+      "frames": {
+        "median": 16.7,
+        "p95": 74.2,
+        "max": 103.8
+      }
+    },
+    "mountMs": 120.5,
+    "boundary": {
+      "allocations": 519,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 15960,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 274
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.044114,
+      "RecalcStyleCount": 101,
+      "RecalcStyleDuration": 0.035724,
+      "ScriptDuration": 0.21813,
+      "TaskDuration": 0.39382
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.6,
+      "max": 17.6
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 6.9,
+        "p95": 6.9,
+        "max": 6.9
+      },
+      "afterUndoPaste": {
+        "median": 8.7,
+        "p95": 9,
+        "max": 9
+      },
+      "largePaste": {
+        "median": 34.4,
+        "p95": 34.4,
+        "max": 34.4
+      },
+      "sustained": {
+        "median": 6,
+        "p95": 7.8,
+        "max": 7.8
+      }
+    }
+  },
+  "letter-native-numeric-1": {
+    "typing": {
+      "sync": {
+        "median": 6.8,
+        "p95": 9.3,
+        "max": 13.5
+      },
+      "settled": {
+        "median": 8.3,
+        "p95": 12.3,
+        "max": 16
+      },
+      "frames": {
+        "median": 17.2,
+        "p95": 105.2,
+        "max": 167.1
+      }
+    },
+    "mountMs": 124.9,
+    "boundary": {
+      "allocations": 0,
+      "hydrations": 0,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 0,
+      "suffixWrites": 0,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 0,
+      "annotationViews": 0,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.057108,
+      "RecalcStyleCount": 101,
+      "RecalcStyleDuration": 0.051207,
+      "ScriptDuration": 0.351412,
+      "TaskDuration": 0.582758
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.2,
+      "max": 17.2
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 7.4,
+        "p95": 9.1,
+        "max": 9.1
+      },
+      "afterUndoPaste": {
+        "median": 9,
+        "p95": 9.6,
+        "max": 9.6
+      },
+      "largePaste": {
+        "median": 30.3,
+        "p95": 30.3,
+        "max": 30.3
+      },
+      "sustained": {
+        "median": 6.3,
+        "p95": 7.7,
+        "max": 8.4
+      }
+    }
+  },
+  "letter-native-resident-1": {
+    "typing": {
+      "sync": {
+        "median": 4,
+        "p95": 6,
+        "max": 10.1
+      },
+      "settled": {
+        "median": 5.4,
+        "p95": 6.2,
+        "max": 12.5
+      },
+      "frames": {
+        "median": 16.6,
+        "p95": 75.3,
+        "max": 105
+      }
+    },
+    "mountMs": 121.7,
+    "boundary": {
+      "allocations": 519,
+      "hydrations": 1,
+      "rebinds": 0,
+      "evictions": 0,
+      "splices": 40,
+      "suffixWrites": 15960,
+      "endpointVisits": 0,
+      "retargets": 0,
+      "removedRanges": 0,
+      "survivorListReads": 0,
+      "numericExports": 0,
+      "numericRanges": 0,
+      "records": 80,
+      "annotationViews": 18,
+      "entityInventoryReads": 0,
+      "mentionSurfaceChecks": 0
+    },
+    "browserCosts": {
+      "LayoutCount": 41,
+      "LayoutDuration": 0.0409,
+      "RecalcStyleCount": 101,
+      "RecalcStyleDuration": 0.037225,
+      "ScriptDuration": 0.219747,
+      "TaskDuration": 0.38564099999999996
+    },
+    "idle": {
+      "median": 16.7,
+      "p95": 17.1,
+      "max": 17.1
+    },
+    "bulk": {
+      "warmPaste": {
+        "median": 6.4,
+        "p95": 7.7,
+        "max": 7.7
+      },
+      "afterUndoPaste": {
+        "median": 6.9,
+        "p95": 7,
+        "max": 7
+      },
+      "largePaste": {
+        "median": 31,
+        "p95": 31,
+        "max": 31
+      },
+      "sustained": {
+        "median": 5.4,
+        "p95": 6.3,
+        "max": 7.1
+      }
+    }
+  }
+}

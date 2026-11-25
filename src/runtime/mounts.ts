@@ -28,6 +28,7 @@ export interface MountHandle {
   captureInlineSelection?(): { anchor: number; head: number } | undefined;
   restoreInlineSelection?(selection: { anchor: number; head: number }): void;
   inlinePoint?(node: Node, offset: number): number | undefined;
+  adjacentGrapheme?(index:number,direction:-1|1):number|undefined;
   inlineBoundary?(index: number): { node: Node; offset: number };
   /** Alternate native presentations expose their shared cached geometry. */
   inlineRangeRects?(start:number,end:number):DOMRectReadOnly[];

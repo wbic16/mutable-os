@@ -21,7 +21,7 @@ function attachCss(proof,layout='inline'){
 export async function attach(proof,selectedMode){
  mode=selectedMode;report.mode=mode;originalWorker=window.Worker;if(mode==='baseline')return;instrumentWorkers();
  const start=performance.now();lib=await import('/__initialis/lib/initialis.js');report.moduleLoadMs=performance.now()-start;
- target=[...proof.flow.querySelectorAll('[data-inline-key]')].find(c=>/^[A-Z]$/.test(c.textContent));cellKey=target.dataset.inlineKey;sourceIndex=Number(target.dataset.inlineIndex);
+ target=[...proof.flow.querySelectorAll('[data-inline-key]')].find(c=>/^[A-Z]$/.test(c.textContent));cellKey=target.dataset.inlineKey;sourceIndex=proof.mount.inlinePoint(target.firstChild,0);
  const property={id:'experimental-character-renderer',type:'experimental/character-renderer',start:sourceIndex,end:sourceIndex,metadata:{renderer:'initialis',rendererVersion:'6cf93f7d3d2922efdbeb86cafa27f39758be9398',settings:{...base,text:undefined},layout:{mode:'inline'}}};
  const e=proof.editor,node=e.node(proof.text.key);e.commands.setPayloadField(node.key,'standoffProperties',JSON.parse(JSON.stringify([...(node.payload.standoffProperties??[]),property])));
  const rev=e.repository.state.revision;

@@ -40,7 +40,7 @@ export function registerFocusFade(registry: VisualEffectRegistry) {
           }
           let css = '';
           if (region && region.kind !== 'geometry') {
-            const outside = region.kind === 'text' ? `, ${base}[data-caret-focus="${id}"] > [data-inline-index]:not(:nth-child(n+${region.start + 1}):nth-child(-n+${region.end}))` : '';
+            const outside = region.kind === 'text' ? `, ${base}[data-caret-focus="${id}"] > :is([data-inline-key],[data-provisional-cell],[data-inline-index]):not(:nth-child(n+${region.start + 1}):nth-child(-n+${region.end}))` : '';
             css = `${unfocused}${outside} { opacity: ${params.opacity}; }`;
           }
           if (style.textContent !== css) style.textContent = css;

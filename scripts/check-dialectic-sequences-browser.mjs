@@ -96,7 +96,7 @@ try{
  const play=await evaluate(`(()=>{const f=${frame};f.scrollIntoView({block:'nearest'});const a=f.getBoundingClientRect(),b=f.contentDocument.querySelector('button').getBoundingClientRect();return {x:a.x+b.x+b.width/2,y:a.y+b.y+b.height/2};})()`);
  for(const type of ['mousePressed','mouseReleased'])await send('Input.dispatchMouseEvent',{type,button:'left',clickCount:1,...play},sessionId);
  await wait(`${frame}.contentDocument.querySelector('video').currentTime>0`);report.interactions.mediaPlayback='HTMLMediaElement in isolated native iframe; external provider not exercised';
- await evaluate(`window.open=(...args)=>{proof.openedLink=args;return null;}`);await click(`${panels}[0].querySelector('[data-block-id=native-link] [data-inline-index]')`);assert.equal(await evaluate('proof.openedLink?.[0]'),'https://example.test/reference');report.interactions.links=true;
+ await evaluate(`window.open=(...args)=>{proof.openedLink=args;return null;}`);await click(`${panels}[0].querySelector('[data-block-id=native-link] [data-inline-key]')`);assert.equal(await evaluate('proof.openedLink?.[0]'),'https://example.test/reference');report.interactions.links=true;
  await send('Browser.grantPermissions',{origin:`http://127.0.0.1:${server.httpServer.address().port}`,permissions:['clipboardReadWrite','clipboardSanitizedWrite']});
  const word=await evaluate(`(()=>{const e=${panels}[0].querySelector('.reactive-standoff-flow');e.scrollIntoView({block:'nearest'});const r=e.firstElementChild.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
  for(const type of ['mousePressed','mouseReleased'])await send('Input.dispatchMouseEvent',{type,button:'left',clickCount:2,...word},sessionId);

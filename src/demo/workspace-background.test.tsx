@@ -15,7 +15,7 @@ it("keeps the document, caret and file actions across background changes and doc
   const flow = host.querySelector<HTMLElement>('[contenteditable="true"]')!;
   const original = flow.textContent;
   flow.focus();
-  const range = document.createRange(); range.selectNodeContents(flow.querySelector('[data-inline-index="2"]')!); const selection = document.getSelection()!; selection.removeAllRanges(); selection.addRange(range);
+  const range = document.createRange(); range.selectNodeContents(flow.querySelector('[data-inline-key]:nth-child(3)')!); const selection = document.getSelection()!; selection.removeAllRanges(); selection.addRange(range);
   const selectionText = selection.toString();
   click("Background…"); await tick(); click("Background", ".reactive-block-menu button"); click("Image", ".reactive-block-menu button"); click("Desktop", ".reactive-block-menu button"); await tick();
   expect(host.querySelector("[contenteditable=true]")).toBe(flow); expect(flow.textContent).toBe(original); expect(document.activeElement).toBe(flow); expect(selection.toString()).toBe(selectionText);

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "containment", "title": "The comfort of hierarchy", "start": 0, "duration": 6,
+    "heading": "Beyond the Hierarchy",
+    "objective": "Recognize a phrase inside a line inside a stanza.",
+    "action": "Three labelled enclosures settle around the poem, the first line and its opening phrase.",
+    "captions": [{"at": 1.3, "text": "Some structures fit neatly inside others."}],
+    "narration": [{"at": 0.25, "text": "The moon rose slowly above the sleeping sea. Two lines make a stanza."}]
+  },
+  {
+    "id": "two-readings", "title": "Another way of reading", "start": 6, "duration": 9,
+    "heading": "Reading the poem",
+    "objective": "Find where a poetic line ends and a predicate continues.",
+    "action": "Mark the two poetic lines. Show the subject, the continuing predicate and its prepositional phrase. Bring the line marks back.",
+    "captions": [{"at": 0.3, "text": "A poet counts two lines."}, {"at": 3.0, "text": "What the moon did spans both lines."}, {"at": 6.1, "text": "A text can have more than one structure."}],
+    "narration": [{"at": 0.25, "text": "The first line ends on “slowly.”"}, {"at": 3.15, "text": "The predicate starts with “rose” and continues across the line break."}]
+  },
+  {
+    "id": "crossed-boundaries", "title": "The collision", "start": 15, "duration": 7,
+    "heading": "Where the boundaries fall",
+    "objective": "Trace why the line and predicate cannot each be one whole element in the same nested tree.",
+    "action": "Open the poem into a single sequence. Fit enclosures to the line and predicate. Trace their four boundaries in reading order.",
+    "captions": [{"at": 0.2, "text": "What happens when their boundaries cross?"}, {"at": 3.6, "text": ["A single hierarchy cannot", "contain both intact."]}],
+    "narration": [{"at": 0.38, "text": "The line opens first. The predicate begins inside it, but ends outside it."}]
+  },
+  {
+    "id": "independent-tracks", "title": "Liberation from the tree", "start": 22, "duration": 8,
+    "heading": "From containers to tracks",
+    "objective": "Follow the same four endpoints as the enclosures flatten into independent tracks.",
+    "action": "Fold the upper edges onto the lower edges. Lower the strokes onto separate tracks while endpoint guides remain attached to the first and last character Cells.",
+    "captions": [{"at": 0.2, "text": ["Remove the requirement", "for containment."]}, {"at": 4.1, "text": "Annotations become independent."}],
+    "narration": [{"at": 0.35, "text": "Keep the boundary characters in view. Each enclosure folds into its own track, and both ranges stay whole."}]
+  },
+  {
+    "id": "arrangements", "title": "Freedom of arrangement", "start": 30, "duration": 11,
+    "heading": "Two independent ranges",
+    "objective": "Distinguish disjoint, nested, coincident and crossing ranges.",
+    "action": "Glide the same pair of tracks between four arrangements. Name each once its endpoints settle.",
+    "captions": [{"at": 0.8, "text": "Disjoint."}, {"at": 3.05, "text": "Nested."}, {"at": 5.3, "text": "Coincident."}, {"at": 7.55, "text": "Crossing."}, {"at": 9.05, "text": "Every arrangement is equally natural."}],
+    "narration": [{"at": 0.7, "text": "Disjoint ranges stand apart."}, {"at": 2.94, "text": "One range can nest inside another."}, {"at": 5.26, "text": "Coincident ranges match exactly."}, {"at": 7.62, "text": "Crossing ranges overlap at one end."}]
+  },
+  {
+    "id": "ontologies", "title": "Beyond a single ontology", "start": 41, "duration": 11,
+    "heading": "Systems of description",
+    "objective": "See different kinds of concepts and relationships at work on the same passage.",
+    "action": "Return to verse. Add line divisions, grammatical roles and a rhetorical figure one system at a time. Match each mark to its example below the poem.",
+    "captions": [{"at": 0.2, "text": "Annotations need not share a hierarchy."}, {"at": 4.5, "text": "Nor need they share an ontology."}, {"at": 7.0, "text": ["An ontology defines a system", "of concepts and relationships."]}],
+    "narration": [{"at": 0.28, "text": "Poetics marks the lines. Grammar pairs a subject with its predicate. Rhetoric reads a sleeping sea as personification. Each system brings its own concepts."}]
+  },
+  {
+    "id": "new-ontology", "title": "The arrival of a new ontology", "start": 52, "duration": 6,
+    "heading": "A new way in",
+    "objective": "Watch a literary system arrive independently of the three established systems.",
+    "action": "Keep the poem and its three rows fixed. Add a diamond-ended literary range and a fourth row relating imagery to atmosphere.",
+    "captions": [{"at": 0.2, "text": ["New ontologies can be", "introduced independently."]}, {"at": 3.35, "text": "Nothing else needs to be dismantled."}],
+    "narration": [{"at": 0.35, "text": "A literary reading adds atmosphere. The other three systems stay in place."}]
+  },
+  {
+    "id": "interpretations", "title": "Beyond a single interpretation", "start": 58, "duration": 7,
+    "heading": "Two readings of one image",
+    "objective": "Recognize two attributed readings with identical textual boundaries.",
+    "action": "Isolate the sleeping sea in the verse. Two equal tracks span the same phrase and lead to separately attributed readings.",
+    "captions": [{"at": 0.25, "text": ["Annotations need not share", "an interpretation."]}, {"at": 2.85, "text": "Different readings can coexist."}, {"at": 4.95, "text": "Agreement is a separate question."}],
+    "narration": [{"at": 0.32, "text": "One reader hears tranquillity. Another senses power waiting to wake. Both point to the same words."}]
+  },
+  {
+    "id": "synthesis", "title": "Synthesis", "start": 65, "duration": 4,
+    "heading": "One shared passage",
+    "objective": "See hierarchy, independent systems and open interpretations together.",
+    "action": "Restore the whole poem and all four systems. The literary entry carries both readings side by side.",
+    "captions": [{"at": 0.25, "text": ["Hierarchy is a possibility,", "not a constraint."]}],
+    "narration": [{"at": 0.28, "text": "The stanza and both readings can stand together."}]
+  },
+  {
+    "id": "closing", "title": "Many ways of knowing", "start": 69, "duration": 6,
+    "heading": "",
+    "objective": "Recall the progression from one text to many systems of knowledge.",
+    "action": "Reveal the closing lines in sequence on the engraved series card. Pause before the final line and hold the series identifier.",
+    "captions": [{"at": 0.15, "text": "One text."}, {"at": 0.95, "text": "Many structures."}, {"at": 1.85, "text": "Many ontologies."}, {"at": 3.45, "text": "Many ways of knowing."}, {"at": 4.65, "text": "MUTABLE · CONCEPT 003"}],
+    "narration": [{"at": 0.12, "text": "One text. Many structures. Many ontologies."}, {"at": 3.5, "text": "Many ways of knowing."}]
+  }
+]

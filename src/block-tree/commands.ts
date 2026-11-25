@@ -932,9 +932,11 @@ export class TreeCommands {
   ): void {
     const state = this.current(true);
     const placement = this.placementKey(key, state);
-    this.publish(label, this.inlineReplacementOperations(state, placement, start, end, text), {
-      commandId: "tree.replaceInlineRange", subjects: [this.subject(state, placement)],
-    });
+    const command = {commandId: "tree.replaceInlineRange", subjects: [this.subject(state, placement)]};
+    if (!this.pending && this.repository.commitResidentText(
+      state.placements[placement].contentKey, start, end, text, label, {commands: [command]},
+    )) return;
+    this.publish(label, this.inlineReplacementOperations(state, placement, start, end, text), command);
   }
 
   /** Shared native text planner; composed edits retain the same annotation mapping. */

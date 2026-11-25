@@ -16,6 +16,7 @@ export class AnnotationIdentities {
     this.unsubscribe=repository.subscribeChanges(change=>{
       for(const [content,before] of change.previousContents){
         const entry=this.entries.get(content);if(!entry)continue;
+        if (change.residentPayload && !change.annotationOrigins?.has(content)) continue;
         const previous=properties(before?.payload.standoffProperties);
         const next=properties(repository.readState().contents[content]?.payload.standoffProperties);
         const oldCounts=counts(previous),newCounts=counts(next),oldKeys=entry.keys();

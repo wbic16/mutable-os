@@ -5,6 +5,7 @@ export const ink = {
   entity: '#83CFC0',
   grammar: '#DFB575',
   narrative: '#C1A0E5',
+  invalid: '#E6A18E',
   rule: '#526064',
 };
 

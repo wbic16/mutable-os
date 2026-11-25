@@ -79,7 +79,7 @@ it.each([true, false])('guards both deletion boundaries and empty mode-bearing B
 it('keeps mode through the existing composition reconciliation and commits only at composition end', () => {
   const f = setup([text('p')]), saved = f.save(), flow = f.select('p', 0), mount = f.editor.mounts.get(f.node('p').key)!;
   flow.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true })); expect(mount.composing).toBe(true);
-  flow.querySelector('[data-inline-index="0"]')!.firstChild!.textContent = '漢';
+  flow.querySelector('[data-inline-key]:nth-child(1)')!.firstChild!.textContent = '漢';
   flow.dispatchEvent(new InputEvent('input', { bubbles: true, isComposing: true, inputType: 'insertCompositionText', data: '漢' }));
   expect(f.save()).toBe(saved); expect(f.editor.repository.canUndo()).toBe(false);
   flow.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: '漢' }));

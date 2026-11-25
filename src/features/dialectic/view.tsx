@@ -1,3 +1,4 @@
+import { characterIndex } from '../../rendering/character-address';
 import {SemanticRefreshControl} from './semantic-refresh-view';
 import {ConversationWorkspaceTabs,ConversationWorkspacePanels} from './workspace-view';
 import {AttachFiles,AttachmentCards,AttachmentStatus} from './attachments-view';
@@ -46,9 +47,10 @@ function Chrome(props:{c:DialecticController;children:JSX.Element;actions?:JSX.E
   const shortcut=(e:KeyboardEvent)=>{if(!root.contains(e.target as Node)||e.isComposing||e.altKey||e.shiftKey||!(e.metaKey||e.ctrlKey)||e.key.toLowerCase()!=='s'||(e.target as Element)?.closest('[role="dialog"]'))return;e.preventDefault();e.stopPropagation();void save();};
   const entityClick=(event:MouseEvent)=>{
    if(event.button!==0||event.metaKey||event.ctrlKey||event.altKey||event.shiftKey||window.getSelection()?.isCollapsed===false)return;
-   const cell=(event.target as Element)?.closest<HTMLElement>('.dialectic-entity-mention[data-inline-index]');
+   const cell=(event.target as Element)?.closest<HTMLElement>('.dialectic-entity-mention');
    const block=cell?.closest<HTMLElement>('[data-runtime-key]');
-   if(cell&&block&&root.contains(cell)&&c.inspectEntityMention(block.dataset.runtimeKey!,Number(cell.dataset.inlineIndex))){if(workspace){const tab=c.workspaceConfiguration().tabs.find(t=>t.type==='semantics');if(tab)c.setWorkspaceSelection(tab.id);}event.preventDefault();event.stopPropagation();}
+   const index=characterIndex(cell);
+   if(cell&&block&&index!==undefined&&root.contains(cell)&&c.inspectEntityMention(block.dataset.runtimeKey!,index)){if(workspace){const tab=c.workspaceConfiguration().tabs.find(t=>t.type==='semantics');if(tab)c.setWorkspaceSelection(tab.id);}event.preventDefault();event.stopPropagation();}
   };
   const smallerImage=(event:Event)=>{const request=(event as CustomEvent<SmallerImageRequest>).detail;event.stopPropagation();request.accept(c.smallerImage(request.nodeKey,request.originalUrl,request.signal,request.reason));};
   root.addEventListener(smallerImageEvent,smallerImage);onCleanup(()=>root.removeEventListener(smallerImageEvent,smallerImage));

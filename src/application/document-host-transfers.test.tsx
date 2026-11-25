@@ -84,14 +84,14 @@ describe('E1.2 controlled Document host transfer', () => {
     const surface = document.querySelector<HTMLInputElement>(`[aria-label="Session tool ${f.node.key}"]`)!;
     const portal = surface.closest<HTMLElement>('[data-mwm-surface]')!, surfaceRecord = f.session.windowManager!.registry.surfaces[portal.dataset.mwmSurface!];
     surface.value = 'View-local state';
-    const projection = s.projection, cells = [...f.mount.root.querySelectorAll('[data-inline-index]')];
+    const projection = s.projection, cells = [...f.mount.root.querySelectorAll('[data-inline-key]')];
     const subscribe = vi.spyOn(f.editor.repository, 'subscribeChanges'), create = vi.spyOn(f.editor, 'createView');
     const revision = f.editor.repository.state.revision, native = nativeDocumentSession(f.editor), ticket = s.host.ticket();
     f.mount.focus(); f.mount.restoreInlineSelection!({ anchor: 7, head: 3 });
     await f.transfer.transfer(s, f.destination);
     expect(ticket()).toBe(false); expect(f.transfer.owns(s, f.destination)).toBe(true);
     expect(s.projection).toBe(projection); expect(f.editor.mounts.get(f.node.key)).toBe(f.mount);
-    expect([...f.mount.root.querySelectorAll('[data-inline-index]')]).toEqual(cells);
+    expect([...f.mount.root.querySelectorAll('[data-inline-key]')]).toEqual(cells);
     expect(owner.host!.windowId).toBe(f.destination.port.windowId);
     expect(f.editor.windowManager!.ownerForNode(f.node.key)).toBe(f.destination.port.windowId);
     expect(surface.closest('[data-mwm-window]')).toBe(f.session.windowManager!.groups.get(f.destination.port.windowId));

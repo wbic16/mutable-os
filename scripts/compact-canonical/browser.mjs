@@ -47,7 +47,7 @@ try{
  record('Existing ProvisionalCells commit reaches canonical authority immediately',await evaluate(`poc.model.get('b').inline[0].text.startsWith('Sdraft')`));
  record('Existing geometry cache reuses the same occurrence/revision',await evaluate(`(()=>{const e=poc.editor,m=e.measurements,h=e.mounts.get(poc.third),r=h.root.getBoundingClientRect(),v=poc.model.version('b');m.retainedRangeRects(poc.third,0,2,v,r,1,123);m.retainedRangeRects(poc.third,0,2,v,r,1,123);return m.rangeDiagnostics.reads===1&&m.rangeDiagnostics.hits===1})()`));
  await evaluate(`poc.model.annotations('a',[...poc.model.get('a').properties.standoffProperties,{type:'text/background-colour',value:'#00ff00',start:8,end:10}])`);
- record('Annotation editing updates both live occurrences',await evaluate(`[...poc.editor.occurrences.values()].filter(o=>o.id==='a').every(o=>getComputedStyle(o.flow.querySelector('[data-inline-index="9"]')).backgroundColor==='rgb(0, 255, 0)')`));
+ record('Annotation editing updates both live occurrences',await evaluate(`[...poc.editor.occurrences.values()].filter(o=>o.id==='a').every(o=>getComputedStyle(o.flow.children[9]).backgroundColor==='rgb(0, 255, 0)')`));
  const nativeBefore=await evaluate('poc.model.capture()');await evaluate('compactReadonlyFixture()');
  record('Read-only rendering creates no character spans',await evaluate(`poc.host.querySelectorAll('[data-inline-key]').length===0`));
  record('Read-only inline image has native alternative text',await evaluate(`poc.host.querySelector('img').alt==='blue square'`));

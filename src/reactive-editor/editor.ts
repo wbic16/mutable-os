@@ -1,3 +1,4 @@
+import { characterIndex, characterSelector } from '../rendering/character-address';
 import { editorInputBoundary } from '../runtime/editor-input';
 import { presentationEligible } from '../runtime/presentation-eligibility';
 import { passiveFocus } from '../runtime/passive-presentation';
@@ -167,7 +168,7 @@ export class ReactiveEditor {
     operations: this.currentTextOperation,
     capture: () => captureTextSelection(document, this.mounts, this.crossText, this.textRanges),
     target: event => selectionInputTarget(event, this.mounts, target => this.crossInput?.ownsInput(target) ? this.crossText.range()?.head.occurrenceKey : undefined),
-    point: event => { const cell = event.target instanceof Element ? event.target.closest<HTMLElement>("[data-inline-index]") : null; return cell ? Number(cell.dataset.inlineIndex) : undefined; },
+    point: event => { const cell = event.target instanceof Element ? event.target.closest<HTMLElement>(characterSelector) : null; return characterIndex(cell); },
     releasePointer: () => this.crossInput?.releasePointer(),
     focusedKey: () => this.focus.state.focusedKey ?? this.focus.state.lastFocusedKey,
     clearSelection: key => { document.getSelection()?.removeAllRanges(); this.selections.removeOccurrence(key); this.crossText.clear(); },
@@ -207,7 +208,7 @@ export class ReactiveEditor {
     const loadedWorkspace = "state" in dto && "references" in dto ? dto as LoadedWorkspace : undefined;
     if ((loadedWorkspace?.localContainer || loadedWorkspace?.manifest?.schemaVersion === 2) && !this.features.mutableWindowManager) throw new Error("Enable the Mutable Window Manager to open a managed Workspace.");
     const decoded = loadedWorkspace ? { state: loadedWorkspace.state } : isHistoryDocument(dto) ? decodeHistoryDocument(dto) : decodeBlockTree(dto as ExistingBlockDto);
-    this.repository = new CanonicalRepository(this.features.reversibleBlocks ? upgradeLegacySurfaces(decoded.state) : decoded.state, {compactCanonicalText:this.features.compactCanonicalText});
+    this.repository = new CanonicalRepository(this.features.reversibleBlocks ? upgradeLegacySurfaces(decoded.state) : decoded.state, {compactCanonicalText:this.features.compactCanonicalText, residentCellBoundaries:this.features.residentCellBoundaries});
     this.textProtection = new NativeTextProtection(this.repository);
     const protectedInput=(event:Event)=>{
       // SDK read-only is synchronised by its adapter; canonical admission remains authoritative.
@@ -334,6 +335,7 @@ export class ReactiveEditor {
       this.occurrences,
       rootPlacementKey,
       this.features.reversibleBlocks,
+      this.features.identityDomCharacterAddressing,
     );
     this.projections.set(viewId, projection);
     return projection;

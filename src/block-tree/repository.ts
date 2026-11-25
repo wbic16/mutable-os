@@ -8,7 +8,10 @@ import { listWrapChangeFor, type ListWrapChange } from "./list-wrap-plan";
 import { recordOperations } from "./record-batch";
 import {documentTabParentFor} from './document-tab-plan';
 import { batch, createSignal } from "solid-js";
-import { createStore, reconcile, unwrap } from "solid-js/store";
+import { cellWork, cellStageTimes } from "./cell-diagnostics";
+import { ResidentCells, CellRecordVersion, type ResidentCharacter } from "./resident-cells";
+import type { InlineSplice } from "./inline-sequence";
+import { createStore, produce, reconcile, unwrap } from "solid-js/store";
 import { inlineOwnerFor } from "./inline-plan";
 import { emptyParagraphChangeFor, splitChangeFor, type SplitChange, type EmptyParagraphChange } from "./split-plan";
 import { clone } from "./clone";
@@ -89,6 +92,19 @@ function applyOperation(state: RepositoryState, operation: RepositoryOperation) 
   }
 }
 
+function inverseOrigins(origins: readonly (number | null)[], length: number) {
+  const result: (number | null)[] = Array(length).fill(null);
+  origins.forEach((old, index) => { if (old !== null && result[old] === null) result[old] = index; });
+  return result;
+}
+
+// The closure owns only an immutable record version. UndoStorage's existing
+// materializer resolves it on replay, even after eviction or unrelated edits.
+function historyCellRecord(version: CellRecordVersion, inlineSplice: InlineSplice, origins?: (number | null)[]): RepositoryOperation {
+  return {kind: "put-content", inlineSplice, get record() { return version.record(); },
+    get annotationOrigins() { return origins ?? Array.from({length: version.version.ranges.length}, (_, i) => i); }};
+}
+
 function inverseFor(state: RepositoryState, operation: RepositoryOperation): RepositoryOperation {
   switch (operation.kind) {
     case "record-batch": {
@@ -100,7 +116,7 @@ function inverseFor(state: RepositoryState, operation: RepositoryOperation): Rep
     case "put-content": {
       const previous = state.contents[operation.record.key];
       return previous
-        ? { kind: "put-content", record: clone(previous), ...(operation.inlineSplice && previous.compactInline ? {inlineSplice:{start:operation.inlineSplice.start,end:operation.inlineSplice.start+inlineLength(operation.inlineSplice.insert),insert:inlineSlice(previous.compactInline.spans,operation.inlineSplice.start,operation.inlineSplice.end)}} : {}), ...(operation.annotationOrigins ? { annotationOrigins: (Array.isArray(previous.payload.standoffProperties) ? previous.payload.standoffProperties : []).map((_, i) => { const n = operation.annotationOrigins!.indexOf(i); return n < 0 ? null : n; }) } : {}) }
+        ? { kind: "put-content", record: clone(previous), ...(operation.inlineSplice && previous.compactInline ? {inlineSplice:{start:operation.inlineSplice.start,end:operation.inlineSplice.start+inlineLength(operation.inlineSplice.insert),insert:inlineSlice(previous.compactInline.spans,operation.inlineSplice.start,operation.inlineSplice.end)}} : {}), ...(operation.annotationOrigins ? { annotationOrigins: inverseOrigins(operation.annotationOrigins, Array.isArray(previous.payload.standoffProperties) ? previous.payload.standoffProperties.length : 0) } : {}) }
         : { kind: "remove-content", key: operation.record.key };
     }
     case "remove-content": {
@@ -296,6 +312,10 @@ export interface RepositoryChange {
   resourceProvenanceChanged?: boolean;
   /** General validated commits expose affected edges to occurrence consumers. */
   changedPlacements?: readonly string[];
+  /** Builds a detached compatibility view at the committed splice revision. */
+  residentPayload?: () => ContentRecord["payload"];
+  /** Logical length computed once when resident Cells are allocated for this splice. */
+  residentInsertedLength?: number;
   compactEdits?: ReadonlyMap<string, import("./inline-sequence").InlineSplice>;
   /** Lightweight identity/cause for occurrence-local history restoration.
    * Does not enable exact-record capture on ordinary typing. */
@@ -317,6 +337,121 @@ export interface RepositoryChange {
 }
 
 export class CanonicalRepository {
+  private readonly residentCellsEnabled: boolean;
+  private readonly residents = new Map<string, {
+    leases: number; cells?: ResidentCells; attempted: boolean; shape: ReturnType<typeof createSignal<number>>;
+  }>();
+
+  acquireResidentCells(key: string) {
+    if (!this.residentCellsEnabled) return () => {};
+    let entry = this.residents.get(key);
+    if (!entry) {
+      entry = {leases: 0, attempted: false, shape: createSignal(0)};
+      this.residents.set(key, entry);
+    }
+    entry.leases++;
+    // A caller may keep an already-fired cleanup function. Release both its
+    // model entry and its repository (including history) on the first call.
+    let owner: CanonicalRepository | undefined = this;
+    return () => {
+      const repository = owner, lease = entry;
+      owner = undefined;
+      entry = undefined;
+      if (!repository || !lease || --lease.leases !== 0) return;
+      repository.residents.delete(key);
+      if (lease.cells) {
+        if (cellWork) cellWork.evictions++;
+        void repository.readState().contents[key]?.payload.standoffProperties;
+        lease.cells.current.version.retire();
+        lease.cells = undefined;
+      }
+    };
+  }
+
+  residentAnnotations(key: string) {
+    const entry = this.residents.get(key);
+    entry?.shape[0]();
+    const cells = entry?.cells;
+    return cells && cells.current.revision === this.readState().contents[key]?.revision ? cells.annotations() : undefined;
+  }
+
+  /** Read-only lookup. Mounts and hit tests never hydrate a cold paragraph. */
+  residentCharacterAt(key: string, index: number): ResidentCharacter | undefined {
+    const cells = this.residents.get(key)?.cells;
+    if (cells && cells.current.revision === this.readState().contents[key]?.revision) return cells.characterAt(index);
+  }
+
+  residentRangeTextNearSplice(key: string, ordinal: number, start: number, inserted: number) {
+    const cells = this.residents.get(key)?.cells;
+    if (cells && cells.current.revision === this.readState().contents[key]?.revision)
+      return cells.rangeTextNearSplice(ordinal, start, inserted);
+  }
+
+  /** A closed, text-only operation. The admitted shell, ownership, identities,
+   * annotation definitions and placement graph are immutable on this route. */
+  commitResidentText(key: string, start: number, end: number, text: string, label: string, metadata: CommitMetadata) {
+    const entry = this.residents.get(key);
+    if (!entry || this.activeUndoGroup) return false;
+    this.assertNotCaptureCallback();
+    const times = cellStageTimes;
+    let mark = times ? performance.now() : 0;
+    const state = this.readState(), content = state.contents[key];
+    // A synchronous observer can read the newly committed canonical record
+    // before the ordinary change notification invalidates its old binding.
+    if (!entry.attempted || entry.cells && entry.cells.current.revision !== content?.revision) {
+      entry.cells = content && ResidentCells.open(content, entry.cells);
+      entry.attempted = true;
+    }
+    const cells = entry.cells, plan = cells?.plan(start, end, text);
+    if (!cells || !plan) return false;
+    const {before, after, origins} = plan;
+    const splice: InlineSplice = {start, end, insert: text ? [{kind: "text", text}] : []};
+    const forward = historyCellRecord(after, clone(splice), origins?.slice());
+    const backward = historyCellRecord(before, {start, end: start + plan.insertedLength,
+      insert: plan.removedText ? [{kind: "text", text: plan.removedText}] : []},
+      origins && inverseOrigins(origins, before.version.ranges.length));
+    const operations: RepositoryOperation[] = [{kind: "put-content", record: after.record(), inlineSplice: splice,
+      get annotationOrigins() { return forward.kind === "put-content" ? forward.annotationOrigins : undefined; }}];
+    const previousContents = new Map([[key, before.record()]]);
+    const originalRevision = state.revision;
+    for (const guard of this.admission) guard(operations, state, metadata);
+    for (const subscriber of this.beforeChangeSubscribers) subscriber(label, metadata.cause);
+    for (const subscriber of this.beforeSubscribers) subscriber(this.snapshot(), label);
+    const capture = this.prepareCapture(state, operations, metadata);
+    const resources = this.changedResources(operations), commitId = createCommitId();
+    if (this.state.revision !== originalRevision || entry.cells !== cells || cells.current !== before)
+      throw new ModelInvariantError("Stale resident text splice");
+    if (times) { times.prepare += performance.now() - mark; mark = performance.now(); }
+    batch(() => {
+      plan.apply();
+      // Assignment replaces the payload atomically. Reconciling its numeric
+      // compatibility array here would force enumeration during every edit.
+      this.setState("contents", key, produce<ContentRecord>(row => {
+        row.compactInline = {version: 1, spans: after.text ? [{kind: "text", text: after.text}] : []};
+        row.payload = after.payload();
+        row.inlineRevision = after.inlineRevision;
+        row.revision = after.revision;
+      }));
+      this.setState("revision", originalRevision + 1);
+      this.advanceResourceGenerations(operations, resources, false);
+      this.undoStack.push({commitId, label, forward: [forward], inverse: [backward]});
+      this.redoStack = [];
+      if (times) { times.apply += performance.now() - mark; mark = performance.now(); }
+      this.deliverCapture(capture, commitId, label, true);
+      for (const subscriber of this.subscribers) subscriber(this.snapshot(), label);
+      if (!before.version.edited || plan.bindingsChanged) entry.shape[1](v => v + 1);
+      for (const subscriber of this.changeSubscribers) subscriber({
+        label, previousContents, inlineOwner: key, compactEdits: new Map([[key, splice]]),
+        residentPayload: () => after.payload(), residentInsertedLength: plan.insertedLength, annotationOrigins: origins ? new Map([[key, origins]]) : undefined,
+        resourceIds: this.references.enriched ? [...resources] : undefined, resourceProvenanceChanged: false,
+        commit: {id: commitId, cause: metadata.cause},
+      });
+      if (times) { times.notify += performance.now() - mark; mark = performance.now(); }
+    });
+    if (times) times.flush += performance.now() - mark;
+    return true;
+  }
+
   private activeUndoGroup?: {record:(operations:RepositoryOperation[],inverse:RepositoryOperation[])=>void};
   /** Native edits publish normally; only their Undo record is accumulated. The
    * caller explicitly scopes each synchronous insertion, never unrelated edits. */
@@ -437,6 +572,22 @@ export class CanonicalRepository {
   }
 
   constructor(initial: RepositoryState, options: RepositoryOptions = {}) {
+    this.residentCellsEnabled = options.residentCellBoundaries !== false;
+    this.subscribeChanges(change => {
+      if (change.residentPayload || !this.residents.size) return;
+      for (const key of change.previousContents.keys()) {
+        const entry = this.residents.get(key);
+        if (!entry?.attempted) continue;
+        const content = this.readState().contents[key], cells = entry.cells;
+        // Reuse character identity through annotation/metadata authoring.
+        // Structural text replacement is hydrated on the next committed edit.
+        entry.cells = content && cells && cells.current.inlineRevision === content.inlineRevision
+          ? ResidentCells.open(content, cells) : undefined;
+        cells?.current.version.retire();
+        entry.attempted = !!entry.cells;
+        entry.shape[1](v => v + 1);
+      }
+    });
     this.compactCanonicalText = options.compactCanonicalText === true;
     const validation: BoundaryValidation | undefined = options.resourceBoundaryEvidence !== false ? {} : undefined;
     validateRepository(initial, validation);

@@ -1,3 +1,4 @@
+import {cellWork} from "../block-tree/cell-diagnostics";
 import {contentLength,inlineSlice,inlineText} from "../block-tree/inline-sequence";
 import type { ReactiveEditor } from '../reactive-editor/editor';
 import type { ContentRecord, JsonObject } from '../block-tree/types';
@@ -6,7 +7,7 @@ import { linkedDefinitionOwner, resolveLinkedProperty } from '../block-tree/link
 import type { LiveDocumentEntities, LiveEntityRow, LiveEntitySnapshot } from '../feature-api/live-entities';
 
 interface Link {
-  key: string; entity: string; name?: string; block: boolean;
+  ordinal: number; key: string; entity: string; name?: string; block: boolean;
   surface: string; cells: readonly string[]; signature: string; definitionOwner?: string;
 }
 const properties = (content: ContentRecord) => {
@@ -20,12 +21,14 @@ const pools = new WeakMap<ReactiveEditor, Map<string, Inventory>>();
 class Inventory {
   private members = new Map<string, string[]>();
   private links = new Map<string, Map<string, Link>>();
+  private ambiguous = new Set<string>();
   private invalid = new Map<string, number>();
   private rows = new Map<string, LiveEntityRow>();
   private entityLinks = new Map<string, Map<string, Link>>();
   private invalidTotal = 0;
   private listeners = new Set<() => void>();
   private pending = new Map<string, ContentRecord | undefined>();
+  private changedForms = new Set<string>();
   private changedCells = new Set<string>();
   private cellOwners = new Map<string, Set<string>>();
   private contentCells = new Map<string, Set<string>>();
@@ -65,10 +68,33 @@ class Inventory {
   private clearLinks(key: string, affected: Set<string>) {
     for (const [id,link] of this.links.get(key) ?? []) { affected.add(link.entity);this.entityLinks.get(link.entity)?.delete(`${key}:${id}`); }
     this.invalidTotal -= this.invalid.get(key) ?? 0;
-    this.links.delete(key);this.invalid.delete(key);this.clearCells(key);
+    this.links.delete(key);this.invalid.delete(key);this.ambiguous.delete(key);this.clearCells(key);
+  }
+  private updateResidentForms(change: RepositoryChange): boolean {
+    const key = change.inlineOwner, splice = key && change.compactEdits?.get(key);
+    const inserted = change.residentInsertedLength;
+    if (!key || !splice || inserted === undefined || change.annotationOrigins?.size || this.pending.size || this.invalid.get(key) || this.ambiguous.has(key)) return false;
+    // This publication preserves every authored property and its ordinal.
+    // Only the displayed spelling of a tracked entity can have changed.
+    const links = this.links.get(key);
+    if (!links?.size) return true;
+    for (const link of links.values()) {
+      if (cellWork) cellWork.mentionSurfaceChecks++;
+      const text = this.editor.repository.residentRangeTextNearSplice(key, link.ordinal, splice.start, inserted);
+      if (text === undefined) return false;
+      if (text !== false && text !== link.surface) {
+        link.surface = text;
+        this.changedForms.add(link.entity);
+      }
+    }
+    return true;
   }
   private changed(change: RepositoryChange) {
     if (change.taskStateOwner) return;
+    if (this.updateResidentForms(change)) {
+      if (this.changedForms.size) this.schedule();
+      return;
+    }
     const state = this.editor.repository.readState(), affectedOwners=new Set<string>();
     for (const [key,before] of change.previousContents) {
       const after=state.contents[key];
@@ -88,6 +114,9 @@ class Inventory {
     }
     for(const owner of affectedOwners)if(!this.pending.has(owner))this.pending.set(owner,state.contents[owner]);
     if (!this.pending.size) { this.changedCells.clear(); return; }
+    this.schedule();
+  }
+  private schedule() {
     if (this.queued) return;
     this.queued = true;
     queueMicrotask(() => { this.queued = false; if (!this.disposed) this.flush(); });
@@ -96,8 +125,10 @@ class Inventory {
   private definitions = new Map<string, Set<string>>();
   private definitionUsed(key: string) { return this.definitions.has(key); }
   private flush() {
-    if (!this.pending.size) return;
-    const state = this.editor.repository.readState(), affected = new Set<string>(), update = new Set<string>();
+    if (!this.pending.size && !this.changedForms.size) return;
+    const affected = this.changedForms;
+    this.changedForms = new Set();
+    const state = this.editor.repository.readState(), update = new Set<string>();
     const pending = this.pending; this.pending = new Map();
     for (const [key,before] of pending) {
       if (this.members.has(key)) {
@@ -128,6 +159,8 @@ class Inventory {
     const old = this.links.get(key) ?? new Map<string,Link>(), next = new Map<string,Link>();
     this.clearCells(key);const linkedCells=new Set<string>();
     const codePoints=content.viewType==='standoff-code-mirror-block'?[...String(content.payload.text??'')]:undefined;
+    this.ambiguous.delete(key);
+    if (cellWork) cellWork.entityInventoryReads++;
     let invalid = 0;
     for (const [index,p] of properties(content).entries()) {
       if(p.type==='dialectic/range-anchor')continue; // passive reply identity, never an Entity mention
@@ -162,8 +195,9 @@ class Inventory {
       }
       const metadata = resolved.metadata as Record<string,unknown>|undefined;
       const name = metadata?.entityName ?? metadata?.name;
-      const link: Link = {key:p.annotationId?`${definitionOwner}:${p.annotationId}`:`${key}:${localId}`,entity:resolved.value,name:typeof name==='string'?name:undefined,block,surface,cells,signature,definitionOwner};
+      const link: Link = {ordinal:index,key:p.annotationId?`${definitionOwner}:${p.annotationId}`:`${key}:${localId}`,entity:resolved.value,name:typeof name==='string'?name:undefined,block,surface,cells,signature,definitionOwner};
       for(const id of cells){const cell=state.placements[id]?.contentKey;if(cell)linkedCells.add(cell);}
+      if (next.has(localId)) this.ambiguous.add(key);
       next.set(localId,link);
       if(prior?.entity!==link.entity && prior)this.entityLinks.get(prior.entity)?.delete(`${key}:${localId}`);
       const entries=this.entityLinks.get(link.entity)??new Map<string,Link>();entries.set(`${key}:${localId}`,link);this.entityLinks.set(link.entity,entries);

@@ -75,7 +75,7 @@ try{
  await chord(0,'Escape','Escape',27);check('Escape returns to the source Document editor',await evaluate(`!proof.editor.crossText.range()&&!!document.activeElement.closest('.reactive-document-occurrence')`));
  await evaluate(`proof.mount.focus();proof.mount.restoreInlineSelection({anchor:1,head:1})`);await chord(2);await chord(2);
  check('Control-A provides the same two-stage selection',await evaluate(`proof.editor.crossText.isDocumentSelection()&&Object.values(proof.editor.crossText.segments).filter(Boolean).length===proof.expected.length`));
- await click(`proof.flow.querySelector('[data-inline-index]')`);
+ await click(`proof.flow.querySelector('[data-inline-key]')`);
  check('clicking selected text restores ordinary caret input',await evaluate(`!proof.editor.crossText.range()&&document.activeElement===proof.mount.focusElement`));
  await evaluate(`proof.field=document.createElement('input');proof.field.value='Native field';proof.host.append(proof.field);proof.field.focus();proof.field.setSelectionRange(2,2)`);await chord(4,'a','KeyA',65,['selectAll']);
  check('native input retains browser Select All',await evaluate(`!proof.editor.crossText.range()&&proof.field.selectionStart===0&&proof.field.selectionEnd===proof.field.value.length`));

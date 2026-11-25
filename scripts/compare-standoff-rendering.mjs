@@ -87,7 +87,7 @@ try{
   if(DEV)DEV.hooks.afterCreateOwner=null;
   Object.assign(stats,{prepareMs,commitMs,serializeMs,projectionMs,synchronousMs,throughFramesMs,offsetMs,solidOwners:owners,solidComputations:pure+effects,pureComputations:pure,effectComputations:effects,domElements:host.querySelectorAll('*').length});
   if(legacy){stats.boundAnnotations=legacy.data.properties.length;stats.cells=legacy.getCells().length;stats.textPreserved=legacy.getCells().map(c=>legacy.getTextContent(c)).join('')===texts.join('');}
-  else{const flows=(mode.startsWith('current') || mode.startsWith('reactive'))?[...host.querySelectorAll('.reactive-standoff-flow')]:[host];stats.textPreserved=flows.map(f=>f.textContent).join('')===texts.join('');stats.cells=(mode.startsWith('current') || mode.startsWith('reactive'))?host.querySelectorAll('[data-inline-index]').length:host.querySelectorAll('span').length;}
+  else{const flows=(mode.startsWith('current') || mode.startsWith('reactive'))?[...host.querySelectorAll('.reactive-standoff-flow')]:[host];stats.textPreserved=flows.map(f=>f.textContent).join('')===texts.join('');stats.cells=(mode.startsWith('current') || mode.startsWith('reactive'))?host.querySelectorAll('[data-inline-key],[data-inline-index]').length:host.querySelectorAll('span').length;}
   if(!stats.textPreserved)throw Error('Comparison changed text: '+JSON.stringify(stats));
   return stats;
  })()`);

@@ -1597,7 +1597,7 @@ it('semantic workspace uses the selected AI participant in native provenance and
 
 it('shows proactive Entity mentions and inspects them in place without canonical or per-keystroke background work',async()=>{
  const f=await activityFixture(),c=f.c!,e=f.editor;await activityExchange(f);
- const mention=f.host.querySelector<HTMLElement>('.dialectic-entity-mention[data-inline-index]');expect(mention).toBeTruthy();
+ const mention=f.host.querySelector<HTMLElement>('.dialectic-entity-mention[data-inline-key]');expect(mention).toBeTruthy();
  const renderer=e.visualEffects.type('mutable/entity-reference')!.renderers[0];expect(renderer.params).toMatchObject({affectsLayout:false});
  const scroll=vi.fn();Object.defineProperty(Element.prototype,'scrollIntoView',{configurable:true,value:scroll});cleanup.push(()=>delete (Element.prototype as any).scrollIntoView);
  const revision=e.repository.state.revision,snapshots=vi.spyOn(e.repository,'snapshot'),transaction=vi.spyOn(e.commands,'boundedStructuralTransaction'),build=vi.spyOn(c.session()!.projection as any,'build');

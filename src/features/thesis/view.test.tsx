@@ -14,7 +14,7 @@ it('native draft keeps multiline replacements, Unicode annotations and undo; no 
  const root=document.body.appendChild(document.createElement('div'));
  disposers.push(render(()=><NativePropositionEditor draft={{text:'A😀z',properties:[{id:crypto.randomUUID(),type:'style/bold',start:1,end:1}],warnings:[]}} vault="." changed={dirty} ready={p=>port=p} notice={()=>{}}/>,root));
  await Promise.resolve();const flow=root.querySelector<HTMLElement>('[contenteditable=true]')!;expect(flow).toBeTruthy();
- const cell=flow.querySelectorAll('[data-inline-index]')[1],range=document.createRange();range.setStart(cell.firstChild!,0);range.collapse(true);document.getSelection()!.removeAllRanges();document.getSelection()!.addRange(range);flow.focus();
+ const cell=flow.querySelectorAll('[data-inline-key]')[1],range=document.createRange();range.setStart(cell.firstChild!,0);range.collapse(true);document.getSelection()!.removeAllRanges();document.getSelection()!.addRange(range);flow.focus();
  flow.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));await Promise.resolve();
  expect(port!.read().text).toBe('A\n😀z');expect(port!.read().annotations[0]).toMatchObject({start:2,end:4});expect(dirty).toHaveBeenCalledTimes(1);expect(requests).not.toHaveBeenCalled();
  [...root.querySelectorAll('button')].find(b=>b.textContent==='Undo')!.click();expect(port!.read().text).toBe('A😀z');expect(port!.read().annotations[0]).toMatchObject({start:1,end:3});
