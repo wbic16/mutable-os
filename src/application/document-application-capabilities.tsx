@@ -577,11 +577,13 @@ export function documentApplicationCapabilities(editor: ReactiveEditor, scope: F
           const target=event.target instanceof Element?event.target:undefined;
           const library=!!target?.closest('.flint-application__vault');
           const resolved=editor.mounts.resolveElement(target??null),node=resolved&&editor.node(resolved.nodeKey),view=liveViews.get(activeTab()??'');
-          if(!library&&(!node||!view||node.viewId!==view.viewId||node.viewType!=='standoff-editor-block'))return;
+          const block=!library&&!!node&&!!view&&node.viewId===view.viewId&&node.viewType==='standoff-editor-block';
+          const root=!library&&!block?target?.closest<HTMLElement>('.flint-application'):undefined;
+          if(!library&&!block&&!root)return;
           event.preventDefault();event.stopPropagation();if(event.dataTransfer)event.dataTransfer.dropEffect='copy';
-          clearDrop();if(!drop){dropIndicator=library?target!.closest<HTMLElement>('.flint-application__vault')!:resolved!.handle.root as HTMLElement;dropIndicator!.dataset.interchangeDrop=library?'Import as new Ink documents':'Insert files after this Block';return;}
+          clearDrop();if(!drop){dropIndicator=library?target!.closest<HTMLElement>('.flint-application__vault')!:block?resolved!.handle.root as HTMLElement:root!;dropIndicator!.dataset.interchangeDrop=block?'Insert files after this Block':'Import as new Ink documents';return;}
           const files=Array.from(event.dataTransfer?.files??[]).map(blob=>({blob,name:blob.name}));
-          if(library)void editor.interchange.importNew(files,{current:()=>mounted&&scope.active(),open:openDocument});
+          if(!block)void editor.interchange.importNew(files,{current:()=>mounted&&scope.active(),open:openDocument});
           else {const id=activeId();void editor.interchange.dropFiles(files,node!.key,()=>mounted&&scope.active()&&activeId()===id);}
         },
       } : undefined;
