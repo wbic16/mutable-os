@@ -9,7 +9,12 @@ export async function runInterchange<R extends InterchangeRequest>(request:R,sig
   const cancel=()=>finish('Operation cancelled.');
   const timer=setTimeout(()=>finish('Interchange preparation timed out. Try a smaller input.'),request.kind==='tei-document'?(request.limits?.timeoutMs??120000):request.kind==='structured-preview'?3000:30000);
   signal.addEventListener('abort',cancel,{once:true});
-  worker.onmessage=e=>finish(e.data.error,e.data.result);worker.onerror=()=>finish('Interchange worker failed.');
+  // Only the operations reply settles the call. Libraries evaluated inside
+  // the worker can post their own protocol messages on this channel (pdf.js,
+  // when it falls back to a self-hosted worker, announces {sourceName:'worker',
+  // action:'ready'}); those carry neither field and must not resolve the call
+  // with undefined.
+  worker.onmessage=e=>{const data=e.data as {error?:string;result?:Prepared<R>}|undefined;if(!data||!('error' in data||'result' in data))return;finish(data.error,data.result);};worker.onerror=()=>finish('Interchange worker failed.');
   try{worker.postMessage(request);}catch(e){finish(String(e));}
  });
 }
