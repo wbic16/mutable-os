@@ -87,7 +87,13 @@ async function pdfFile(file:SuppliedFile,index:number,byteHash:string){
  // afterwards by the server-mediated pdf.extract operation on the retained
  // snapshot (identical pipeline, server leg by platform necessity).
  const bytes=new Uint8Array(await file.blob.arrayBuffer());
- const {getDocument,version}=await import('pdfjs-dist/legacy/build/pdf.mjs');
+ const pdf=await import('pdfjs-dist/legacy/build/pdf.mjs');
+ // The legacy instance needs its own worker configured, exactly as
+ // viewer.ts configures the standard build's instance: without it,
+ // getDocument dies in the browser with 'No "GlobalWorkerOptions.workerSrc"
+ // specified'. The legacy build ships its matching worker; set it once.
+ if(!pdf.GlobalWorkerOptions.workerSrc){const worker=await import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url');pdf.GlobalWorkerOptions.workerSrc=worker.default;}
+ const {getDocument,version}=pdf;
  const task=getDocument({data:bytes.slice(),isEvalSupported:false,useSystemFonts:false,disableFontFace:true,stopAtErrors:true});
  const password=new Promise<never>((_resolve,reject)=>{task.onPassword=()=>reject(Error('Encrypted/password-protected PDFs are not supported'));});
  try{
