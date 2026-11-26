@@ -1,4 +1,4 @@
-import type {PdfCapture,PdfInspection} from '../pdf/model';
+import type {PdfCapture,PdfExtraction,PdfInspection} from '../pdf/model';
 import type {JobStorage,Executor} from './capabilities';
 import type {JobSummary} from './contracts';
 export interface PdfOperations {
@@ -9,9 +9,10 @@ export interface PdfOperations {
  'pdf.resume':{input:{id:string};output:{snapshot:PdfCapture}};
  'pdf.inspect':{input:{id:string};output:{job:JobSummary}};
  'pdf.read':{input:{snapshotId:string};output:{snapshot:PdfCapture;bytes:Uint8Array}};
+ 'pdf.extract':{input:{snapshotId:string};output:{snapshot:PdfCapture;extraction:PdfExtraction}};
  'pdf.verify':{input:{snapshotId:string};output:{snapshot:PdfCapture;byteLength:number}};
 }
-export const pdfOperations=['resources.original','resource.context','resource.review','pdf.import','pdf.resume','pdf.inspect','pdf.read','pdf.verify'] as const;
+export const pdfOperations=['resources.original','resource.context','resource.review','pdf.import','pdf.resume','pdf.inspect','pdf.read','pdf.verify','pdf.extract'] as const;
 export interface PdfCapabilities {
  originalResource(assetId:string,signal:AbortSignal):Promise<PdfOperations['resources.original']['output']>;
  cavernId:string;jobs:JobStorage;executor:Executor;uuid():string;now():string;

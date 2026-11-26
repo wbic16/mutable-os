@@ -23,7 +23,7 @@ export async function readSelectedFile(file: SuppliedFile, explicit?: ImportForm
   if (format==='tei') throw Error('TEI requires full-document native import; fragment insertion and source embedding are not enabled.');
   const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
   const byteHash=[...digest].map(b=>b.toString(16).padStart(2,'0')).join('');
-  if (format==='academic'||format==='png'||format==='jpeg') return {format,title,filename:`${title}.ink`,byteHash,diagnostics:[],source:''};
+  if (format==='academic'||format==='png'||format==='jpeg'||format==='pdf') return {format,title,filename:`${title}.ink`,byteHash,diagnostics:[],source:''};
   if (bytes.length>LIMITS.bytes) throw Error('Text files are limited to 8 MiB.');
   const decoded=decodeSource(bytes), diagnostics=[];
   if (format!=='structured' && /\r/.test(decoded.source)) diagnostics.push(diagnostic('normalized-newlines','Source line endings become logical newlines in Ink.',false,file.name));

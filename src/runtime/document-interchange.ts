@@ -9,6 +9,7 @@ import {webBlock} from '../web-resources/block';
 import {academicIdentifier,academicJob} from '../academic/identifiers';
 import {academicBlock} from '../academic/block';
 import {ACADEMIC_BLOCK,type AcademicCapture} from '../academic/model';
+import {PDF_BLOCK,type PdfCapture} from '../pdf/model';
 import {STRUCTURED_BLOCK} from '../structured/model';
 import {pdfBlock} from '../pdf/block';
 import type {BlockFragment} from '../block-tree/clipboard';
@@ -105,6 +106,12 @@ export class DocumentInterchange {
    const media=capture.format==='epub'?'application/epub+zip':capture.format==='bibtex'?'application/x-bibtex':capture.format==='ris'?'application/x-research-info-systems':'application/xml';
    const ref={...capture.asset,cavernId:t.scope.cavernId!};const existing=await this.editor.assets.verify(ref,signal).catch(()=>undefined);this.check(t);
    if(!existing){const lease=await this.editor.assets.begin([],signal);let done=false;try{const m=await this.editor.assets.stageOriginal(lease,new Blob([file.blob],{type:media}),signal);this.check(t);if(m.assetId!==ref.assetId)throw Error('Original hash mismatch');await this.editor.assets.action(lease,'publish',signal);await this.editor.assets.action(lease,'finish',signal);done=true;}finally{if(!done)await this.editor.assets.action(lease,'abort').catch(()=>{});}}
+   capture.asset=ref;delete block.data.importFileIndex;
+  }
+  for(const block of fragment.blocks)if(block.type===PDF_BLOCK&&block.data.importFileIndex!==undefined){
+   if(!this.editor.features.crossResourceLoaders)throw Error('PDF resources are disabled');const capture=block.data.pdf as PdfCapture,file=files[Number(block.data.importFileIndex)];if(!file)throw Error('Missing PDF original');
+   const ref={...capture.asset,cavernId:t.scope.cavernId!};const existing=await this.editor.assets.verify(ref,signal).catch(()=>undefined);this.check(t);
+   if(!existing){const lease=await this.editor.assets.begin([],signal);let done=false;try{const m=await this.editor.assets.stageOriginal(lease,new Blob([file.blob],{type:'application/pdf'}),signal);this.check(t);if(m.assetId!==ref.assetId)throw Error('Original hash mismatch');await this.editor.assets.action(lease,'publish',signal);await this.editor.assets.action(lease,'finish',signal);done=true;}finally{if(!done)await this.editor.assets.action(lease,'abort').catch(()=>{});}}
    capture.asset=ref;delete block.data.importFileIndex;
   }
   for(const block of fragment.blocks)if(block.type===STRUCTURED_BLOCK&&!block.data.asset){

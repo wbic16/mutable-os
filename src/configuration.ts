@@ -90,6 +90,8 @@ export type FeatureFlags = Readonly<{
   resourceUrlPaste: boolean;
   academicResourceLoaders: boolean;
   crossResourceLoaders: boolean;
+  /** Whole-document PDF text/layout extraction (LiteParse) for retained PDF originals. */
+  liteparsePdfExtraction: boolean;
   structuredResources: boolean;
   webResourceViewers: boolean;
   everydayWebResources: boolean;
@@ -306,6 +308,7 @@ export const featureFlags: FeatureFlags = Object.freeze({
   resourceUrlPaste: true,
   academicResourceLoaders: true,
   crossResourceLoaders: true,
+  liteparsePdfExtraction: true,
   structuredResources: true,
   webResourceViewers: true,
   everydayWebResources: true,
