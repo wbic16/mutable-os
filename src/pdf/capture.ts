@@ -8,7 +8,13 @@ export function checkedPdfCapture(value:unknown):PdfCapture {
  if(!fields(v,['version','kind','snapshotId','identityId','entityId','resourceId','sourceUrl','endpoint','retrievedAt','asset','inspection'])||v.version!==1||v.kind!=='pdf')throw Error('Invalid retained PDF capture');
  for(const id of [v.snapshotId,v.identityId,v.entityId,v.resourceId])if(typeof id!=='string'||!/^[a-f0-9-]{36}$/.test(id))throw Error('Invalid PDF capture identity');
  if(!fields(v.asset,['kind','cavernId','assetId'])||!managedAsset(v.asset)||v.asset.cavernId.length>1024)throw Error('Invalid PDF original reference');
- for(const value of [v.sourceUrl,v.endpoint]){if(typeof value!=='string'||value.length>4096)throw Error('Invalid PDF provenance URL');const url=new URL(value);if(url.protocol!=='https:'||url.username||url.password||url.port||url.hash)throw Error('Invalid PDF provenance URL');}
+ if(v.endpoint==='local-file'){
+  // Local-file provenance is a distinct, checkable class: the endpoint is
+  // the literal 'local-file' and the sourceUrl is the bare supplied
+  // filename — never a URL, never a path. Anything else takes the strict
+  // https path below, unchanged.
+  if(typeof v.sourceUrl!=='string'||!v.sourceUrl.length||v.sourceUrl.length>1024||/[\u0000-\u001f\\\/]/.test(v.sourceUrl))throw Error('Invalid PDF provenance URL');
+ }else for(const value of [v.sourceUrl,v.endpoint]){if(typeof value!=='string'||value.length>4096)throw Error('Invalid PDF provenance URL');const url=new URL(value);if(url.protocol!=='https:'||url.username||url.password||url.port||url.hash)throw Error('Invalid PDF provenance URL');}
  if(typeof v.retrievedAt!=='string'||v.retrievedAt.length>40||!Number.isFinite(Date.parse(v.retrievedAt)))throw Error('Invalid PDF capture time');
  const i=v.inspection;if(!fields(i,['kind','pages','label','version'])||i.kind!=='pdf-inspection'||!Number.isInteger(i.pages)||i.pages<1||i.pages>PDF_LIMITS.pages||typeof i.label!=='string'||i.label.length>1000||typeof i.version!=='string'||!i.version.length||i.version.length>80)throw Error('Invalid PDF inspection');
  return v;

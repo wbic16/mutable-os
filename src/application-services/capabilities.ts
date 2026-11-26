@@ -12,6 +12,7 @@ export type ExecutionTask =
  | {kind:'academic-original-inspect';bytes:Uint8Array;mediaType:string}
  | {kind:'json-inspect';bytes:Uint8Array}
  | {kind:'pdf-inspect';bytes:Uint8Array}
+ | {kind:'pdf-extract';bytes:Uint8Array}
  | {kind:'iiif-normalize';bytes:Uint8Array}
  | import('./encyclopedia-contracts').EncyclopediaTask
  | {kind:'academic-normalize';doi:string;provider:import('../interchange/scholarly').ScholarlyProvider;bytes:Uint8Array}
@@ -23,7 +24,7 @@ export type ExecutionTask =
  | {kind:'package';native:Uint8Array;source:PackageManifest['source'];context:PackageDataResult;assets:PackageAsset[]};
 export interface Inventory {entities:string[];claims:string[];assets:ManagedAssetReference[]}
 export interface Executor {
- run(task:ExecutionTask,signal?:AbortSignal):Promise<import('./web-contracts').WebResult|import('./deterministic-contracts').DeterministicResult|{kind:'json-inspection'}|import('../pdf/model').PdfInspection|import('../iiif/model').Projection|import('./encyclopedia-contracts').EncyclopediaProjection|import('./academic-contracts').AcademicNormalized|PreparationResult|Inventory|Projection|import('../publication/research').ResearchInspection|{bytes:Uint8Array}>;
+ run(task:ExecutionTask,signal?:AbortSignal):Promise<import('./web-contracts').WebResult|import('./deterministic-contracts').DeterministicResult|{kind:'json-inspection'}|import('../pdf/model').PdfInspection|import('../pdf/model').PdfExtraction|import('../iiif/model').Projection|import('./encyclopedia-contracts').EncyclopediaProjection|import('./academic-contracts').AcademicNormalized|PreparationResult|Inventory|Projection|import('../publication/research').ResearchInspection|{bytes:Uint8Array}>;
  close():Promise<void>;
 }
 export interface JobRecord {summary:JobSummary;preparation:Preparation;result?:{file:string;sha256:string;bytes:number}}
