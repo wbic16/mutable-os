@@ -47,3 +47,14 @@ it('cancels late PDF reads and destroys native viewers on occurrence disposal',a
  finish(new Response(JSON.stringify({Success:true,Data:{snapshot:f.capture,bytes:[]}})));await tick();expect(mountPdfViewer).not.toHaveBeenCalled();
  f.fetcher.mockResolvedValue(new Response(JSON.stringify({Success:true,Data:{snapshot:f.capture,bytes:[]}})));await f.open();f.editor.commands.remove(f.node().key);expect(f.viewer.destroy).toHaveBeenCalledTimes(1);
 });
+
+it('extracts the whole document through pdf.extract and inserts it with layout blocks anchored',async()=>{
+ const f=setup(),extraction={kind:'pdf-text-derivative',version:2,text:'Whole document text',pages:[{pageIndex:0,viewBox:[0,0,612,792],rotation:0,text:'Whole document text',ocr:true,runs:[],blocks:[{kind:'paragraph',ordinal:0,range:{start:0,end:19},bbox:[0,0,100,10],address:'1.1.1/1.1.1/1.1.1'}]}],provenance:{engine:'liteparse',ocrBackend:'ocria-nano',offsetUnit:'utf16',pages:[{pageIndex:0,ocr:true}]}};
+ f.fetcher.mockImplementation(async input=>String(input).endsWith('pdf.read')?new Response(new Uint8Array([1]),{headers:{'Content-Type':'application/octet-stream','X-Mutable-Cavern-Id':f.capture.asset.cavernId,'X-Mutable-Result':JSON.stringify({snapshot:f.capture})}}):String(input).endsWith('pdf.extract')?new Response(JSON.stringify({Success:true,Data:{snapshot:f.capture,extraction}})):new Response(JSON.stringify({Success:true,Data:{snapshot:f.capture,reviews:[]}})));
+ await f.open();const button=f.button('Extract whole document as editable Ink');expect(button.disabled).toBe(false);
+ const unprotect=f.editor.textProtection.protect(f.node().contentKey),revision=f.editor.repository.state.revision;button.disabled=false;button.click();await tick();
+ expect(f.fetcher.mock.calls.some(([url])=>String(url).endsWith('pdf.extract'))).toBe(false);expect(f.editor.repository.state.revision).toBe(revision);unprotect();
+ button.click();await vi.waitFor(()=>expect(f.host.textContent).toContain('Inserted whole document with layout blocks anchored. OCR was used on 1 page.'));
+ expect(f.fetcher.mock.calls.some(([url])=>String(url).endsWith('pdf.extract'))).toBe(true);expect(f.editor.repository.state.revision).not.toBe(revision);
+ const inserted=Object.values(f.view.state.nodes).find(n=>(n.payload.blockProperties as any[]|undefined)?.some(p=>p.type==='mutable/pdf-layout-block'&&p.value==='1.1.1/1.1.1/1.1.1'));expect(inserted).toBeDefined();
+});
