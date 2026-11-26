@@ -1,4 +1,6 @@
 import {academicBlock} from '../academic/block';
+import {pdfBlock} from '../pdf/block';
+import {PDF_LIMITS,type PdfCapture} from '../pdf/model';
 import type {AcademicFormat} from '../academic/model';
 import {structuredText} from '../structured/text';
 import {STRUCTURED_BLOCK,presentation} from '../structured/model';
@@ -65,7 +67,7 @@ export async function prepareFiles(files:SuppliedFile[],explicit?:ImportFormat) 
   const results=[];
   for(let index=0;index<files.length;index++) {
     const file=files[index],read=await readSelectedFile(file,explicit);
-    const converted=read.format==='academic'?await academicFile(file,index,read.byteHash):read.format==='structured'?{fragment:structuredFragment(file.name,read.source,file.blob.type),diagnostics:[],title:undefined}:read.format==='png'||read.format==='jpeg'?{fragment:imagesFragment([file]),diagnostics:[],title:undefined}:convertSource(read.source,read.format,true);
+    const converted=read.format==='academic'?await academicFile(file,index,read.byteHash):read.format==='pdf'?await pdfFile(file,index,read.byteHash):read.format==='structured'?{fragment:structuredFragment(file.name,read.source,file.blob.type),diagnostics:[],title:undefined}:read.format==='png'||read.format==='jpeg'?{fragment:imagesFragment([file]),diagnostics:[],title:undefined}:convertSource(read.source,read.format,true);
     converted.fragment.assets.forEach(a=>{if(a.source.kind==='transfer')a.source.index=index;});
     if(read.format==='structured'){structuredText(new Uint8Array(await file.blob.arrayBuffer()));const b=converted.fragment.blocks[0];b.data.importFileIndex=index;Object.assign(b.data.structured as object,{encoding:read.encoding,bom:read.bom,byteHash:read.byteHash});}
     const title=read.title;
@@ -75,6 +77,29 @@ export async function prepareFiles(files:SuppliedFile[],explicit?:ImportFormat) 
 }
 
 function structuredFragment(filename:string,text:string,mime:string){const f=emptyFragment();f.blocks=[{localId:'resource',type:STRUCTURED_BLOCK,data:{text,structured:{version:1,filename:filename.split(/[\\/]/).at(-1)!.slice(0,255),mime,presentation:presentation(filename)}},children:[],relations:{},blockProperties:[]}];f.placements=[{localId:'edge',kind:'owned',target:{kind:'local',object:'block',id:'resource'}}];f.roots=[{placement:'edge',openStart:false,openEnd:false,clippedStart:false,clippedEnd:false}];return validateFragment(f);}
+
+async function pdfFile(file:SuppliedFile,index:number,byteHash:string){
+ // The capture's inspection is a real client-side pdf.js inspection — the
+ // same option family as the server's inspectPdf — never fabricated values.
+ // Extraction itself cannot run here: prepareFiles runs in the browser,
+ // where the native LiteParse engine cannot load. The fragment carries the
+ // retained-original PDF block; the whole-document extraction is delivered
+ // afterwards by the server-mediated pdf.extract operation on the retained
+ // snapshot (identical pipeline, server leg by platform necessity).
+ const bytes=new Uint8Array(await file.blob.arrayBuffer());
+ const {getDocument,version}=await import('pdfjs-dist/legacy/build/pdf.mjs');
+ const task=getDocument({data:bytes.slice(),isEvalSupported:false,useSystemFonts:false,disableFontFace:true,stopAtErrors:true});
+ const password=new Promise<never>((_resolve,reject)=>{task.onPassword=()=>reject(Error('Encrypted/password-protected PDFs are not supported'));});
+ try{
+  const doc=await Promise.race([task.promise,password]);
+  if(doc.numPages<1||doc.numPages>PDF_LIMITS.pages)throw Error('PDF page limit exceeded');
+  for(let i=1;i<=doc.numPages;i++){const p=await doc.getPage(i);if(p.view.length!==4||!p.view.every(Number.isFinite)||p.view[2]<=p.view[0]||p.view[3]<=p.view[1])throw Error('Invalid PDF page geometry');p.cleanup();}
+  const metadata=await doc.getMetadata();const title=(metadata.info as any)?.Title;
+  const capture:PdfCapture={version:1,kind:'pdf',snapshotId:crypto.randomUUID(),identityId:crypto.randomUUID(),entityId:crypto.randomUUID(),resourceId:crypto.randomUUID(),sourceUrl:file.name.split(/[\\/]/).at(-1)!,endpoint:'local-file',retrievedAt:new Date().toISOString(),asset:{kind:'managed',cavernId:'pending',assetId:'sha256:'+byteHash},inspection:{kind:'pdf-inspection',pages:doc.numPages,label:typeof title==='string'&&title?title.slice(0,1000):'PDF document',version}};
+  const {fragment}=pdfBlock(capture);fragment.blocks[0].data.importFileIndex=index;
+  return {fragment,diagnostics:[]};
+ }finally{await task.destroy();}
+}
 
 async function academicFile(file:SuppliedFile,index:number,byteHash:string){
  const bytes=new Uint8Array(await file.blob.arrayBuffer()),ext=file.name.split('.').at(-1)?.toLowerCase();let format:AcademicFormat|'ocr';

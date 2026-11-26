@@ -2,7 +2,7 @@
 import {afterEach,it,expect,vi} from 'vitest';
 import {mkdtemp,rm,rename,writeFile,readFile} from 'node:fs/promises';import {tmpdir} from 'node:os';import path from 'node:path';import {randomUUID} from 'node:crypto';
 import Database from 'better-sqlite3';import {migrate} from '../../src/knowledge-sqlite/schema.mjs';import {canonicalLedger} from '../../src/knowledge-sqlite/canonical-ledger.mjs';import {canonicalEntities,entityCommand} from '../../src/knowledge-sqlite/entities.mjs';
-import {PdfService} from '../../src/application-services/pdf-service';import {CavernJobStorage} from './job-storage';import {NodePreparationExecutor} from './executor';import {ManagedAssetStore} from '../managed-assets.mjs';import {pdfFixture} from '../../src/pdf/fixtures';import {PDF_LIMITS,pdfText,validPdfAnchor} from '../../src/pdf/model';import {extractPackageData} from '../../src/knowledge-sqlite/package-data.mjs';
+import {PdfService} from '../../src/application-services/pdf-service';import {CavernJobStorage} from './job-storage';import {NodePreparationExecutor} from './executor';import {ManagedAssetStore} from '../managed-assets.mjs';import {pdfFixture} from '../../src/pdf/fixtures';import {PDF_LIMITS,pdfText,validPdfAnchor,type PdfExtraction} from '../../src/pdf/model';import {pdfExtractionFragment} from '../../src/pdf/block';import {extractPackageData} from '../../src/knowledge-sqlite/package-data.mjs';
 vi.setConfig({testTimeout:30000});const clean:Array<()=>any>=[];afterEach(async()=>{for(const f of clean.splice(0).reverse())await f();});
 async function fixture(){const root=await mkdtemp(path.join(tmpdir(),'pdf-d-')),cavernId=randomUUID();clean.push(()=>rm(root,{recursive:true,force:true}));const db=new Database(':memory:'),audit=new Database(':memory:');migrate(db,'mutable',{fresh:true,vaultGuid:cavernId});migrate(audit,'audit',{fresh:true,vaultGuid:cavernId});clean.push(()=>{db.close();audit.close();});const ledger=canonicalLedger(db,()=>audit),jobs=new CavernJobStorage(root,cavernId),assets=new ManagedAssetStore({root,cavernId,session:'test'}),executor=new NodePreparationExecutor();clean.push(()=>jobs.close(),()=>assets.close(),()=>executor.close());let calls=0,fail=false;
  const ports={cavernId,jobs,executor,uuid:randomUUID,now:()=>new Date().toISOString(),acquire:async(source:string)=>{calls++;return {bytes:pdfFixture(),endpoint:source};},retain:async(bytes:Uint8Array)=>{const l=await assets.begin(),a=await assets.stage(l,Buffer.from(bytes),{mediaType:'application/pdf'});await assets.publish(l);await assets.finish(l,'test');return {kind:'managed' as const,cavernId,assetId:a.assetId};},original:async(a:any)=>{const original=await assets.get(a.assetId,a.cavernId);if(original.manifest.mediaType!=='application/pdf')throw Error('Wrong PDF asset type');return new Uint8Array(original.bytes);},originalResource:async(id:string)=>{const a=await assets.get(id,cavernId);return {assetId:id,cavernId,mediaType:a.manifest.mediaType,bytes:new Uint8Array(a.bytes)};},knowledge:async(r:any)=>{const result=canonicalEntities(db,r,()=>{},ledger);if(fail&&r.op==='pdf-commit'){fail=false;throw Error('Lost acknowledgement');}return result;}};
@@ -52,4 +52,41 @@ it('rejects PDF cancellation and canonical snapshot changes during retained-orig
  const f=await fixture(),{snapshot}=await f.capture(),controller=new AbortController(),read=f.ports.original;
  f.ports.original=async a=>{controller.abort();return read(a);};await expect(f.service.call('pdf.verify',{snapshotId:snapshot.snapshotId},controller.signal)).rejects.toThrow();
  f.ports.original=async a=>{const bytes=await read(a);f.db.prepare('UPDATE SourceSnapshot SET attributes=? WHERE guid=?').run(JSON.stringify({...snapshot,inspection:{...snapshot.inspection,label:'Changed'}}),snapshot.snapshotId);return bytes;};await expect(f.service.call('pdf.verify',{snapshotId:snapshot.snapshotId})).rejects.toThrow(/differs/);
+});
+it('extracts whole-document text, runs, layout blocks and phext addresses in the bounded worker',async()=>{
+ const f=await fixture(),x=await f.executor.run({kind:'pdf-extract',bytes:pdfFixture(2)}) as PdfExtraction;
+ expect(x).toMatchObject({kind:'pdf-text-derivative',version:2});expect(x.provenance).toMatchObject({engine:'liteparse',ocrBackend:'ocria-nano',offsetUnit:'utf16'});
+ expect(x.text).toContain('Academic PDF page 1');expect(x.text).toContain('Selectable text and source alignment.');expect(x.pages).toHaveLength(2);
+ const page=x.pages[0];expect(page.viewBox).toEqual([0,0,612,792]);expect(page.rotation).toBe(0);expect(page.runs.length).toBeGreaterThan(0);expect(page.blocks.length).toBeGreaterThan(0);
+ for(const run of page.runs)expect(page.text.slice(run.start,run.end).length).toBe(run.end-run.start);
+ for(const block of page.blocks){expect(block.address).toMatch(/^\d{1,3}\.\d{1,3}\.\d{1,3}\/\d+\.\d+\.\d+\/\d+\.\d+\.\d+$/);expect(block.bbox[1]+block.bbox[3]).toBeLessThanOrEqual(792+1e-6);}
+ expect(page.text.slice(page.blocks[0].range.start,page.blocks[0].range.end)).toContain('Academic PDF page 1');
+ expect(x.provenance.pages).toEqual(x.pages.map(p=>({pageIndex:p.pageIndex,ocr:p.ocr})));
+ await expect(f.executor.run({kind:'pdf-extract',bytes:new TextEncoder().encode('not a pdf')})).rejects.toThrow('Invalid or oversized');
+ await expect(f.executor.run({kind:'pdf-extract',bytes:new TextEncoder().encode('%PDF-1.7\n garbage')})).rejects.toThrow();
+ await expect(f.executor.run({kind:'pdf-extract',bytes:new Uint8Array(PDF_LIMITS.bytes+1)})).rejects.toThrow('oversized');
+ await expect(f.executor.run({kind:'pdf-extract',bytes:pdfFixture(1001)})).rejects.toThrow('page limit');
+ await expect(f.executor.run({kind:'pdf-extract',bytes:pdfFixture(1,false,true)})).rejects.toThrow('Encrypted/password-protected');
+});
+it('routes image-only pages to OCR and reports the per-page OCR flag',async()=>{
+ const f=await fixture(),x=await f.executor.run({kind:'pdf-extract',bytes:pdfFixture(2,true)}) as PdfExtraction;
+ expect(x.pages).toHaveLength(2);expect(x.pages.every(p=>p.ocr)).toBe(true);expect(x.provenance.pages.every(p=>p.ocr)).toBe(true);expect(x.text.trim()).toBe('');
+});
+it('OCRs rendered text embedded as an image and returns it as addressed text',async()=>{
+ const sharp=(await import('sharp')).default,PDFDocument=(await import('pdfkit')).default;
+ const png=await sharp({text:{text:'<span font="DejaVu Sans" size="48pt">OCR probe line one</span>',rgba:true}}).png().toBuffer();
+ const chunks:Buffer[]=[],doc=new PDFDocument({size:[612,792],margin:0});doc.on('data',c=>chunks.push(c));const done=new Promise<void>(r=>doc.on('end',r));doc.image(png,40,40,{width:500});doc.end();await done;
+ const f=await fixture(),x=await f.executor.run({kind:'pdf-extract',bytes:new Uint8Array(Buffer.concat(chunks))}) as PdfExtraction;
+ expect(x.pages[0].ocr).toBe(true);expect(x.text).toMatch(/OCR probe/i);expect(x.pages[0].blocks.length).toBeGreaterThan(0);
+});
+it('serves pdf.extract for retained snapshots and materializes the layout-addressed fragment',async()=>{
+ const f=await fixture(),{snapshot}=await f.capture(),result=await f.service.call('pdf.extract',{snapshotId:snapshot.snapshotId});
+ expect(result.snapshot).toEqual(snapshot);expect(result.extraction.text).toContain('Academic PDF page 1');
+ const {fragment,native}=pdfExtractionFragment(snapshot,result.extraction),root=native.state.contents[native.state.placements[native.roots[0]].contentKey],props=root.payload.blockProperties as any[];
+ expect((fragment.blocks[0].data as any).metadata.provenance.engine).toBe('liteparse');
+ expect(props.some(p=>p.type==='codex/entity-reference'&&p.value===snapshot.entityId)).toBe(true);
+ const layout=props.filter(p=>p.type==='mutable/pdf-layout-block');
+ expect(layout).toHaveLength(result.extraction.pages.reduce((n,p)=>n+p.blocks.length,0));
+ expect(layout[0].value).toBe(result.extraction.pages[0].blocks[0].address);expect(layout[0].metadata).toMatchObject({pageIndex:0,ordinal:0});
+ await expect(f.service.call('pdf.extract',{snapshotId:randomUUID()})).rejects.toThrow('unavailable');
 });

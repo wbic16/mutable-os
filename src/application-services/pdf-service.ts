@@ -1,5 +1,5 @@
 import type {PdfCapabilities,PdfOperations} from './pdf-contracts';
-import type {PdfCapture,PdfInspection} from '../pdf/model';
+import type {PdfCapture,PdfExtraction,PdfInspection} from '../pdf/model';
 import {object,jobId,assetId} from './validation';
 import {httpsUrl} from '../iiif/model';
 import {checkedPdfCapture,samePdfCapture} from '../pdf/capture';
@@ -15,7 +15,7 @@ export class PdfService {
   try{
    if(op==='resources.original'){object(v,['assetId']);assetId(v.assetId);return await this.p.originalResource(v.assetId,s) as any;}
    if(op==='resource.context'||op==='resource.review'){object(v,op==='resource.context'?['snapshotId']:['operationId','snapshotId','targetId','relation','note','decision']);jobId(v.snapshotId);if(op==='resource.review'){jobId(v.operationId);jobId(v.targetId);}return await this.p.knowledge({...v,op:op==='resource.context'?'resource-context':'resource-review'},s);}
-   if(op==='pdf.read'||op==='pdf.verify'){
+   if(op==='pdf.read'||op==='pdf.verify'||op==='pdf.extract'){
     object(v,['snapshotId']);jobId(v.snapshotId);
     const snapshot=checkedPdfCapture((await this.p.knowledge({op:'pdf-snapshot',snapshotId:v.snapshotId},s)).snapshot);
     if(snapshot.snapshotId!==v.snapshotId||snapshot.asset.cavernId!==this.p.cavernId)throw Error('Foreign or mismatched PDF capture');
@@ -24,6 +24,7 @@ export class PdfService {
     const bytes=await this.p.original(snapshot.asset,s);s.throwIfAborted();
     if(!bytes.length||bytes.length>PDF_LIMITS.bytes||!new TextDecoder().decode(bytes.subarray(0,8)).startsWith('%PDF-'))throw Error('Invalid or oversized retained PDF original');
     samePdfCapture(snapshot,(await this.p.knowledge({op:'pdf-snapshot',snapshotId:v.snapshotId},s)).snapshot);s.throwIfAborted();
+    if(op==='pdf.extract'){const extraction=await this.p.executor.run({kind:'pdf-extract',bytes},s) as PdfExtraction;return {snapshot,extraction} as any;}
     return (op==='pdf.verify'?{snapshot,byteLength:bytes.length}:{snapshot,bytes}) as any;
    }
    object(v,op==='pdf.import'?['id','source']:['id']);jobId(v.id);
