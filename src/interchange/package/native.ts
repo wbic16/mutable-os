@@ -86,6 +86,12 @@ export function directImportCaptures(fragment:MutableFragment){
 export function stampDirectImportContext(native:BlockFragment,captures:Array<Record<string,any>>,source:Record<string,unknown>){
  const root=native.state.contents[native.state.placements[native.roots[0]].contentKey];
  if(!root||root.viewType!=='document-block')throw Error('Direct import has no native Document root');
+ // Mirror materializePackage: the Document root owns its definitions, itself
+ // included. Without the self-ownership mark, insertFragment's fresh-record
+ // ownership pass cannot recognize the stamped context as one of the root's
+ // retained definitions and strips its definitionOwnerKey, leaving Restore
+ // with no isolated context to find.
+ root.definitionOwnerKey=root.key;
  const rows:SqlValue[][]=captures.map(capture=>[['text',capture.snapshotId],typeof capture.identityId==='string'?['text',capture.identityId]:['null'],['text',JSON.stringify(capture)],['null']]);
  const data:PackageData={kind:'mutable-package-data',version:1,readOnly:true,encoding:'sqlite-storage-class-v1',tables:[{name:'SourceSnapshot',classification:'canonical',columns:['guid','identityGuid','attributes','captureKey'],rows}],provenance:{...source,operation:'import-file'},selection:{profile:'document-context-v1'},unresolved:[],excluded:[]};
  validatePackageData(data);
