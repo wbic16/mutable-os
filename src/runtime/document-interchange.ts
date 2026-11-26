@@ -41,6 +41,7 @@ import { nativeDocumentSession } from '../persistence/native-session';
 import { captureNative, admitNative } from '../persistence/native-resource';
 import { resourceToRepository } from '../history/durable-core';
 import { runInterchange } from './interchange-worker';
+import { directImportCaptures, stampDirectImportContext } from '../interchange/package/native';
 import type { AssetLease } from './managed-assets';
 export interface ImportHost { current():boolean; open(id:string):void }
 interface Ticket { revision:number; session?:string; scope:InterchangeScope; viewId?:string; segments?:CrossTextSegment[]; destination?:Destination; current():boolean }
@@ -305,6 +306,7 @@ export class DocumentInterchange {
     const wrapped=documentFragment(admitted.fragment,prepared.title,prepared.filename);
     const root=wrapped.blocks.at(-1)!; (root.data.metadata as any).interchange.provenance=prepared.provenance;
     const native=await runInterchange({kind:'materialize',fragment:wrapped,scope:ticket.scope,assets:admitted.admitted},signal);this.check(ticket);
+    const captures=directImportCaptures(wrapped);if(captures.length)stampDirectImportContext(native,captures,{operation:'import-file',filename:file.name});
     const state=this.editor.repository.readState(),workspace=state.contents[state.placements[state.rootPlacementKey].contentKey];
     const banks=workspace.children.filter(k=>state.contents[state.placements[k].contentKey].viewType==='workspace-object-bank-block');if(banks.length!==1)throw Error('A workspace with one object bank is required.');
     const id=String(native.state.contents[native.state.placements[native.roots[0]].contentKey].payload.id);

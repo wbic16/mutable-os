@@ -1,8 +1,8 @@
 import {WEB_BLOCK,webCapture} from '../../web-resources/model';
 import {ACADEMIC_BLOCK,academicCapture} from '../../academic/model';
 import {STRUCTURED_BLOCK} from '../../structured/model';
-import {RESOURCE_TYPES,resourceSnapshots} from './resources';
-import {assetKey,managedAsset} from '../managed-asset';
+import {RESOURCE_TYPES,resourceSnapshots,captureAssets} from './resources';
+import {assetKey,managedAsset,type ManagedAssetReference} from '../managed-asset';
 import { encodeAuthoredValue } from '../../history/preplan-spike/wire';
 import type { DeepReadonly } from '../../block-tree/commit-capture';
 import type { ResourceSnapshot } from '../../history/stage-c-gates/resource';
@@ -11,7 +11,8 @@ import { serializeSelection } from '../serializer';
 import { materializeFragment, contentRecord } from '../materialize';
 import type { MutableFragment } from '../fragment';
 import { createBlockId, createContentKey } from '../../block-tree/ids';
-import type { PackageData } from './data';
+import { validatePackageData, type PackageData, type SqlValue } from './data';
+import type { BlockFragment } from '../../block-tree/clipboard';
 /** Only operation-local synthetic edges. Retained definitions never enter reading order. */
 export function packageFragment(snapshot:DeepReadonly<ResourceSnapshot>,cavernId?:string,observeBlock?:(localId:string,canonicalId:string)=>void){
  const state=resourceToRepository(snapshot),slices=[{placementKey:state.rootPlacementKey}];
@@ -61,5 +62,36 @@ export function materializePackage(fragment:MutableFragment,cavernId:string|unde
  native.roots=native.roots.slice(0,1);
  const key=createContentKey();native.state.contents[key]={...contentRecord(key,'mutable/package-data-block',{id:createBlockId(),type:'mutable/package-data-block',version:1,readOnly:true,packageContext:context}),definitionOwnerKey:root.key};
  const metadata=root.payload.metadata as Record<string,unknown>??{};root.payload.metadata={...metadata,packageContextBlockId:native.state.contents[key].payload.id,interchange:{suggestedFilename:'Imported package.ink',operation:'import-package-copy'}};
+ return native;
+}
+
+/** Captures riding a directly imported file's fragment. Admission has already
+ * rewritten their asset references to the destination Cavern, so what is
+ * harvested here is final. Only resource Blocks carry captures, and a capture
+ * can anchor an isolated context only with a string snapshot identity. */
+export function directImportCaptures(fragment:MutableFragment){
+ const seen=new Set<string>(),captures:Array<Record<string,any>>=[];
+ for(const b of fragment.blocks){if(!RESOURCE_TYPES.includes(b.type))continue;const data=b.data as Record<string,any>,capture=data?.pdf??data?.iiif??data?.article??data?.citation;
+  if(capture&&typeof capture.snapshotId==='string'&&!seen.has(capture.snapshotId)){seen.add(capture.snapshotId);captures.push(capture);}}
+ return captures;
+}
+/** A direct file import retains resource Blocks as inactive opaque copies, but
+ * unlike a package import it arrives with no isolated package context, so
+ * Restore (runtime/archived-resources) has nothing local to reinterpret them
+ * from and reports the context unavailable. Stamp the same context a package
+ * import carries, built only from what this import itself retained and
+ * admitted: one canonical SourceSnapshot row per capture (the capture JSON is
+ * the row's attributes, keyed by its snapshot id) plus explicit bindings for
+ * every original the captures name. Nothing is looked up anywhere else. */
+export function stampDirectImportContext(native:BlockFragment,captures:Array<Record<string,any>>,source:Record<string,unknown>){
+ const root=native.state.contents[native.state.placements[native.roots[0]].contentKey];
+ if(!root||root.viewType!=='document-block')throw Error('Direct import has no native Document root');
+ const rows:SqlValue[][]=captures.map(capture=>[['text',capture.snapshotId],typeof capture.identityId==='string'?['text',capture.identityId]:['null'],['text',JSON.stringify(capture)],['null']]);
+ const data:PackageData={kind:'mutable-package-data',version:1,readOnly:true,encoding:'sqlite-storage-class-v1',tables:[{name:'SourceSnapshot',classification:'canonical',columns:['guid','identityGuid','attributes','captureKey'],rows}],provenance:{...source,operation:'import-file'},selection:{profile:'document-context-v1'},unresolved:[],excluded:[]};
+ validatePackageData(data);
+ const bound=new Map<string,ManagedAssetReference>();for(const capture of captures)for(const a of captureAssets(capture))bound.set(assetKey(a),a);
+ const context={data,schema:{kind:'mutable-knowledge-schema',version:1,tables:[]},source,assetBindings:[...bound.entries()]};
+ const key=createContentKey();native.state.contents[key]={...contentRecord(key,'mutable/package-data-block',{id:createBlockId(),type:'mutable/package-data-block',version:1,readOnly:true,packageContext:context}),definitionOwnerKey:root.key};
+ const metadata=root.payload.metadata as Record<string,unknown>??{};root.payload.metadata={...metadata,packageContextBlockId:native.state.contents[key].payload.id};
  return native;
 }
