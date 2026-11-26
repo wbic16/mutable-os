@@ -33,3 +33,11 @@ it('prepares a local PDF as a retained-original block with a real local capture'
  expect(capture.asset.assetId).toBe('sha256:'+prepared.provenance.byteHash);
  expect(prepared.provenance).toMatchObject({format:'pdf'});
 });
+
+it('configures the legacy pdf.js worker before inspecting a local PDF',async()=>{
+ vi.stubGlobal('crypto',webcrypto);
+ await prepareFiles([file('paper.pdf',pdfFixture(1),'application/pdf')]);
+ const pdf=await import('pdfjs-dist/legacy/build/pdf.mjs');
+ expect(typeof pdf.GlobalWorkerOptions.workerSrc).toBe('string');
+ expect(pdf.GlobalWorkerOptions.workerSrc.length).toBeGreaterThan(0);
+});
