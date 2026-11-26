@@ -57,4 +57,5 @@ it('extracts the whole document through pdf.extract and inserts it with layout b
  button.click();await vi.waitFor(()=>expect(f.host.textContent).toContain('Inserted whole document with layout blocks anchored. OCR was used on 1 page.'));
  expect(f.fetcher.mock.calls.some(([url])=>String(url).endsWith('pdf.extract'))).toBe(true);expect(f.editor.repository.state.revision).not.toBe(revision);
  const inserted=Object.values(f.view.state.nodes).find(n=>(n.payload.blockProperties as any[]|undefined)?.some(p=>p.type==='mutable/pdf-layout-block'&&p.value==='1.1.1/1.1.1/1.1.1'));expect(inserted).toBeDefined();
+ const layoutProperty=(inserted!.payload.blockProperties as any[]).find(p=>p.type==='mutable/pdf-layout-block'&&p.value==='1.1.1/1.1.1/1.1.1');expect(layoutProperty.metadata).toMatchObject({kind:'paragraph',ordinal:0,range:{start:0,end:19},pageIndex:0,bbox:[0,0,100,10]});
 });
