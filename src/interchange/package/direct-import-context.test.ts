@@ -10,6 +10,8 @@ import {captureAssets,resourceSnapshots} from './resources';
 import {validatePackageData} from './data';
 import {assetKey} from '../managed-asset';
 import {directImportCaptures,stampDirectImportContext} from './native';
+import {ReactiveEditor} from '../../reactive-editor/editor';
+import {restoreArchivedResource} from '../../runtime/archived-resources';
 
 /** Post-admission shape: pdfFile mints the capture with a pending Cavern and
  * importNew's admit() rewrites the asset to the destination Cavern before the
@@ -70,5 +72,42 @@ describe('direct import package context',()=>{
   expect(Object.values(native.state.contents).some(c=>c.viewType==='mutable/package-data-block')).toBe(false);
   const root=native.state.contents[native.state.placements[native.roots[0]].contentKey];
   expect((root.payload.metadata as any).packageContextBlockId).toBeUndefined();
+ });
+});
+
+describe('direct import package context through insertion',()=>{
+ it('survives the real insertFragment and Restore finds it in the live state',()=>{
+  const {wrapped,native}=importedNative();
+  const captures=directImportCaptures(wrapped);
+  expect(captures).toHaveLength(1);
+  stampDirectImportContext(native,captures,{operation:'import-file',filename:'paper.pdf'});
+  const editor=new ReactiveEditor({id:'workspace',type:'workspace-block',children:[{id:'bank',type:'workspace-object-bank-block',children:[]}]});
+  try{
+   // Insert into the workspace object bank exactly as importNew does.
+   const state0=editor.repository.readState(),workspace=state0.contents[state0.placements[state0.rootPlacementKey].contentKey];
+   const banks=workspace.children.filter(k=>state0.contents[state0.placements[k].contentKey].viewType==='workspace-object-bank-block');
+   expect(banks).toHaveLength(1);
+   editor.commands.insertFragment(native,{kind:'at',parentKey:banks[0],index:state0.contents[state0.placements[banks[0]].contentKey].children.length},{commandId:'interchange.import-new',subjects:[]});
+   const state=editor.repository.readState();
+   const opaque=Object.values(state.contents).find(c=>c.viewType==='mutable/opaque-block'&&(c.payload.original as any)?.type===PDF_BLOCK);
+   expect(opaque).toBeDefined();
+   // The stamped context record must keep its definition ownership across
+   // insertion: Restore finds it by payload id AND definitionOwnerKey.
+   const owner=resourceOwner(state,opaque!.key)!;
+   expect(owner.viewType).toBe('document-block');
+   const contextId=(owner.payload.metadata as any)?.packageContextBlockId;
+   const contextRecord=Object.values(state.contents).find(c=>c.payload.id===contextId&&c.definitionOwnerKey===owner.key);
+   expect(contextRecord?.viewType).toBe('mutable/package-data-block');
+   expect((contextRecord!.payload as any).packageContext).toBeDefined();
+   // The real Restore, driven through the editor's own repository/commands.
+   const view=editor.createView('test');
+   const node=Object.values(view.state.nodes).find(n=>n.viewType==='mutable/opaque-block')!;
+   const stub={features:{crossResourceLoaders:true},repository:editor.repository,commands:editor.commands,node:(k:string)=>editor.node(k as any),readAssetContext:()=>({cavernId:'cavern-x',session:'session-1'})} as any;
+   expect(()=>restoreArchivedResource(stub,node.key)).not.toThrow();
+   const restored=Object.values(editor.repository.readState().contents).find(c=>c.viewType===PDF_BLOCK);
+   expect(restored).toBeDefined();
+   expect((restored!.payload as any).archive?.snapshots).toHaveLength(1);
+   expect((restored!.payload as any).archive.snapshots[0].snapshotId).toBe(capture.snapshotId);
+  } finally { editor.dispose(); }
  });
 });
