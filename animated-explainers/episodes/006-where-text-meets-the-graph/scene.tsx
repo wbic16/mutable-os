@@ -1,4 +1,5 @@
 import React from 'react';
+import {DocumentFrame} from '../../shared/DocumentFrame';
 import {Html5Audio, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {Bookend, Caption, SeriesPlate} from '../../shared/SeriesPlate';
 import {CellSequence, mix} from '../../shared/CellSequence';
@@ -77,8 +78,7 @@ function Association({mention,index,t,grid,comparison,entity}: {
   const pulse = traversal(t,index);
   const {block,lines}=mention.document;
   return <g opacity={opacity} data-association={mention.id} data-referent={mention.entity.id}>
-    <rect x={doc.x} y={doc.y} width={width} height={145} rx={6} fill="#202b2f" stroke={ink.grey} strokeOpacity={.58} strokeWidth={2}/>
-    <text x={doc.x+width-18} textAnchor="end" y={doc.y+31} fontFamily={type.mono} fontSize={22} fill={ink.grey} letterSpacing={1.5}>DOCUMENT {mention.document.id}</text>
+    <DocumentFrame id={mention.document.id} x={doc.x} y={doc.y} width={width} height={145}/>
     <CellSequence cells={block.cells} size={textSize}>{spans=>{
       const x = doc.x+20;
       const origin = spans.get(block.cells[0])!.left;

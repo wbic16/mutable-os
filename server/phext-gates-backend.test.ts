@@ -168,14 +168,17 @@ describe('phext gates backend', () => {
     const lockInfo = await fs.atDirectory(memoir, { kind: 'stat', name: 'writer.lock' });
 
     await expect(fs.lockFile(memoir, 'writer.lock', { dev: 'x', ino: 'y' })).rejects.toThrow('lock identity changed');
+    // A contended flock refuses with errno 11, spelled EWOULDBLOCK or
+    // EAGAIN depending on the host's lock layer; production code
+    // (job-storage, publication-storage) accepts both names, so does this test.
     const exclusive = await fs.lockFile(memoir, 'writer.lock', lockInfo.identity);
-    await expect(fs.lockFile(memoir, 'writer.lock', lockInfo.identity)).rejects.toMatchObject({ code: 'EWOULDBLOCK' });
-    await expect(fs.lockFile(memoir, 'writer.lock', lockInfo.identity, true)).rejects.toMatchObject({ code: 'EWOULDBLOCK' });
+    await expect(fs.lockFile(memoir, 'writer.lock', lockInfo.identity)).rejects.toMatchObject({ code: expect.stringMatching(/^(EAGAIN|EWOULDBLOCK)$/) });
+    await expect(fs.lockFile(memoir, 'writer.lock', lockInfo.identity, true)).rejects.toMatchObject({ code: expect.stringMatching(/^(EAGAIN|EWOULDBLOCK)$/) });
     await exclusive.close();
 
     const shared1 = await fs.lockFile(memoir, 'writer.lock', lockInfo.identity, true);
     const shared2 = await fs.lockFile(memoir, 'writer.lock', lockInfo.identity, true);
-    await expect(fs.lockFile(memoir, 'writer.lock', lockInfo.identity)).rejects.toMatchObject({ code: 'EWOULDBLOCK' });
+    await expect(fs.lockFile(memoir, 'writer.lock', lockInfo.identity)).rejects.toMatchObject({ code: expect.stringMatching(/^(EAGAIN|EWOULDBLOCK)$/) });
     await shared1.close();
     await shared2.close();
 
@@ -219,7 +222,7 @@ try {
 `);
     const gatesPath = path.resolve('scripts/stage-c-gates/filesystem.mjs');
     const attempt = async () => (await run(process.execPath, [childPath, root, bundle, gatesPath, memoir.path])).stdout.trim();
-    await expect(attempt()).resolves.toContain('REFUSED:EWOULDBLOCK');
+    await expect(attempt()).resolves.toMatch(/REFUSED:(EAGAIN|EWOULDBLOCK)/);
     await lock.close();
     await expect(attempt()).resolves.toContain('ACQUIRED');
   }, 60_000);

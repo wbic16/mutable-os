@@ -109,3 +109,43 @@ npm run render -- 006-where-text-meets-the-graph renders/006-where-text-meets-th
 ```
 
 [Narrated film](renders/006-where-text-meets-the-graph.mp4) · [Stage sheet](renders/006-stages.png) · [Storyboard and script](episodes/006-where-text-meets-the-graph/storyboard.md) · [Production report](episodes/006-where-text-meets-the-graph/implementation.md)
+
+## Episode 007 delivery
+
+*Finding things through words* compares a search of entity properties with a search of annotated passages. Open `007-finding-things-through-words` in Studio for the 80-second narrated film.
+
+```sh
+npm run render -- 007-finding-things-through-words renders/007-finding-things-through-words.mp4 --audio-bitrate=192k
+```
+
+[Narrated film](renders/007-finding-things-through-words.mp4) · [Stage sheet](renders/007-stages.png) · [Storyboard and corpus](episodes/007-finding-things-through-words/storyboard.md) · [Production report](episodes/007-finding-things-through-words/implementation.md)
+
+## Episode 008 delivery
+
+*When annotations become queries* follows an interval test from one sentence to a five-document corpus. Choose `008-when-annotations-become-queries` in Studio for the 100-second narrated film.
+
+```sh
+npm run render -- 008-when-annotations-become-queries renders/008-when-annotations-become-queries.mp4 --audio-bitrate=192k
+```
+
+[Narrated film](renders/008-when-annotations-become-queries.mp4) · [Stage sheet](renders/008-stages.png) · [Storyboard and corpus](episodes/008-when-annotations-become-queries/storyboard.md) · [Production report](episodes/008-when-annotations-become-queries/implementation.md)
+
+## Volume III — The Architecture of Meaning
+
+*When a relationship is not enough* opens the volume with two illustrative sendings. The 90-second film follows each participant from the sentence into the graph and back to its source. Choose `009-when-a-relationship-is-not-enough` in Studio.
+
+```sh
+npm run render -- 009-when-a-relationship-is-not-enough renders/009-when-a-relationship-is-not-enough.mp4 --audio-bitrate=192k
+```
+
+[Narrated film](renders/009-when-a-relationship-is-not-enough.mp4) · [Stage sheet](renders/009-stages.png) · [Storyboard and narration](episodes/009-when-a-relationship-is-not-enough/storyboard.md) · [Production report](episodes/009-when-a-relationship-is-not-enough/implementation.md)
+
+### Concept 010 · The language of characterisation
+
+The same passage in Luca Landucci’s *Florentine Diary* can lead into a history of the Venetians, a history of Landucci’s observations, or a history of a descriptive concept. Choose `010-the-language-of-characterisation` in Studio for the 103-second narrated film.
+
+```sh
+npm run render -- 010-the-language-of-characterisation renders/010-the-language-of-characterisation.mp4 --audio-bitrate=192k
+```
+
+[Narrated film](renders/010-the-language-of-characterisation.mp4) · [Stage sheet](renders/010-stages.png) · [Storyboard and script](episodes/010-the-language-of-characterisation/storyboard.md) · [Production report](episodes/010-the-language-of-characterisation/implementation.md)

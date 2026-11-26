@@ -82,12 +82,12 @@ function Folios({spread}: {spread: number}) {
   </g>;
 }
 
-export function Bookend({lead, emphasis, leadSize = 92, emphasisSize = 89, spread, opacity, imprintOpacity = 1, volumeLabel}: {
-  lead: string; emphasis: string; leadSize?: number; emphasisSize?: number; spread: number; opacity: number; imprintOpacity?: number; volumeLabel?: string;
+export function Bookend({lead, emphasis, leadSize = 92, emphasisSize = 89, spread, opacity, imprintOpacity = 1, folioOpacity = 1, volumeLabel}: {
+  lead: string; emphasis: string; leadSize?: number; emphasisSize?: number; spread: number; opacity: number; imprintOpacity?: number; folioOpacity?: number; volumeLabel?: string;
 }) {
   const productBranding = React.useContext(ProductBranding);
   return <g opacity={opacity}>
-    <g opacity={imprintOpacity}><Folios spread={spread} /></g>
+    <g opacity={imprintOpacity*folioOpacity}><Folios spread={spread} /></g>
     <g textAnchor="middle" fontFamily={type.serif} fill={ink.cream}>
       <text x="540" y="679" fontSize={leadSize}>
         {lead}

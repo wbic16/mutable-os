@@ -1,0 +1,11 @@
+[
+  {"id":"diary","start":0,"duration":9,"caption":"An act of characterisation.","narration":[{"at":1.0,"text":"In his Florentine Diary, Luca Landucci characterises the Venetians as untrustworthy."}]},
+  {"id":"act","start":9,"duration":11,"caption":"Whose judgement does the passage record?","narration":[{"at":0.35,"text":"We need not accept this description as an objective property of the Venetians. We can instead preserve the act of characterisation itself."}]},
+  {"id":"expression","start":20,"duration":11,"caption":"The trait has a conceptual identity.","narration":[{"at":0.25,"text":"The English expression stays in the passage. Its trait type has an identity of its own. Landucci’s own vocabulary would require the Italian text."}]},
+  {"id":"reputation","start":31,"duration":11,"caption":"The history of reputation.","narration":[{"at":0.4,"text":"Begin with the Venetians. Other observers might describe them differently. Bringing these characterisations together lets us investigate their reputation."}]},
+  {"id":"observer","start":42,"duration":11,"caption":"The history of perception.","narration":[{"at":0.4,"text":"Begin with the observer, and we can investigate a different history: the language through which that person understood the world."}]},
+  {"id":"concept","start":53,"duration":16,"caption":"The history of a concept.","narration":[{"at":0.4,"text":"But we can reverse the direction of inquiry."},{"at":4.6,"text":"Begin with the trait itself, and discover the occasions on which that concept has been applied to the world."}]},
+  {"id":"passages","start":69,"duration":13,"caption":"The concept leads back to its textual evidence.","narration":[{"at":0.3,"text":"Each statement leads back to a passage. Here, researchers have associated two expressions with the same concept: untrustworthy, and not to be trusted."}]},
+  {"id":"network","start":82,"duration":10,"caption":"Concepts have relationships of their own.","narration":[{"at":0.4,"text":"And the trait type itself can belong to a wider network of concepts, each with its own relationships and history of application."}]},
+  {"id":"close","start":92,"duration":11,"caption":"","narration":[{"at":0.3,"text":"We can trace the history of things."},{"at":3.35,"text":"We can trace the history of ideas."},{"at":6.65,"text":"And we can trace the history of their meeting."}]}
+]

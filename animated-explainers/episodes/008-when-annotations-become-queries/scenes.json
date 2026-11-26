@@ -1,0 +1,12 @@
+[
+  {"id":"overlap","start":0,"duration":7,"caption":"More than overlapping underlines.","narration":[{"at":0.7,"text":"Standoff annotations can overlap. But their intersections are more than a visual phenomenon."}]},
+  {"id":"geometry","start":7,"duration":9,"caption":"Annotations have geometry.","narration":[{"at":0.4,"text":"Every annotation occupies a range of text. Its relationship to another range can therefore be calculated."}]},
+  {"id":"relations","start":16,"duration":11,"caption":"Spatial relationships become computational tests.","narration":[{"at":0.7,"text":"Two ranges may intersect."},{"at":4.15,"text":"One may contain another."},{"at":7.4,"text":"Or they may meet without sharing a single character."}]},
+  {"id":"records","start":27,"duration":8,"caption":"The overlap itself becomes queryable.","narration":[{"at":0.4,"text":"When annotations are represented as database records, these relationships can become query predicates."}]},
+  {"id":"question","start":35,"duration":9,"caption":"","narration":[{"at":0.4,"text":"Now consider a question for an annotated corpus. Which places are mentioned in passages of direct speech that also mention Napoleon?"}]},
+  {"id":"mentions","start":44,"duration":11,"caption":"Find the entity’s mentions.","narration":[{"at":0.4,"text":"Begin with the entity itself, and follow its mentions through the corpus."},{"at":6.5,"text":"The wording need not be identical."}]},
+  {"id":"containment","start":55,"duration":18,"caption":"Find containing speech.","narration":[{"at":0.35,"text":"Find the speech annotations containing those mentions."},{"at":5.3,"text":"In the Brussels passage, Napoleon is outside the quotation."},{"at":11.2,"text":"Then find the place mentions contained within those same passages."}]},
+  {"id":"results","start":73,"duration":10,"caption":"Graph traversal. Textual geometry. Graph traversal.","narration":[{"at":0.4,"text":"Follow the matching mentions back to the graph, and the answer emerges: Paris and Vienna."}]},
+  {"id":"ontologies","start":83,"duration":11,"caption":"Independent ontologies. Composable queries.","narration":[{"at":0.35,"text":"Independent annotation ontologies can participate in the same inquiry. Their creators need not have anticipated the questions that will later be asked."}]},
+  {"id":"close","start":94,"duration":6,"caption":"The geometry of annotations becomes a language of inquiry.","narration":[{"at":0.5,"text":"The geometry of annotations becomes a language of inquiry."}]}
+]

@@ -1,0 +1,10 @@
+[
+  {"id":"opening","start":0,"duration":7,"caption":"Finding things through words","narration":[{"at":0.45,"text":"Bond. James Bond."},{"at":3,"text":"Finding an entity is easy when you know its name."}]},
+  {"id":"names","start":7,"duration":7,"caption":"Search by name.","narration":[{"at":0.3,"text":"A search of entity names can take us directly to the entity we seek."}]},
+  {"id":"missing","start":14,"duration":10,"caption":"The entity exists. The name does not match.","narration":[{"at":0.1,"text":"But what if the text calls him something else?"},{"at":3.6,"text":"The man in the dinner jacket."},{"at":6.05,"text":"A search of names and aliases may find nothing."}]},
+  {"id":"corpus","start":24,"duration":10,"caption":"Many expressions. One entity.","narration":[{"at":0.2,"text":"Yet across a corpus, an entity may be referred to in many different ways."},{"at":4.95,"text":"Each annotated mention connects a particular textual occurrence to its referent."}]},
+  {"id":"mentions","start":34,"duration":13,"caption":"Search by mention.","narration":[{"at":0.25,"text":"Instead of searching the names of entities, we can search the language used to refer to them."},{"at":7.1,"text":"Follow a matching mention, and we arrive at the entity itself."}]},
+  {"id":"results","start":47,"duration":15,"caption":"Same expression. Different entities.","narration":[{"at":0.25,"text":"Two mentions of Bond lead to one person."},{"at":5.5,"text":"The same expression may even lead to different entities. The recorded associations, rather than the words alone, determine the results."}]},
+  {"id":"evidence","start":62,"duration":10,"caption":"Discovery with textual provenance.","narration":[{"at":1.1,"text":"And every result retains a connection to the passage from which it was discovered."}]},
+  {"id":"close","start":72,"duration":8,"caption":"The language of a corpus becomes an index into its knowledge graph.","narration":[{"at":0.8,"text":"The language of a corpus becomes an index into its knowledge graph."}]}
+]
