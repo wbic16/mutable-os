@@ -29,3 +29,5 @@ writer.lock
 /public/mutable-mermaid.js
 /docs/development/scry-provisional-*
 *programme-evidence*
+# Deploy rotation residue from an older practice — not source, never tracked.
+dist-prev-*
